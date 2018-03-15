@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,7 @@ import org.eclipse.ui.internal.util.Util;
  * This class is only intended for internal use within
  * <code>org.eclipse.ui.workbench</code>.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public final class ActionSetSourceProvider extends AbstractSourceProvider
@@ -50,12 +50,11 @@ public final class ActionSetSourceProvider extends AbstractSourceProvider
 		super();
 	}
 
-	@Override
 	public final void actionSetsChanged(final ActionSetsEvent event) {
 		final IActionSetDescriptor[] newActionSets = event.getNewActionSets();
 		if (!Util.equals(newActionSets, activeActionSets)) {
 			if (DEBUG) {
-				final StringBuilder message = new StringBuilder();
+				final StringBuffer message = new StringBuffer();
 				message.append("Action sets changed to ["); //$NON-NLS-1$
 				if (newActionSets != null) {
 					for (int i = 0; i < newActionSets.length; i++) {
@@ -76,19 +75,16 @@ public final class ActionSetSourceProvider extends AbstractSourceProvider
 		}
 	}
 
-	@Override
 	public final void dispose() {
 		activeActionSets = null;
 	}
 
-	@Override
 	public final Map getCurrentState() {
 		final Map currentState = new HashMap();
 		currentState.put(ISources.ACTIVE_ACTION_SETS_NAME, activeActionSets);
 		return currentState;
 	}
 
-	@Override
 	public final String[] getProvidedSourceNames() {
 		return PROVIDED_SOURCE_NAMES;
 	}

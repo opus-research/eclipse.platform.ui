@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 IBM Corporation and others.
+ * Copyright (c) 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,67 +16,30 @@ import org.eclipse.jface.action.MenuManager;
 
 /**
  * @since 3.8.100
+ * @noextend This class is not intended to be subclassed by clients.
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @noreference This class is not intended to be referenced by clients.
  */
 public final class MenuManagerEventHelper {
 
-	private IMenuListener2 showHelper;
-
-	private IMenuListener2 hideHelper;
-
-	private static MenuManagerEventHelper INSTANCE;
-
-	/**
-	 * @return singleton instance
-	 */
-	public static MenuManagerEventHelper getInstance() {
-		if( INSTANCE == null ) {
-			INSTANCE = new MenuManagerEventHelper();
-		}
-		return INSTANCE;
-	}
-
 	/**
 	 * Uses IMenuListener2 to do some processing before (menuAboutToShow) and
 	 * after (menuAboutToHide) the SWT.Show event.
-	 *
-	 * @param showHelper
 	 */
-	public void setShowHelper(IMenuListener2 showHelper) {
-		this.showHelper = showHelper;
-	}
-
-	/**
-	 * @return the show helper
-	 */
-	public IMenuListener2 getShowHelper() {
-		return showHelper;
-	}
+	public static IMenuListener2 showHelper;
 
 	/**
 	 * Uses IMenuListener2 to do some processing before (menuAboutToShow) and
 	 * after (menuAboutToHide) the SWT.Hide event.
-	 *
-	 * @param hideHelper
 	 */
-	public void setHideHelper(IMenuListener2 hideHelper) {
-		this.hideHelper = hideHelper;
-	}
-
-	/**
-	 * @return the hide helper
-	 */
-	public IMenuListener2 getHideHelper() {
-		return this.hideHelper;
-	}
+	public static IMenuListener2 hideHelper;
 
 	/**
 	 * Do show pre-processing.
-	 *
+	 * 
 	 * @param manager
 	 */
-	public void showEventPreHelper(MenuManager manager) {
+	public static void showEventPreHelper(MenuManager manager) {
 		if (showHelper != null) {
 			showHelper.menuAboutToShow(manager);
 		}
@@ -84,10 +47,10 @@ public final class MenuManagerEventHelper {
 
 	/**
 	 * Do show post-processing.
-	 *
+	 * 
 	 * @param manager
 	 */
-	public void showEventPostHelper(MenuManager manager) {
+	public static void showEventPostHelper(MenuManager manager) {
 		if (showHelper != null) {
 			showHelper.menuAboutToHide(manager);
 		}
@@ -95,10 +58,10 @@ public final class MenuManagerEventHelper {
 
 	/**
 	 * Do hide pre-processing.
-	 *
+	 * 
 	 * @param manager
 	 */
-	public void hideEventPreHelper(MenuManager manager) {
+	public static void hideEventPreHelper(MenuManager manager) {
 		if (hideHelper != null) {
 			hideHelper.menuAboutToShow(manager);
 		}
@@ -106,10 +69,10 @@ public final class MenuManagerEventHelper {
 
 	/**
 	 * Do hide post-processing.
-	 *
+	 * 
 	 * @param manager
 	 */
-	public void hideEventPostHelper(MenuManager manager) {
+	public static void hideEventPostHelper(MenuManager manager) {
 		if (hideHelper != null) {
 			hideHelper.menuAboutToHide(manager);
 		}
@@ -117,5 +80,4 @@ public final class MenuManagerEventHelper {
 
 	private MenuManagerEventHelper() {
 	}
-
 }

@@ -1,21 +1,22 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  *******************************************************************************/
-
+ 
 package org.eclipse.e4.ui.css.core.impl.dom;
 
 import org.w3c.css.sac.LexicalUnit;
 import org.w3c.dom.DOMException;
+import org.w3c.dom.css.CSSValue;
 
 public class Measure extends CSSValueImpl {
-
+	
 	LexicalUnit value;
 
 	public Measure(LexicalUnit value) {
@@ -27,7 +28,6 @@ public class Measure extends CSSValueImpl {
 	 * Return a float representation of the receiver's value.
 	 * @param valueType a short representing the value type, see {@link CSSValue#getCssValueType()}
 	 */
-	@Override
 	public float getFloatValue(short valueType) throws DOMException {
 		//If it's actually a SAC_INTEGER return the integer value, callers tend to expect and cast
 		//There is no getIntegerFloat(short)
@@ -47,7 +47,10 @@ public class Measure extends CSSValueImpl {
 		return value.getIntegerValue();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSPrimitiveValue#getStringValue()
+	 */
 	public String getStringValue() throws DOMException {
 		short lexicalUnit = value.getLexicalUnitType();
 		if((lexicalUnit == LexicalUnit.SAC_IDENT)
@@ -57,8 +60,11 @@ public class Measure extends CSSValueImpl {
 		// TODO There are more cases to catch of getLexicalUnitType()
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSPrimitiveValue#getPrimitiveType()
+	 */
 	public short getPrimitiveType() {
 		switch (value.getLexicalUnitType()) {
 		case LexicalUnit.SAC_IDENT:
@@ -92,8 +98,11 @@ public class Measure extends CSSValueImpl {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED - LexicalUnit type: " + value.getLexicalUnitType());
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValue#getCssText()
+	 */
 	public String getCssText() {
 		// TODO: All LexicalUnit.SAC_OPERATOR_* except for COMMA left undone for
 		// now as it's not even clear whether they should be treated as measures

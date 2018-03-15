@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - Initial API and implementation
  *******************************************************************************/
@@ -29,7 +29,7 @@ public class WebBrowserUIPlugin extends AbstractUIPlugin {
 
 	// singleton instance of this class
 	private static WebBrowserUIPlugin singleton;
-
+	
 	// cached copy of all browsers
 	private static List<BrowserExt> browsers;
 
@@ -55,18 +55,17 @@ public class WebBrowserUIPlugin extends AbstractUIPlugin {
 	 *
 	 * @exception Exception
 	 */
-	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		BrowserManager.safeDispose();
 	}
-
+	
 	/**
 	 * Returns an array of all known browers.
 	 * <p>
 	 * A new array is returned on each call, so clients may store or modify the result.
 	 * </p>
-	 *
+	 * 
 	 * @return a possibly-empty array of browser instances {@link IClient}
 	 */
 	public static IBrowserExt[] getBrowsers() {
@@ -76,18 +75,18 @@ public class WebBrowserUIPlugin extends AbstractUIPlugin {
 		browsers.toArray(c);
 		return c;
 	}
-
+	
 	public static IBrowserExt findBrowsers(String executable) {
 		IBrowserExt[] browsers2 = getBrowsers();
 		if (browsers2 == null || executable == null)
 			return null;
-
+		
 		int ind1 = executable.lastIndexOf("/"); //$NON-NLS-1$
 		int ind2 = executable.lastIndexOf("\\"); //$NON-NLS-1$
 		if (ind2 > ind1)
 			ind1 = ind2;
 		executable = executable.substring(ind1 + 1);
-
+		
 		String os = Platform.getOS();
 		int size = browsers2.length;
 		for (int i = 0; i < size; i++) {
@@ -101,7 +100,7 @@ public class WebBrowserUIPlugin extends AbstractUIPlugin {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Load the browsers extension point.
 	 */
@@ -113,7 +112,7 @@ public class WebBrowserUIPlugin extends AbstractUIPlugin {
 		IConfigurationElement[] cf = registry.getConfigurationElementsFor(PLUGIN_ID, "browsers"); //$NON-NLS-1$
 
 		int size = cf.length;
-		browsers = new ArrayList<>(size);
+		browsers = new ArrayList<BrowserExt>(size);
 		for (int i = 0; i < size; i++) {
 			try {
 				browsers.add(new BrowserExt(cf[i]));
@@ -124,7 +123,7 @@ public class WebBrowserUIPlugin extends AbstractUIPlugin {
 		}
 		Trace.trace(Trace.CONFIG, "-<- Done loading .browsers extension point -<-"); //$NON-NLS-1$
 	}
-
+	
 	/**
 	 * Logs an Error message with an exception. Note that the message should
 	 * already be localized to proper locale. ie: Resources.getString() should

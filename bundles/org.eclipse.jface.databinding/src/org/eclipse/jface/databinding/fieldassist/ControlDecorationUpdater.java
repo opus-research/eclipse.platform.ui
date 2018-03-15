@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,14 +21,14 @@ import org.eclipse.swt.graphics.Image;
 /**
  * Controls the appearance of a ControlDecoration managed by a
  * ControlDecorationSupport.
- *
+ * 
  * @since 1.4
  */
 public class ControlDecorationUpdater {
 	/**
 	 * Updates the visibility, image, and description text of the given
 	 * ControlDecoration to represent the given status.
-	 *
+	 * 
 	 * @param decoration
 	 *            the ControlDecoration to update
 	 * @param status
@@ -48,7 +48,7 @@ public class ControlDecorationUpdater {
 	 * Returns the description text to show in a ControlDecoration for the given
 	 * status. The default implementation of this method returns
 	 * status.getMessage().
-	 *
+	 * 
 	 * @param status
 	 *            the status object.
 	 * @return the description text to show in a ControlDecoration for the given
@@ -70,7 +70,7 @@ public class ControlDecorationUpdater {
 	 * <li>IStatus.CANCEL => FieldDecorationRegistry.DEC_ERROR
 	 * <li>Other => No image
 	 * </ul>
-	 *
+	 * 
 	 * @param status
 	 *            the status object.
 	 * @return an image to display in a ControlDecoration which is appropriate

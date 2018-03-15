@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory;
 import org.eclipse.core.resources.mapping.ResourceChangeValidator;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
@@ -61,7 +62,7 @@ public class CopyProjectOperation {
 	/**
 	 * Validates that the copy of the project will not have undesirable side
 	 * effects.
-	 *
+	 * 
 	 * @param shell
 	 *            a shell
 	 * @param project
@@ -76,7 +77,6 @@ public class CopyProjectOperation {
 	 * @deprecated As of 3.3, validation is performed in the undoable operation
 	 *             executed by this operation.
 	 */
-	@Deprecated
 	protected static boolean validateCopy(Shell shell, IProject project,
 			String newName, String[] modelProviderIds) {
 		IResourceChangeDescriptionFactory factory = ResourceChangeValidator
@@ -91,7 +91,7 @@ public class CopyProjectOperation {
 
 	/**
 	 * Create a new operation initialized with a shell.
-	 *
+	 * 
 	 * @param shell
 	 *            parent shell for error dialogs
 	 */
@@ -101,7 +101,7 @@ public class CopyProjectOperation {
 
 	/**
 	 * Paste a copy of the project on the clipboard to the workspace.
-	 *
+	 * 
 	 * @param project
 	 *            The project that is beign copied.
 	 */
@@ -141,7 +141,7 @@ public class CopyProjectOperation {
 
 	/**
 	 * Copies the project to the new values.
-	 *
+	 * 
 	 * @param project
 	 *            the project to copy
 	 * @param projectName
@@ -153,23 +153,25 @@ public class CopyProjectOperation {
 	 */
 	private boolean performProjectCopy(final IProject project,
 			final String projectName, final URI newLocation) {
-		IRunnableWithProgress op = monitor -> {
-			org.eclipse.ui.ide.undo.CopyProjectOperation op1 = new org.eclipse.ui.ide.undo.CopyProjectOperation(
-					project, projectName, newLocation,
-					IDEWorkbenchMessages.CopyProjectOperation_copyProject);
-			op1.setModelProviderIds(getModelProviderIds());
-			try {
-				// If we are Copying projects and their content, do not execute
-				// the operation in the undo history, since it cannot be
-				// properly restored, if it has modified or new files added to
-				// it. Just execute it directly so it won't be added to the undo
-				// history.
-				op1.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(parentShell));
-			} catch (final ExecutionException e) {
-				if (e.getCause() instanceof CoreException) {
-					recordError((CoreException)e.getCause());
-				} else {
-					throw new InvocationTargetException(e);
+		IRunnableWithProgress op = new IRunnableWithProgress() {
+			public void run(IProgressMonitor monitor) throws InvocationTargetException {
+				org.eclipse.ui.ide.undo.CopyProjectOperation op = new org.eclipse.ui.ide.undo.CopyProjectOperation(
+						project, projectName, newLocation,
+						IDEWorkbenchMessages.CopyProjectOperation_copyProject);
+				op.setModelProviderIds(getModelProviderIds());
+				try {
+					PlatformUI.getWorkbench().getOperationSupport()
+							.getOperationHistory().execute(
+									op,
+									monitor,
+									WorkspaceUndoUtil
+											.getUIInfoAdapter(parentShell));
+				} catch (final ExecutionException e) {
+					if (e.getCause() instanceof CoreException) {
+						recordError((CoreException)e.getCause());
+					} else {
+						throw new InvocationTargetException(e);
+					}
 				}
 			}
 		};
@@ -180,11 +182,18 @@ public class CopyProjectOperation {
 			return false;
 		} catch (InvocationTargetException e) {
 			final String message = e.getTargetException().getMessage();
-			parentShell.getDisplay().syncExec(() -> MessageDialog
-					.openError(
-							parentShell,
-							IDEWorkbenchMessages.CopyProjectOperation_copyFailedTitle,
-							NLS.bind(IDEWorkbenchMessages.CopyProjectOperation_internalError, message)));
+			parentShell.getDisplay().syncExec(new Runnable() {
+				public void run() {
+					MessageDialog
+							.openError(
+									parentShell,
+									IDEWorkbenchMessages.CopyProjectOperation_copyFailedTitle,
+									NLS
+											.bind(
+													IDEWorkbenchMessages.CopyProjectOperation_internalError,
+													message));
+				}
+			});
 			return false;
 		}
 
@@ -213,7 +222,7 @@ public class CopyProjectOperation {
     /**
      * Returns the model provider ids that are known to the client
      * that instantiated this operation.
-     *
+     * 
      * @return the model provider ids that are known to the client
      * that instantiated this operation.
 	 * @since 3.2
@@ -226,7 +235,7 @@ public class CopyProjectOperation {
 	 * Sets the model provider ids that are known to the client that
 	 * instantiated this operation. Any potential side effects reported by these
 	 * models during validation will be ignored.
-	 *
+	 * 
 	 * @param modelProviderIds
 	 *            the model providers known to the client who is using this
 	 *            operation.

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,10 @@
 package org.eclipse.ui.dialogs;
 
 import java.util.List;
+
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -28,7 +31,7 @@ import org.eclipse.swt.widgets.Table;
  * A dialog that prompts for one element out of a list of elements. Uses
  * <code>IStructuredContentProvider</code> to provide the elements and
  * <code>ILabelProvider</code> to provide their labels.
- *
+ * 
  * @since 2.1
  */
 public class ListDialog extends SelectionDialog {
@@ -90,8 +93,7 @@ public class ListDialog extends SelectionDialog {
         return fTableViewer;
     }
 
-    @Override
-	protected void createButtonsForButtonBar(Composite parent) {
+    protected void createButtonsForButtonBar(Composite parent) {
         if (!fAddCancelButton) {
 			createButton(parent, IDialogConstants.OK_ID,
                     IDialogConstants.OK_LABEL, true);
@@ -100,19 +102,20 @@ public class ListDialog extends SelectionDialog {
 		}
     }
 
-    @Override
-	protected Control createDialogArea(Composite container) {
+    protected Control createDialogArea(Composite container) {
         Composite parent = (Composite) super.createDialogArea(container);
         createMessageArea(parent);
         fTableViewer = new TableViewer(parent, getTableStyle());
         fTableViewer.setContentProvider(fContentProvider);
         fTableViewer.setLabelProvider(fLabelProvider);
         fTableViewer.setInput(fInput);
-        fTableViewer.addDoubleClickListener(event -> {
-		    if (fAddCancelButton) {
-				okPressed();
-			}
-		});
+        fTableViewer.addDoubleClickListener(new IDoubleClickListener() {
+            public void doubleClick(DoubleClickEvent event) {
+                if (fAddCancelButton) {
+					okPressed();
+				}
+            }
+        });
         List initialSelection = getInitialElementSelections();
         if (initialSelection != null) {
 			fTableViewer
@@ -138,17 +141,17 @@ public class ListDialog extends SelectionDialog {
     /*
      * Overrides method from Dialog
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
         // Build a list of selected children.
-		IStructuredSelection selection = fTableViewer.getStructuredSelection();
+        IStructuredSelection selection = (IStructuredSelection) fTableViewer
+                .getSelection();
         setResult(selection.toList());
         super.okPressed();
     }
 
     /**
      * Returns the initial height of the dialog in number of characters.
-     *
+     * 
      * @return the initial height of the dialog in number of characters
      */
     public int getHeightInChars() {
@@ -157,7 +160,7 @@ public class ListDialog extends SelectionDialog {
 
     /**
      * Returns the initial width of the dialog in number of characters.
-     *
+     * 
      * @return the initial width of the dialog in number of characters
      */
     public int getWidthInChars() {
@@ -166,7 +169,7 @@ public class ListDialog extends SelectionDialog {
 
     /**
      * Sets the initial height of the dialog in number of characters.
-     *
+     * 
      * @param heightInChars
      *            the initialheight of the dialog in number of characters
      */
@@ -176,7 +179,7 @@ public class ListDialog extends SelectionDialog {
 
     /**
      * Sets the initial width of the dialog in number of characters.
-     *
+     * 
      * @param widthInChars
      *            the initial width of the dialog in number of characters
      */

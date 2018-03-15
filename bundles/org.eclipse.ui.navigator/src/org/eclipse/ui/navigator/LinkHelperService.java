@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.ui.internal.navigator.extensions.LinkHelperManager;
 /**
  * Manages the link helpers which are used to define the behavior of
  * the link with editor function.
- *
+ * 
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @since 3.4
  */
@@ -49,7 +49,7 @@ public class LinkHelperService {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param anObject
 	 *            An object from the viewer
 	 * @return An array of link helpers that know about elements in the
@@ -64,8 +64,8 @@ public class LinkHelperService {
 		}
 
 		Set helpers = new LinkedHashSet();
-		for (LinkHelperDescriptor descriptor : descriptors) {
-			helpers.add(getLinkHelper(descriptor));
+		for (int i = 0; i < descriptors.length; i++) {
+			helpers.add(getLinkHelper(descriptors[i]));
 		}
 		if (helpers.size() == 0)
 			return CANT_GET_NO_HELP;
@@ -74,7 +74,7 @@ public class LinkHelperService {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param input
 	 *            The Editor input from the active viewer.
 	 * @return An array of link helpers that know about elements in the
@@ -88,8 +88,8 @@ public class LinkHelperService {
 		}
 
 		Set helpers = new LinkedHashSet();
-		for (LinkHelperDescriptor descriptor : descriptors) {
-			helpers.add(getLinkHelper(descriptor));
+		for (int i = 0; i < descriptors.length; i++) {
+			helpers.add(getLinkHelper(descriptors[i]));
 		}
 		if (helpers.size() == 0)
 			return CANT_GET_NO_HELP;
@@ -108,12 +108,12 @@ public class LinkHelperService {
 		}
 		return helper;
 	}
-
+	
 	/**
-	 * Return a selection that contains the elements that the given editor input
+	 * Return a selection that contains the elements that the given editor input 
 	 * represent.
 	 * @param input the editor input
-	 * @return a selection that contains the elements that the given editor input
+	 * @return a selection that contains the elements that the given editor input 
 	 * represent
 	 */
 	public IStructuredSelection getSelectionFor(IEditorInput input) {
@@ -122,15 +122,15 @@ public class LinkHelperService {
 		IStructuredSelection selection = StructuredSelection.EMPTY;
 		IStructuredSelection newSelection = StructuredSelection.EMPTY;
 
-		for (ILinkHelper helper : helpers) {
-			selection = helper.findSelection(input);
+		for (int i = 0; i < helpers.length; i++) {
+			selection = helpers[i].findSelection(input);
 			if (selection != null && !selection.isEmpty()) {
 				newSelection = mergeSelection(newSelection, selection);
 			}
 		}
 		return newSelection;
-	}
-
+	} 
+	
 	private IStructuredSelection mergeSelection(IStructuredSelection aBase,
 			IStructuredSelection aSelectionToAppend) {
 		if (aBase == null || aBase.isEmpty()) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 import org.eclipse.ui.part.FileEditorInput;
 
 /**
- * Standard action for opening an editor on the currently selected file
+ * Standard action for opening an editor on the currently selected file 
  * resource(s).
  * <p>
  * Note that there is a different action for opening closed projects:
@@ -47,7 +47,7 @@ public class OpenFileAction extends OpenSystemEditorAction {
     private IEditorDescriptor editorDescriptor;
 
     /**
-     * Creates a new action that will open editors on the then-selected file
+     * Creates a new action that will open editors on the then-selected file 
      * resources. Equivalent to <code>OpenFileAction(page,null)</code>.
      *
      * @param page the workbench page in which to open the editor
@@ -57,7 +57,7 @@ public class OpenFileAction extends OpenSystemEditorAction {
     }
 
     /**
-     * Creates a new action that will open instances of the specified editor on
+     * Creates a new action that will open instances of the specified editor on 
      * the then-selected file resources.
      *
      * @param page the workbench page in which to open the editor
@@ -92,8 +92,7 @@ public class OpenFileAction extends OpenSystemEditorAction {
      *
      * @param file the file resource
      */
-    @Override
-	void openFile(IFile file) {
+    void openFile(IFile file) {
         try {
             boolean activate = OpenStrategy.activateOnOpen();
             if (editorDescriptor == null) {

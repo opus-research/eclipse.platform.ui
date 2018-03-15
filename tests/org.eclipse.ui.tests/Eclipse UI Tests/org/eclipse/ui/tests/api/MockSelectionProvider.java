@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 
 public class MockSelectionProvider implements ISelectionProvider {
 
-	private List<ISelectionChangedListener> listeners = new ArrayList<>(3);
+    private List listeners = new ArrayList(3);
 
     /**
      * Fires out a selection to all listeners.
@@ -35,30 +35,38 @@ public class MockSelectionProvider implements ISelectionProvider {
      * Fires out a selection to all listeners.
      */
     public void fireSelection(SelectionChangedEvent event) {
-		Iterator<ISelectionChangedListener> iter = listeners.iterator();
+        Iterator iter = listeners.iterator();
         while (iter.hasNext()) {
-            iter.next().selectionChanged(event);
+            ((ISelectionChangedListener) iter.next()).selectionChanged(event);
         }
     }
 
-    @Override
-	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+    /**
+     * @see ISelectionProvider#addSelectionChangedListener(ISelectionChangedListener)
+     */
+    public void addSelectionChangedListener(ISelectionChangedListener listener) {
         listeners.add(listener);
     }
 
-    @Override
-	public ISelection getSelection() {
+    /**
+     * @see ISelectionProvider#getSelection()
+     */
+    public ISelection getSelection() {
         return StructuredSelection.EMPTY;
     }
 
-    @Override
-	public void removeSelectionChangedListener(
+    /**
+     * @see ISelectionProvider#removeSelectionChangedListener(ISelectionChangedListener)
+     */
+    public void removeSelectionChangedListener(
             ISelectionChangedListener listener) {
         listeners.remove(listener);
     }
 
-    @Override
-	public void setSelection(ISelection selection) {
+    /**
+     * @see ISelectionProvider#setSelection(ISelection)
+     */
+    public void setSelection(ISelection selection) {
     }
 }
 

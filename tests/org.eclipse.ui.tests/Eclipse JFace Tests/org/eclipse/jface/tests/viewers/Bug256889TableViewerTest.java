@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 CAS Software AG and others.
+ * Copyright (c) 2009 CAS Software AG and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ public class Bug256889TableViewerTest extends ViewerTestCase {
 
 	private int rowcounter = 0;
 
-	private List<String> model = new ArrayList<>();
+	private List model = new ArrayList();
 	private Table table;
 	private TableViewer tableViewer;
 
@@ -42,13 +42,11 @@ public class Bug256889TableViewerTest extends ViewerTestCase {
 		initModel();
 	}
 
-	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		tableViewer = new TableViewer(parent, SWT.VIRTUAL | SWT.BORDER
 				| SWT.MULTI);
 		tableViewer.setContentProvider(new ILazyContentProvider() {
 
-			@Override
 			public void updateElement(int index) {
 				if (index >= 0 && index < tableViewer.getTable().getItemCount()) {
 					if (index > getModel().size() - PREFETCH_TRESHOLD
@@ -73,11 +71,9 @@ public class Bug256889TableViewerTest extends ViewerTestCase {
 				}
 			}
 
-			@Override
 			public void dispose() {
 			}
 
-			@Override
 			public void inputChanged(Viewer arg0, Object arg1, Object arg2) {
 			}
 		});
@@ -104,7 +100,11 @@ public class Bug256889TableViewerTest extends ViewerTestCase {
 		return tableViewer;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.ViewerTestCase#setInput()
+	 */
 	protected void setInput() {
 		tableViewer.setInput(getModel());
 		tableViewer.setItemCount(getModel().size());
@@ -146,13 +146,13 @@ public class Bug256889TableViewerTest extends ViewerTestCase {
 		return approxRecordCount;
 	}
 
-	private List<String> getModel() {
+	private List getModel() {
 		return this.model;
 	}
 
 	public void testBug256889() {
 		table.selectAll();
-		tableViewer.getStructuredSelection();
+		tableViewer.getSelection();
 
 	}
 

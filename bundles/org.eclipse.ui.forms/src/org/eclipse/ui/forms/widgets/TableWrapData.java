@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,39 +12,29 @@ package org.eclipse.ui.forms.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
 
 /**
  * Layout data used in conjunction with <code>TableWrapLayout</code>.
  * Children in a composite that uses this layout should call <samp>setLayoutData
  * </samp> and pass an instance of this class to control physical placement in
  * the parent.
- *
+ * 
  * @see TableWrapLayout
  * @since 3.0
  */
 public final class TableWrapData {
 	/**
-	 * The control will be left-justified unless it has the SWT.WRAP flag set or
-	 * it is a {@link Composite} with a layout that implements
-	 * {@link ILayoutExtension}, in which case it will have {@link #FILL}
-	 * alignment.
+	 * The control will be left-justified.
 	 */
 	public static final int LEFT = 1 << 1;
 
 	/**
-	 * The control will be centered horizontally unless it has the SWT.WRAP flag
-	 * set or it is a {@link Composite} with a layout that implements
-	 * {@link ILayoutExtension}, in which case it will have {@link #FILL}
-	 * alignment.
+	 * The control will be centered horizontally.
 	 */
 	public static final int CENTER = 1 << 2;
 
 	/**
-	 * The control will be right-justified unless it has the SWT.WRAP flag set
-	 * or it is a {@link Composite} with a layout that implements
-	 * {@link ILayoutExtension}, in which case it will have {@link #FILL}
-	 * alignment.
+	 * The control will be right-justified.
 	 */
 	public static final int RIGHT = 1 << 3;
 
@@ -147,7 +137,7 @@ public final class TableWrapData {
 	/**
 	 * The convenience constructor - allows passing the horizontal alignment
 	 * style.
-	 *
+	 * 
 	 * @param align
 	 *            horizontal alignment (LEFT, CENTER, RIGHT, FILL or FILL_GRAB).
 	 */
@@ -157,7 +147,7 @@ public final class TableWrapData {
 
 	/**
 	 * The convenience constructor - allows passing the alignment styles.
-	 *
+	 * 
 	 * @param align
 	 *            horizontal alignment (LEFT, CENTER, RIGHT, FILL or FILL_GRAB).
 	 * @param valign
@@ -170,7 +160,7 @@ public final class TableWrapData {
 	/**
 	 * The convenience constructor - allows passing the alignment styles, column
 	 * and row spans.
-	 *
+	 * 
 	 * @param align
 	 *            horizontal alignment (LEFT, CENTER, RIGHT, FILL or FILL_GRAB).
 	 * @param valign

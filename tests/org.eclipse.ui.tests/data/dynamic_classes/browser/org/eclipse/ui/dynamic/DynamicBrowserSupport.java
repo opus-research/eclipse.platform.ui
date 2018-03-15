@@ -20,20 +20,24 @@ import org.eclipse.ui.browser.IWebBrowser;
 public class DynamicBrowserSupport extends AbstractWorkbenchBrowserSupport {
 
     /**
-     *
+     * 
      */
     public DynamicBrowserSupport() {
         super();
     }
 
-    @Override
-	public IWebBrowser createBrowser(int style, String browserId, String name,
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(int, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public IWebBrowser createBrowser(int style, String browserId, String name,
             String tooltip) throws PartInitException {
         return null;
     }
 
-    @Override
-	public IWebBrowser createBrowser(String browserId) throws PartInitException {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(java.lang.String)
+     */
+    public IWebBrowser createBrowser(String browserId) throws PartInitException {
         return null;
     }
 

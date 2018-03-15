@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433608
- *******************************************************************************/
+ ******************************************************************************/
 
 package org.eclipse.jface.tests.wizards;
 
+import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -25,13 +27,15 @@ public class TheTestWizardPage extends WizardPage {
 	public static final String BAD_TEXT_FIELD_STATUS = "A bad value was entered";
 	public static final String GOOD_TEXT_FIELD_CONTENTS = "GOOD VALUE";
 	public Text textInputField;
-	private boolean throwExceptionOnDispose;
+	private boolean throwExceptionOnDispose; 
 
 	public TheTestWizardPage(String name) {
 		super(name);
 	}
 
-	@Override
+	/**
+	 * @see IDialogPage#createControl(Composite)
+	 */
 	public void createControl(Composite parent) {
 		Composite container = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
@@ -44,8 +48,12 @@ public class TheTestWizardPage extends WizardPage {
 		textInputField = new Text(container, SWT.BORDER | SWT.SINGLE);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		textInputField.setLayoutData(gd);
-		textInputField.addModifyListener(e -> dialogChanged());
-
+		textInputField.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				dialogChanged();
+			}
+		});
+		
 		initialize();
 		dialogChanged();
 		setControl(container);
@@ -57,6 +65,7 @@ public class TheTestWizardPage extends WizardPage {
 	/**
 	 * Handle dialog values changing
 	 */
+
 	private void dialogChanged() {
 		if (textInputField.getText().equals(BAD_TEXT_FIELD_CONTENTS)) {
 			setPageComplete(false);
@@ -72,20 +81,21 @@ public class TheTestWizardPage extends WizardPage {
 		setErrorMessage(message);
 		setPageComplete(message == null);
 	}
-
+	
 	/**
 	 * @param throwExceptionOnDispose The throwExceptionOnDispose to set.
 	 */
 	public void setThrowExceptionOnDispose(boolean throwExceptionOnDispose) {
 		this.throwExceptionOnDispose = throwExceptionOnDispose;
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.DialogPage#dispose()
+	 */
 	public void dispose() {
 		super.dispose();
-		if(throwExceptionOnDispose) {
+		if(throwExceptionOnDispose)
 			throw new NullPointerException();
-		}
 	}
 
 }

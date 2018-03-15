@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,8 +46,10 @@ public class FilePropertySource extends ResourcePropertySource {
         return fileDescriptor;
     }
 
-    @Override
-	public IPropertyDescriptor[] getPropertyDescriptors() {
+    /* (non-Javadoc)
+     * Method declared on IPropertySource.
+     */
+    public IPropertyDescriptor[] getPropertyDescriptors() {
         IPropertyDescriptor[] superDescriptors = super.getPropertyDescriptors();
         int superLength = superDescriptors.length;
         IPropertyDescriptor[] fileDescriptors = new IPropertyDescriptor[superLength + 1];
@@ -57,8 +59,10 @@ public class FilePropertySource extends ResourcePropertySource {
         return fileDescriptors;
     }
 
-    @Override
-	public Object getPropertyValue(Object key) {
+    /* (non-Javadoc)
+     * Method declared on IPropertySource.
+     */
+    public Object getPropertyValue(Object key) {
     	Object returnValue = (key.equals(IBasicPropertyConstants.P_TEXT)) ? TextProcessor
 				.process(element.getName())
 				: super.getPropertyValue(key);
@@ -68,7 +72,7 @@ public class FilePropertySource extends ResourcePropertySource {
 		}
 
         if (key.equals(IResourcePropertyConstants.P_SIZE_RES)) {
-			return IDEResourceInfoUtils.getSizeString(element);
+			return IDEResourceInfoUtils.getSizeString((IFile) element);
 		}
         return null;
     }

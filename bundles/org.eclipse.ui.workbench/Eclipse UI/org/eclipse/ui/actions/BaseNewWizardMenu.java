@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,10 +15,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.core.runtime.Adapters;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IRegistryChangeEvent;
 import org.eclipse.core.runtime.IRegistryChangeListener;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
@@ -35,16 +36,14 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.actions.NewWizardShortcutAction;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 
 /**
  * A <code>BaseNewWizardMenu</code> is used to populate a menu manager with
  * New Wizard actions for the current perspective's new wizard shortcuts,
  * including an Other... action to open the new wizard dialog.
- * <p>
- * <strong>Note:</strong> Clients must dispose this menu when it is no longer required.
- * </p>
- *
+ * 
  * @since 3.1
  */
 public class BaseNewWizardMenu extends CompoundContributionItem {
@@ -59,17 +58,21 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
 
     private final IExtensionChangeHandler configListener = new IExtensionChangeHandler() {
 
-        @Override
-		public void removeExtension(IExtension source, Object[] objects) {
-            for (Object object : objects) {
-                if (object instanceof NewWizardShortcutAction) {
-                    actions.values().remove(object);
+        /* (non-Javadoc)
+         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
+         */
+        public void removeExtension(IExtension source, Object[] objects) {
+            for (int i = 0; i < objects.length; i++) {
+                if (objects[i] instanceof NewWizardShortcutAction) {
+                    actions.values().remove(objects[i]);
                 }
             }
         }
 
-        @Override
-		public void addExtension(IExtensionTracker tracker, IExtension extension) {
+        /* (non-Javadoc)
+         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
+         */
+        public void addExtension(IExtensionTracker tracker, IExtension extension) {
             // Do nothing
         }
     };
@@ -77,13 +80,17 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
     /**
      * TODO: should this be done with an addition listener?
      */
-    private final IRegistryChangeListener registryListener = event -> {
-	    // reset the reader.
-	    // TODO This is expensive.  Can we be more selective?
-	    if (getParent() != null) {
-	        getParent().markDirty();
-	    }
-	};
+    private final IRegistryChangeListener registryListener = new IRegistryChangeListener() {
+
+        public void registryChanged(IRegistryChangeEvent event) {
+            // reset the reader.
+            // TODO This is expensive.  Can we be more selective?
+            if (getParent() != null) {
+                getParent().markDirty();
+            }
+        }
+
+    };
 
     private ActionFactory.IWorkbenchAction showDlgAction;
 
@@ -91,10 +98,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
 
     /**
      * Creates a new wizard shortcut menu for the IDE.
-     * <p>
-     * <strong>Note:</strong> Clients must dispose this menu when it is no longer required.
-     * </p>
-     *
+     * 
      * @param window
      *            the window containing the menu
      * @param id
@@ -115,7 +119,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
 
     /**
      * Adds the items to show to the given list.
-     *
+     * 
      * @param list the list to add items to
      */
     protected void addItems(List list) {
@@ -127,7 +131,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
 
     /**
      * Adds the new wizard shortcuts for the current perspective to the given list.
-     *
+     * 
      * @param list the list to add items to
      * @return <code>true</code> if any items were added, <code>false</code> if none were added
      */
@@ -136,8 +140,8 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         IWorkbenchPage page = workbenchWindow.getActivePage();
         if (page != null) {
             String[] wizardIds = page.getNewWizardShortcuts();
-            for (String wizardId : wizardIds) {
-                IAction action = getAction(wizardId);
+            for (int i = 0; i < wizardIds.length; i++) {
+                IAction action = getAction(wizardIds[i]);
                 if (action != null) {
                     if (!WorkbenchActivityHelper.filterItem(action)) {
                         list.add(new ActionContributionItem(action));
@@ -149,8 +153,12 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         return added;
     }
 
-    @Override
-	public void dispose() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.IContributionItem#dispose()
+     */
+    public void dispose() {
         if (workbenchWindow != null) {
             super.dispose();
             unregisterListeners();
@@ -160,9 +168,10 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         }
     }
 
-	/*
-	 * Returns the action for the given wizard id, or null if not found.
-	 */
+    /*
+     * (non-Javadoc) Returns the action for the given wizard id, or null if not
+     * found.
+     */
     private IAction getAction(String id) {
         // Keep a cache, rather than creating a new action each time,
         // so that image caching in ActionContributionItem works.
@@ -174,7 +183,8 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
                 action = new NewWizardShortcutAction(workbenchWindow,
 						wizardDesc);
 				actions.put(id, action);
-				IConfigurationElement element = Adapters.adapt(wizardDesc, IConfigurationElement.class);
+				IConfigurationElement element = (IConfigurationElement) Util
+						.getAdapter(wizardDesc, IConfigurationElement.class);
 				if (element != null) {
 					workbenchWindow.getExtensionTracker().registerObject(
 							element.getDeclaringExtension(), action,
@@ -185,8 +195,12 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         return action;
     }
 
-    @Override
-	protected IContributionItem[] getContributionItems() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.actions.CompoundContributionItem#getContributionItems()
+     */
+    protected IContributionItem[] getContributionItems() {
         ArrayList list = new ArrayList();
         if (workbenchWindow != null && workbenchWindow.getActivePage() != null
                 && workbenchWindow.getActivePage().getPerspective() != null) {
@@ -204,7 +218,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
 
     /**
      * Returns the "Other..." action, used to show the new wizards dialog.
-     *
+     * 
      * @return the action used to show the new wizards dialog
      */
     protected IAction getShowDialogAction() {
@@ -213,7 +227,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
 
     /**
      * Returns the window in which this menu appears.
-     *
+     * 
      * @return the window in which this menu appears
      */
     protected IWorkbenchWindow getWindow() {
@@ -222,7 +236,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
 
     /**
      * Registers listeners.
-     *
+     * 
      * @since 3.1
      */
     private void registerListeners() {
@@ -235,7 +249,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
     /**
      * Returns whether the new wizards registry has a non-empty category with
      * the given identifier.
-     *
+     * 
      * @param categoryId
      *            the identifier for the category
      * @return <code>true</code> if there is a non-empty category with the
@@ -248,7 +262,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
 
     /**
      * Unregisters listeners.
-     *
+     * 
      * @since 3.1
      */
     private void unregisterListeners() {

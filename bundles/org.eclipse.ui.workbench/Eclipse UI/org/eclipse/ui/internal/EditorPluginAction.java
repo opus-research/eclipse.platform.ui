@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,17 +35,23 @@ public final class EditorPluginAction extends PartPluginAction {
 		}
     }
 
-    @Override
-	protected IActionDelegate validateDelegate(Object obj)
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
+    protected IActionDelegate validateDelegate(Object obj)
             throws WorkbenchException {
         if (obj instanceof IEditorActionDelegate) {
 			return (IEditorActionDelegate) obj;
+		} else {
+			throw new WorkbenchException(
+                    "Action must implement IEditorActionDelegate"); //$NON-NLS-1$
 		}
-		throw new WorkbenchException("Action must implement IEditorActionDelegate"); //$NON-NLS-1$
     }
 
-    @Override
-	protected void initDelegate() {
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
+    protected void initDelegate() {
         super.initDelegate();
         ((IEditorActionDelegate) getDelegate()).setActiveEditor(this,
                 currentEditor);
@@ -73,8 +79,10 @@ public final class EditorPluginAction extends PartPluginAction {
 			registerSelectionListener(part);
 		}
     }
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.PluginAction#dispose()
+	 */
 	public void dispose() {
         if (currentEditor != null) {
             unregisterSelectionListener(currentEditor);

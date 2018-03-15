@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -25,6 +25,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
@@ -36,7 +37,7 @@ import org.eclipse.ui.preferences.ViewPreferencesAction;
  * The ProgressView is the class that shows the details of the current workbench
  * progress.
  */
-public class ProgressView extends ViewPart {
+public class ProgressView extends ViewPart implements IViewPart {
 
 	DetailedProgressViewer viewer;
 
@@ -45,7 +46,11 @@ public class ProgressView extends ViewPart {
 	Action clearAllAction;
 
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		viewer = new DetailedProgressViewer(parent, SWT.MULTI | SWT.H_SCROLL);
 		viewer.setComparator(ProgressManagerUtil.getProgressViewerComparator());
@@ -55,7 +60,7 @@ public class ProgressView extends ViewPart {
 
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				IWorkbenchHelpContextIds.RESPONSIVE_UI);
-
+		
 		initContentProvider();
 		createClearAllAction();
 		createCancelAction();
@@ -65,7 +70,11 @@ public class ProgressView extends ViewPart {
 		getSite().setSelectionProvider(viewer);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		if (viewer != null) {
 			viewer.setFocus();
@@ -88,10 +97,12 @@ public class ProgressView extends ViewPart {
 		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		Menu menu = menuMgr.createContextMenu(viewer.getControl());
 		menuMgr.add(cancelAction);
-		menuMgr.addMenuListener(manager -> {
-			JobInfo info = getSelectedInfo();
-			if (info == null) {
-				return;
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager manager) {
+				JobInfo info = getSelectedInfo();
+				if (info == null) {
+					return;
+				}
 			}
 		});
 		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -103,7 +114,11 @@ public class ProgressView extends ViewPart {
 		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(clearAllAction);
 		menuMgr.add(new ViewPreferencesAction() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.internal.preferences.ViewPreferencesAction#openViewPreferencesDialog()
+			 */
 			public void openViewPreferencesDialog() {
 				new JobsViewPreferenceDialog(viewer.getControl().getShell())
 						.open();
@@ -122,7 +137,7 @@ public class ProgressView extends ViewPart {
 	/**
 	 * Return the selected objects. If any of the selections are not JobInfos or
 	 * there is no selection then return null.
-	 *
+	 * 
 	 * @return JobInfo[] or <code>null</code>.
 	 */
 	private IStructuredSelection getSelection() {
@@ -141,7 +156,7 @@ public class ProgressView extends ViewPart {
 	/**
 	 * Get the currently selected job info. Only return it if it is the only
 	 * item selected and it is a JobInfo.
-	 *
+	 * 
 	 * @return JobInfo
 	 */
 	JobInfo getSelectedInfo() {
@@ -161,7 +176,11 @@ public class ProgressView extends ViewPart {
 	 */
 	private void createCancelAction() {
 		cancelAction = new Action(ProgressMessages.ProgressView_CancelAction) {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.action.Action#run()
+			 */
 			public void run() {
 				viewer.cancelSelection();
 			}
@@ -175,7 +194,11 @@ public class ProgressView extends ViewPart {
 	private void createClearAllAction() {
 		clearAllAction = new Action(
 				ProgressMessages.ProgressView_ClearAllAction) {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.action.Action#run()
+			 */
 			public void run() {
 				FinishedJobs.getInstance().clearAll();
 			}
@@ -183,12 +206,12 @@ public class ProgressView extends ViewPart {
 		clearAllAction
 				.setToolTipText(ProgressMessages.NewProgressView_RemoveAllJobsToolTip);
 		ImageDescriptor id = WorkbenchImages
-				.getWorkbenchImageDescriptor("/elcl16/progress_remall.png"); //$NON-NLS-1$
+				.getWorkbenchImageDescriptor("/elcl16/progress_remall.gif"); //$NON-NLS-1$
 		if (id != null) {
 			clearAllAction.setImageDescriptor(id);
 		}
 		id = WorkbenchImages
-				.getWorkbenchImageDescriptor("/dlcl16/progress_remall.png"); //$NON-NLS-1$
+				.getWorkbenchImageDescriptor("/dlcl16/progress_remall.gif"); //$NON-NLS-1$
 		if (id != null) {
 			clearAllAction.setDisabledImageDescriptor(id);
 		}

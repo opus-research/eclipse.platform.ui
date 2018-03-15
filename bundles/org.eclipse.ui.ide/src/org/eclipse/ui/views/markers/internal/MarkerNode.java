@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
 package org.eclipse.ui.views.markers.internal;
 
 /**
- * The MarkerNode class is the class that handles category nodes and
+ * The MarkerNode class is the class that handles category nodes and 
  * concrete markers.
  *
  */
@@ -50,6 +50,6 @@ public abstract class MarkerNode {
 	 * @return ConcreteMarker
 	 */
 	public abstract ConcreteMarker getConcreteRepresentative();
-
+	
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,27 +28,26 @@ public class PartDragAgent extends DragAgent {
 		super(manager);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.addons.dndaddon.DragAgent#getElementToDrag(org.eclipse.e4.ui.
+	 * workbench.addons.dndaddon.CursorInfo)
+	 */
 	@Override
 	public MUIElement getElementToDrag(DnDInfo info) {
-		if (!(info.curElement instanceof MPartStack)) {
+		if (!(info.curElement instanceof MPartStack))
 			return null;
-		}
 
 		MPartStack stack = (MPartStack) info.curElement;
 
 		// Drag a part that is in a stack
 		if (info.itemElement instanceof MStackElement) {
 			// Prevent dragging 'No Move' parts
-			if (info.itemElement.getTags().contains(IPresentationEngine.NO_MOVE)) {
+			if (info.itemElement.getTags().contains(IPresentationEngine.NO_MOVE))
 				return null;
-			}
 
-			// If it's an MPart only drag the part itself
-			if (info.itemElement instanceof MPart) {
-				return info.itemElement;
-			}
-
-			// check if we want to drag the placeholder or default to dragging the whole stack
 			int tbrCount = dndManager.getModelService().countRenderableChildren(stack);
 			if (tbrCount > 1 || dndManager.getModelService().isLastEditorStack(stack)) {
 				dragElement = info.itemElement;
@@ -58,39 +57,45 @@ public class PartDragAgent extends DragAgent {
 
 		// Drag a complete stack
 		// Only allow a drag to start if we're a CTabFolder
-		if (!(stack.getWidget() instanceof CTabFolder)) {
+		if (!(stack.getWidget() instanceof CTabFolder))
 			return null;
-		}
 
 		// Only allow a drag to start if we're inside the 'tab area' of the CTF
 		CTabFolder ctf = (CTabFolder) stack.getWidget();
 		Point ctfPos = ctf.getDisplay().map(null, ctf, info.cursorPos);
-		if (ctfPos.y > ctf.getTabHeight()) {
+		if (ctfPos.y > ctf.getTabHeight())
 			return null;
-		}
 
 		// Prevent dragging 'No Move' stacks
-		if (stack.getTags().contains(IPresentationEngine.NO_MOVE)) {
+		if (stack.getTags().contains(IPresentationEngine.NO_MOVE))
 			return null;
-		}
 
 		// Prevent dragging the last stack out of the shared area
-		if (dndManager.getModelService().isLastEditorStack(stack)) {
+		if (dndManager.getModelService().isLastEditorStack(stack))
 			return null;
-		}
 
 		dragElement = info.curElement;
 		return info.curElement;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DragAgent#dragStart(org.eclipse.e4.ui.model.
+	 * application.ui.MUIElement)
+	 */
 	@Override
 	public void dragStart(DnDInfo info) {
 		super.dragStart(info);
-		if (dndManager.getFeedbackStyle() != DnDManager.SIMPLE) {
+		if (dndManager.getFeedbackStyle() != DnDManager.SIMPLE)
 			dndManager.hostElement(dragElement, 16, 10);
-		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DragAgent#dragFinished()
+	 */
 	@Override
 	public void dragFinished(boolean performDrop, DnDInfo info) {
 		if (dragElement instanceof MPart) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import org.eclipse.core.expressions.ICountable;
 import org.eclipse.core.expressions.IIterable;
@@ -23,58 +23,94 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 /**
  * Adapts ISelection instances to either IIterable or ICountable. For use with
  * core expressions.
- *
+ * 
  * @since 3.3
  */
 public class SelectionAdapterFactory implements IAdapterFactory {
-
-	private static final ICountable ICOUNT_0 = () -> 0;
-
-	private static final ICountable ICOUNT_1 = () -> 1;
-
-	private static final IIterable<?> ITERATE_EMPTY = () -> Collections.emptyList().iterator();
+	private static final ICountable ICOUNT_0 = new ICountable() {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.expressions.ICountable#count()
+		 */
+		public int count() {
+			return 0;
+		}
+	};
+	private static final ICountable ICOUNT_1 = new ICountable() {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.expressions.ICountable#count()
+		 */
+		public int count() {
+			return 1;
+		}
+	};
+	private static final IIterable ITERATE_EMPTY = new IIterable() {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.expressions.IIterable#iterator()
+		 */
+		public Iterator iterator() {
+			return Collections.EMPTY_LIST.iterator();
+		}
+	};
 
 	/**
 	 * The classes we can adapt to.
 	 */
-	private static final Class<?>[] CLASSES = new Class[] { IIterable.class, ICountable.class };
+	private static final Class[] CLASSES = new Class[] { IIterable.class,
+			ICountable.class };
 
-	@Override
-	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
+	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adaptableObject instanceof ISelection) {
 			if (adapterType == IIterable.class) {
-				return adapterType.cast(iterable((ISelection) adaptableObject));
+				return iterable((ISelection) adaptableObject);
 			} else if (adapterType == ICountable.class) {
-				return adapterType.cast(countable((ISelection) adaptableObject));
+				return countable((ISelection) adaptableObject);
 			}
 		}
 		return null;
 	}
 
-	private IIterable<?> iterable(final ISelection sel) {
+	private Object iterable(final ISelection sel) {
 		if (sel.isEmpty()) {
 			return ITERATE_EMPTY;
 		}
 		if (sel instanceof IStructuredSelection) {
-			return ((IStructuredSelection) sel)::iterator;
+			return new IIterable() {
+				public Iterator iterator() {
+					return ((IStructuredSelection) sel).iterator();
+				}
+			};
 		}
-		final List<Object> list = Arrays.asList(new Object[] { sel });
-		return list::iterator;
+		final List list = Arrays.asList(new Object[] { sel });
+		return new IIterable() {
+
+			public Iterator iterator() {
+				return list.iterator();
+			}
+		};
 	}
 
-	private ICountable countable(final ISelection sel) {
+	private Object countable(final ISelection sel) {
 		if (sel.isEmpty()) {
 			return ICOUNT_0;
 		}
 		if (sel instanceof IStructuredSelection) {
 			final IStructuredSelection ss = (IStructuredSelection) sel;
-			return ss::size;
+			return new ICountable() {
+				public int count() {
+					return ss.size();
+				}
+			};
 		}
 		return ICOUNT_1;
 	}
 
-	@Override
-	public Class<?>[] getAdapterList() {
+	public Class[] getAdapterList() {
 		return CLASSES;
 	}
 }

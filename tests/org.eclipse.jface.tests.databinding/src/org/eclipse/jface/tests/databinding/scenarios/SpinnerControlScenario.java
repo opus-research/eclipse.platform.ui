@@ -30,15 +30,13 @@ public class SpinnerControlScenario extends ScenariosTestCase {
 
     private Adventure adventure;
 
-    @Override
-	protected void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
         // do any setup work here
         adventure = SampleData.WINTER_HOLIDAY;
     }
 
-    @Override
-	protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception {
         // do any teardown work here
         super.tearDown();
     }

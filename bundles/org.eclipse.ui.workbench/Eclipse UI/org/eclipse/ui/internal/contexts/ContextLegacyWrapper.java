@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.ui.internal.util.Util;
  * This implements the old <code>IContext</code> interface based on the new
  * context implementation in <code>org.eclipse.ui.contexts</code>. This is a
  * wrapper.
- *
+ * 
  * @since 3.1
  */
 public class ContextLegacyWrapper implements IContext {
@@ -40,7 +40,7 @@ public class ContextLegacyWrapper implements IContext {
 
 	/**
 	 * Constructs a new instance of <code>ContextWrapper</code>.
-	 *
+	 * 
 	 * @param context
 	 *            The context to wrapper; must not be <code>null</code>.
 	 * @param contextManager
@@ -63,7 +63,11 @@ public class ContextLegacyWrapper implements IContext {
 		this.contextManager = contextManager;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContext#addContextListener(org.eclipse.ui.contexts.IContextListener)
+	 */
 	public void addContextListener(IContextListener contextListener) {
 		final LegacyContextListenerWrapper wrapper = new LegacyContextListenerWrapper(
 				contextListener, contextManager, this);
@@ -76,18 +80,30 @@ public class ContextLegacyWrapper implements IContext {
 		contextManager.addContextManagerListener(wrapper);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(T)
+	 */
 	public int compareTo(Object o) {
 		return Util
 				.compare(wrappedContext, ((ContextLegacyWrapper) o).wrappedContext);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContext#getId()
+	 */
 	public String getId() {
 		return wrappedContext.getId();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContext#getName()
+	 */
 	public String getName() throws NotDefinedException {
 		try {
 			return wrappedContext.getName();
@@ -96,7 +112,11 @@ public class ContextLegacyWrapper implements IContext {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContext#getParentId()
+	 */
 	public String getParentId() throws NotDefinedException {
 		try {
 			return wrappedContext.getParentId();
@@ -105,18 +125,30 @@ public class ContextLegacyWrapper implements IContext {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContext#isDefined()
+	 */
 	public boolean isDefined() {
 		return wrappedContext.isDefined();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContext#isEnabled()
+	 */
 	public boolean isEnabled() {
 		return contextManager.getActiveContextIds().contains(
 				wrappedContext.getId());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContext#removeContextListener(org.eclipse.ui.contexts.IContextListener)
+	 */
 	public void removeContextListener(IContextListener contextListener) {
 		final LegacyContextListenerWrapper wrapper = new LegacyContextListenerWrapper(
 				contextListener, contextManager, this);

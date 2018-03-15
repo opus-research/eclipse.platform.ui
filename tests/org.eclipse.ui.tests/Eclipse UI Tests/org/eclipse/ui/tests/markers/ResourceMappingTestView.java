@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,10 +22,11 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.tests.TestPlugin;
 
-public class ResourceMappingTestView extends ViewPart {
+public class ResourceMappingTestView extends ViewPart implements IViewPart {
 
 	private TreeViewer viewer;
 
@@ -33,14 +34,12 @@ public class ResourceMappingTestView extends ViewPart {
 		super();
 	}
 
-	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent);
 		viewer.getTree().setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		viewer.setLabelProvider(new LabelProvider() {
-			@Override
 			public String getText(Object element) {
 				return ((TestResourceMapping) element).getName();
 			}
@@ -54,32 +53,26 @@ public class ResourceMappingTestView extends ViewPart {
 	private IContentProvider getContentProvider() {
 		return new ITreeContentProvider() {
 
-			@Override
 			public Object[] getChildren(Object parentElement) {
 				return ((TestResourceMapping) parentElement).getChildren();
 			}
 
-			@Override
 			public Object getParent(Object element) {
 				return ((TestResourceMapping) element).getParent();
 			}
 
-			@Override
 			public boolean hasChildren(Object element) {
 				return ((TestResourceMapping) element).getChildren().length > 0;
 			}
 
-			@Override
 			public Object[] getElements(Object inputElement) {
 				return ((TestResourceMapping) inputElement).getChildren();
 			}
 
-			@Override
 			public void dispose() {
 
 			}
 
-			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 
@@ -88,17 +81,21 @@ public class ResourceMappingTestView extends ViewPart {
 		};
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		viewer.setSelection(new StructuredSelection(new TestResourceMapping(
 				TestPlugin.getWorkspace().getRoot())));
 	}
 
 	public IMarker addMarkerToFirstProject() {
-
+		
 		TestResourceMapping top = ((TestResourceMapping) viewer.getInput());
 		IResource element = top.getChildren()[0].element;
-
+		
 		try {
 			IMarker marker = element.createMarker("org.eclipse.core.resources.problemmarker");
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
@@ -107,7 +104,7 @@ public class ResourceMappingTestView extends ViewPart {
 			return null;
 		}
 
-
-
+		
+		
 	}
 }

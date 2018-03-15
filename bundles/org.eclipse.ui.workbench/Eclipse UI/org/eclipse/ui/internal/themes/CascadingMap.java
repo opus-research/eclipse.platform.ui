@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ public class CascadingMap {
 
     private Map base, override;
 
-    /**
+    /** 
      * @param base the base (default) map
      * @param override the override map
      */
@@ -32,8 +32,8 @@ public class CascadingMap {
     }
 
     /**
-     * Return the union of the parent and child key sets.
-     *
+     * Return the union of the parent and child key sets.  
+     * 
      * @return the union.  This set is read only.
      */
     public Set keySet() {
@@ -44,7 +44,7 @@ public class CascadingMap {
 
     /**
      * Get the value.  Preference will be given to entries in the override map.
-     *
+     * 
      * @param key the key
      * @return the value
      */

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,6 @@ import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
-
 
 /**
  * The editor input for the integrated web browser.
@@ -120,7 +119,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 	/**
 	 * Returns true if this page can reuse the browser that the given input is
 	 * being displayed in, or false if it should open up in a new page.
-	 *
+	 * 
 	 * @param input
 	 *            org.eclipse.ui.internal.browser.IWebBrowserEditorInput
 	 * @return boolean
@@ -144,13 +143,12 @@ public class WebBrowserEditorInput implements IEditorInput,
 	/**
 	 * Creates an <code>IElement</code> from the state captured within an
 	 * <code>IMemento</code>.
-	 *
+	 * 
 	 * @param memento
 	 *            a memento containing the state for an element
 	 * @return an element, or <code>null</code> if the element could not be
 	 *         created
 	 */
-	@Override
 	public IAdaptable createElement(IMemento memento) {
 		int style = 0;
 		Integer integer = memento.getInteger(MEMENTO_STYLE);
@@ -173,7 +171,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 		String id = memento.getString(MEMENTO_ID);
 		String name = memento.getString(MEMENTO_NAME);
 		String tooltip = memento.getString(MEMENTO_TOOLTIP);
-
+		
 		WebBrowserEditorInput input = new WebBrowserEditorInput(url, style, id);
 		input.setName(name);
 		input.setToolTipText(tooltip);
@@ -185,7 +183,6 @@ public class WebBrowserEditorInput implements IEditorInput,
 	 * editor.
 	 * @return true if the url and browser id are equal and the style bits are compatible
 	 */
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -206,7 +203,6 @@ public class WebBrowserEditorInput implements IEditorInput,
 	/*
 	 * Returns whether the editor input exists.
 	 */
-	@Override
 	public boolean exists() {
 		if ((style & IWorkbenchBrowserSupport.PERSISTENT) != 0)
 			return false;
@@ -214,8 +210,17 @@ public class WebBrowserEditorInput implements IEditorInput,
 		return true;
 	}
 
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+	/**
+	 * Returns an object which is an instance of the given class associated with
+	 * this object. Returns <code>null</code> if no such object can be found.
+	 * 
+	 * @param adapter
+	 *            the adapter class to look up
+	 * @return a object castable to the given class, or <code>null</code> if
+	 *         this object does not have an adapter for the given class
+	 */
+	@SuppressWarnings("rawtypes")
+	public Object getAdapter(Class adapter) {
 		return null;
 	}
 
@@ -223,30 +228,36 @@ public class WebBrowserEditorInput implements IEditorInput,
 	 * Returns the ID of an element factory which can be used to recreate this
 	 * object. An element factory extension with this ID must exist within the
 	 * workbench registry.
-	 *
+	 * 
 	 * @return the element factory ID
 	 */
-	@Override
 	public String getFactoryId() {
 		return ELEMENT_FACTORY_ID;
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return ImageResource
 				.getImageDescriptor(ImageResource.IMG_INTERNAL_BROWSER);
 	}
-
+	
 	/**
 	 * Returns true if the name is locked and cannot be changed.
-	 *
+	 * 
 	 * @return <code>true</code> if the name of the browser should not change
 	 */
 	protected boolean isNameLocked() {
 		return (name != null);
 	}
 
-	@Override
+	/**
+	 * Returns the name of this editor input for display purposes.
+	 * <p>
+	 * For instance, if the fully qualified input name is
+	 * <code>"a\b\MyFile.gif"</code>, the return value would be just
+	 * <code>"MyFile.gif"</code>.
+	 * 
+	 * @return the file name string
+	 */
 	public String getName() {
 		if (name != null)
 			return name;
@@ -254,7 +265,11 @@ public class WebBrowserEditorInput implements IEditorInput,
 		return Messages.viewWebBrowserTitle;
 	}
 
-	@Override
+	/*
+	 * Returns an object that can be used to save the state of this editor
+	 * input. @return the persistable element, or <code>null</code> if this
+	 * editor input cannot be persisted
+	 */
 	public IPersistableElement getPersistable() {
 		if ((style & IWorkbenchBrowserSupport.PERSISTENT) == 0)
 			return null;
@@ -262,7 +277,6 @@ public class WebBrowserEditorInput implements IEditorInput,
 		return this;
 	}
 
-	@Override
 	public String getToolTipText() {
 		if (tooltip != null)
 			return tooltip;
@@ -275,7 +289,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 
 	/**
 	 * Returns the url.
-	 *
+	 * 
 	 * @return java.net.URL
 	 */
 	public URL getURL() {
@@ -285,7 +299,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 	/**
 	 * Returns the browser id. Browsers with a set id will always & only be
 	 * replaced by browsers with the same id.
-	 *
+	 * 
 	 * @return String
 	 */
 	public String getBrowserId() {
@@ -294,7 +308,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 
 	/**
 	 * Returns true if the status bar should be shown.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	public boolean isStatusbarVisible() {
@@ -303,24 +317,33 @@ public class WebBrowserEditorInput implements IEditorInput,
 
 	/**
 	 * Returns true if the toolbar should be shown.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	public boolean isLocationBarLocal() {
 		return (style & BrowserViewer.LOCATION_BAR) != 0;
 	}
 
+	/*
+	 * public boolean isLocationBarGlobal() { return (style &
+	 * ExternalBrowserInstance.LOCATION_TOOLBAR) != 0; }
+	 */
+
 	public boolean isToolbarLocal() {
 		return (style & BrowserViewer.BUTTON_BAR) != 0;
 	}
 
+	/*
+	 * public boolean isToolbarGlobal() { return (style &
+	 * ExternalBrowserInstance.BUTTON_TOOLBAR) != 0; }
+	 */
+
 	/**
 	 * Saves the state of an element within a memento.
-	 *
+	 * 
 	 * @param memento
 	 *            the storage area for element state
 	 */
-	@Override
 	public void saveState(IMemento memento) {
 		memento.putInteger(MEMENTO_STYLE, style);
 		if ((style & IWorkbenchBrowserSupport.PERSISTENT) != 0 && url != null) {
@@ -337,12 +360,15 @@ public class WebBrowserEditorInput implements IEditorInput,
 		}
 	}
 
-	@Override
+	/**
+	 * Converts this object to a string.
+	 * 
+	 * @return java.lang.String
+	 */
 	public String toString() {
 		return "WebBrowserEditorInput[" + url + " " + style + " " + id + "]";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
-
-	@Override
+	
 	public int hashCode() {
 		int result = 0;
 		if (url != null) {

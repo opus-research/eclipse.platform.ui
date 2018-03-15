@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.ui.internal.themes;
 
 import java.util.Hashtable;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
@@ -29,8 +30,8 @@ import org.eclipse.ui.themes.IColorFactory;
  * &lt;colorDefinition
  *     label="Red/Blue Contrast"
  *     id="example.redblueblend"&gt;
- *     &lt;colorFactory
- * 				plugin="org.eclipse.ui"
+ *     &lt;colorFactory 
+ * 				plugin="org.eclipse.ui" 
  * 				class="org.eclipse.ui.internal.themes.RGBContrastFactory"&gt;
  *      	&lt;parameter name="foreground" value="0,0,0" /&gt;
  *  		&lt;parameter name="background1" value="COLOR_RED" /&gt;
@@ -39,12 +40,12 @@ import org.eclipse.ui.themes.IColorFactory;
  * &lt;/colorDefinition&gt;
  * </code>
  * </p>
- *
+ * 
  * <p>
  * This will select whichever of Red or Blue has a higher contrst with black.
  * The color values may be specified as RGB triples or as SWT constants.
  * </p>
- *
+ * 
  * @see org.eclipse.swt.SWT
  * @since 3.0
  */
@@ -54,7 +55,7 @@ public class RGBContrastFactory implements IColorFactory, IExecutableExtension {
     /**
      * Returns the intensity of an RGB component using the
      * sRGB gamma function.
-     *
+     * 
      * @param val Value to convert.
      * @return Light intensity of the component.
      */
@@ -76,7 +77,7 @@ public class RGBContrastFactory implements IColorFactory, IExecutableExtension {
     /**
      * Returns a measure of the lightness in the perceptual colourspace
      * IPT.
-     *
+     * 
      * @param color The colour in sRGB
      * @return Lightness in IPT space.
      */
@@ -108,8 +109,7 @@ public class RGBContrastFactory implements IColorFactory, IExecutableExtension {
         return (0.4000 * lp) + (0.4000 * mp) + (0.2000 * sp);
     }
 
-    @Override
-	public RGB createColor() {
+    public RGB createColor() {
         /**
          * Determine which pair has a higher contrast by selecting
          * the colour with the furthest distance in lightness.
@@ -138,22 +138,22 @@ public class RGBContrastFactory implements IColorFactory, IExecutableExtension {
 
         if (Math.abs(lbg1 - lfg) > Math.abs(lbg2 - lfg)) {
             return cbg1;
+        } else {
+            return cbg2;
         }
-		return cbg2;
     }
 
     /**
-     * This executable extension requires parameters to be explicitly declared
-     * via the second method described in the <code>IExecutableExtension</code>
-     * documentation.  This class expects that there will be three parameters,
+     * This executable extension requires parameters to be explicitly declared 
+     * via the second method described in the <code>IExecutableExtension</code> 
+     * documentation.  This class expects that there will be three parameters, 
      * <code>foreground</code>, <code>background1</code> and
      * <code>background2</code>, that describe the two colors to be blended.
      * These values may either be RGB triples or SWT constants.
-     *
+     * 
      * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
      */
-    @Override
-	public void setInitializationData(IConfigurationElement config,
+    public void setInitializationData(IConfigurationElement config,
             String propertyName, Object data) throws CoreException {
         if (data instanceof Hashtable) {
             Hashtable table = (Hashtable) data;

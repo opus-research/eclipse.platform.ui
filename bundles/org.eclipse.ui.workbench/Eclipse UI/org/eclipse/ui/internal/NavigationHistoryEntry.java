@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
+
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.INavigationLocation;
@@ -93,8 +94,8 @@ public class NavigationHistoryEntry {
         if (location != null) {
             // location exists or has been restored, use its text.
             // Also update the historyText so that this value will
-            // be saved.  Doing so handles cases where getText() value
-            // may be dynamic.
+            // be saved.  Doing so handles cases where getText() value 
+            // may be dynamic. 
             String text = location.getText();
             if ((text == null) || text.equals("")) { //$NON-NLS-1$
                 text = historyText;
@@ -102,11 +103,12 @@ public class NavigationHistoryEntry {
                 historyText = text;
             }
             return text;
+        } else {
+            return historyText;
         }
-		return historyText;
     }
 
-    /**
+    /** 
      * Saves the state of this entry and its location.
      * Returns true if possible otherwise returns false.
      */
@@ -147,8 +149,11 @@ public class NavigationHistoryEntry {
         locationMemento = mem.getChild(IWorkbenchConstants.TAG_POSITION);
     }
 
-    @Override
-	public String toString() {
+    /*
+     * (non-Javadoc)
+     * Method declared on Object.
+     */
+    public String toString() {
         return "Input<" + editorInfo.editorInput + "> Details<" + location + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
@@ -175,8 +180,9 @@ public class NavigationHistoryEntry {
                     currentEntry.location = location;
                     location = null;
                     return true;
+                } else {
+                    return location.mergeInto(currentEntry.location);
                 }
-				return location.mergeInto(currentEntry.location);
             } else if (currentEntry.location == null) {
                 return true;
             }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
@@ -24,11 +25,11 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * Tests TreeViewer's support for multiple equal elements ().
- *
+ * 
  * @since 3.2
  */
 public class MultipleEqualElementsTreeViewerTest extends TreeViewerTest {
-
+	
 	private TestElement element_2;
 
 	private TestElement element_2_1;
@@ -67,7 +68,6 @@ public class MultipleEqualElementsTreeViewerTest extends TreeViewerTest {
 		return (TreeViewer) fViewer;
 	}
 
-	@Override
 	protected void setUpModel() {
 		/*
 		 * - fRootElement
@@ -155,19 +155,21 @@ public class MultipleEqualElementsTreeViewerTest extends TreeViewerTest {
 		getTreeViewer().expandToLevel(element_1, AbstractTreeViewer.ALL_LEVELS);
 		getTreeViewer().expandToLevel(element_2, AbstractTreeViewer.ALL_LEVELS);
 		getTreeViewer().setSelection(new StructuredSelection(element_1_3));
-		ITreeSelection treeSelection = getTreeViewer().getStructuredSelection();
+		ISelection selection = getTreeViewer().getSelection();
+		assertTrue(selection instanceof ITreeSelection);
+		ITreeSelection treeSelection = (ITreeSelection) selection;
 		assertEquals(new TreeSelection(new TreePath(new Object[] { element_1,
 				element_1_3 }), null), treeSelection);
 		Widget[] items = getTreeViewer().testFindItems(element_2_1_2);
 		TreeItem[] treeItems = new TreeItem[items.length];
 		System.arraycopy(items, 0, treeItems, 0, items.length);
 		assertEquals(4, treeItems.length);
-		for (TreeItem treeItem : treeItems) {
-			assertNotNull(treeItem);
+		for (int i = 0; i < treeItems.length; i++) {
+			assertNotNull(treeItems[i]);
 		}
 		getTreeViewer().getTree().setSelection(treeItems);
-		treeSelection = getTreeViewer().getStructuredSelection();
-		List<TreePath> paths = Arrays.asList(treeSelection.getPaths());
+		treeSelection = (ITreeSelection) getTreeViewer().getSelection();
+		List paths = Arrays.asList(treeSelection.getPaths());
 		assertEquals(4, paths.size());
 		assertTrue(paths.contains(treePath_1_2_21_212));
 		assertTrue(paths.contains(treePath_1_21_212));
@@ -205,17 +207,17 @@ public class MultipleEqualElementsTreeViewerTest extends TreeViewerTest {
 		getTreeViewer().setExpandedTreePaths(
 				new TreePath[] { treePath_1_2_21, treePath_2_21 });
 		Widget[] items = getTreeViewer().testFindItems(element_2_1);
-		for (Widget item : items) {
-			assertEquals("0-2-1 name-1", ((TreeItem) item).getText());
+		for (int i = 0; i < items.length; i++) {
+			assertEquals("0-2-1 name-1", ((TreeItem) items[i]).getText());
 		}
 		element_2_1.setLabel("billy");
 		// the setLabel call fires a change event which results in a call like this:
 		// getTreeViewer().update(element_2_1, null);
-		for (Widget item : items) {
-			assertEquals("0-2-1 billy", ((TreeItem) item).getText());
+		for (int i = 0; i < items.length; i++) {
+			assertEquals("0-2-1 billy", ((TreeItem) items[i]).getText());
 		}
 	}
-
+	
 	public void testAddWithoutMaterialize() {
 		TestElement newElement = element_2.addChild(TestModelChange.INSERT);
 		getTreeViewer().setExpandedTreePaths(
@@ -223,7 +225,7 @@ public class MultipleEqualElementsTreeViewerTest extends TreeViewerTest {
 		Widget[] items = getTreeViewer().testFindItems(newElement);
 		assertEquals(2, items.length);
 	}
-
+	
 	public void testAddAfterMaterialize() {
 		// materialize before adding
 		getTreeViewer().setExpandedTreePaths(
@@ -234,7 +236,7 @@ public class MultipleEqualElementsTreeViewerTest extends TreeViewerTest {
 		Widget[] items = getTreeViewer().testFindItems(newElement);
 		assertEquals(2, items.length);
 	}
-
+	
 	public void testRemoveWithParentAfterMaterialize() {
 		// materialize
 		getTreeViewer().expandToLevel(element_1, AbstractTreeViewer.ALL_LEVELS);
@@ -256,5 +258,5 @@ public class MultipleEqualElementsTreeViewerTest extends TreeViewerTest {
 		assertEquals(1, getTreeViewer().testFindItems(element_2_1).length);
 		assertEquals(2, getTreeViewer().testFindItems(element_2_1_2).length);
 	}
-
+	
 }

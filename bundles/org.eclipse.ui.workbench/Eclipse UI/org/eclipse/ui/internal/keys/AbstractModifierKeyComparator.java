@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2017 IBM Corporation and others.
+ * Copyright (c) 2003, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,12 @@
 package org.eclipse.ui.internal.keys;
 
 import java.util.Comparator;
+
 import org.eclipse.ui.keys.ModifierKey;
 
 abstract class AbstractModifierKeyComparator implements Comparator {
 
-    @Override
-	public int compare(Object left, Object right) {
+    public int compare(Object left, Object right) {
         ModifierKey modifierKeyLeft = (ModifierKey) left;
         ModifierKey modifierKeyRight = (ModifierKey) right;
         int modifierKeyLeftRank = rank(modifierKeyLeft);
@@ -24,8 +24,9 @@ abstract class AbstractModifierKeyComparator implements Comparator {
 
         if (modifierKeyLeftRank != modifierKeyRightRank) {
 			return modifierKeyLeftRank - modifierKeyRightRank;
+		} else {
+			return modifierKeyLeft.compareTo(modifierKeyRight);
 		}
-		return modifierKeyLeft.compareTo(modifierKeyRight);
     }
 
     protected abstract int rank(ModifierKey modifierKey);

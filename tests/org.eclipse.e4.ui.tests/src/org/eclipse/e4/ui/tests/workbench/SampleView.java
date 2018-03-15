@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,7 +53,7 @@ public class SampleView {
 
 	/**
 	 * Create the sample view.
-	 *
+	 * 
 	 * @param parent
 	 * @param selectionService
 	 */
@@ -63,7 +63,6 @@ public class SampleView {
 		context = outputContext;
 
 		parent.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				if (errorOnWidgetDisposal) {
 					throw new RuntimeException();
@@ -74,7 +73,6 @@ public class SampleView {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.getTree().setData("class", "navigator"); //$NON-NLS-1$ //$NON-NLS-2$
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				outputContext.set(IServiceConstants.ACTIVE_SELECTION,
 						event.getSelection());
@@ -82,7 +80,6 @@ public class SampleView {
 		});
 		viewer.setContentProvider(new ITreeContentProvider() {
 
-			@Override
 			public Object[] getChildren(Object parentElement) {
 				if (parentElement instanceof IConfigurationElement) {
 					return ((IConfigurationElement) parentElement)
@@ -91,7 +88,6 @@ public class SampleView {
 				return null;
 			}
 
-			@Override
 			public Object getParent(Object element) {
 				if (element instanceof IConfigurationElement) {
 					return ((IConfigurationElement) element).getParent();
@@ -99,7 +95,6 @@ public class SampleView {
 				return null;
 			}
 
-			@Override
 			public boolean hasChildren(Object element) {
 				if (element instanceof IConfigurationElement) {
 					return ((IConfigurationElement) element).getChildren().length > 0;
@@ -107,7 +102,6 @@ public class SampleView {
 				return false;
 			}
 
-			@Override
 			public Object[] getElements(Object inputElement) {
 				if (inputElement instanceof IExtension) {
 					return ((IExtension) inputElement)
@@ -116,11 +110,9 @@ public class SampleView {
 				return null;
 			}
 
-			@Override
 			public void dispose() {
 			}
 
-			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 			}

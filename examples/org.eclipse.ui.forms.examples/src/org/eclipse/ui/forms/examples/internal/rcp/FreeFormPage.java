@@ -25,7 +25,7 @@ import org.eclipse.ui.forms.examples.internal.ExamplesPlugin;
 import org.eclipse.ui.forms.widgets.*;
 /**
  * @author dejan
- *
+ * 
  * To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Generation - Code and Comments
  */
@@ -51,7 +51,6 @@ public class FreeFormPage extends FormPage {
 		Hyperlink link = toolkit.createHyperlink(form.getBody(),
 				"Sample hyperlink with longer text.", SWT.WRAP);
 		link.addHyperlinkListener(new HyperlinkAdapter() {
-			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				try {
 					Thread.sleep(1000);
@@ -65,8 +64,7 @@ public class FreeFormPage extends FormPage {
 		createExpandable(form, toolkit);
 		createFormTextSection(form, toolkit);
 	}
-
-	@Override
+	
 	protected void createFormContent(IManagedForm managedForm) {
 		createSharedFormContent(managedForm);
 	}
@@ -85,13 +83,11 @@ public class FreeFormPage extends FormPage {
 		elayout.leftMargin = elayout.rightMargin = 0;
 		final Button button = toolkit.createButton(client, "Button", SWT.PUSH);
 		button.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//openFormWizard(button.getShell(), toolkit.getColors());
 			}
 		});
 		exp.addExpansionListener(new ExpansionAdapter() {
-			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				form.reflow(true);
 			}
@@ -103,7 +99,7 @@ public class FreeFormPage extends FormPage {
 		//td.align = TableWrapData.FILL;
 		exp.setLayoutData(td);
 	}
-
+	
 	private static void createFormTextSection(final ScrolledForm form, FormToolkit toolkit) {
 		Section section =
 			toolkit.createSection(
@@ -119,7 +115,6 @@ public class FreeFormPage extends FormPage {
 		loadFormText(rtext, toolkit);
 
 		section.addExpansionListener(new ExpansionAdapter() {
-			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				form.reflow(false);
 			}
@@ -136,9 +131,8 @@ public class FreeFormPage extends FormPage {
 
 	private static void loadFormText(final FormText rtext, FormToolkit toolkit) {
 		rtext.addHyperlinkListener(new HyperlinkAdapter() {
-			@Override
 			public void linkActivated(HyperlinkEvent e) {
-				MessageDialog.openInformation(rtext.getShell(), "Eclipse Forms",
+				MessageDialog.openInformation(rtext.getShell(), "Eclipse Forms", 
 				"Link activated: href=" + e.getHref());
 			}
 		});
@@ -150,7 +144,6 @@ public class FreeFormPage extends FormPage {
 		final MenuItem item = new MenuItem(menu, SWT.PUSH);
 		item.setText("&Copy");
 		item.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				rtext.copy();
 			}
@@ -158,7 +151,6 @@ public class FreeFormPage extends FormPage {
 		//rtext.setMenu(menu);
 		item.setEnabled(false);
 		rtext.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				item.setEnabled(rtext.canCopy());
 			}

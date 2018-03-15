@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -29,7 +29,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
  * The override tests view.
- *
+ * 
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -48,7 +48,11 @@ public class OverrideTestsView extends ViewPart implements
 
 	private TableViewer viewer;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL |
 				SWT.V_SCROLL);
@@ -62,7 +66,11 @@ public class OverrideTestsView extends ViewPart implements
 		viewer.addSelectionChangedListener(this);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.WorkbenchPart#getAdapter(java.lang.Class)
+	 */
 	public Object getAdapter(Class adapter) {
 		if (IPropertySheetPage.class.equals(adapter)) {
 			if (TestsPerspective.TESTS_PERSPECTIVE_ID.equals(getSite()
@@ -78,14 +86,18 @@ public class OverrideTestsView extends ViewPart implements
 		return super.getAdapter(adapter);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor#getContributorId()
+	 */
 	public String getContributorId() {
 		return "org.eclipse.ui.tests.views.properties.tabbed.override"; //$NON-NLS-1$
 	}
 
 	/**
 	 * Get the currently selected element in the view.
-	 *
+	 * 
 	 * @return the currently selected element in the view.
 	 */
 	public ISelection getSelection() {
@@ -94,28 +106,36 @@ public class OverrideTestsView extends ViewPart implements
 
 	/**
 	 * Get the tabbed property sheet page for the view.
-	 *
+	 * 
 	 * @return the tabbed property sheet page for the view.
 	 */
 	public TabbedPropertySheetPage getTabbedPropertySheetPage() {
 		return tabbedPropertySheetPage;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+	 */
 	public void selectionChanged(SelectionChangedEvent event) {
 		SelectionChangedEvent newEvent = new SelectionChangedEvent(
 				selectionProvider, selectionProvider.getSelection());
 		selectionProvider.selectionChanged(newEvent);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
 
 	/**
 	 * Set the selected element to be the same type as the provided class.
-	 *
+	 * 
 	 * @param elementClass
 	 *            the provided class.
 	 */

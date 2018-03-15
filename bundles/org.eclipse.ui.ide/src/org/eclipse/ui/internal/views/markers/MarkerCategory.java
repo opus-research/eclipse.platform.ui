@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,9 +17,9 @@ import org.eclipse.ui.views.markers.MarkerItem;
 import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 class MarkerCategory extends MarkerSupportItem {
-
+	
 	boolean refreshing;
-
+	
 	int start;
 
 	int end;
@@ -35,7 +35,7 @@ class MarkerCategory extends MarkerSupportItem {
 	/**
 	 * Create a new instance of the receiver that has the markers between
 	 * startIndex and endIndex showing.
-	 *
+	 * 
 	 * @param markers
 	 * @param startIndex
 	 * @param endIndex
@@ -50,26 +50,42 @@ class MarkerCategory extends MarkerSupportItem {
 		name = categoryName;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.views.markers.MarkerSupportItem#getChildren()
+	 */
 	MarkerSupportItem[] getChildren() {
 		if (children == null) {
 			MarkerItem[] allMarkers = markers.getMarkerEntryArray();
 			int totalSize = getChildrenCount();
 			children = new MarkerEntry[totalSize];
 			System.arraycopy(allMarkers, start, children, 0, totalSize);
-			for (MarkerEntry markerEntry : children) {
-				markerEntry.setCategory(this);
+			for (int i = 0; i < children.length; i++) {
+				children[i].setCategory(this);
 			}
 		}
 		return children;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.views.markers.MarkerSupportItem#getChildrenCount
+	 * ()
+	 */
 	int getChildrenCount() {
 		return end - start + 1;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.views.markers.MarkerSupportItem#getDescription()
+	 */
 	String getDescription() {
 		//see Bug 294959
 		//if(refreshing){
@@ -99,16 +115,18 @@ class MarkerCategory extends MarkerSupportItem {
 
 	/**
 	 * Get the highest severity in the receiver.
-	 *
+	 * 
 	 * @return int
 	 */
 	int getHighestSeverity() {
 		if (severity >= 0)
 			return severity;
 		severity = 0;// Reset to info
-		for (MarkerSupportItem supportItem : getChildren()) {
-			if (supportItem.isConcrete()) {
-				int elementSeverity = supportItem.getAttributeValue(IMarker.SEVERITY, -1);
+		MarkerSupportItem[] contents = getChildren();
+		for (int i = 0; i < contents.length; i++) {
+			if (contents[i].isConcrete()) {
+				int elementSeverity = contents[i].getAttributeValue(
+						IMarker.SEVERITY, -1);
 				if (elementSeverity > severity)
 					severity = elementSeverity;
 				if (severity == IMarker.SEVERITY_ERROR)// As bad as it gets
@@ -120,19 +138,27 @@ class MarkerCategory extends MarkerSupportItem {
 
 	/**
 	 * Return the name of the receiver.
-	 *
+	 * 
 	 * @return String
 	 */
 	String getName() {
 		return name;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getParent()
+	 */
 	MarkerSupportItem getParent() {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#isConcrete()
+	 */
 	boolean isConcrete() {
 		return false;
 	}
@@ -140,14 +166,16 @@ class MarkerCategory extends MarkerSupportItem {
 	/**
 	 * Clear the cached values for performance reasons.
 	 */
-	@Override
 	void clearCache() {
-		for (MarkerSupportItem supportItem : getChildren()) {
-			supportItem.clearCache();
+		MarkerSupportItem[] entries = getChildren();
+		for (int i = 0; i < entries.length; i++) {
+			entries[i].clearCache();
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -157,7 +185,9 @@ class MarkerCategory extends MarkerSupportItem {
 		return result;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

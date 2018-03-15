@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.session;
 
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IViewPart;
@@ -19,18 +22,15 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart3;
 import org.eclipse.ui.PlatformUI;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 /**
  * If a view is not activated during a session, it's part is not instantiated.
  * This tests that case, and the outcome should be the view has it's last
  * session state when it is finally instantiated in the workbench.
- *
+ * 
  * @since 3.3
  */
 public class ArbitraryPropertiesViewTest extends TestCase {
-
+	
 	private static final String USER_PROP = "org.eclipse.ui.tests.users";
 
 	private static final String PROBLEM_VIEW_ID = "org.eclipse.ui.views.ProblemView";
@@ -52,7 +52,7 @@ public class ArbitraryPropertiesViewTest extends TestCase {
 	/**
 	 * This is the first part of a 3 part tests. First instantiate a view and
 	 * set a state.
-	 *
+	 * 
 	 * @throws Throwable
 	 */
 	public void test01ActivateView() throws Throwable {
@@ -72,7 +72,7 @@ public class ArbitraryPropertiesViewTest extends TestCase {
 	/**
 	 * The second session doesn't activate the view, so it should not be
 	 * instantiated.
-	 *
+	 * 
 	 * @throws Throwable
 	 */
 	public void test02SecondOpening() throws Throwable {
@@ -81,7 +81,8 @@ public class ArbitraryPropertiesViewTest extends TestCase {
 				.getActivePage();
 
 		IViewReference[] views = page.getViewReferences();
-		for (IViewReference ref : views) {
+		for (int i = 0; i < views.length; i++) {
+			IViewReference ref = views[i];
 			if (ref.getId().equals(VIEW_WITH_STATE_ID)) {
 				assertNull("The view should not be instantiated", ref
 						.getPart(false));
@@ -93,22 +94,26 @@ public class ArbitraryPropertiesViewTest extends TestCase {
 	static class PropListener implements IPropertyChangeListener {
 		public int count = 0;
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+		 */
 		public void propertyChange(PropertyChangeEvent event) {
 			count++;
 		}
-	}
+	};
 
 	/**
 	 * Activate the view and it's state should re-appear.
-	 *
+	 * 
 	 * @throws Throwable
 	 */
 	public void test03PartInstantiation() throws Throwable {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		final IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
 				.getActivePage();
-
+		
 		IViewReference ref = page.findViewReference(VIEW_WITH_STATE_ID);
 		assertEquals("pwebster", ref.getPartProperty(USER_PROP));
 		PropListener listener = new PropListener();

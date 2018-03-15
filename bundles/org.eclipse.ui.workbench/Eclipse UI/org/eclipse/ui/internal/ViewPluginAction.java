@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,17 +38,23 @@ public final class ViewPluginAction extends PartPluginAction {
         registerSelectionListener(viewPart);
     }
 
-    @Override
-	protected IActionDelegate validateDelegate(Object obj)
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
+    protected IActionDelegate validateDelegate(Object obj)
             throws WorkbenchException {
         if (obj instanceof IViewActionDelegate) {
 			return (IViewActionDelegate) obj;
+		} else {
+			throw new WorkbenchException(
+                    "Action must implement IViewActionDelegate"); //$NON-NLS-1$
 		}
-		throw new WorkbenchException("Action must implement IViewActionDelegate"); //$NON-NLS-1$
     }
 
-    @Override
-	protected void initDelegate() {
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
+    protected void initDelegate() {
         super.initDelegate();
         ((IViewActionDelegate) getDelegate()).init(viewPart);
     }
@@ -59,12 +65,13 @@ public final class ViewPluginAction extends PartPluginAction {
      * before the view is stored.  We cannot create the delegate
      * at that time.
      */
-    @Override
-	public boolean isOkToCreateDelegate() {
+    public boolean isOkToCreateDelegate() {
         return super.isOkToCreateDelegate() && viewPart != null;
     }
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.PluginAction#dispose()
+	 */
 	public void dispose() {
 		unregisterSelectionListener(viewPart);
 		super.dispose();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,13 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -25,21 +29,23 @@ import org.eclipse.ui.internal.preferences.WorkbenchPreferenceExtensionNode;
 /**
  * A class that handles filtering preference node items based on a supplied
  * matching string.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class PreferencePatternFilter extends PatternFilter {
 
 	/**
 	 * this cache is needed because
 	 * WorkbenchPreferenceExtensionNode.getKeywordLabels() is expensive. When it
-	 * tracks keyword changes effectively than this cache can be removed.
+	 * tracks keyword changes effectivly than this cache can be removed.
 	 */
-	private Map<WorkbenchPreferenceExtensionNode, Collection<String>> keywordCache = new HashMap<>();
+	private Map keywordCache = new HashMap();
 
 	/**
 	 * Create a new instance of a PreferencePatternFilter
+	 * 
+	 * @param isMatchItem
 	 */
 	public PreferencePatternFilter() {
 		super();
@@ -51,31 +57,44 @@ public class PreferencePatternFilter extends PatternFilter {
 	 * property pages.
 	 */
 	private String[] getKeywords(Object element) {
+		List keywordList = new ArrayList();
 		if (element instanceof WorkbenchPreferenceExtensionNode) {
 			WorkbenchPreferenceExtensionNode workbenchNode = (WorkbenchPreferenceExtensionNode) element;
 
-			Collection<String> keywordCollection = keywordCache.get(element);
+			Collection keywordCollection = (Collection) keywordCache
+					.get(element);
 			if (keywordCollection == null) {
 				keywordCollection = workbenchNode.getKeywordLabels();
-				keywordCache.put(workbenchNode, keywordCollection);
+				keywordCache.put(element, keywordCollection);
 			}
-			return keywordCollection.toArray(new String[keywordCollection.size()]);
+			if (!keywordCollection.isEmpty()){
+				Iterator keywords = keywordCollection.iterator();
+				while (keywords.hasNext()) {
+					keywordList.add(keywords.next());
+				}
+			}
 		}
-		return new String[0];
+		return (String[]) keywordList.toArray(new String[keywordList.size()]);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.dialogs.PatternFilter#isElementSelectable(java.lang.Object)
+	 */
 	public boolean isElementSelectable(Object element) {
 		return element instanceof WorkbenchPreferenceExtensionNode;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.dialogs.PatternFilter#isElementVisible(org.eclipse.jface.viewers.Viewer, java.lang.Object)
+	 */
 	public boolean isElementVisible(Viewer viewer, Object element) {
 	    if (WorkbenchActivityHelper.restrictUseOf(
 	            element))
 	        return false;
-
-		// Preference nodes are not differentiated based on category since
+	    
+		// Preference nodes are not differentiated based on category since 
 		// categories are selectable nodes.
 		if (isLeafMatch(viewer, element)) {
 			return true;
@@ -88,11 +107,14 @@ public class PreferencePatternFilter extends PatternFilter {
 		// Will return true if any subnode of the element matches the search
 		if (filter(viewer, element, children).length > 0) {
 			return true;
-		}
+		}		
 		return false;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.dialogs.PatternFilter#isLeafMatch(org.eclipse.jface.viewers.Viewer, java.lang.Object)
+	 * 
+	 */
 	protected boolean isLeafMatch(Viewer viewer, Object element) {
 		IPreferenceNode node = (IPreferenceNode) element;
 		String text = node.getLabelText();
@@ -102,8 +124,9 @@ public class PreferencePatternFilter extends PatternFilter {
 		}
 
 		// Also need to check the keywords
-		for (String keyword : getKeywords(node)) {
-			if (wordMatches(keyword)) {
+		String[] keywords = getKeywords(node);
+		for (int i = 0; i < keywords.length; i++){
+			if (wordMatches(keywords[i])) {
 				return true;
 			}
 		}

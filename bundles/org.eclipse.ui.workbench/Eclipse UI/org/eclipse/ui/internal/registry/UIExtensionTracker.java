@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,30 +38,33 @@ public class UIExtensionTracker extends ExtensionTracker {
 		this.display = display;
 	}
 
-	@Override
 	protected void applyRemove(final IExtensionChangeHandler handler, final IExtension removedExtension, final Object[] objects) {
 		if (display.isDisposed())
 			return;
 
-		display.asyncExec(() -> {
-            try {
-                handler.removeExtension(removedExtension, objects);
-            } catch (Exception e) {
-                WorkbenchPlugin.log(getClass(), "doRemove", e); //$NON-NLS-1$
+		display.syncExec(new Runnable() {
+
+            public void run() {
+                try {
+                    handler.removeExtension(removedExtension, objects);
+                } catch (Exception e) {
+                    WorkbenchPlugin.log(getClass(), "doRemove", e); //$NON-NLS-1$
+                }
             }
         });
     }
 
-    @Override
-	protected void applyAdd(final IExtensionChangeHandler handler, final IExtension addedExtension) {
+    protected void applyAdd(final IExtensionChangeHandler handler, final IExtension addedExtension) {
 		if (display.isDisposed())
 			return;
 
-		display.asyncExec(() -> {
-			try {
-				handler.addExtension(UIExtensionTracker.this, addedExtension);
-			} catch (Exception e) {
-				WorkbenchPlugin.log(getClass(), "doAdd", e); //$NON-NLS-1$
+        display.syncExec(new Runnable() {
+            public void run() {
+                try {
+                    handler.addExtension(UIExtensionTracker.this, addedExtension);
+                } catch (Exception e) {
+                    WorkbenchPlugin.log(getClass(), "doAdd", e); //$NON-NLS-1$
+                }
             }
         });
     }

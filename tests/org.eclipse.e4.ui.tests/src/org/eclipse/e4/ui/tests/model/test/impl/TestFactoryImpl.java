@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: TestFactoryImpl.java,v 1.3 2010, 2015/06/04 20:22:20 johna Exp $
+ * $Id: TestFactoryImpl.java,v 1.3 2010/06/04 20:22:20 johna Exp $
  */
 package org.eclipse.e4.ui.tests.model.test.impl;
 
@@ -18,20 +18,20 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
- *
+ * 
  * @generated
  */
 public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 	/**
 	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 *
+	 * 
 	 * @generated
 	 */
 	public static MTestFactory init() {
 		try {
 			MTestFactory theTestFactory = (MTestFactory) EPackage.Registry.INSTANCE
-					.getEFactory(MTestPackage.eNS_URI);
+					.getEFactory("http://www.eclipse.org/ui/2010/Test/UIModel/test");
 			if (theTestFactory != null) {
 				return theTestFactory;
 			}
@@ -44,7 +44,7 @@ public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 	/**
 	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 *
+	 * 
 	 * @generated
 	 */
 	public TestFactoryImpl() {
@@ -53,7 +53,7 @@ public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -69,10 +69,9 @@ public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
+	 * 
 	 * @generated
 	 */
-	@Override
 	public MTestHarness createTestHarness() {
 		TestHarnessImpl testHarness = new TestHarnessImpl();
 		return testHarness;
@@ -80,17 +79,16 @@ public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
+	 * 
 	 * @generated
 	 */
-	@Override
 	public MTestPackage getTestPackage() {
 		return (MTestPackage) getEPackage();
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
+	 * 
 	 * @deprecated
 	 * @generated
 	 */

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,12 +19,12 @@ import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
- * A menu for page creation in the workbench.
+ * A menu for page creation in the workbench.  
  * <p>
  * An <code>OpenNewPageMenu</code> is used to populate a menu with
  * "Open Page" actions.  One item is added for each shortcut perspective,
- * as defined by the product ini.  If the user selects one of these items a new page is
- * created in the workbench with the given perspective.
+ * as defined by the product ini.  If the user selects one of these items a new page is 
+ * created in the workbench with the given perspective.  
  * </p><p>
  * The visible perspectives within the menu may also be updated dynamically to
  * reflect user preference.
@@ -39,12 +39,11 @@ import org.eclipse.ui.statushandlers.StatusManager;
  * 		user ui model. See IWorkbench.showPerspective methods.
  * @noextend This class is not intended to be subclassed by clients.
  */
-@Deprecated
 public class OpenNewPageMenu extends PerspectiveMenu {
     private IAdaptable pageInput;
 
     /**
-     * Constructs a new instance of <code>OpenNewPageMenu</code>.
+     * Constructs a new instance of <code>OpenNewPageMenu</code>. 
      * <p>
      * If this method is used be sure to set the page input by invoking
      * <code>setPageInput</code>.  The page input is required when the user
@@ -61,7 +60,7 @@ public class OpenNewPageMenu extends PerspectiveMenu {
     }
 
     /**
-     * Constructs a new instance of <code>OpenNewPageMenu</code>.
+     * Constructs a new instance of <code>OpenNewPageMenu</code>.  
      *
      * @param window the window where a new page is created if an item within
      *		the menu is selected
@@ -72,10 +71,12 @@ public class OpenNewPageMenu extends PerspectiveMenu {
         this.pageInput = input;
     }
 
-    @Override
-	protected void run(IPerspectiveDescriptor desc) {
+    /* (non-Javadoc)
+     * Opens a new page with a particular perspective and input.
+     */
+    protected void run(IPerspectiveDescriptor desc) {
         // Verify page input.
-        if (pageInput == null) {
+        if (pageInput == null) {	
 			StatusUtil.handleStatus(
 					WorkbenchMessages.OpenNewPageMenu_dialogTitle + ": " + //$NON-NLS-1$
 							WorkbenchMessages.OpenNewPageMenu_unknownPageInput,
@@ -94,7 +95,7 @@ public class OpenNewPageMenu extends PerspectiveMenu {
     }
 
     /**
-     * Sets the page input.
+     * Sets the page input.  
      *
      * @param input the page input
      */

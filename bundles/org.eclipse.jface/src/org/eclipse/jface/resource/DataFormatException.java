@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ package org.eclipse.jface.resource;
  * @see StringConverter
  */
 public class DataFormatException extends IllegalArgumentException {
-
+    
     /**
      * Generated serial version UID for this class.
      * @since 3.1

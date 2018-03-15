@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,13 +17,13 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 
 /**
  * A <code>LabelRetargetAction</code> extends the behavior of
- * RetargetAction.  It will track the enable state, label, and
+ * RetargetAction.  It will track the enable state, label, and 
  * tool tip text of the target action..
  * <p>
  * This class may be instantiated. It is not intented to be subclassed.
  * </p>
  *
- * @since 2.0
+ * @since 2.0 
  * @noextend This class is not intended to be subclassed by clients.
  */
 public class LabelRetargetAction extends RetargetAction {
@@ -41,7 +41,7 @@ public class LabelRetargetAction extends RetargetAction {
 
     /**
      * Constructs a LabelRetargetAction with the given action id and text.
-     *
+     * 
      * @param actionID the retargetable action id
      * @param text the action's text, or <code>null</code> if there is no text
      */
@@ -51,7 +51,7 @@ public class LabelRetargetAction extends RetargetAction {
 
     /**
      * Constructs a RetargetAction with the given action id, text and style.
-     *
+     * 
      * @param actionID the retargetable action id
      * @param text the action's text, or <code>null</code> if there is no text
      * @param style one of <code>AS_PUSH_BUTTON</code>, <code>AS_CHECK_BOX</code>,
@@ -69,8 +69,7 @@ public class LabelRetargetAction extends RetargetAction {
     /**
      * The action handler has changed.  Update self.
      */
-    @Override
-	protected void propagateChange(PropertyChangeEvent event) {
+    protected void propagateChange(PropertyChangeEvent event) {
         super.propagateChange(event);
         String prop = event.getProperty();
         if (prop.equals(IAction.TEXT)) {
@@ -87,8 +86,7 @@ public class LabelRetargetAction extends RetargetAction {
     /**
      * Sets the action handler.  Update self.
      */
-    @Override
-	protected void setActionHandler(IAction handler) {
+    protected void setActionHandler(IAction handler) {
         // Run the default behavior.
         super.setActionHandler(handler);
 
@@ -108,20 +106,26 @@ public class LabelRetargetAction extends RetargetAction {
         updateImages(handler);
     }
 
-    @Override
-	public void setDisabledImageDescriptor(ImageDescriptor image) {
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
+    public void setDisabledImageDescriptor(ImageDescriptor image) {
         super.setDisabledImageDescriptor(image);
         defaultDisabledImage = image;
     }
 
-    @Override
-	public void setHoverImageDescriptor(ImageDescriptor image) {
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
+    public void setHoverImageDescriptor(ImageDescriptor image) {
         super.setHoverImageDescriptor(image);
         defaultHoverImage = image;
     }
 
-    @Override
-	public void setImageDescriptor(ImageDescriptor image) {
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
+    public void setImageDescriptor(ImageDescriptor image) {
         super.setImageDescriptor(image);
         defaultImage = image;
     }
@@ -129,8 +133,7 @@ public class LabelRetargetAction extends RetargetAction {
     /**
      * Sets the action's label text to the given value.
      */
-    @Override
-	public void setText(String text) {
+    public void setText(String text) {
         super.setText(text);
         acceleratorText = LegacyActionTools.extractAcceleratorText(text);
         defaultText = text;
@@ -140,8 +143,7 @@ public class LabelRetargetAction extends RetargetAction {
      * Sets the tooltip text to the given text.
      * The value <code>null</code> clears the tooltip text.
      */
-    @Override
-	public void setToolTipText(String text) {
+    public void setToolTipText(String text) {
         super.setToolTipText(text);
         defaultToolTipText = text;
     }
@@ -159,9 +161,7 @@ public class LabelRetargetAction extends RetargetAction {
         String str = removeAcceleratorText(newText);
         // Append our accelerator
         if (acceleratorText != null) {
-			str = str + '\t' + acceleratorText;
-		} else if (str != newText) {
-			str = str + '\t';
+			str = str + acceleratorText;
 		}
         return str;
     }

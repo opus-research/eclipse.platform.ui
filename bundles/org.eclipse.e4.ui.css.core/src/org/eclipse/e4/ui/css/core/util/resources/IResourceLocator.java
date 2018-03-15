@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ public interface IResourceLocator extends IURIResolver {
 
 	/**
 	 * Return {@link InputStream} from the <code>uri</code>.
-	 *
+	 * 
 	 * @param uri
 	 * @return
 	 * @throws Exception
@@ -29,7 +29,7 @@ public interface IResourceLocator extends IURIResolver {
 
 	/**
 	 * Return {@link Reader} from the <code>uri</code>.
-	 *
+	 * 
 	 * @param uri
 	 * @return
 	 * @throws Exception

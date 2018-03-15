@@ -1,10 +1,10 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -222,15 +222,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	public static final int PLACEHOLDER__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PLACEHOLDER__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Ref</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -258,13 +249,13 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	public static final int PLACEHOLDER_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PLACEHOLDER___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int PLACEHOLDER___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Placeholder</em>' class.
@@ -421,15 +412,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	public static final int PERSPECTIVE__ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PERSPECTIVE__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -475,31 +457,13 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	public static final int PERSPECTIVE__TOOLTIP = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PERSPECTIVE__LOCALIZED_LABEL = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 3;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PERSPECTIVE__LOCALIZED_TOOLTIP = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 4;
-
-	/**
 	 * The feature id for the '<em><b>Context</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PERSPECTIVE__CONTEXT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 5;
+	public static final int PERSPECTIVE__CONTEXT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Variables</b></em>' attribute list.
@@ -508,7 +472,7 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PERSPECTIVE__VARIABLES = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 6;
+	public static final int PERSPECTIVE__VARIABLES = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Properties</b></em>' map.
@@ -517,25 +481,7 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PERSPECTIVE__PROPERTIES = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 7;
-
-	/**
-	 * The feature id for the '<em><b>Handlers</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PERSPECTIVE__HANDLERS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 8;
-
-	/**
-	 * The feature id for the '<em><b>Binding Contexts</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PERSPECTIVE__BINDING_CONTEXTS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 9;
+	public static final int PERSPECTIVE__PROPERTIES = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Windows</b></em>' containment reference list.
@@ -544,16 +490,7 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PERSPECTIVE__WINDOWS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 10;
-
-	/**
-	 * The feature id for the '<em><b>Trim Bars</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PERSPECTIVE__TRIM_BARS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 11;
+	public static final int PERSPECTIVE__WINDOWS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 6;
 
 	/**
 	 * The number of structural features of the '<em>Perspective</em>' class.
@@ -562,16 +499,34 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PERSPECTIVE_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 12;
+	public static final int PERSPECTIVE_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 7;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PERSPECTIVE___UPDATE_LOCALIZATION = UiPackageImpl.ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int PERSPECTIVE___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PERSPECTIVE___GET_LOCALIZED_LABEL = UiPackageImpl.ELEMENT_CONTAINER_OPERATION_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PERSPECTIVE___GET_LOCALIZED_TOOLTIP = UiPackageImpl.ELEMENT_CONTAINER_OPERATION_COUNT + 1;
 
 	/**
 	 * The number of operations of the '<em>Perspective</em>' class.
@@ -580,7 +535,7 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PERSPECTIVE_OPERATION_COUNT = UiPackageImpl.ELEMENT_CONTAINER_OPERATION_COUNT + 0;
+	public static final int PERSPECTIVE_OPERATION_COUNT = UiPackageImpl.ELEMENT_CONTAINER_OPERATION_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveStackImpl <em>Perspective Stack</em>}' class.
@@ -728,15 +683,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	public static final int PERSPECTIVE_STACK__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PERSPECTIVE_STACK__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -764,13 +710,13 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	public static final int PERSPECTIVE_STACK_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PERSPECTIVE_STACK___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int PERSPECTIVE_STACK___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Perspective Stack</em>' class.
@@ -927,15 +873,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	public static final int AREA__ACCESSIBILITY_PHRASE = BasicPackageImpl.PART_SASH_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int AREA__LOCALIZED_ACCESSIBILITY_PHRASE = BasicPackageImpl.PART_SASH_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -990,40 +927,40 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	public static final int AREA__TOOLTIP = BasicPackageImpl.PART_SASH_CONTAINER_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int AREA__LOCALIZED_LABEL = BasicPackageImpl.PART_SASH_CONTAINER_FEATURE_COUNT + 3;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int AREA__LOCALIZED_TOOLTIP = BasicPackageImpl.PART_SASH_CONTAINER_FEATURE_COUNT + 4;
-
-	/**
 	 * The number of structural features of the '<em>Area</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int AREA_FEATURE_COUNT = BasicPackageImpl.PART_SASH_CONTAINER_FEATURE_COUNT + 5;
+	public static final int AREA_FEATURE_COUNT = BasicPackageImpl.PART_SASH_CONTAINER_FEATURE_COUNT + 3;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int AREA___UPDATE_LOCALIZATION = BasicPackageImpl.PART_SASH_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int AREA___GET_LOCALIZED_ACCESSIBILITY_PHRASE = BasicPackageImpl.PART_SASH_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int AREA___GET_LOCALIZED_LABEL = BasicPackageImpl.PART_SASH_CONTAINER_OPERATION_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int AREA___GET_LOCALIZED_TOOLTIP = BasicPackageImpl.PART_SASH_CONTAINER_OPERATION_COUNT + 1;
 
 	/**
 	 * The number of operations of the '<em>Area</em>' class.
@@ -1032,7 +969,7 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int AREA_OPERATION_COUNT = BasicPackageImpl.PART_SASH_CONTAINER_OPERATION_COUNT + 0;
+	public static final int AREA_OPERATION_COUNT = BasicPackageImpl.PART_SASH_CONTAINER_OPERATION_COUNT + 2;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -1209,20 +1146,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	}
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link org.eclipse.e4.ui.model.application.ui.advanced.MPerspective#getTrimBars <em>Trim Bars</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Trim Bars</em>'.
-	 * @see org.eclipse.e4.ui.model.application.ui.advanced.MPerspective#getTrimBars()
-	 * @see #getPerspective()
-	 * @generated
-	 */
-	public EReference getPerspective_TrimBars() {
-		return (EReference)perspectiveEClass.getEStructuralFeatures().get(1);
-	}
-
-
-	/**
 	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack <em>Perspective Stack</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1282,7 +1205,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 
 		perspectiveEClass = createEClass(PERSPECTIVE);
 		createEReference(perspectiveEClass, PERSPECTIVE__WINDOWS);
-		createEReference(perspectiveEClass, PERSPECTIVE__TRIM_BARS);
 
 		perspectiveStackEClass = createEClass(PERSPECTIVE_STACK);
 
@@ -1315,7 +1237,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 		// Obtain other dependent packages
 		UiPackageImpl theUiPackage = (UiPackageImpl)EPackage.Registry.INSTANCE.getEPackage(UiPackageImpl.eNS_URI);
 		BasicPackageImpl theBasicPackage = (BasicPackageImpl)EPackage.Registry.INSTANCE.getEPackage(BasicPackageImpl.eNS_URI);
-		CommandsPackageImpl theCommandsPackage = (CommandsPackageImpl)EPackage.Registry.INSTANCE.getEPackage(CommandsPackageImpl.eNS_URI);
 
 		// Create type parameters
 
@@ -1332,10 +1253,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 		g1 = createEGenericType(theUiPackage.getUILabel());
 		perspectiveEClass.getEGenericSuperTypes().add(g1);
 		g1 = createEGenericType(theUiPackage.getContext());
-		perspectiveEClass.getEGenericSuperTypes().add(g1);
-		g1 = createEGenericType(theCommandsPackage.getHandlerContainer());
-		perspectiveEClass.getEGenericSuperTypes().add(g1);
-		g1 = createEGenericType(theCommandsPackage.getBindings());
 		perspectiveEClass.getEGenericSuperTypes().add(g1);
 		g1 = createEGenericType(theUiPackage.getUIElement());
 		perspectiveStackEClass.getEGenericSuperTypes().add(g1);
@@ -1357,7 +1274,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 
 		initEClass(perspectiveEClass, MPerspective.class, "Perspective", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEReference(getPerspective_Windows(), theBasicPackage.getWindow(), null, "windows", null, 0, -1, MPerspective.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-		initEReference(getPerspective_TrimBars(), theBasicPackage.getTrimBar(), null, "trimBars", null, 0, -1, MPerspective.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(perspectiveStackEClass, MPerspectiveStack.class, "PerspectiveStack", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 
@@ -1420,14 +1336,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 		 * @generated
 		 */
 		public static final EReference PERSPECTIVE__WINDOWS = eINSTANCE.getPerspective_Windows();
-
-		/**
-		 * The meta object literal for the '<em><b>Trim Bars</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		public static final EReference PERSPECTIVE__TRIM_BARS = eINSTANCE.getPerspective_TrimBars();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveStackImpl <em>Perspective Stack</em>}' class.

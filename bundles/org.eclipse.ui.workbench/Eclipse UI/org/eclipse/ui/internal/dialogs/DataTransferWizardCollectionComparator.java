@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,16 +22,16 @@ import org.eclipse.ui.internal.registry.WizardsRegistryReader;
  *
  *	NOTE exceptions to the above: an element with the system's reserved
  *	category for Other Wizards will always be sorted such that it will
- *	ultimately be placed at the end of the sorted result, and an elemen
- *  with the reserved category name for General wizards will always be
+ *	ultimately be placed at the end of the sorted result, and an elemen 
+ *  with the reserved category name for General wizards will always be 
  *  placed at the beginning of the sorted result.
- *
+ *  
  *  @since 3.2
  */
 class DataTransferWizardCollectionComparator extends ViewerComparator {
 	/**
 	 * Static instance of this class.
-	 */
+	 */	
     public final static DataTransferWizardCollectionComparator INSTANCE = new DataTransferWizardCollectionComparator();
 
     /**
@@ -43,8 +43,7 @@ class DataTransferWizardCollectionComparator extends ViewerComparator {
         super();
     }
 
-    @Override
-	public int category(Object element) {
+    public int category(Object element) {
 		if (element instanceof WizardCollectionElement){
 			String id = ((WizardCollectionElement)element).getId();
     		if (WizardsRegistryReader.GENERAL_WIZARD_CATEGORY.equals(id)) {
@@ -59,11 +58,10 @@ class DataTransferWizardCollectionComparator extends ViewerComparator {
 	}
 
 	/**
-     *	Return true if this sorter is affected by a property
+     *	Return true if this sorter is affected by a property 
      *	change of propertyName on the specified element.
      */
-    @Override
-	public boolean isSorterProperty(Object object, String propertyId) {
+    public boolean isSorterProperty(Object object, String propertyId) {
         return propertyId.equals(IBasicPropertyConstants.P_TEXT);
     }
 }

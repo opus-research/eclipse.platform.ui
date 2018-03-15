@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sebastian Lohmeier <sebastian@monochromata.de> - Bug 484310
  ******************************************************************************/
 
 package org.eclipse.ui.tests.filteredtree;
@@ -33,27 +32,26 @@ public class FilteredTreeTests extends UITestCase {
 	// create an 8000-item Tree
 	private static int DEPTH = 3;
 	private static int NUM_ITEMS = 20;
-
+	
 	private class MyFilteredTree extends FilteredTree{
 		public MyFilteredTree(Composite comp, int style) {
 			super(comp);
 			doSomeStuffBeforeWidgetCreation();
 			init(style, new PatternFilter());
 		}
-
+		
 		private void doSomeStuffBeforeWidgetCreation(){
 			// do nothing
 		}
 	}
-
+	
 	private abstract class FilteredTreeDialog extends Dialog {
 		private int style;
-
+		
 		public FilteredTreeDialog(Shell shell, int treeStyle){
 			super(shell);
 			style = treeStyle;
 		}
-		@Override
 		protected Control createContents(Composite parent) {
 			Composite c = new Composite(parent, SWT.NONE);
 			c.setLayout(new GridLayout());
@@ -65,10 +63,10 @@ public class FilteredTreeTests extends UITestCase {
 			return parent;
 		}
 
-		protected abstract FilteredTree doCreateFilteredTree(Composite comp, int style);
-
-	}
-
+		protected abstract FilteredTree doCreateFilteredTree(Composite comp, int style); 
+		
+	};	
+	
 	/**
 	 * @param testName
 	 */
@@ -80,7 +78,7 @@ public class FilteredTreeTests extends UITestCase {
 		runFilteredTreeTest(SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.BORDER);
 	}
-
+	
 	public void testCreateCheckboxFilteredTree(){
 		runFilteredTreeTest(SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.BORDER | SWT.CHECK);
@@ -89,66 +87,40 @@ public class FilteredTreeTests extends UITestCase {
 	 * Tests creation of a subclass of filtered tree, using alternate constructor.
 	 */
 	public void testCreateMyFilteredTree(){
-		fRootElement = TestElement.createModel(DEPTH, NUM_ITEMS);
+		fRootElement = TestElement.createModel(DEPTH, NUM_ITEMS);	
 		final int treeStyle = SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL |SWT.FLAT;
-
+		
 		Dialog dialog = new FilteredTreeDialog((Shell)null, treeStyle){
-			@Override
 			protected FilteredTree doCreateFilteredTree(Composite comp, int style) {
 				return createMyFilteredTree(comp, treeStyle);
 			}
 		};
 
 		dialog.create();
-
 		Assert.isNotNull(fTreeViewer, "Filtered tree is null");
-		assertNumberOfTopLevelItems(NUM_ITEMS);
-
+		int itemCount = fTreeViewer.getViewer().getTree().getItemCount();
+		Assert.isTrue(itemCount == NUM_ITEMS, "tree item count " + itemCount
+				+ " does not match expected: " + NUM_ITEMS);
 		dialog.close();
 	}
-
-	public void testAddAndRemovePattern() {
-		Dialog dialog = createFilteredTreeDialog();
-
-		Assert.isNotNull(fTreeViewer, "Filtered tree is null");
-		assertNumberOfTopLevelItems(NUM_ITEMS);
-
-		applyPattern("0-0-0-0 name-*");
-		assertNumberOfTopLevelItems(1);
-
-		applyPattern("");
-		assertNumberOfTopLevelItems(NUM_ITEMS);
-
-		dialog.close();
-	}
-
+	
 	private void runFilteredTreeTest(final int treeStyle){
-		Dialog dialog = createFilteredTreeDialog(treeStyle);
-
-		Assert.isNotNull(fTreeViewer, "Filtered tree is null");
-		assertNumberOfTopLevelItems(NUM_ITEMS);
-
-		dialog.close();
-	}
-
-	private Dialog createFilteredTreeDialog() {
-		return createFilteredTreeDialog(SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-	}
-
-	private Dialog createFilteredTreeDialog(final int treeStyle) {
-		fRootElement = TestElement.createModel(DEPTH, NUM_ITEMS);
-
+		fRootElement = TestElement.createModel(DEPTH, NUM_ITEMS);	
+		
 		Dialog dialog = new FilteredTreeDialog((Shell)null, treeStyle){
-			@Override
 			protected FilteredTree doCreateFilteredTree(Composite comp, int style) {
 				return createFilteredTree(comp, treeStyle);
 			}
 		};
 
 		dialog.create();
-		return dialog;
+		Assert.isNotNull(fTreeViewer, "Filtered tree is null");
+		int itemCount = fTreeViewer.getViewer().getTree().getItemCount();
+		Assert.isTrue(itemCount == NUM_ITEMS, "tree item count " + itemCount
+				+ " does not match expected: " + NUM_ITEMS);
+		dialog.close();
 	}
-
+	
 	private FilteredTree createFilteredTree(Composite parent, int style){
 	      Composite c = new Composite(parent, SWT.NONE);
 	      c.setLayout(new GridLayout());
@@ -161,9 +133,9 @@ public class FilteredTreeTests extends UITestCase {
 		  fTree.getViewer().setContentProvider(new TestModelContentProvider());
 		  fTree.getViewer().setLabelProvider(new LabelProvider());
 
-	      return fTree;
+	      return fTree;	
 	}
-
+	
 	private FilteredTree createMyFilteredTree(Composite parent, int style){
 		Composite c = new Composite(parent, SWT.NONE);
 	    c.setLayout(new GridLayout());
@@ -176,28 +148,16 @@ public class FilteredTreeTests extends UITestCase {
 		fTree.getViewer().setLabelProvider(new LabelProvider());
 		return fTree;
 	}
-
-	private void assertNumberOfTopLevelItems(int expectedCount) {
-		int actualCount = fTreeViewer.getViewer().getTree().getItemCount();
-		Assert.isTrue(actualCount == expectedCount,
-				"tree item count " + actualCount + " does not match expected: " + expectedCount);
-	}
-
-	private void applyPattern(String pattern) {
-		fTreeViewer.getPatternFilter().setPattern(pattern);
-		fTreeViewer.getViewer().refresh();
-	}
-
+	
 	private void setInput() {
 		fTreeViewer.getViewer().setInput(fRootElement);
 	}
 
-	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		fTreeViewer = null;
 		fRootElement = null;
-	}
-
-
+	}	
+	
+	
 }

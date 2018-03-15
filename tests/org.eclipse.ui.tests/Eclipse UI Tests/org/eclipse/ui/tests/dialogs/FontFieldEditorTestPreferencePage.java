@@ -33,8 +33,7 @@ public class FontFieldEditorTestPreferencePage extends
     /**
      * @see org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors()
      */
-    @Override
-	protected void createFieldEditors() {
+    protected void createFieldEditors() {
 
         Composite feParent = getFieldEditorParent();
 
@@ -54,8 +53,7 @@ public class FontFieldEditorTestPreferencePage extends
     /**
      * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
      */
-    @Override
-	public void init(IWorkbench workbench) {
+    public void init(IWorkbench workbench) {
     }
 
 }

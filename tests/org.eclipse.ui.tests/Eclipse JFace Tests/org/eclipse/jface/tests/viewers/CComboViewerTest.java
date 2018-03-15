@@ -24,23 +24,20 @@ public class CComboViewerTest extends StructuredViewerTest {
         super(name);
     }
 
-    @Override
-	protected StructuredViewer createViewer(Composite parent) {
+    protected StructuredViewer createViewer(Composite parent) {
     	CCombo cCombo = new CCombo(parent, SWT.READ_ONLY | SWT.BORDER);
         ComboViewer viewer = new ComboViewer(cCombo);
         viewer.setContentProvider(new TestModelContentProvider());
         return viewer;
     }
 
-    @Override
-	protected int getItemCount() {
+    protected int getItemCount() {
         TestElement first = fRootElement.getFirstChild();
         CCombo list = (CCombo) fViewer.testFindItem(first);
         return list.getItemCount();
     }
 
-    @Override
-	protected String getItemText(int at) {
+    protected String getItemText(int at) {
         CCombo list = (CCombo) fViewer.getControl();
         return list.getItem(at);
     }
@@ -50,10 +47,9 @@ public class CComboViewerTest extends StructuredViewerTest {
     }
 
     /**
-     * TODO: Determine if this test is applicable to ComboViewer
+     * TODO: Determine if this test is applicable to ComboViewer 
      */
-    @Override
-	public void testInsertChild() {
+    public void testInsertChild() {
 
     }
 }

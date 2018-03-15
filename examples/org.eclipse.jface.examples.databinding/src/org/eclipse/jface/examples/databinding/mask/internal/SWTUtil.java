@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ public class SWTUtil {
     /**
      * Stores a work queue for each display
      */
-	private static Map<Display, WorkQueue> mapDisplayOntoWorkQueue = new HashMap<>();
+    private static Map mapDisplayOntoWorkQueue = new HashMap();
 
     private SWTUtil() {
     }
@@ -33,11 +33,11 @@ public class SWTUtil {
      * possible, the runnable will be executed before the next widget is
      * repainted, but this behavior is not guaranteed. Use this method to
      * schedule work will affect the way one or more widgets are drawn.
-     *
+     * 
      * <p>
      * This is threadsafe.
      * </p>
-     *
+     * 
      * @param d
      *            display
      * @param r
@@ -62,11 +62,11 @@ public class SWTUtil {
      * scheduled for execution. Use this method to schedule work that will
      * affect the way one or more wigdets are drawn, but that should only happen
      * once.
-     *
+     * 
      * <p>
      * This is threadsafe.
      * </p>
-     *
+     * 
      * @param d
      *            display
      * @param r
@@ -85,7 +85,7 @@ public class SWTUtil {
      * Cancels a greedyExec or runOnce that was previously scheduled on the
      * given display. Has no effect if the given runnable is not in the queue
      * for the given display
-     *
+     * 
      * @param d
      *            target display
      * @param r
@@ -102,7 +102,7 @@ public class SWTUtil {
     /**
      * Returns the work queue for the given display. Creates a work queue if
      * none exists yet.
-     *
+     * 
      * @param d
      *            display to return queue for
      * @return a work queue (never null)
@@ -111,7 +111,7 @@ public class SWTUtil {
         WorkQueue result;
         synchronized (mapDisplayOntoWorkQueue) {
             // Look for existing queue
-			result = mapDisplayOntoWorkQueue.get(d);
+            result = (WorkQueue) mapDisplayOntoWorkQueue.get(d);
 
             if (result == null) {
                 // If none, create new queue
@@ -119,11 +119,9 @@ public class SWTUtil {
                 final WorkQueue q = result;
                 mapDisplayOntoWorkQueue.put(d, result);
                 d.asyncExec(new Runnable() {
-                    @Override
-					public void run() {
+                    public void run() {
                         d.disposeExec(new Runnable() {
-                            @Override
-							public void run() {
+                            public void run() {
                                 synchronized (mapDisplayOntoWorkQueue) {
                                     q.cancelAll();
                                     mapDisplayOntoWorkQueue.remove(d);
@@ -136,7 +134,7 @@ public class SWTUtil {
             return result;
         }
     }
-
+    
     /**
      * @param rgb1
      * @param rgb2
@@ -144,11 +142,11 @@ public class SWTUtil {
      * @return the RGB object
      */
     public static RGB mix(RGB rgb1, RGB rgb2, double ratio) {
-        return new RGB(interp(rgb1.red, rgb2.red, ratio),
+        return new RGB(interp(rgb1.red, rgb2.red, ratio), 
                 interp(rgb1.green, rgb2.green, ratio),
                 interp(rgb1.blue, rgb2.blue, ratio));
     }
-
+    
     private static int interp(int i1, int i2, double ratio) {
         int result = (int)(i1 * ratio + i2 * (1.0d - ratio));
         if (result < 0) result = 0;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ public class FormsResources {
 	private static Cursor busyCursor;
 	private static Cursor handCursor;
 	private static Cursor textCursor;
-
+	
 	public static Cursor getBusyCursor() {
 		if (busyCursor==null)
 			busyCursor = new Cursor(Display.getCurrent(), SWT.CURSOR_WAIT);
@@ -43,7 +43,7 @@ public class FormsResources {
 			textCursor = new Cursor(Display.getCurrent(), SWT.CURSOR_IBEAM);
 		return textCursor;
 	}
-
+	
 	public static int getProgressDelay(int index) {
 		/*
 		if (progressDelays==null)
@@ -52,7 +52,7 @@ public class FormsResources {
 		*/
 		return 100;
 	}
-
+	
 	public static void shutdown() {
 		if (busyCursor!=null)
 			busyCursor.dispose();

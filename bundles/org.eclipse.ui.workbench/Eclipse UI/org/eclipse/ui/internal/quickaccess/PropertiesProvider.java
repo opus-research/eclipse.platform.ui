@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,35 +28,38 @@ import org.eclipse.ui.internal.dialogs.PropertyPageManager;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class PropertiesProvider extends QuickAccessProvider {
 
 	private Map idToElement;
 
-	@Override
 	public QuickAccessElement getElementForId(String id) {
 		getElements();
 		return (PropertiesElement) idToElement.get(id);
 	}
 
-	@Override
 	public QuickAccessElement[] getElements() {
 		if (idToElement == null) {
 			idToElement = new HashMap();
-			IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			IWorkbenchPage activePage = PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow().getActivePage();
 			if (activePage != null) {
 				PropertyPageManager pageManager = new PropertyPageManager();
 				ISelection selection = activePage.getSelection();
 				if (selection instanceof IStructuredSelection
 						&& !selection.isEmpty()) {
-					Object element = ((IStructuredSelection) selection).getFirstElement();
-					PropertyPageContributorManager.getManager().contribute(pageManager, element);
-					List list = pageManager.getElements(PreferenceManager.PRE_ORDER);
-					IPreferenceNode[] properties = (IPreferenceNode[]) list.toArray(new IPreferenceNode[list.size()]);
-					for (IPreferenceNode property : properties) {
+					Object element = ((IStructuredSelection) selection)
+							.getFirstElement();
+					PropertyPageContributorManager.getManager().contribute(
+							pageManager, element);
+					List list = pageManager
+							.getElements(PreferenceManager.PRE_ORDER);
+					IPreferenceNode[] properties = (IPreferenceNode[]) list
+							.toArray(new IPreferenceNode[list.size()]);
+					for (int i = 0; i < properties.length; i++) {
 						PropertiesElement propertiesElement = new PropertiesElement(
-								element, property, this);
+								element, properties[i], this);
 						idToElement.put(propertiesElement.getId(),
 								propertiesElement);
 					}
@@ -67,23 +70,19 @@ public class PropertiesProvider extends QuickAccessProvider {
 				new QuickAccessElement[idToElement.values().size()]);
 	}
 
-	@Override
 	public String getId() {
 		return "org.eclipse.ui.properties"; //$NON-NLS-1$
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return WorkbenchImages
 				.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_NODE);
 	}
 
-	@Override
 	public String getName() {
 		return QuickAccessMessages.QuickAccess_Properties;
 	}
 
-	@Override
 	protected void doReset() {
 		idToElement = null;
 	}

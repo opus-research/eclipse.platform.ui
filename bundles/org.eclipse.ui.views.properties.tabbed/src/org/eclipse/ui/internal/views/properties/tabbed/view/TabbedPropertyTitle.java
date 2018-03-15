@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2015 IBM Corporation and others.
+ * Copyright (c) 2001, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -20,20 +20,18 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.FormColors;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 
 /**
  * The title in the tabbed property sheet page.
- *
+ * 
  * @author Anthony Hunter
  */
 public class TabbedPropertyTitle
@@ -44,16 +42,16 @@ public class TabbedPropertyTitle
 	private Image image = null;
 
 	private String text = null;
-
+	
 	private static final String BLANK = ""; //$NON-NLS-1$
 
 	private static final String TITLE_FONT = "org.eclipse.ui.internal.views.properties.tabbed.view.TabbedPropertyTitle"; //$NON-NLS-1$
-
+	
 	private TabbedPropertySheetWidgetFactory factory;
 
 	/**
 	 * Constructor for TabbedPropertyTitle.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite.
 	 * @param factory
@@ -66,14 +64,13 @@ public class TabbedPropertyTitle
 
 		this.addPaintListener(new PaintListener() {
 
-			@Override
 			public void paintControl(PaintEvent e) {
 				if (image == null && (text == null || text.equals(BLANK))) {
 					label.setVisible(false);
 				} else {
 					label.setVisible(true);
+					drawTitleBackground(e);
 				}
-				drawTitleBackground(e);
 			}
 		});
 
@@ -90,12 +87,12 @@ public class TabbedPropertyTitle
 		if (! JFaceResources.getFontRegistry().hasValueFor(TITLE_FONT)) {
 			FontData[] fontData = JFaceResources.getFontRegistry().getBold(
 					JFaceResources.DEFAULT_FONT).getFontData();
-			/* title font is 2pt larger than that used in the tabs. */
+			/* title font is 2pt larger than that used in the tabs. */  
 			fontData[0].setHeight(fontData[0].getHeight() + 2);
 			JFaceResources.getFontRegistry().put(TITLE_FONT, fontData);
 		}
 		font = JFaceResources.getFont(TITLE_FONT);
-
+		
 		label = factory.createCLabel(this, BLANK);
 		label.setBackground(new Color[] {
 				factory.getColors().getColor(IFormColors.H_GRADIENT_END),
@@ -145,7 +142,7 @@ public class TabbedPropertyTitle
 
 	/**
 	 * Set the text label.
-	 *
+	 * 
 	 * @param text
 	 *            the text label.
 	 * @param image
@@ -157,27 +154,9 @@ public class TabbedPropertyTitle
 		if (text != null) {
 			label.setText(text);
 		} else {
-			label.setText(BLANK);
+			label.setText(BLANK); 
 		}
 		label.setImage(image);
 		redraw();
-	}
-
-	public void setColor(String key, RGBA color) {
-		this.factory.getColors().createColor(key, color.rgb);
-	}
-
-	public void resetSectionToolBarColors() {
-		TabbedPropertySheetWidgetFactory f = new TabbedPropertySheetWidgetFactory();
-		FormColors defaultColors = f.getColors();
-		defaultColors.initializeSectionToolBarColors();
-
-		FormColors colors = factory.getColors();
-		colors.createColor(IFormColors.H_GRADIENT_START, defaultColors.getColor(IFormColors.H_GRADIENT_START).getRGB());
-		colors.createColor(IFormColors.H_GRADIENT_END, defaultColors.getColor(IFormColors.H_GRADIENT_END).getRGB());
-		colors.createColor(IFormColors.H_BOTTOM_KEYLINE1,
-				defaultColors.getColor(IFormColors.H_BOTTOM_KEYLINE1).getRGB());
-		colors.createColor(IFormColors.H_BOTTOM_KEYLINE2,
-				defaultColors.getColor(IFormColors.H_BOTTOM_KEYLINE2).getRGB());
 	}
 }

@@ -1,13 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 485848, 485850
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -16,11 +15,11 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.UIEvents.UIElement;
@@ -33,43 +32,43 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
 /**
- * Default SWT renderer responsible for an MArea. See
- * {@link WorkbenchRendererFactory}
+ * Create a contribute part.
  */
 public class AreaRenderer extends SWTPartRenderer {
 
 	@Inject
-	private IEventBroker eventBroker;
+	Logger logger;
+	@Inject
+	IEventBroker eventBroker;
 
-	private EventHandler itemUpdater = event -> {
-		// Ensure that this event is for a MArea
-		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MArea))
-			return;
+	private EventHandler itemUpdater = new EventHandler() {
+		public void handleEvent(Event event) {
+			// Ensure that this event is for a MArea
+			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MArea))
+				return;
 
-		MArea areaModel = (MArea) event
-				.getProperty(UIEvents.EventTags.ELEMENT);
-		CTabFolder ctf = (CTabFolder) areaModel.getWidget();
-		CTabItem areaItem = ctf.getItem(0);
+			MArea areaModel = (MArea) event
+					.getProperty(UIEvents.EventTags.ELEMENT);
+			CTabFolder ctf = (CTabFolder) areaModel.getWidget();
+			CTabItem areaItem = ctf.getItem(0);
 
-		// No widget == nothing to update
-		if (areaItem == null)
-			return;
+			// No widget == nothing to update
+			if (areaItem == null)
+				return;
 
-		String attName = (String) event
-				.getProperty(UIEvents.EventTags.ATTNAME);
-		if (UIEvents.UILabel.LABEL.equals(attName)
-				|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
-			areaItem.setText(areaModel.getLocalizedLabel());
-		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
-			areaItem.setImage(getImage(areaModel));
-		} else if (UIEvents.UILabel.TOOLTIP.equals(attName)
-				|| UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
-			areaItem.setToolTipText(areaModel.getLocalizedTooltip());
+			String attName = (String) event
+					.getProperty(UIEvents.EventTags.ATTNAME);
+			if (UIEvents.UILabel.LABEL.equals(attName)) {
+				areaItem.setText(areaModel.getLocalizedLabel());
+			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
+				areaItem.setImage(getImage(areaModel));
+			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
+				areaItem.setToolTipText(areaModel.getLocalizedTooltip());
+			}
 		}
 	};
 
 	private EventHandler widgetListener = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			final MUIElement changedElement = (MUIElement) event
 					.getProperty(EventTags.ELEMENT);
@@ -104,7 +103,6 @@ public class AreaRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(widgetListener);
 	}
 
-	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MArea) || !(parent instanceof Composite))
 			return null;
@@ -124,8 +122,6 @@ public class AreaRenderer extends SWTPartRenderer {
 		Composite curComp = (Composite) areaModel.getWidget();
 		Composite parentComp = curComp.getParent();
 		CTabFolder ctf = new CTabFolder(parentComp, SWT.BORDER | SWT.SINGLE);
-		// don't paint the split editor area tab highlighted, it looks ugly
-		ctf.setHighlightEnabled(false);
 
 		// Find the stack in the area that used to have the min/max state
 		List<MPartStack> stacks = modelService.findElements(areaModel, null,
@@ -151,10 +147,8 @@ public class AreaRenderer extends SWTPartRenderer {
 			ctf.setMinimized(curCTF.getMinimized());
 			ctf.setMaximized(curCTF.getMaximized());
 
-			if (!areaModel.getTags().contains(IPresentationEngine.MIN_MAXIMIZEABLE_CHILDREN_AREA_TAG)) {
-				curCTF.setMinimizeVisible(false);
-				curCTF.setMaximizeVisible(false);
-			}
+			curCTF.setMinimizeVisible(false);
+			curCTF.setMaximizeVisible(false);
 		}
 
 		CTabItem cti = new CTabItem(ctf, SWT.NONE);
@@ -171,7 +165,7 @@ public class AreaRenderer extends SWTPartRenderer {
 
 		curComp.setData(AbstractPartRenderer.OWNING_ME, null);
 		bindWidget(areaModel, ctf);
-		ctf.requestLayout();
+		ctf.getParent().layout(null, SWT.ALL | SWT.DEFER | SWT.CHANGED);
 	}
 
 	private void ensureComposite(MArea areaModel) {
@@ -202,7 +196,7 @@ public class AreaRenderer extends SWTPartRenderer {
 
 			bindWidget(areaModel, innerComp);
 			innerComp.setVisible(true);
-			innerComp.requestLayout();
+			innerComp.getParent().layout(true, true);
 		}
 	}
 
@@ -222,6 +216,13 @@ public class AreaRenderer extends SWTPartRenderer {
 			ensureComposite(areaModel);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#getUIContainer
+	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
+	 */
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		MUIElement parentElement = element.getParent();

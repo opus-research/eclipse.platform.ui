@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,8 +13,8 @@ package org.eclipse.ui.internal.ide.model;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
@@ -37,8 +37,7 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
     /**
      * Returns an image descriptor for this object.
      */
-    @Override
-	public ImageDescriptor getImageDescriptor(Object o) {
+    public ImageDescriptor getImageDescriptor(Object o) {
         IResource resource = getResource(o);
         return resource == null ? null : getBaseImage(resource);
     }
@@ -46,8 +45,7 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
     /**
      * getLabel method comment.
      */
-    @Override
-	public String getLabel(Object o) {
+    public String getLabel(Object o) {
         IResource resource = getResource(o);
         return resource == null ? null : resource.getName();
     }
@@ -56,8 +54,7 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
      * Returns the parent of the given object.  Returns null if the
      * parent is not available.
      */
-    @Override
-	public Object getParent(Object o) {
+    public Object getParent(Object o) {
         IResource resource = getResource(o);
         return resource == null ? null : resource.getParent();
     }
@@ -67,7 +64,13 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
      * or null if there is none.
      */
     protected IResource getResource(Object o) {
-		return Adapters.adapt(o, IResource.class);
+        if (o instanceof IResource) {
+            return (IResource) o;
+        }
+        if (o instanceof IAdaptable) {
+            return (IResource) ((IAdaptable) o).getAdapter(IResource.class);
+        }
+        return null;
     }
 
     /**
@@ -79,8 +82,7 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
      * @param value the attribute value
      * @return <code>true</code> if the attribute matches; <code>false</code> otherwise
      */
-    @Override
-	public boolean testAttribute(Object target, String name, String value) {
+    public boolean testAttribute(Object target, String name, String value) {
         if (!(target instanceof IResource)) {
             return false;
         }
@@ -122,7 +124,7 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
      * <code>contentTypeId</code>. It is possible that this method call could
      * cause the resource to be read. It is also possible (through poor plug-in
      * design) for this method to load plug-ins.
-     *
+     * 
      * @param resource
      *            The resource for which the content type should be determined;
      *            must not be <code>null</code>.
@@ -162,7 +164,7 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
     /**
      * Tests whether a session or persistent property on the resource or its project
      * matches the given value.
-     *
+     * 
      * @param resource
      *            the resource to check
      * @param persistentFlag
@@ -209,16 +211,16 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
                     return false;
                 }
                 return expectedVal == null || expectedVal.equals(actualVal);
-            }
+            } 
 
             Object actualVal = resToCheck.getSessionProperty(key);
              if (actualVal == null) {
 				return false;
 			}
-
+              
              return expectedVal == null
                         || expectedVal.equals(actualVal.toString());
-
+            
         } catch (CoreException e) {
             // ignore
         }

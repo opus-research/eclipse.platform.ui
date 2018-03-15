@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.ui.IPluginContribution;
 import org.eclipse.ui.internal.ActionExpression;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.registry.RegistryReader;
@@ -25,16 +24,16 @@ import org.eclipse.ui.internal.registry.RegistryReader;
  * class a decorator definition applies to,
  */
 
-public abstract class DecoratorDefinition implements IPluginContribution {
-
+public abstract class DecoratorDefinition {
+	
     private static final String ATT_LABEL = "label"; //$NON-NLS-1$
-
+    
     private static final String ATT_OBJECT_CLASS = "objectClass"; //$NON-NLS-1$
-
+    
     static final String CHILD_ENABLEMENT = "enablement"; //$NON-NLS-1$
-
+    
     private static final String ATT_ADAPTABLE = "adaptable"; //$NON-NLS-1$
-
+    
     private static final String ATT_ENABLED = "state"; //$NON-NLS-1$
 
     private ActionExpression enablement;
@@ -61,37 +60,25 @@ public abstract class DecoratorDefinition implements IPluginContribution {
 
     DecoratorDefinition(String identifier, IConfigurationElement element) {
 
-        this.id = identifier;
+        this.id = identifier;  
         this.definingElement = element;
-
+        
         this.enabled = this.defaultEnabled = Boolean.valueOf(element.getAttribute(ATT_ENABLED)).booleanValue();
     }
 
     /**
-	 * Gets the name.
-	 *
-	 * @return Returns the label attribute from the decorator contribution, or
-	 *         null if the underlined definition is not valid anymore
-	 */
+     * Gets the name.
+     * @return Returns a String
+     */
     public String getName() {
-		if (!definingElement.isValid()) {
-			crashDisable();
-			return null;
-		}
         return definingElement.getAttribute(ATT_LABEL);
     }
 
     /**
-	 * Returns the description
-	 *
-	 * @return Returns the label attribute from the decorator contribution, or
-	 *         null if the underlined definition is not valid anymore
-	 */
+     * Returns the description.
+     * @return String
+     */
     public String getDescription() {
-		if (!definingElement.isValid()) {
-			crashDisable();
-			return null;
-		}
         return RegistryReader.getDescription(definingElement);
     }
 
@@ -141,17 +128,13 @@ public abstract class DecoratorDefinition implements IPluginContribution {
     }
 
     /**
-     * Return whether or not this decorator should be
+     * Return whether or not this decorator should be 
      * applied to adapted types.
-     *
-     * @return whether or not this decorator should be
+     * 
+     * @return whether or not this decorator should be 
      * applied to adapted types
      */
     public boolean isAdaptable() {
-		if (!definingElement.isValid()) {
-			crashDisable();
-			return false;
-		}
     	return Boolean.valueOf(definingElement.getAttribute(ATT_ADAPTABLE)).booleanValue();
     }
 
@@ -166,7 +149,7 @@ public abstract class DecoratorDefinition implements IPluginContribution {
     /**
      * Return the default value for this type - this value
      * is the value read from the element description.
-     *
+     * 
      * @return the default value for this type - this value
      * is the value read from the element description
      */
@@ -190,10 +173,6 @@ public abstract class DecoratorDefinition implements IPluginContribution {
      * Initialize the enablement expression for this decorator
      */
     protected void initializeEnablement() {
-		if (!definingElement.isValid()) {
-			crashDisable();
-			return;
-		}
         IConfigurationElement[] elements = definingElement.getChildren(CHILD_ENABLEMENT);
         if (elements.length == 0) {
             String className = definingElement.getAttribute(ATT_OBJECT_CLASS);
@@ -226,7 +205,7 @@ public abstract class DecoratorDefinition implements IPluginContribution {
 
     /**
      * Return whether or not the decorator registered for element
-     * has a label property called property name. If there is an
+     * has a label property called property name. If there is an 
      * exception disable the receiver and return false.
      * This method should not be called unless a check for
      * isEnabled() has been done first.
@@ -245,7 +224,7 @@ public abstract class DecoratorDefinition implements IPluginContribution {
     }
 
     /**
-     * Gets the label provider and creates it if it does not exist yet.
+     * Gets the label provider and creates it if it does not exist yet. 
      * Throws a CoreException if there is a problem
      * creating the labelProvider.
      * This method should not be called unless a check for
@@ -255,7 +234,7 @@ public abstract class DecoratorDefinition implements IPluginContribution {
     protected abstract IBaseLabelProvider internalGetLabelProvider()
             throws CoreException;
 
-    /**
+    /** 
      * A CoreException has occured. Inform the user and disable
      * the receiver.
      */
@@ -282,7 +261,7 @@ public abstract class DecoratorDefinition implements IPluginContribution {
 
 	/**
 	 * Return the configuration element.
-	 *
+	 * 
 	 * @return the configuration element
 	 * @since 3.1
 	 */
@@ -301,25 +280,9 @@ public abstract class DecoratorDefinition implements IPluginContribution {
     		if(expression != null) {
 				return expression.isEnabledFor(element);
 			}
-			// Always on if no expression and is still enabled
-			return isEnabled();
+    		return true;//Always on if no expression
     	}
     	return false;
-
+       
     }
-
-	@Override
-	public String getPluginId() {
-		IConfigurationElement element = getConfigurationElement();
-		if (!element.isValid()) {
-			crashDisable();
-			return null;
-		}
-		return element.getContributor().getName();
-	}
-
-	@Override
-	public String getLocalId() {
-		return getId();
-	}
 }

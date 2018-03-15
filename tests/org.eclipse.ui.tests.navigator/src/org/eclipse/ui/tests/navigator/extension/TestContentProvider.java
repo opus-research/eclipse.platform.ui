@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  * IBM Corporation - initial API and implementation
- * Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 package org.eclipse.ui.tests.navigator.extension;
 
@@ -50,42 +49,41 @@ public class TestContentProvider implements ITreeContentProvider,
 	private final Map rootElements = new HashMap();
 
 	private StructuredViewer viewer;
-
+	
 	public static TestExtensionTreeData _modelRoot;
-
+	
 	public static boolean _dieOnSetInput;
 	public static boolean _diedOnSetInput;
-
+	
 	public TestContentProvider() {
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
 		_dieOnSetInput = false;
 		_diedOnSetInput = false;
 	}
 
-	@Override
 	public Object[] getElements(Object inputElement) {
 		return getChildren(inputElement);
 	}
 
-	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof TestExtensionTreeData) {
 			TestExtensionTreeData data = (TestExtensionTreeData) parentElement;
 			return data.getChildren();
 		} else {
 
-			IProject project = adaptToProject(parentElement);
+			IProject project = adaptToProject(parentElement);  
 			if (project != null && project.isAccessible()) {
 				IFile modelFile = project.getFile(MODEL_FILE_PATH);
 				if (rootElements.containsKey(modelFile)) {
-					TestExtensionTreeData model = (TestExtensionTreeData) rootElements.get(modelFile);
+					TestExtensionTreeData model = (TestExtensionTreeData) rootElements
+							.get(modelFile);
 					return model != null ? model.getChildren() : NO_CHILDREN;
 				} else {
 					TestExtensionTreeData model = updateModel(modelFile);
 					return model != null ? model.getChildren() : NO_CHILDREN;
 				}
 			}
-		}
+		}  
 		return NO_CHILDREN;
 	}
 
@@ -98,9 +96,9 @@ public class TestContentProvider implements ITreeContentProvider,
 		if(parentElement instanceof IProject)
 			return (IProject) parentElement;
 		else if(parentElement instanceof IAdaptable)
-			return ((IAdaptable) parentElement).getAdapter(IProject.class);
-		else
-			return Platform.getAdapterManager().getAdapter(parentElement, IProject.class);
+			return (IProject) ((IAdaptable) parentElement).getAdapter(IProject.class);
+		else 
+			return (IProject) Platform.getAdapterManager().getAdapter(parentElement, IProject.class); 
 	}
 
 	/**
@@ -109,7 +107,8 @@ public class TestContentProvider implements ITreeContentProvider,
 	private TestExtensionTreeData updateModel(IFile modelFile) {
 		Properties model = new Properties();
 		if (modelFile.exists()) {
-			try (InputStream is = modelFile.getContents()) {
+			try {
+				InputStream is = modelFile.getContents();
 				model.load(is);
 				is.close();
 				TestExtensionTreeData root = new TestExtensionTreeData(null,
@@ -117,7 +116,8 @@ public class TestContentProvider implements ITreeContentProvider,
 				_modelRoot = root;
 				rootElements.put(modelFile, root);
 				return root;
-			} catch (IOException | CoreException e) {
+			} catch (IOException e) {
+			} catch (CoreException e) {
 			}
 		} else {
 			rootElements.remove(modelFile);
@@ -126,7 +126,6 @@ public class TestContentProvider implements ITreeContentProvider,
 
 	}
 
-	@Override
 	public Object getParent(Object element) {
 		if (element instanceof TestExtensionTreeData) {
 			TestExtensionTreeData data = (TestExtensionTreeData) element;
@@ -135,7 +134,6 @@ public class TestContentProvider implements ITreeContentProvider,
 		return null;
 	}
 
-	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof TestExtensionTreeData) {
 			TestExtensionTreeData data = (TestExtensionTreeData) element;
@@ -144,14 +142,12 @@ public class TestContentProvider implements ITreeContentProvider,
 		return false;
 	}
 
-	@Override
 	public void dispose() {
 		rootElements.clear();
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
 
 	}
 
-	@Override
 	public void inputChanged(Viewer aViewer, Object oldInput, Object newInput) {
 		if (_dieOnSetInput)
 			_diedOnSetInput = true;
@@ -161,19 +157,27 @@ public class TestContentProvider implements ITreeContentProvider,
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
+	 */
 	public void resourceChanged(IResourceChangeEvent event) {
 
 		IResourceDelta delta = event.getDelta();
 		try {
 			delta.accept(this);
-		} catch (CoreException e) {
+		} catch (CoreException e) { 
 			e.printStackTrace();
 		}
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.resources.IResourceDeltaVisitor#visit(org.eclipse.core.resources.IResourceDelta)
+	 */
 	public boolean visit(IResourceDelta delta) throws CoreException {
 
 		IResource source = delta.getResource();
@@ -187,11 +191,10 @@ public class TestContentProvider implements ITreeContentProvider,
 				if ("model.properties".equals(file.getName())) {
 				updateModel(file);
 				new UIJob("Update Test Model in CommonViewer") {
-					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						if (viewer != null && !viewer.getControl().isDisposed())
 							viewer.refresh(file.getParent());
-						return Status.OK_STATUS;
+						return Status.OK_STATUS;						
 					}
 				}.schedule();
 			}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ import org.eclipse.jface.util.Util;
  * on JFace code and lower. See the method comments for descriptions of the
  * currently supported performance tests.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class CommandsPerformanceTest extends BasicPerformanceTest {
@@ -54,7 +54,7 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 	 * <p>
 	 * TODO This should add a bit of breadth to the tree.
 	 * </p>
-	 *
+	 * 
 	 * @param contextManager
 	 *            The context manager in which the contexts should be defined;
 	 *            must not be <code>null</code>.
@@ -71,7 +71,7 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 	 */
 	private static final void createContext(
 			final ContextManager contextManager, final String parent,
-			final int successors, final List<String> activeContextIds) {
+			final int successors, final List activeContextIds) {
 		final int count = activeContextIds.size();
 		final String contextString = "context" + count;
 		final Context context = contextManager.getContext(contextString);
@@ -95,7 +95,7 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 	 * <p>
 	 * TODO This should add a bit of breadth to the tree.
 	 * </p>
-	 *
+	 * 
 	 * @param bindingManager
 	 *            The binding manager in which the schemes should be defined;
 	 *            must not be <code>null</code>.
@@ -110,7 +110,7 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 	 *            The list of created schemes; must not be <code>null</code>.
 	 */
 	private static final void createScheme(final BindingManager bindingManager,
-			final String parent, final int successors, final List<Scheme> schemes) {
+			final String parent, final int successors, final List schemes) {
 		final int count = schemes.size();
 		final String schemeString = "scheme" + count;
 		final Scheme scheme = bindingManager.getScheme(schemeString);
@@ -144,7 +144,7 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 
 	/**
 	 * Constructs an instance of <code>CommandsPerformanceTest</code>.
-	 *
+	 * 
 	 * @param testName
 	 *            Test's name.
 	 */
@@ -174,11 +174,10 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 	 * ever be anything but four elements, or why the platform list would ever
 	 * be anything but three elements.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If something went wrong initializing the active scheme.
 	 */
-	@Override
 	protected final void doSetUp() throws NotDefinedException, Exception {
 		super.doSetUp();
 
@@ -230,16 +229,16 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 
 		// Initialize the contexts.
 		contextManager = new ContextManager();
-		final List<String> activeContextIds = new ArrayList<>();
+		final List activeContextIds = new ArrayList();
 		createContext(contextManager, null, contextTreeDepth, activeContextIds);
-		contextManager.setActiveContextIds(new HashSet<>(activeContextIds));
+		contextManager.setActiveContextIds(new HashSet(activeContextIds));
 
 		// Initialize the schemes.
 		bindingManager = new BindingManager(contextManager, commandManager);
-		final List<Scheme> schemes = new ArrayList<>();
+		final List schemes = new ArrayList();
 		createScheme(bindingManager, null, schemeDepth, schemes);
 		bindingManager
-				.setActiveScheme(schemes.get(schemes.size() - 1));
+				.setActiveScheme((Scheme) schemes.get(schemes.size() - 1));
 
 		// Create the deletion markers.
 		final Binding[] bindings = new Binding[bindingCount];
@@ -277,9 +276,9 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 			final KeySequence keySequence = KeySequence.getInstance(keyStroke);
 
 			// Build the other parameters.
-			final String schemeId = schemes.get(i % schemes.size())
+			final String schemeId = ((Scheme) schemes.get(i % schemes.size()))
 					.getId();
-			final String contextId = activeContextIds.get(i
+			final String contextId = (String) activeContextIds.get(i
 					% activeContextIds.size());
 			final int type = (i % 2);
 
@@ -330,9 +329,9 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 
 			// Build the other parameters.
 			final String commandId = "command" + i;
-			final String schemeId = schemes.get(i % schemes.size())
+			final String schemeId = ((Scheme) schemes.get(i % schemes.size()))
 					.getId();
-			final String contextId = activeContextIds.get(i
+			final String contextId = (String) activeContextIds.get(i
 					% activeContextIds.size());
 			final int type = (i % 2);
 
@@ -348,7 +347,6 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 		bindingManager.setBindings(bindings);
 	}
 
-	@Override
 	protected final void doTearDown() throws Exception {
 		bindingManager = null;
 		commandManager = null;
@@ -362,7 +360,7 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 	 * changed. It measures how long it takes to look up the computation from
 	 * the cache one million times.
 	 * </p>
-	 *
+	 * 
 	 * @throws ParseException
 	 *             If "CTRL+F" can't be parsed for some strange reason.
 	 */
@@ -391,7 +389,7 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 	 * the cache one million times. In this test, the look-up is done in reverse --
 	 * from command identifier to trigger.
 	 * </p>
-	 *
+	 * 
 	 * @throws ParseException
 	 *             If "CTRL+F" can't be parsed for some strange reason.
 	 */
@@ -419,7 +417,7 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 	 * changed, but the cache contains a matching entry. It measures how long it
 	 * takes to look up the computation from the cache forty thousand times.
 	 * </p>
-	 *
+	 * 
 	 * @throws ParseException
 	 *             If "CTRL+F" can't be parsed for some strange reason.
 	 */
@@ -458,7 +456,7 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 	 * an exceptionally large set of bindings. The binding set tries to mimick
 	 * some of the same properties of a "real" binding set.
 	 * </p>
-	 *
+	 * 
 	 * @throws ParseException
 	 *             If "CTRL+F" can't be parsed for some strange reason.
 	 */

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,14 +27,13 @@ public interface ITreeContentProvider extends IStructuredContentProvider {
 	 * <a href="https://bugs.eclipse.org/9262">bug 9262</a>).
 	 * </p>
 	 */
-	@Override
 	public Object[] getElements(Object inputElement);
 
     /**
      * Returns the child elements of the given parent element.
      * <p>
-     * The difference between this method and <code>IStructuredContentProvider.getElements</code>
-     * is that <code>getElements</code> is called to obtain the
+     * The difference between this method and <code>IStructuredContentProvider.getElements</code> 
+     * is that <code>getElements</code> is called to obtain the 
      * tree viewer's root elements, whereas <code>getChildren</code> is used
      * to obtain the children of a given parent element in the tree (including a root).
      * </p>
@@ -46,8 +45,8 @@ public interface ITreeContentProvider extends IStructuredContentProvider {
     public Object[] getChildren(Object parentElement);
 
     /**
-     * Returns the parent for the given element, or <code>null</code>
-     * indicating that the parent can't be computed.
+     * Returns the parent for the given element, or <code>null</code> 
+     * indicating that the parent can't be computed. 
      * In this case the tree-structured viewer can't expand
      * a given node correctly if requested.
      *

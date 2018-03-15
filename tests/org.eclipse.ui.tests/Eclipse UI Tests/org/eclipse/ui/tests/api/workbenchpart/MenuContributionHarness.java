@@ -19,6 +19,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -42,10 +43,10 @@ import org.eclipse.ui.part.ViewPart;
  * This view acts as a test harness for the new 3.3 menu contribution story. It
  * read the additions and uses the mechanism to construct its various menus and
  * toolbars.
- *
+ * 
  * Right now it's under development but will act as a primary testing point for
  * the development.
- *
+ * 
  * Currently reads the additions when the control is created and only handles
  * the popup menu contributions...
  */
@@ -71,15 +72,12 @@ public class MenuContributionHarness extends ViewPart {
 	 */
 
 	class ViewContentProvider implements IStructuredContentProvider {
-		@Override
 		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
 		}
 
-		@Override
 		public void dispose() {
 		}
 
-		@Override
 		public Object[] getElements(Object parent) {
 			return new String[] { "One", "Two", "Three" };
 		}
@@ -87,17 +85,14 @@ public class MenuContributionHarness extends ViewPart {
 
 	class ViewLabelProvider extends LabelProvider implements
 			ITableLabelProvider {
-		@Override
 		public String getColumnText(Object obj, int index) {
 			return getText(obj);
 		}
 
-		@Override
 		public Image getColumnImage(Object obj, int index) {
 			return getImage(obj);
 		}
 
-		@Override
 		public Image getImage(Object obj) {
 			return PlatformUI.getWorkbench().getSharedImages().getImage(
 					ISharedImages.IMG_OBJ_ELEMENT);
@@ -117,10 +112,9 @@ public class MenuContributionHarness extends ViewPart {
 	 * This is a callback that will allow us to create the viewer and initialize
 	 * it.
 	 */
-	@Override
 	public void createPartControl(Composite parent) {
 		// Access the menu service
-		menuSvc = getSite().getService(IMenuService.class);
+		menuSvc = (IMenuService) getSite().getService(IMenuService.class);
 
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
 				| SWT.V_SCROLL);
@@ -139,7 +133,6 @@ public class MenuContributionHarness extends ViewPart {
 
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				MenuContributionHarness.this.fillContextMenu(manager);
 			}
@@ -177,7 +170,6 @@ public class MenuContributionHarness extends ViewPart {
 
 	private void makeActions() {
 		action1 = new Action() {
-			@Override
 			public void run() {
 				showMessage("Action 1 executed");
 			}
@@ -188,7 +180,6 @@ public class MenuContributionHarness extends ViewPart {
 				.getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 
 		action2 = new Action() {
-			@Override
 			public void run() {
 				showMessage("Action 2 executed");
 			}
@@ -198,12 +189,11 @@ public class MenuContributionHarness extends ViewPart {
 		action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 
-		final IContextService contextService = getSite()
+		final IContextService contextService = (IContextService) getSite()
 				.getService(IContextService.class);
 		action3 = new Action() {
 			IContextActivation currentActivation = null;
 
-			@Override
 			public void run() {
 				if (currentActivation == null) {
 					currentActivation = contextService
@@ -226,10 +216,10 @@ public class MenuContributionHarness extends ViewPart {
 				.getImageDescriptor(ISharedImages.IMG_TOOL_REDO));
 
 		doubleClickAction = new Action() {
-			@Override
 			public void run() {
-				IStructuredSelection selection = viewer.getStructuredSelection();
-				Object obj = selection.getFirstElement();
+				ISelection selection = viewer.getSelection();
+				Object obj = ((IStructuredSelection) selection)
+						.getFirstElement();
 				showMessage("Double-click detected on " + obj.toString());
 			}
 		};
@@ -237,7 +227,6 @@ public class MenuContributionHarness extends ViewPart {
 
 	private void hookDoubleClickAction() {
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				doubleClickAction.run();
 			}
@@ -252,17 +241,16 @@ public class MenuContributionHarness extends ViewPart {
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
-	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
-
+	
 	int callCount = 0;
-
+	
 	public void updateCount() {
 		callCount++;
 	}
-
+	
 	public int getCount() {
 		return callCount;
 	}

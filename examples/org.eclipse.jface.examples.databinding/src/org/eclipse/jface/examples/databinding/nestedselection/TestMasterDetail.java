@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bug 116920
  *     Matthew Hall - bugs 260329, 260337
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  *******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.nestedselection;
@@ -18,6 +17,7 @@ import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeanProperties;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.databinding.observable.IObserving;
 import org.eclipse.core.databinding.observable.Realm;
@@ -28,8 +28,7 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.internal.databinding.conversion.ObjectToStringConverter;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.ViewerSupport;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.examples.databinding.model.SimpleModel;
@@ -49,16 +48,15 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * @since 1.0
- *
+ * 
  */
 public class TestMasterDetail {
 	/**
 	 * @since 3.2
-	 *
+	 * 
 	 */
 	private static final class CustomUpdateValueStrategy extends
 			UpdateValueStrategy {
-		@Override
 		protected IStatus doSet(IObservableValue observableValue, Object value) {
 			IStatus result = super.doSet(observableValue, value);
 			if (result.isOK()) {
@@ -105,7 +103,7 @@ public class TestMasterDetail {
 
 	/**
 	 * This method initializes table
-	 *
+	 * 
 	 */
 	private void createTable() {
 		GridData gridData = new org.eclipse.swt.layout.GridData();
@@ -128,7 +126,7 @@ public class TestMasterDetail {
 
 	/**
 	 * This method initializes table1
-	 *
+	 * 
 	 */
 	private void createTable1() {
 		GridData gridData5 = new org.eclipse.swt.layout.GridData();
@@ -198,8 +196,7 @@ public class TestMasterDetail {
 	private void run() {
 		final Display display = new Display();
 
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
-			@Override
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			public void run() {
 				createShell();
 				bind(shell);
@@ -218,7 +215,7 @@ public class TestMasterDetail {
 	SimpleModel model = new SimpleModel();
 
 	private void bind(Control parent) {
-		Realm realm = DisplayRealm.getRealm(parent.getDisplay());
+		Realm realm = SWTObservables.getRealm(parent.getDisplay());
 
 		TableViewer peopleViewer = new TableViewer(personsTable);
 		ViewerSupport.bind(peopleViewer, new WritableList(realm, model
@@ -229,30 +226,25 @@ public class TestMasterDetail {
 				.observeSingleSelection(peopleViewer);
 
 		DataBindingContext dbc = new DataBindingContext(realm) {
-			@Override
 			protected UpdateValueStrategy createTargetToModelUpdateValueStrategy(
 					IObservableValue fromValue, IObservableValue toValue) {
 				return new CustomUpdateValueStrategy();
 			}
 		};
 		IConverter upperCaseConverter = new IConverter() {
-			@Override
 			public Object convert(Object fromObject) {
 				return ((String) fromObject).toUpperCase();
 			}
 
-			@Override
 			public Object getFromType() {
 				return String.class;
 			}
 
-			@Override
 			public Object getToType() {
 				return String.class;
 			}
 		};
 		IValidator vowelValidator = new IValidator() {
-			@Override
 			public IStatus validate(Object value) {
 				String s = (String) value;
 				if (!s.matches("[aeiouAEIOU]*")) {
@@ -261,36 +253,33 @@ public class TestMasterDetail {
 				return Status.OK_STATUS;
 			}
 		};
-		Binding b = dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(name),
-				BeanProperties.value((Class) selectedPerson.getValueType(), "name", String.class).observeDetail(
-								selectedPerson), new CustomUpdateValueStrategy()
+		Binding b = dbc.bindValue(SWTObservables.observeText(name, SWT.Modify),
+				BeansObservables.observeDetailValue(selectedPerson, "name",
+						String.class), new CustomUpdateValueStrategy()
 						.setConverter(upperCaseConverter).setAfterGetValidator(
 								vowelValidator), null);
 
 		// AggregateValidationStatus status = new AggregateValidationStatus(dbc
 		// .getBindings(), AggregateValidationStatus.MAX_SEVERITY);
-		dbc.bindValue(WidgetProperties.text().observe(validationStatus), b
+		dbc.bindValue(SWTObservables.observeText(validationStatus, SWT.NONE), b
 				.getValidationStatus(), null, new UpdateValueStrategy()
 				.setConverter(new ObjectToStringConverter()));
 
-		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(address),
-				BeanProperties.value((Class) selectedPerson.getValueType(), "address", String.class).observeDetail(
-						selectedPerson));
+		dbc.bindValue(SWTObservables.observeText(address, SWT.Modify),
+				BeansObservables.observeDetailValue(selectedPerson, "address",
+						String.class));
 
-		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(city),
-				BeanProperties.value((Class) selectedPerson.getValueType(), "city", String.class).observeDetail(
-						selectedPerson));
+		dbc.bindValue(SWTObservables.observeText(city, SWT.Modify),
+				BeansObservables.observeDetailValue(selectedPerson, "city",
+						String.class));
 
-		dbc.bindValue(
-				WidgetProperties.text(SWT.Modify).observe(state),
-				BeanProperties.value((Class) selectedPerson.getValueType(), "state", String.class).observeDetail(
-				selectedPerson));
+		dbc.bindValue(SWTObservables.observeText(state, SWT.Modify),
+				BeansObservables.observeDetailValue(selectedPerson, "state",
+						String.class));
 
 		TableViewer ordersViewer = new TableViewer(ordersTable);
-		ViewerSupport.bind(ordersViewer, BeanProperties
-				.list((Class) selectedPerson.getValueType(),
-						"orders", SimpleOrder.class).observeDetail(selectedPerson),
-				BeanProperties
+		ViewerSupport.bind(ordersViewer, BeansObservables.observeDetailList(
+				selectedPerson, "orders", SimpleOrder.class), BeanProperties
 				.values(SimpleOrder.class,
 						new String[] { "orderNumber", "date" }));
 	}

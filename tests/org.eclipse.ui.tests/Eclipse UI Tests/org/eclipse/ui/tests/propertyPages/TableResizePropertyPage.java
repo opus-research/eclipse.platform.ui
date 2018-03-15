@@ -25,9 +25,9 @@ import org.eclipse.ui.dialogs.PropertyPage;
 /**
  * The TableResizePropertyPage is an example of a property page with this resize
  * capability
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class TableResizePropertyPage extends PropertyPage {
 
@@ -53,7 +53,7 @@ public class TableResizePropertyPage extends PropertyPage {
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		TableColumnLayout tableLayout = new TableColumnLayout();
-
+		
 		GridData data = new GridData(GridData.FILL_BOTH);
 		table.setLayoutData(data);
 
@@ -64,7 +64,7 @@ public class TableResizePropertyPage extends PropertyPage {
 
 		column = new TableColumn(table, SWT.NULL);
 		column.setText("Column 2");
-
+		
 		tableLayout.setColumnData(column,new ColumnWeightData(50, 100, true));
 		enclosingComposite.setLayout(tableLayout);
 
@@ -73,7 +73,6 @@ public class TableResizePropertyPage extends PropertyPage {
 	/**
 	 * @see PreferencePage#createContents(Composite)
 	 */
-	@Override
 	protected Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -87,7 +86,11 @@ public class TableResizePropertyPage extends PropertyPage {
 		return composite;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
+	 */
 	public boolean performOk() {
 		return true;
 	}

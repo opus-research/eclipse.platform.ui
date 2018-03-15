@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,12 +10,15 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.api.workbenchpart;
 
+import org.eclipse.core.runtime.CoreException;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IStorage;
-import org.eclipse.core.runtime.CoreException;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPersistableElement;
@@ -29,12 +32,12 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
  */
 public class ArbitraryPropertyTest extends UITestCase {
 	/**
-	 *
+	 * 
 	 */
 	private static final String EDITOR_ID = "org.eclipse.ui.tests.TitleTestEditor";
 
 	/**
-	 *
+	 * 
 	 */
 	private static final String USER_PROP = "org.eclipse.ui.test.user";
 
@@ -51,14 +54,22 @@ public class ArbitraryPropertyTest extends UITestCase {
 
 	IWorkbenchPage page;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		window = openTestWindow();
 		page = window.getActivePage();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
+	 */
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 	}
@@ -70,13 +81,12 @@ public class ArbitraryPropertyTest extends UITestCase {
 
 		String firedNV = null;
 
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			firedProp = event.getProperty();
 			firedOV = (String) event.getOldValue();
 			firedNV = (String) event.getNewValue();
 		}
-	}
+	};
 
 	public void testViewProperties() throws Exception {
 		OverriddenTitleView view = (OverriddenTitleView) page.showView(VIEW_ID);
@@ -107,47 +117,39 @@ public class ArbitraryPropertyTest extends UITestCase {
 
 	public void testEditorProperties() throws Exception {
 		IFileEditorInput input = new IFileEditorInput() {
-			@Override
 			public boolean exists() {
 				return true;
 			}
 
-			@Override
 			public ImageDescriptor getImageDescriptor() {
 				return null;
 			}
 
-			@Override
 			public String getName() {
 				return "MyInputFile";
 			}
 
-			@Override
 			public IPersistableElement getPersistable() {
 				return null;
 			}
 
-			@Override
 			public String getToolTipText() {
 				return "My Input File";
 			}
 
-			@Override
-			public <T> T getAdapter(Class<T> adapter) {
+			public Object getAdapter(Class adapter) {
 				return null;
 			}
 
-			@Override
 			public IFile getFile() {
 				return null;
 			}
 
 			/**
 			 * {@inheritDoc}
-			 *
+			 * 
 			 * @throws CoreException
 			 */
-			@Override
 			public IStorage getStorage() throws CoreException {
 				return null;
 			}

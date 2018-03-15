@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public abstract class TreeTest extends ViewerTest {
-
+	
 
 
 	TreeViewer viewer;
@@ -47,7 +47,6 @@ public abstract class TreeTest extends ViewerTest {
 	}
 
 
-	@Override
 	protected StructuredViewer createViewer(Shell shell) {
 		viewer = createTreeViewer(shell);
 		viewer.setContentProvider(getContentProvider());
@@ -65,46 +64,70 @@ public abstract class TreeTest extends ViewerTest {
 		return new TreeViewer(shell);
 	}
 
-	@Override
 	protected Object getInitialInput() {
 		return new TestTreeElement(0, null);
 	}
 
 	private IContentProvider getContentProvider() {
 		return new ITreeContentProvider() {
-
-			@Override
+	
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+			 */
 			public Object[] getChildren(Object parentElement) {
 				TestTreeElement element = (TestTreeElement) parentElement;
 				return element.children;
 			}
-
-			@Override
+	
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
+			 */
 			public Object getParent(Object element) {
 				return ((TestTreeElement) element).parent;
 			}
-
-			@Override
+	
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
+			 */
 			public boolean hasChildren(Object element) {
 				return ((TestTreeElement) element).children.length > 0;
 			}
-
-			@Override
+	
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+			 */
 			public Object[] getElements(Object inputElement) {
 				return getChildren(inputElement);
 			}
-
-			@Override
+	
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+			 */
 			public void dispose() {
 				// Do nothing here
 			}
-
-			@Override
+	
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+			 *      java.lang.Object, java.lang.Object)
+			 */
 			public void inputChanged(Viewer localViewer, Object oldInput,
 					Object newInput) {
 				// Do nothing here
 			}
-
+	
 		};
 	}
 

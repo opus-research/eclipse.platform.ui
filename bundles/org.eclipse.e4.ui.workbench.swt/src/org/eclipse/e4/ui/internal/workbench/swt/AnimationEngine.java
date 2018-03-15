@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,15 +16,17 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Display;
 
 /**
  * This job creates an Animation Engine that uses an Animation Feedback to
  * render the animation. To begin the animation, instantiate this object then
  * call schedule().
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class AnimationEngine extends Job {
 	public static final int TICK_TIMER = 1;
@@ -51,7 +53,7 @@ public class AnimationEngine extends Job {
 
 	/**
 	 * Creates an Animation that will run for the given number of milliseconds.
-	 *
+	 * 
 	 * @param animationFeedback
 	 *            provides renderStep(), initialize() and jobInit() methods
 	 * @param durationIn
@@ -82,7 +84,11 @@ public class AnimationEngine extends Job {
 		display = feedbackRenderer.getAnimationShell().getDisplay();
 
 		animationFeedback.getAnimationShell().addDisposeListener(
-				e -> cancelAnimation());
+				new DisposeListener() {
+					public void widgetDisposed(DisposeEvent e) {
+						cancelAnimation();
+					}
+				});
 
 		// Don't show the job in monitors
 		setSystem(true);
@@ -102,18 +108,22 @@ public class AnimationEngine extends Job {
 		return feedbackRenderer;
 	}
 
-	private Runnable animationStep = () -> {
-		if (animationCanceled)
-			return;
+	private Runnable animationStep = new Runnable() {
 
-		// Capture time
-		prevTime = curTime;
-		curTime = System.currentTimeMillis();
+		public void run() {
+			if (animationCanceled)
+				return;
 
-		if (isUpdateStep()) {
-			updateDisplay();
-			frameCount++;
+			// Capture time
+			prevTime = curTime;
+			curTime = System.currentTimeMillis();
+
+			if (isUpdateStep()) {
+				updateDisplay();
+				frameCount++;
+			}
 		}
+
 	};
 
 	protected void updateDisplay() {
@@ -157,7 +167,6 @@ public class AnimationEngine extends Job {
 		return amount;
 	}
 
-	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		// We use preference value to indicate that the animation should be
 		// skipped on this platform.
@@ -166,11 +175,13 @@ public class AnimationEngine extends Job {
 		}
 
 		// We're starting, initialize
-		display.syncExec(() -> {
-			// 'jobInit' returns 'false' if it doesn't want to run...
-			if (!animationCanceled)
-				animationCanceled = !feedbackRenderer
-						.jobInit(AnimationEngine.this);
+		display.syncExec(new Runnable() {
+			public void run() {
+				// 'jobInit' returns 'false' if it doesn't want to run...
+				if (!animationCanceled)
+					animationCanceled = !feedbackRenderer
+							.jobInit(AnimationEngine.this);
+			}
 		});
 
 		if (animationCanceled)
@@ -193,7 +204,11 @@ public class AnimationEngine extends Job {
 			return Status.CANCEL_STATUS;
 
 		// We're done, clean up
-		display.syncExec(feedbackRenderer::dispose);
+		display.syncExec(new Runnable() {
+			public void run() {
+				feedbackRenderer.dispose();
+			}
+		});
 
 		return Status.OK_STATUS;
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 Matthew Hall and others.
+ * Copyright (c) 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 169876)
  *     Matthew Hall - bug 271720
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 502228
  ******************************************************************************/
 
 package org.eclipse.jface.internal.databinding.swt;
@@ -22,30 +21,27 @@ import org.eclipse.swt.widgets.DateTime;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class DateTimeSelectionProperty extends WidgetValueProperty {
 	/**
-	 *
+	 * 
 	 */
 	public DateTimeSelectionProperty() {
 		super(SWT.Selection);
 	}
 
-	@Override
 	public Object getValueType() {
 		return Date.class;
 	}
 
 	// One calendar per thread to preserve thread-safety
 	private static final ThreadLocal calendar = new ThreadLocal() {
-		@Override
 		protected Object initialValue() {
 			return Calendar.getInstance();
 		}
 	};
 
-	@Override
 	protected Object doGetValue(Object source) {
 		DateTime dateTime = (DateTime) source;
 
@@ -63,14 +59,12 @@ public class DateTimeSelectionProperty extends WidgetValueProperty {
 		return cal.getTime();
 	}
 
-	@Override
 	protected void doSetValue(Object source, Object value) {
-		if (value == null) {
-			// ignore null, since it cannot be applied to the DateTimeWidget
-			return;
-		}
-
 		DateTime dateTime = (DateTime) source;
+
+		if (value == null)
+			throw new IllegalArgumentException(
+					"Cannot set null selection on DateTime"); //$NON-NLS-1$
 
 		Calendar cal = (Calendar) calendar.get();
 		cal.setTime((Date) value);

@@ -37,12 +37,12 @@ public class PropertyPageTests extends DynamicTestCase {
 		removeBundle();
 		assertEquals(size, manager.getContributors().size());
 	}
-
+	
 	public void testPropertyPageContribution() {
 		PropertyPageContributorManager cManager = PropertyPageContributorManager.getManager();
-		PropertyPageManager manager;
+		PropertyPageManager manager; 
 		DynamicTestType type = new DynamicTestType();
-
+			
 		cManager.contribute(manager = new PropertyPageManager(), type);
 		assertNull(manager.find(PROPERTYPAGE));
 		getBundle();
@@ -55,23 +55,31 @@ public class PropertyPageTests extends DynamicTestCase {
 		cManager.contribute(manager = new PropertyPageManager(), type);
 		assertNull(manager.find(PROPERTYPAGE));
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
+	 */
 	protected String getExtensionId() {
 		return "newPropertyPage1.testDynamicPropertyPageAddition";
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
+	 */
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_PROPERTY_PAGES;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
+	 */
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newPropertyPage1";
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
+	 */
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicPropertyPage";
 	}

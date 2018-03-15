@@ -1,26 +1,11 @@
-/*******************************************************************************
- * Copyright (c) 2013, 2014 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 436344
- *******************************************************************************/
 package org.eclipse.e4.ui.bindings.tests;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.TestCase;
 
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -34,15 +19,15 @@ import org.eclipse.e4.ui.bindings.BindingServiceAddon;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.bindings.internal.BindingTable;
 import org.eclipse.e4.ui.bindings.internal.BindingTableManager;
+import org.eclipse.e4.ui.bindings.internal.ContextSet;
+import org.eclipse.e4.ui.internal.services.ActiveContextsFunction;
 import org.eclipse.e4.ui.services.ContextServiceAddon;
 import org.eclipse.e4.ui.services.EContextService;
+import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.TriggerSequence;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-public class BindingLookupTest {
+public class BindingLookupTest extends TestCase {
 	private static final String ID_DIALOG = "org.eclipse.ui.contexts.dialog";
 	private static final String ID_DIALOG_AND_WINDOW = "org.eclipse.ui.contexts.dialogAndWindow";
 	private static final String ID_WINDOW = "org.eclipse.ui.contexts.window";
@@ -62,15 +47,15 @@ public class BindingLookupTest {
 	private IEclipseContext workbenchContext;
 
 	private void defineCommands(IEclipseContext context) {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		Category category = cs.defineCategory(TEST_CAT1, "CAT1", null);
 		cs.defineCommand(TEST_ID1, "ID1", null, category, null);
 		cs.defineCommand(TEST_ID2, "ID2", null, category, null);
 	}
 
-	@Before
-	public void setUp() {
+	@Override
+	protected void setUp() throws Exception {
 		IEclipseContext globalContext = Activator.getDefault()
 				.getGlobalContext();
 		workbenchContext = globalContext.createChild("workbenchContext");
@@ -78,7 +63,7 @@ public class BindingLookupTest {
 				workbenchContext);
 		ContextInjectionFactory.make(ContextServiceAddon.class, workbenchContext);
 		ContextInjectionFactory.make(BindingServiceAddon.class, workbenchContext);
-
+		
 		defineCommands(workbenchContext);
 		defineContexts(workbenchContext);
 		defineBindingTables(workbenchContext);
@@ -91,8 +76,8 @@ public class BindingLookupTest {
 			c.define(CONTEXTS[i + 1], null, CONTEXTS[i + 2]);
 		}
 
-		EContextService cs = context
-				.get(EContextService.class);
+		EContextService cs = (EContextService) context
+				.get(EContextService.class.getName());
 		cs.activateContext(ID_DIALOG_AND_WINDOW);
 	}
 
@@ -104,19 +89,18 @@ public class BindingLookupTest {
 		btm.addTable(new BindingTable(cm.getContext(ID_DIALOG)));
 	}
 
-	@After
-	public void tearDown() {
+	@Override
+	protected void tearDown() throws Exception {
 		workbenchContext.dispose();
 		workbenchContext = null;
 	}
 
-	@Test
-	public void testFindBinding() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testFindBinding() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd = cs.createCommand(TEST_ID1, null);
-		EBindingService bs = workbenchContext
-				.get(EBindingService.class);
+		EBindingService bs = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq = bs.createSequence("CTRL+5 T");
 		Binding db = createDefaultBinding(bs, seq, cmd, ID_DIALOG_AND_WINDOW);
 		bs.activateBinding(db);
@@ -129,13 +113,12 @@ public class BindingLookupTest {
 		assertEquals(cmd, bs.getPerfectMatch(seq).getParameterizedCommand());
 	}
 
-	@Test
-	public void testMultipleBindings() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testMultipleBindings() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd = cs.createCommand(TEST_ID1, null);
-		EBindingService bs = workbenchContext
-				.get(EBindingService.class);
+		EBindingService bs = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq = bs.createSequence("CTRL+5 T");
 		TriggerSequence seq2 = bs.createSequence("CTRL+2 X");
 		Binding db = createDefaultBinding(bs, seq, cmd, ID_DIALOG_AND_WINDOW);
@@ -147,21 +130,20 @@ public class BindingLookupTest {
 		assertEquals(cmd, bs.getPerfectMatch(seq2).getParameterizedCommand());
 	}
 
-	@Test
-	public void testLookupChildBinding() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testLookupChildBinding() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd = cs.createCommand(TEST_ID1, null);
 		IEclipseContext c1 = workbenchContext.createChild("c1");
 		c1.activate();
 
-		EBindingService bs1 = c1.get(EBindingService.class
-				);
+		EBindingService bs1 = (EBindingService) c1.get(EBindingService.class
+				.getName());
 		TriggerSequence seq = bs1.createSequence("CTRL+5 T");
 		Binding db = createDefaultBinding(bs1, seq, cmd, ID_DIALOG_AND_WINDOW);
 		bs1.activateBinding(db);
-		EBindingService wBS = workbenchContext
-				.get(EBindingService.class);
+		EBindingService wBS = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		assertEquals(cmd, wBS.getPerfectMatch(seq).getParameterizedCommand());
 		assertEquals(cmd, bs1.getPerfectMatch(seq).getParameterizedCommand());
 
@@ -170,35 +152,34 @@ public class BindingLookupTest {
 		assertNull(bs1.getPerfectMatch(seq));
 	}
 
-	@Test
-	public void testLookupWithTwoChildren() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testLookupWithTwoChildren() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd1 = cs.createCommand(TEST_ID1, null);
 		ParameterizedCommand cmd2 = cs.createCommand(TEST_ID2, null);
 
-		EBindingService wBS = workbenchContext
-				.get(EBindingService.class);
+		EBindingService wBS = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq = wBS.createSequence("CTRL+5 T");
 
 		IEclipseContext c1 = workbenchContext.createChild("c1");
 		c1.activate();
-		EContextService es = c1.get(EContextService.class
-				);
+		EContextService es = (EContextService) c1.get(EContextService.class
+				.getName());
 		es.activateContext(ID_WINDOW);
 
-		EBindingService bs1 = c1.get(EBindingService.class
-				);
+		EBindingService bs1 = (EBindingService) c1.get(EBindingService.class
+				.getName());
 		Binding db = createDefaultBinding(bs1, seq, cmd1, ID_WINDOW);
 		bs1.activateBinding(db);
 
 		IEclipseContext c2 = workbenchContext.createChild("c2");
-		EContextService es2 = c2.get(EContextService.class
-				);
+		EContextService es2 = (EContextService) c2.get(EContextService.class
+				.getName());
 		es2.activateContext(ID_DIALOG);
 
-		EBindingService bs2 = c2.get(EBindingService.class
-				);
+		EBindingService bs2 = (EBindingService) c2.get(EBindingService.class
+				.getName());
 		db = createDefaultBinding(bs1, seq, cmd2, ID_DIALOG);
 		bs2.activateBinding(db);
 
@@ -207,35 +188,34 @@ public class BindingLookupTest {
 		assertEquals(cmd2, bs2.getPerfectMatch(seq).getParameterizedCommand());
 	}
 
-	@Test
-	public void testLookupWithDifferentActiveChild() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testLookupWithDifferentActiveChild() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd1 = cs.createCommand(TEST_ID1, null);
 		ParameterizedCommand cmd2 = cs.createCommand(TEST_ID2, null);
 
-		EBindingService wBS = workbenchContext
-				.get(EBindingService.class);
+		EBindingService wBS = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq = wBS.createSequence("CTRL+5 T");
 
 		IEclipseContext c1 = workbenchContext.createChild("c1");
 		c1.activate();
-		EContextService es = c1.get(EContextService.class
-				);
+		EContextService es = (EContextService) c1.get(EContextService.class
+				.getName());
 		es.activateContext(ID_WINDOW);
 
-		EBindingService bs1 = c1.get(EBindingService.class
-				);
+		EBindingService bs1 = (EBindingService) c1.get(EBindingService.class
+				.getName());
 		Binding db = createDefaultBinding(bs1, seq, cmd1, ID_WINDOW);
 		bs1.activateBinding(db);
 
 		IEclipseContext c2 = workbenchContext.createChild("c2");
-		EContextService es2 = c2.get(EContextService.class
-				);
+		EContextService es2 = (EContextService) c2.get(EContextService.class
+				.getName());
 		es2.activateContext(ID_DIALOG);
 
-		EBindingService bs2 = c2.get(EBindingService.class
-				);
+		EBindingService bs2 = (EBindingService) c2.get(EBindingService.class
+				.getName());
 		db = createDefaultBinding(bs1, seq, cmd2, ID_DIALOG);
 		bs2.activateBinding(db);
 
@@ -261,13 +241,12 @@ public class BindingLookupTest {
 		assertTrue(wBS.isPerfectMatch(seq));
 	}
 
-	@Test
-	public void testLookupShortcut() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testLookupShortcut() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd = cs.createCommand(TEST_ID1, null);
-		EBindingService bs = workbenchContext
-				.get(EBindingService.class);
+		EBindingService bs = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq = bs.createSequence("CTRL+5 T");
 		Binding db = createDefaultBinding(bs, seq, cmd, ID_DIALOG_AND_WINDOW);
 		bs.activateBinding(db);
@@ -275,13 +254,12 @@ public class BindingLookupTest {
 		assertEquals(seq, bs.getBestSequenceFor(cmd));
 	}
 
-	@Test
-	public void testLookupShortcuts() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testLookupShortcuts() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd = cs.createCommand(TEST_ID1, null);
-		EBindingService bs = workbenchContext
-				.get(EBindingService.class);
+		EBindingService bs = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq = bs.createSequence("CTRL+5 T");
 		TriggerSequence seq2 = bs.createSequence("CTRL+2 X");
 		Binding db = createDefaultBinding(bs, seq, cmd, ID_DIALOG_AND_WINDOW);
@@ -294,13 +272,12 @@ public class BindingLookupTest {
 		assertEquals(seq, foundSequence);
 	}
 
-	@Test
-	public void testLookupBestShortcut() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testLookupBestShortcut() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd = cs.createCommand(TEST_ID1, null);
-		EBindingService bs = workbenchContext
-				.get(EBindingService.class);
+		EBindingService bs = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq2 = bs.createSequence("ALT+5 X");
 		Binding db2 = createDefaultBinding(bs, seq2, cmd, ID_DIALOG_AND_WINDOW);
 		bs.activateBinding(db2);
@@ -314,21 +291,20 @@ public class BindingLookupTest {
 		assertEquals(seq, foundSequence);
 	}
 
-	@Test
-	public void testLookupBestShortcutWithChild() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testLookupBestShortcutWithChild() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd = cs.createCommand(TEST_ID1, null);
-		EBindingService bs = workbenchContext
-				.get(EBindingService.class);
+		EBindingService bs = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq2 = bs.createSequence("CTRL+5 T");
 		Binding db2 = createDefaultBinding(bs, seq2, cmd, ID_DIALOG_AND_WINDOW);
 		bs.activateBinding(db2);
 
 		IEclipseContext c1 = workbenchContext.createChild("c1");
 		c1.activate();
-		EBindingService bs1 = c1.get(EBindingService.class
-				);
+		EBindingService bs1 = (EBindingService) c1.get(EBindingService.class
+				.getName());
 
 		TriggerSequence seq = bs1.createSequence("ALT+5 X");
 		Binding db = createDefaultBinding(bs, seq, cmd, ID_DIALOG_AND_WINDOW);
@@ -339,35 +315,34 @@ public class BindingLookupTest {
 		assertEquals(seq2, foundSequence);
 	}
 
-	@Test
-	public void testLookupShortcutsTwoChildren() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testLookupShortcutsTwoChildren() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd1 = cs.createCommand(TEST_ID1, null);
 		ParameterizedCommand cmd2 = cs.createCommand(TEST_ID2, null);
 
-		EBindingService wBS = workbenchContext
-				.get(EBindingService.class);
+		EBindingService wBS = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq = wBS.createSequence("CTRL+5 T");
 
 		IEclipseContext c1 = workbenchContext.createChild("c1");
 		c1.activate();
-		EContextService es = c1.get(EContextService.class
-				);
+		EContextService es = (EContextService) c1.get(EContextService.class
+				.getName());
 		es.activateContext(ID_WINDOW);
 
-		EBindingService bs1 = c1.get(EBindingService.class
-				);
+		EBindingService bs1 = (EBindingService) c1.get(EBindingService.class
+				.getName());
 		Binding db = createDefaultBinding(bs1, seq, cmd1, ID_WINDOW);
 		bs1.activateBinding(db);
 
 		IEclipseContext c2 = workbenchContext.createChild("c2");
-		EContextService es2 = c2.get(EContextService.class
-				);
+		EContextService es2 = (EContextService) c2.get(EContextService.class
+				.getName());
 		es2.activateContext(ID_DIALOG);
 
-		EBindingService bs2 = c2.get(EBindingService.class
-				);
+		EBindingService bs2 = (EBindingService) c2.get(EBindingService.class
+				.getName());
 		Binding db2 = createDefaultBinding(bs2, seq, cmd2, ID_DIALOG);
 		bs2.activateBinding(db2);
 
@@ -381,13 +356,12 @@ public class BindingLookupTest {
 		assertNull(bs2.getBestSequenceFor(cmd1));
 	}
 
-	@Test
-	public void testLookupAllShortcuts() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testLookupAllShortcuts() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd = cs.createCommand(TEST_ID1, null);
-		EBindingService bs = workbenchContext
-				.get(EBindingService.class);
+		EBindingService bs = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq2 = bs.createSequence("ALT+5 X");
 		Binding db2 = createDefaultBinding(bs, seq2, cmd, ID_DIALOG_AND_WINDOW);
 		bs.activateBinding(db2);
@@ -397,61 +371,59 @@ public class BindingLookupTest {
 		bs.activateBinding(db);
 
 		// the list will always be ordered
-		ArrayList<TriggerSequence> list = new ArrayList<>();
+		ArrayList<TriggerSequence> list = new ArrayList<TriggerSequence>();
 		list.add(seq);
 		list.add(seq2);
 
 		assertEquals(list, bs.getSequencesFor(cmd));
 	}
 
-	@Test
-	public void testLookupAllShortcutsWithChild() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testLookupAllShortcutsWithChild() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd = cs.createCommand(TEST_ID1, null);
 
-		EBindingService wBS = workbenchContext
-				.get(EBindingService.class);
+		EBindingService wBS = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq2 = wBS.createSequence("ALT+5 X");
 		Binding db2 = createDefaultBinding(wBS, seq2, cmd, ID_DIALOG_AND_WINDOW);
 		wBS.activateBinding(db2);
 
 		IEclipseContext c1 = workbenchContext.createChild("c1");
 		c1.activate();
-		EContextService es = c1.get(EContextService.class
-				);
+		EContextService es = (EContextService) c1.get(EContextService.class
+				.getName());
 		es.activateContext(ID_WINDOW);
-		EBindingService bs1 = c1.get(EBindingService.class
-				);
+		EBindingService bs1 = (EBindingService) c1.get(EBindingService.class
+				.getName());
 
 		TriggerSequence seq = bs1.createSequence("CTRL+5 T");
 		Binding db = createDefaultBinding(wBS, seq, cmd, ID_WINDOW);
 		bs1.activateBinding(db);
 
 		// the list will always be ordered
-		ArrayList<TriggerSequence> list = new ArrayList<>();
+		ArrayList<TriggerSequence> list = new ArrayList<TriggerSequence>();
 		list.add(seq);
 		list.add(seq2);
 
 		assertEquals(list, wBS.getSequencesFor(cmd));
 	}
 
-	@Test
-	public void testPartialMatch() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testPartialMatch() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd = cs.createCommand(TEST_ID1, null);
 
-		EBindingService wBS = workbenchContext
-				.get(EBindingService.class);
+		EBindingService wBS = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq2 = wBS.createSequence("ALT+5 X");
 		Binding db2 = createDefaultBinding(wBS, seq2, cmd, ID_DIALOG_AND_WINDOW);
 		wBS.activateBinding(db2);
 
 		IEclipseContext c1 = workbenchContext.createChild("c1");
 		c1.activate();
-		EBindingService bs1 = c1.get(EBindingService.class
-				);
+		EBindingService bs1 = (EBindingService) c1.get(EBindingService.class
+				.getName());
 
 		TriggerSequence seq = bs1.createSequence("CTRL+5 T");
 		Binding db = createDefaultBinding(wBS, seq, cmd, ID_DIALOG_AND_WINDOW);
@@ -463,15 +435,14 @@ public class BindingLookupTest {
 		assertTrue(bs1.isPartialMatch(partialMatch));
 	}
 
-	@Test
-	public void testGetPartialMatches() {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+	public void testGetPartialMatches() throws Exception {
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		ParameterizedCommand cmd = cs.createCommand(TEST_ID1, null);
 		ParameterizedCommand cmd2 = cs.createCommand(TEST_ID2, null);
 
-		EBindingService wBS = workbenchContext
-				.get(EBindingService.class);
+		EBindingService wBS = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq2 = wBS.createSequence("ALT+5 X");
 		Binding wbBind = createDefaultBinding(wBS, seq2, cmd,
 				ID_DIALOG_AND_WINDOW);
@@ -479,7 +450,8 @@ public class BindingLookupTest {
 
 		IEclipseContext c1 = workbenchContext.createChild("c1");
 		c1.activate();
-		EBindingService bs1 = c1.get(EBindingService.class);
+		EBindingService bs1 = (EBindingService) c1.get(EBindingService.class
+				.getName());
 
 		TriggerSequence seq = bs1.createSequence("CTRL+5 T");
 		Binding b1 = createDefaultBinding(wBS, seq, cmd, ID_DIALOG_AND_WINDOW);
@@ -487,7 +459,7 @@ public class BindingLookupTest {
 		TriggerSequence sseq = bs1.createSequence("CTRL+5 Y");
 		Binding b2 = createDefaultBinding(bs1, sseq, cmd2, ID_DIALOG_AND_WINDOW);
 		bs1.activateBinding(b2);
-		ArrayList<Binding> commandMatches = new ArrayList<>();
+		ArrayList<Binding> commandMatches = new ArrayList<Binding>();
 		commandMatches.add(b1);
 		commandMatches.add(b2);
 
@@ -503,9 +475,9 @@ public class BindingLookupTest {
 	private Binding createDefaultBinding(EBindingService bs,
 			TriggerSequence sequence, ParameterizedCommand command,
 			String contextId) {
-		Map<String, String> attrs = new HashMap<>();
+		Map<String, String> attrs = new HashMap<String,String>();
 		attrs.put("schemeId", "org.eclipse.ui.defaultAcceleratorConfiguration");
-
+		
 		return bs.createBinding(sequence, command, contextId, attrs);
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2017 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,6 @@
 
 package org.eclipse.jface.tests.viewers;
 
-import static org.junit.Assert.assertNotEquals;
-
-import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -35,9 +32,9 @@ public class Bug201002TableViewerTest extends ViewerTestCase {
 	 */
 	public Bug201002TableViewerTest(String name) {
 		super(name);
+		// TODO Auto-generated constructor stub
 	}
 
-	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		final TableViewer tableViewer = new TableViewer(parent, SWT.FULL_SELECTION);
 		tableViewer.setContentProvider(new ArrayContentProvider());
@@ -45,17 +42,14 @@ public class Bug201002TableViewerTest extends ViewerTestCase {
 				tableViewer.getTable()) });
 		tableViewer.setColumnProperties(new String[] { "0" });
 		tableViewer.setCellModifier(new ICellModifier() {
-			@Override
 			public boolean canModify(Object element, String property) {
 				return true;
 			}
 
-			@Override
 			public Object getValue(Object element, String property) {
 				return "";
 			}
 
-			@Override
 			public void modify(Object element, String property, Object value) {
 			}
 
@@ -66,13 +60,11 @@ public class Bug201002TableViewerTest extends ViewerTestCase {
 		return tableViewer;
 	}
 
-	@Override
 	protected void setUpModel() {
 		// don't do anything here - we are not using the normal fModel and
 		// fRootElement
 	}
 
-	@Override
 	protected void setInput() {
 		String[] ar = new String[100];
 		for( int i = 0; i < ar.length; i++ ) {
@@ -94,11 +86,7 @@ public class Bug201002TableViewerTest extends ViewerTestCase {
 		while( getTableViewer().getTable().getDisplay().readAndDispatch () ) {
 
 		}
-		int topIndex = getTableViewer().getTable().getTopIndex();
-		if (topIndex == 0 && Util.isGtk()) {
-			// Fix needed: https://bugs.eclipse.org/bugs/show_bug.cgi?id=497767
-			return;
-		}
-		assertNotEquals("TableViewer top index shouldn't be 0", 0, topIndex);
+
+		assertEquals(true, getTableViewer().getTable().getTopIndex() != 0);
 	}
 }

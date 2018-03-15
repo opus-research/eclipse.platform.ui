@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@ package org.eclipse.ui.tests.decorators;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -31,14 +30,18 @@ public abstract class DecoratorViewerTest extends AbstractNavigatorTest {
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param testName
 	 */
 	public DecoratorViewerTest(String testName) {
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.util.UITestCase#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		createTestFile();
@@ -49,7 +52,7 @@ public abstract class DecoratorViewerTest extends AbstractNavigatorTest {
 
 	/**
 	 * Test the background on the viewer.
-	 *
+	 * 
 	 * @throws PartInitException
 	 * @throws CoreException
 	 * @throws InterruptedException
@@ -66,13 +69,13 @@ public abstract class DecoratorViewerTest extends AbstractNavigatorTest {
 
 		final IViewPart view = openView(page);
 		((DecoratorTestPart) view).setUpForDecorators();
-
+		
 
 		IDecoratorManager manager = WorkbenchPlugin.getDefault()
 				.getDecoratorManager();
 		manager.setEnabled(BackgroundColorDecorator.ID, true);
-
-		Job.getJobManager().join(DecoratorManager.FAMILY_DECORATE, null);
+		
+		Platform.getJobManager().join(DecoratorManager.FAMILY_DECORATE, null);
 
 		dispatchDuringUpdates((DecoratorTestPart) view);
 		backgroundCheck(view);
@@ -82,14 +85,14 @@ public abstract class DecoratorViewerTest extends AbstractNavigatorTest {
 
 	/**
 	 * Check the background colors in the view
-	 *
+	 * 
 	 * @param view
 	 */
 	protected abstract void backgroundCheck(IViewPart view);
 
 	/**
 	 * Test the foreground on the viewer.
-	 *
+	 * 
 	 * @throws PartInitException
 	 * @throws CoreException
 	 * @throws InterruptedException
@@ -105,13 +108,13 @@ public abstract class DecoratorViewerTest extends AbstractNavigatorTest {
 		final IViewPart view = openView(page);
 
 		((DecoratorTestPart) view).setUpForDecorators();
-
+		
 
 		IDecoratorManager manager = WorkbenchPlugin.getDefault()
 				.getDecoratorManager();
 		manager.setEnabled(ForegroundColorDecorator.ID, true);
-
-		Job.getJobManager().join(DecoratorManager.FAMILY_DECORATE, null);
+		
+		Platform.getJobManager().join(DecoratorManager.FAMILY_DECORATE, null);
 		dispatchDuringUpdates((DecoratorTestPart) view);
 
 		foregroundCheck(view);
@@ -121,7 +124,7 @@ public abstract class DecoratorViewerTest extends AbstractNavigatorTest {
 
 	/**
 	 * Read and dispatch while updates are occuring
-	 *
+	 * 
 	 */
 	private void dispatchDuringUpdates(DecoratorTestPart view) {
 		view.readAndDispatchForUpdates();
@@ -130,7 +133,7 @@ public abstract class DecoratorViewerTest extends AbstractNavigatorTest {
 
 	/**
 	 * Check the foreground colors.
-	 *
+	 * 
 	 * @param view
 	 */
 	protected abstract void foregroundCheck(IViewPart view);
@@ -145,7 +148,7 @@ public abstract class DecoratorViewerTest extends AbstractNavigatorTest {
 
 	/**
 	 * Test the font on the viewer.
-	 *
+	 * 
 	 * @throws PartInitException
 	 * @throws CoreException
 	 * @throws InterruptedException
@@ -158,32 +161,36 @@ public abstract class DecoratorViewerTest extends AbstractNavigatorTest {
 		IWorkbenchPage page = window.getActivePage();
 		Assert.isNotNull(page, "No active page");
 
-
+		
 		final IViewPart view = openView(page);
 		((DecoratorTestPart) view).setUpForDecorators();
-
+		
 
 		IDecoratorManager manager = WorkbenchPlugin.getDefault()
 				.getDecoratorManager();
 		manager.setEnabled(FontDecorator.ID, true);
-
+		
 		Platform.getJobManager().join(DecoratorManager.FAMILY_DECORATE, null);
 
 		dispatchDuringUpdates((DecoratorTestPart) view);
 		fontCheck(view);
-
+		
 		manager.setEnabled(FontDecorator.ID, false);
 
 	}
 
 	/**
 	 * Check the fonts in the view
-	 *
+	 * 
 	 * @param view
 	 */
 	protected abstract void fontCheck(IViewPart view);
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.navigator.AbstractNavigatorTest#doTearDown()
+	 */
 	protected void doTearDown() throws Exception {
 
 		super.doTearDown();

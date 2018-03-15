@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,10 +15,10 @@ import org.w3c.dom.css.RGBColor;
 /**
  * {@link ICSSValueConverterConfig} to manage format String of the
  * {@link RGBColor}.
- *
+ * 
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- *
+ * 
  */
 public interface ICSSValueConverterColorConfig extends ICSSValueConverterConfig {
 
@@ -39,7 +39,7 @@ public interface ICSSValueConverterColorConfig extends ICSSValueConverterConfig 
 
 	/**
 	 * Return format (Hexadecimal color, Color name, RGB color).
-	 *
+	 * 
 	 * @return
 	 */
 	public int getFormat();

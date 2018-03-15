@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,13 +30,17 @@ import org.eclipse.ui.statushandlers.StatusManager;
 /**
  * The IDESelectionConversionService is the selection service that uses the
  * resource support available to the IDE.
- *
+ * 
  * @since 3.2
  */
 public class IDESelectionConversionService implements
 		ISelectionConversionService {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.SelectionConversionService#convertToResources(org.eclipse.jface.viewers.IStructuredSelection)
+	 */
 	public IStructuredSelection convertToResources(
 			IStructuredSelection originalSelection) {
 
@@ -64,12 +68,14 @@ public class IDESelectionConversionService implements
 					StatusManager.getManager().handle(e, IDEWorkbenchPlugin.IDE_WORKBENCH);
 				}
 				if (traversals != null) {
+					ResourceTraversal traversal = null;
 					IResource[] resources = null;
-					for (ResourceTraversal traversal : traversals) {
+					for (int i = 0; i < traversals.length; i++) {
+						traversal = traversals[i];
 						resources = traversal.getResources();
 						if (resources != null) {
-							for (IResource traversalResource : resources) {
-								result.add(traversalResource);
+							for (int j = 0; j < resources.length; j++) {
+								result.add(resources[j]);
 							}
 						}
 					}

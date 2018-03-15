@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 
 package org.eclipse.ui.tests.operations;
@@ -66,20 +65,20 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 /**
  * Tests the undo of various workspace operations. Uses the following workspace
  * structure to perform the tests
- *
+ * 
  * <pre>
  *  TEST_PROJECT_NAME
  *  **TEST_FOLDER_NAME
  *  ****TEST_SUBFOLDER_NAME
- *  ******TEST_FILEINSUBFOLDER_NAME
+ *  ******TEST_FILEINSUBFOLDER_NAME 
  *  ****TEST_EMPTYFILE_NAME
  *  ****TEST_RANDOMFILE_NAME
  *  ****TEST_LINKEDFILE_NAME (linked to random location)
  *  ****TEST_LINKEDFOLDER_NAME (linked to random location)
- *  **TEST_FILEINPROJECT_NAME
+ *  **TEST_FILEINPROJECT_NAME 
  *  TEST_TARGETPROJECT_NAME
  * </pre>
- *
+ * 
  * @since 3.3
  */
 public class WorkspaceOperationsTests extends UITestCase {
@@ -91,13 +90,13 @@ public class WorkspaceOperationsTests extends UITestCase {
 	IFile emptyTestFile, testFileWithContent, testLinkedFile,
 			testFileInSubFolder, testFileInProject;
 
-	private final Set<IFileStore> storesToDelete = new HashSet<>();
+	private final Set storesToDelete = new HashSet();
 
 	IOperationHistory history;
 
 	IUndoContext context;
 
-	private static Map<String, String> initialAttributes = new HashMap<>();
+	private static Map initialAttributes = new HashMap();
 	static {
 		initialAttributes.put("Attr1", "Attr1 1.0");
 		initialAttributes.put("Attr2", "Attr2 1.0");
@@ -105,9 +104,9 @@ public class WorkspaceOperationsTests extends UITestCase {
 		initialAttributes.put("Attr4", "Attr4 1.0");
 		initialAttributes.put("Attr5", "Attr5 1.0");
 		initialAttributes.put("Attr6", "Attr6 1.0");
-	}
+	};
 
-	private static Map<String, String> updatedAttributes = new HashMap<>();
+	private static Map updatedAttributes = new HashMap();
 	static {
 		updatedAttributes.put("Attr1", "Attr1 1.1");
 		updatedAttributes.put("Attr2", "Attr2 1.1");
@@ -115,9 +114,9 @@ public class WorkspaceOperationsTests extends UITestCase {
 		updatedAttributes.put("Attr4", "Attr4 1.1");
 		updatedAttributes.put("Attr5", "Attr5 1.1");
 		updatedAttributes.put("Attr7", "Attr7 1.0");
-	}
+	};
 
-	private static Map<String, String> mergedUpdatedAttributes = new HashMap<>();
+	private static Map mergedUpdatedAttributes = new HashMap();
 	static {
 		mergedUpdatedAttributes.put("Attr1", "Attr1 1.1");
 		mergedUpdatedAttributes.put("Attr2", "Attr2 1.1");
@@ -126,12 +125,12 @@ public class WorkspaceOperationsTests extends UITestCase {
 		mergedUpdatedAttributes.put("Attr5", "Attr5 1.1");
 		mergedUpdatedAttributes.put("Attr6", "Attr6 1.0");
 		mergedUpdatedAttributes.put("Attr7", "Attr7 1.0");
-	}
+	};
 
-	private static List<String> fileNameExcludes = new ArrayList<>();
+	private static List fileNameExcludes = new ArrayList();
 	static {
 		fileNameExcludes.add(".project");
-	}
+	};
 
 	private static String CUSTOM_TYPE = "TestMarkerType";
 
@@ -162,9 +161,9 @@ public class WorkspaceOperationsTests extends UITestCase {
 	private static String TEST_NEWFOLDER_NAME = "WorkspaceOperationTests_NewFolder";
 
 	private static String TEST_NEWFILE_NAME = "WorkspaceOperationTests_NewFile";
-
+	
 	private static String TEST_NESTEDFOLDER_ROOT_PARENT_NAME = "scooby";
-
+	
 	private static String TEST_NESTEDFOLDER_PARENT_NAME = "scooby/dooby/doo";
 
 	private static String TEST_NEWNESTEDFOLDER_NAME = "scooby/dooby/doo/WorkspaceOperationTests_NewFolder";
@@ -195,7 +194,6 @@ public class WorkspaceOperationsTests extends UITestCase {
 			}
 		}
 
-		@Override
 		boolean isValid(IResource parent) throws CoreException {
 			IResource resource = getWorkspaceRoot().findMember(
 					parent.getFullPath().append(name));
@@ -237,7 +235,6 @@ public class WorkspaceOperationsTests extends UITestCase {
 			}
 		}
 
-		@Override
 		boolean isValid(IResource parent) throws CoreException {
 			IResource resource = getWorkspaceRoot().findMember(
 					parent.getFullPath().append(name));
@@ -264,7 +261,7 @@ public class WorkspaceOperationsTests extends UITestCase {
 	class MarkerSnapshot {
 		String type;
 
-		Map<String, Object> attributes;
+		Map attributes;
 
 		MarkerSnapshot(IMarker marker) throws CoreException {
 			type = marker.getType();
@@ -276,8 +273,8 @@ public class WorkspaceOperationsTests extends UITestCase {
 			// change on create/delete/recreate sequence
 			IMarker[] markers = resource.findMarkers(type, false,
 					IResource.DEPTH_ZERO);
-			for (IMarker marker : markers) {
-				if (marker.getAttributes().equals(attributes)) {
+			for (int i = 0; i < markers.length; i++) {
+				if (markers[i].getAttributes().equals(attributes)) {
 					return true;
 				}
 			}
@@ -305,7 +302,6 @@ public class WorkspaceOperationsTests extends UITestCase {
 
 		}
 
-		@Override
 		boolean isValid(IResource parent) throws CoreException {
 			IResource resource = getWorkspaceRoot().findMember(
 					parent.getFullPath().append(name));
@@ -356,7 +352,6 @@ public class WorkspaceOperationsTests extends UITestCase {
 		super(name);
 	}
 
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		// Suppress validation UI
@@ -420,7 +415,6 @@ public class WorkspaceOperationsTests extends UITestCase {
 
 	}
 
-	@Override
 	protected void doTearDown() throws Exception {
 		testProject = (IProject) getWorkspaceRoot().findMember(
 				TEST_PROJECT_NAME);
@@ -440,11 +434,11 @@ public class WorkspaceOperationsTests extends UITestCase {
 			newProject.close(getMonitor());
 			newProject.delete(true, true, getMonitor());
 		}
-		final IFileStore[] toDelete = storesToDelete
+		final IFileStore[] toDelete = (IFileStore[]) storesToDelete
 				.toArray(new IFileStore[storesToDelete.size()]);
 		storesToDelete.clear();
-		for (IFileStore element : toDelete) {
-			clear(element);
+		for (int i = 0; i < toDelete.length; i++) {
+			clear(toDelete[i]);
 		}
 		AdvancedValidationUserApprover.AUTOMATED_MODE = false;
 
@@ -476,36 +470,40 @@ public class WorkspaceOperationsTests extends UITestCase {
 	private String readContent(IFile file) throws CoreException {
 		InputStream is = file.getContents();
 		String encoding = file.getCharset();
-		if (is == null) {
+		if (is == null)
 			return null;
-		}
-		StringBuilder buffer = new StringBuilder();
-		char[] part = new char[2048];
-		int read = 0;
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, encoding));) {
+		BufferedReader reader = null;
+		try {
+			StringBuffer buffer = new StringBuffer();
+			char[] part = new char[2048];
+			int read = 0;
+			reader = new BufferedReader(new InputStreamReader(is, encoding));
 
-			while ((read = reader.read(part)) != -1) {
+			while ((read = reader.read(part)) != -1)
 				buffer.append(part, 0, read);
-			}
 
 			return buffer.toString();
 
 		} catch (IOException ex) {
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException ex) {
+				}
+			}
 		}
 		return null;
 	}
 
 	private ResourceSnapshot snapshotFromResource(IResource resource)
 			throws CoreException {
-		if (resource instanceof IFile) {
+		if (resource instanceof IFile)
 			return new FileSnapshot((IFile) resource);
-		}
-		if (resource instanceof IFolder) {
+		if (resource instanceof IFolder)
 			return new FolderSnapshot((IFolder) resource);
-		}
-		if (resource instanceof IProject) {
+		if (resource instanceof IProject)
 			return new ProjectSnapshot((IProject) resource);
-		}
 		fail("Unknown resource type");
 		// making compiler happy
 		return new FileSnapshot((IFile) resource);
@@ -578,14 +576,14 @@ public class WorkspaceOperationsTests extends UITestCase {
 		return new ByteArrayInputStream(text.getBytes());
 	}
 
-	private Map<String, String> getInitialMarkerAttributes() {
-		HashMap<String, String> map = new HashMap<>();
+	private Map getInitialMarkerAttributes() {
+		HashMap map = new HashMap();
 		map.putAll(initialAttributes);
 		return map;
 	}
 
-	private Map<String, String> getUpdatedMarkerAttributes() {
-		HashMap<String, String> map = new HashMap<>();
+	private Map getUpdatedMarkerAttributes() {
+		HashMap map = new HashMap();
 		map.putAll(updatedAttributes);
 		return map;
 	}
@@ -633,7 +631,7 @@ public class WorkspaceOperationsTests extends UITestCase {
 			throws CoreException {
 
 		assertTrue(MessageFormat.format("{0} markers should have been created",
-				Integer.valueOf(expectedCount)),
+				new Object[] { new Integer(expectedCount) }),
 				markers.length == expectedCount);
 
 		for (int i = 0; i < markers.length; i++) {
@@ -677,7 +675,8 @@ public class WorkspaceOperationsTests extends UITestCase {
 		IMarker[] markers = op.getMarkers();
 		validateCreatedMarkers(3, markers, attrs, types);
 		undo();
-		for (IMarker createdMarker : markers) {
+		for (int i = 0; i < markers.length; i++) {
+			IMarker createdMarker = markers[i];
 			assertFalse("Marker should no longer exist", createdMarker.exists());
 		}
 		redo();
@@ -699,7 +698,8 @@ public class WorkspaceOperationsTests extends UITestCase {
 		IMarker[] markers = op.getMarkers();
 		validateCreatedMarkers(3, markers, attrs, types);
 		undo();
-		for (IMarker createdMarker : markers) {
+		for (int i = 0; i < markers.length; i++) {
+			IMarker createdMarker = markers[i];
 			assertFalse("Marker should no longer exist", createdMarker.exists());
 		}
 		redo();
@@ -823,14 +823,16 @@ public class WorkspaceOperationsTests extends UITestCase {
 		DeleteMarkersOperation deleteOp = new DeleteMarkersOperation(markers,
 				"Delete Markers Test");
 		execute(deleteOp);
-		for (IMarker createdMarker : markers) {
+		for (int i = 0; i < markers.length; i++) {
+			IMarker createdMarker = markers[i];
 			assertFalse("Marker should no longer exist", createdMarker.exists());
 		}
 		undo();
 		markers = deleteOp.getMarkers();
 		validateCreatedMarkers(3, markers, attrs, types);
 		redo();
-		for (IMarker createdMarker : markers) {
+		for (int i = 0; i < markers.length; i++) {
+			IMarker createdMarker = markers[i];
 			assertFalse("Marker should no longer exist", createdMarker.exists());
 		}
 	}
@@ -1068,7 +1070,7 @@ public class WorkspaceOperationsTests extends UITestCase {
 
 	public void testProjectDeleteUndoRedo() throws ExecutionException, CoreException {
 		ProjectSnapshot snap = new ProjectSnapshot(testProject);
-
+		
 		DeleteResourcesOperation op = new DeleteResourcesOperation(
 				new IResource[] { testProject }, "testProjectDelete", false);
 		execute(op);
@@ -1086,7 +1088,7 @@ public class WorkspaceOperationsTests extends UITestCase {
 		// get cleaned up. Otherwise some content is left on disk.
 		undo();
 	}
-
+	
 	public void test223956() throws ExecutionException, CoreException {
 		// put a marker on a file contained in the test project
 		Map[] attrs = new Map[] { getInitialMarkerAttributes()};
@@ -1103,7 +1105,7 @@ public class WorkspaceOperationsTests extends UITestCase {
 		assertTrue("Marker should not exist at project level", testProject.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO).length == 0);
 		assertTrue("Marker should have been restored in child file", testFileWithContent.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO).length == 1);
 	}
-
+	
 	public void test201441() throws ExecutionException, CoreException {
 		String utf8 = "UTF-8";
 		// set the charset on the project explicitly
@@ -1228,7 +1230,7 @@ public class WorkspaceOperationsTests extends UITestCase {
 		assertFalse("Folder deletion failed", folder.exists());
 		assertFalse("Folder deletion failed", parent.exists());
 		assertFalse("Folder deletion failed", root.exists());
-
+		
 		undo();
 		assertTrue("Folder creation failed", folder.exists());
 		assertTrue("Folder creation failed", parent.exists());
@@ -2153,7 +2155,7 @@ public class WorkspaceOperationsTests extends UITestCase {
 		// Now that project exists again, the undo should fail.
 		undoExpectFail(op);
 	}
-
+	
 	public void test250125() throws ExecutionException {
 		IFolder folder = getWorkspaceRoot().getFolder(
 				testProject.getFullPath().append(TEST_NEWFOLDER_NAME));

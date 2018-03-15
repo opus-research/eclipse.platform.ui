@@ -34,14 +34,25 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 	private DataBindingContext dbc;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 
 		dbc = new DataBindingContext();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase#tearDown
+	 * ()
+	 */
 	protected void tearDown() throws Exception {
 		if (dbc != null) {
 			dbc.dispose();
@@ -80,7 +91,7 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 	/**
 	 * Asserts that IStatus is populated and change events are fired when a
 	 * Binding that is associated with a context is in error.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void testValidationError() throws Exception {
@@ -103,7 +114,6 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 		assertEquals(0, errors.size());
 
 		IValidator validator = new IValidator() {
-			@Override
 			public IStatus validate(Object value) {
 				return ValidationStatus.error(errorMessage);
 			}
@@ -127,7 +137,7 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 	 * Asserts that then
 	 * {@link DataBindingContext#bindValue(IObservableValue, IObservableValue, UpdateValueStrategy, UpdateValueStrategy)}
 	 * if invoked the created binding is added to the internal list of bindings.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void testBindValueAddBinding() throws Exception {
@@ -148,7 +158,7 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 	 * Asserts that when
 	 * {@link DataBindingContext#bindList(IObservableList, IObservableList, UpdateListStrategy, UpdateListStrategy)}
 	 * is invoked the created binding is added to the intenal list of bindings.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void testBindListAddBinding() throws Exception {
@@ -192,14 +202,13 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 	 * Asserts that when a ValueBinding is created validation is ran to ensure
 	 * that the validation status of the Binding reflects the validity of the
 	 * value in the target.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void testValidateTargetAfterValueBindingCreation() throws Exception {
 		WritableValue target = new WritableValue("", String.class);
 		WritableValue model = new WritableValue("2", String.class);
 		class Validator implements IValidator {
-			@Override
 			public IStatus validate(Object value) {
 				return ValidationStatus.error("error");
 			}
@@ -232,32 +241,25 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 			super(new WritableValue(), new WritableValue());
 		}
 
-		@Override
 		public IObservableValue getValidationStatus() {
 			return null;
 		}
 
-		@Override
 		public void updateTargetToModel() {
 		}
 
-		@Override
 		public void updateModelToTarget() {
 		}
 
-		@Override
 		protected void postInit() {
 		}
 
-		@Override
 		protected void preInit() {
 		}
 
-		@Override
 		public void validateModelToTarget() {
 		}
 
-		@Override
 		public void validateTargetToModel() {
 		}
 	}

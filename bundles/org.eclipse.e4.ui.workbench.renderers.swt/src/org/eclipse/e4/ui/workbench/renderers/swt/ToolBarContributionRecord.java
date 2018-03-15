@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -18,18 +16,17 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
-import org.eclipse.core.expressions.ExpressionInfo;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
+import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
+import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.action.ToolBarManager;
@@ -40,8 +37,8 @@ public class ToolBarContributionRecord {
 
 	MToolBar toolbarModel;
 	MToolBarContribution toolbarContribution;
-	ArrayList<MToolBarElement> generatedElements = new ArrayList<>();
-	HashSet<MToolBarElement> sharedElements = new HashSet<>();
+	ArrayList<MToolBarElement> generatedElements = new ArrayList<MToolBarElement>();
+	HashSet<MToolBarElement> sharedElements = new HashSet<MToolBarElement>();
 	ToolBarManagerRenderer renderer;
 	boolean isVisible = true;
 	private IEclipseContext infoContext;
@@ -58,10 +55,13 @@ public class ToolBarContributionRecord {
 		return renderer.getManager(toolbarModel);
 	}
 
+	/**
+	 * @param context
+	 */
 	public void updateVisibility(IEclipseContext context) {
 		ExpressionContext exprContext = new ExpressionContext(context);
 		updateIsVisible(exprContext);
-		HashSet<ToolBarContributionRecord> recentlyUpdated = new HashSet<>();
+		HashSet<ToolBarContributionRecord> recentlyUpdated = new HashSet<ToolBarContributionRecord>();
 		recentlyUpdated.add(this);
 		boolean changed = false;
 		for (MToolBarElement item : generatedElements) {
@@ -82,13 +82,7 @@ public class ToolBarContributionRecord {
 		}
 
 		if (changed) {
-			ToolBarManager managerForModel = getManagerForModel();
-			managerForModel.markDirty();
-			// Make sure the MToolBar model is visible because
-			// TrimBarLayout.hideManagedTB hides and IPresentationEngine moves
-			// it to the Limbo-Shell
-			Stream.of(managerForModel.getItems()).filter(i -> i.isVisible()).findFirst()
-					.ifPresent((i) -> toolbarModel.setVisible(true));
+			getManagerForModel().markDirty();
 		}
 	}
 
@@ -125,48 +119,27 @@ public class ToolBarContributionRecord {
 				currentVisibility = ((Boolean) rc).booleanValue();
 			}
 		}
-		if (currentVisibility && item.getVisibleWhen() != null) {
-			boolean val = ContributionsAnalyzer.isVisible(item.getVisibleWhen(), exprContext);
+		if (currentVisibility
+				&& item.getVisibleWhen() instanceof MCoreExpression) {
+			boolean val = ContributionsAnalyzer.isVisible(
+					(MCoreExpression) item.getVisibleWhen(), exprContext);
 			currentVisibility = val;
 		}
 		return currentVisibility;
-	}
-
-	public void collectInfo(ExpressionInfo info) {
-		ContributionsAnalyzer.collectInfo(info,
-				toolbarContribution.getVisibleWhen());
-		for (MToolBarElement item : generatedElements) {
-			ContributionsAnalyzer.collectInfo(info, item.getVisibleWhen());
-		}
-		for (MToolBarElement item : sharedElements) {
-			ContributionsAnalyzer.collectInfo(info, item.getVisibleWhen());
-		}
 	}
 
 	public boolean anyVisibleWhen() {
 		if (toolbarContribution.getVisibleWhen() != null) {
 			return true;
 		}
-
-		List<MToolBarElement> childrenToInspect;
-		if (toolbarContribution.getTransientData().get(FACTORY) != null) {
-			// See mergeIntoModel
-			childrenToInspect = this.generatedElements;
-		} else {
-			childrenToInspect = toolbarContribution.getChildren();
-		}
-
-		for (MToolBarElement child : childrenToInspect) {
-			if (requiresVisibilityCheck(child)) {
+		for (MToolBarElement child : toolbarContribution.getChildren()) {
+			if (child.getVisibleWhen() != null
+					|| child.getPersistedState().get(
+							MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null) {
 				return true;
 			}
 		}
 		return false;
-	}
-
-	private boolean requiresVisibilityCheck(MToolBarElement toolBarElement) {
-		return toolBarElement.getVisibleWhen() != null
-				|| toolBarElement.getPersistedState().get(MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null;
 	}
 
 	public boolean mergeIntoModel() {
@@ -180,7 +153,7 @@ public class ToolBarContributionRecord {
 		if (toolbarContribution.getTransientData().get(FACTORY) != null) {
 			copyElements = mergeFactoryIntoModel();
 		} else {
-			copyElements = new ArrayList<>();
+			copyElements = new ArrayList<MToolBarElement>();
 			for (MToolBarElement item : toolbarContribution.getChildren()) {
 				MToolBarElement copy = (MToolBarElement) EcoreUtil
 						.copy((EObject) item);
@@ -190,7 +163,7 @@ public class ToolBarContributionRecord {
 		for (MToolBarElement copy : copyElements) {
 			// if a visibleWhen clause is defined, the item should not be
 			// visible until the clause has been evaluated and returned 'true'
-			copy.setVisible(!requiresVisibilityCheck(copy));
+			copy.setVisible(!anyVisibleWhen());
 			if (copy instanceof MToolBarSeparator) {
 				MToolBarSeparator shared = findExistingSeparator(copy
 						.getElementId());
@@ -226,8 +199,8 @@ public class ToolBarContributionRecord {
 		}
 		IEclipseContext staticContext = getStaticContext();
 		staticContext.remove(List.class);
-		factoryDispose = (Runnable) ((IContextFunction) obj).compute(
-				staticContext, null);
+		factoryDispose = (Runnable) ((IContextFunction) obj)
+				.compute(staticContext);
 		return staticContext.get(List.class);
 	}
 

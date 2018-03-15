@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,24 +7,24 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Pablo Cabrera <pablo.cabrera@mulesoft.com> - Bug 428355
  *******************************************************************************/
 package org.eclipse.ui.internal.about;
 
-import com.ibm.icu.text.Collator;
 import java.io.IOException;
 import java.net.URL;
+import com.ibm.icu.text.Collator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
  * An abstract parent that describes data that can be displayed in a table in one of
  * the about dialogs.
- * @since 3.0
+ * @since 3.0 
  */
 public abstract class AboutData {
     private String providerName;
@@ -69,14 +69,14 @@ public abstract class AboutData {
     }
 
     /**
-     * Modify the argument array to reverse the sort order.
+     * Modify the argument array to reverse the sort order. 
      * @param infos
      */
     private static void reverse(AboutData[] infos) {
-		List<AboutData> infoList = Arrays.asList(infos);
+        List infoList = Arrays.asList(infos);
         Collections.reverse(infoList);
         for (int i = 0; i < infos.length; ++i) {
-			infos[i] = infoList.get(i);
+			infos[i] = (AboutData) infoList.get(i);
 		}
     }
 
@@ -85,7 +85,7 @@ public abstract class AboutData {
      * boolean is true, the array is assumed to already be sorted and the
      * direction of sort (ascending vs. descending) is reversed.  Entries
      * with the same name are sorted by name.
-     *
+     * 
      * @param reverse
      *            if true then the order of the argument is reversed without
      *            examining the value of the fields
@@ -98,13 +98,14 @@ public abstract class AboutData {
             return;
         }
 
-		Arrays.sort(infos, new Comparator<AboutData>() {
+        Arrays.sort(infos, new Comparator() {
             Collator collator = Collator.getInstance(Locale.getDefault());
 
-			@Override
-			public int compare(AboutData info1, AboutData info2) {
+            public int compare(Object a, Object b) {
+                AboutData info1 = (AboutData) a;
+                AboutData info2 = (AboutData) b;
 
-				String provider1 = info1.getProviderName();
+                String provider1 = info1.getProviderName();
                 String provider2 = info2.getProviderName();
 
                 if (!provider1.equals(provider2)) {
@@ -120,7 +121,7 @@ public abstract class AboutData {
      * Modify the argument array to be sorted by name. If the reverse
      * boolean is true, the array is assumed to already be sorted and the
      * direction of sort (ascending vs. descending) is reversed.
-     *
+     * 
      * @param reverse
      *            if true then the order of the argument is reversed without
      *            examining the value of the fields
@@ -133,12 +134,13 @@ public abstract class AboutData {
             return;
         }
 
-		Arrays.sort(infos, new Comparator<AboutData>() {
+        Arrays.sort(infos, new Comparator() {
             Collator collator = Collator.getInstance(Locale.getDefault());
 
-			@Override
-			public int compare(AboutData info1, AboutData info2) {
-				return collator.compare(info1.getName(), info2.getName());
+            public int compare(Object a, Object b) {
+                AboutData info1 = (AboutData) a;
+                AboutData info2 = (AboutData) b;
+                return collator.compare(info1.getName(), info2.getName());
             }
         });
     }
@@ -148,7 +150,7 @@ public abstract class AboutData {
      * boolean is true, the array is assumed to already be sorted and the
      * direction of sort (ascending vs. descending) is reversed.  Entries
      * with the same name are sorted by name.
-     *
+     * 
      * @param reverse
      *            if true then the order of the argument is reversed without
      *            examining the value of the fields
@@ -161,11 +163,12 @@ public abstract class AboutData {
             return;
         }
 
-		Arrays.sort(infos, new Comparator<AboutData>() {
+        Arrays.sort(infos, new Comparator() {
             Collator collator = Collator.getInstance(Locale.getDefault());
 
-			@Override
-			public int compare(AboutData info1, AboutData info2) {
+            public int compare(Object a, Object b) {
+                AboutData info1 = (AboutData) a;
+                AboutData info2 = (AboutData) b;
 
                 String version1 = info1.getVersion();
                 String version2 = info2.getVersion();
@@ -184,7 +187,7 @@ public abstract class AboutData {
      * boolean is true, the array is assumed to already be sorted and the
      * direction of sort (ascending vs. descending) is reversed.  Entries
      * with the same name are sorted by name.
-     *
+     * 
      * @param reverse
      *            if true then the order of the argument is reversed without
      *            examining the value of the fields
@@ -197,11 +200,12 @@ public abstract class AboutData {
             return;
         }
 
-		Arrays.sort(infos, new Comparator<AboutData>() {
+        Arrays.sort(infos, new Comparator() {
             Collator collator = Collator.getInstance(Locale.getDefault());
 
-			@Override
-			public int compare(AboutData info1, AboutData info2) {
+            public int compare(Object a, Object b) {
+                AboutData info1 = (AboutData) a;
+                AboutData info2 = (AboutData) b;
 
                 String id1 = info1.getId();
                 String id2 = info2.getId();

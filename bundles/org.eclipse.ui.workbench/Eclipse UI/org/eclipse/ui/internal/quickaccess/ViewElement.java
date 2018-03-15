@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -30,7 +29,7 @@ import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ViewElement extends QuickAccessElement {
 
@@ -61,11 +60,6 @@ public class ViewElement extends QuickAccessElement {
 
 	@Override
 	public void execute() {
-		/*
-		 * TODO: see bug 483699: the code below duplicates the code in
-		 * org.eclipse.ui.handlers.ShowViewHandler#openView() and should be
-		 * refactored to some user friendly API
-		 */
 		String id = viewDescriptor.getElementId();
 		if (id != null) {
 			if (CompatibilityPart.COMPATIBILITY_VIEW_URI
@@ -103,17 +97,9 @@ public class ViewElement extends QuickAccessElement {
 
 	@Override
 	public String getLabel() {
-		String viewLabel = LocalizationHelper.getLocalized(viewDescriptor.getLabel(), viewDescriptor,
-				window.getContext());
-		String categoryLabel = LocalizationHelper.getLocalized(viewDescriptor.getCategory(), viewDescriptor,
-				window.getContext());
-		if (categoryLabel != null) {
-			return NLS.bind(QuickAccessMessages.QuickAccess_ViewWithCategory, viewLabel, categoryLabel);
-		}
-		return viewLabel;
+		return LocalizationHelper.getLocalized(viewDescriptor.getLabel(), viewDescriptor, window.getContext());
 	}
 
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -122,7 +108,6 @@ public class ViewElement extends QuickAccessElement {
 		return result;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

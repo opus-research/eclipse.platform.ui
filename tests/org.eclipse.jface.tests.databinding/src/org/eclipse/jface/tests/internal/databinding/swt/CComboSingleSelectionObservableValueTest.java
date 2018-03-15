@@ -43,7 +43,7 @@ public class CComboSingleSelectionObservableValueTest extends
 		assertEquals(-1, combo.getSelectionIndex());
 		assertEquals(-1, ((Integer) observableValue.getValue()).intValue());
 
-		Integer value = Integer.valueOf(1);
+		Integer value = new Integer(1);
 		observableValue.setValue(value);
 		assertEquals("combo selection index", value.intValue(), combo
 				.getSelectionIndex());
@@ -66,7 +66,6 @@ public class CComboSingleSelectionObservableValueTest extends
 		private CCombo combo;
 		private Shell shell;
 
-		@Override
 		public void setUp() {
 			shell = new Shell();
 			combo = new CCombo(shell, SWT.NONE);
@@ -74,31 +73,26 @@ public class CComboSingleSelectionObservableValueTest extends
 			combo.add("1");
 		}
 
-		@Override
 		public void tearDown() {
 			shell.dispose();
 		}
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return WidgetProperties.singleSelectionIndex()
 					.observe(realm, combo);
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			IObservableValue value = (IObservableValue) observable;
 			value.setValue(createValue(value));
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return Integer.TYPE;
 		}
 
-		@Override
 		public Object createValue(IObservableValue observable) {
-			return Integer.valueOf(_createValue(observable));
+			return new Integer(_createValue(observable));
 		}
 
 		private int _createValue(IObservableValue observable) {

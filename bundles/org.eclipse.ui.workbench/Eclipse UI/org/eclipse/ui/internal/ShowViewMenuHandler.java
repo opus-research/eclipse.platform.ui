@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -26,6 +25,8 @@ import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -45,9 +46,9 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * <p>
  * Replacement for: ShowViewMenuAction
  * </p>
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 
@@ -57,7 +58,13 @@ public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 		registerEnablement();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands
+	 * .ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchPart part = HandlerUtil.getActivePart(event);
 		if (part != null) {
@@ -67,7 +74,7 @@ public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 				Composite partContainer = (Composite) model.getWidget();
 				if (partContainer != null) {
 					Composite parent = partContainer.getParent();
-					while (parent != null) {
+					while (parent != null && parent instanceof Composite) {
 						if (parent instanceof CTabFolder) {
 							CTabFolder ctf = (CTabFolder) parent;
 							final Control topRight = ctf.getTopRight();
@@ -109,7 +116,11 @@ public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 			menu = (Menu) engine.createGui(menuModel, shell, model.getContext());
 			if (menu != null) {
 				final Menu tmpMenu = menu;
-				partContainer.addDisposeListener(e -> tmpMenu.dispose());
+				partContainer.addDisposeListener(new DisposeListener() {
+					public void widgetDisposed(DisposeEvent e) {
+						tmpMenu.dispose();
+					}
+				});
 			}
 		}
 
@@ -129,11 +140,17 @@ public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.AbstractEvaluationHandler#getEnabledWhenExpression
+	 * ()
+	 */
 	protected Expression getEnabledWhenExpression() {
+		// TODO Auto-generated method stub
 		if (enabledWhen == null) {
 			enabledWhen = new Expression() {
-				@Override
 				public EvaluationResult evaluate(IEvaluationContext context) throws CoreException {
 					// IWorkbenchPart part = InternalHandlerUtil
 					// .getActivePart(context);
@@ -147,7 +164,13 @@ public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 					// return EvaluationResult.FALSE;
 				}
 
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see
+				 * org.eclipse.core.expressions.Expression#collectExpressionInfo
+				 * (org.eclipse.core.expressions.ExpressionInfo)
+				 */
 				public void collectExpressionInfo(ExpressionInfo info) {
 					info.addVariableNameAccess(ISources.ACTIVE_PART_NAME);
 				}

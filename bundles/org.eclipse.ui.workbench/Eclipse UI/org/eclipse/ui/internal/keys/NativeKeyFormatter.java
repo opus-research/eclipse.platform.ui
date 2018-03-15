@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ package org.eclipse.ui.internal.keys;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.ResourceBundle;
+
 import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.keys.CharacterKey;
 import org.eclipse.ui.keys.Key;
@@ -26,7 +27,7 @@ import org.eclipse.ui.keys.SpecialKey;
  * Formats the key sequences and key strokes into the native human-readable
  * format. This is typically what you would see on the menus for the given
  * platform and locale.
- *
+ * 
  * @since 3.0
  */
 public class NativeKeyFormatter extends AbstractKeyFormatter {
@@ -87,17 +88,16 @@ public class NativeKeyFormatter extends AbstractKeyFormatter {
      * Formats an individual key into a human readable format. This uses an
      * internationalization resource bundle to look up the key. This does the
      * platform-specific formatting for Carbon.
-     *
+     * 
      * @param key
      *            The key to format; must not be <code>null</code>.
      * @return The key formatted as a string; should not be <code>null</code>.
      */
-    @Override
-	public String format(Key key) {
+    public String format(Key key) {
         String name = key.toString();
 
         // TODO consider platform-specific resource bundles
-        if (org.eclipse.jface.util.Util.isMac()) {
+        if (org.eclipse.jface.util.Util.isMac()) {    	
             String formattedName = (String) CARBON_KEY_LOOK_UP.get(name);
             if (formattedName != null) {
                 return formattedName;
@@ -107,31 +107,47 @@ public class NativeKeyFormatter extends AbstractKeyFormatter {
         return super.format(key);
     }
 
-    @Override
-	protected String getKeyDelimiter() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyDelimiter()
+     */
+    protected String getKeyDelimiter() {
         // We must do the look up every time, as our locale might change.
         if (org.eclipse.jface.util.Util.isMac()) {
             return Util.translateString(RESOURCE_BUNDLE,
                     CARBON_KEY_DELIMITER_KEY, Util.ZERO_LENGTH_STRING, false,
                     false);
+        } else {
+            return Util.translateString(RESOURCE_BUNDLE, KEY_DELIMITER_KEY,
+                    KeyStroke.KEY_DELIMITER, false, false);
         }
-		return Util.translateString(RESOURCE_BUNDLE, KEY_DELIMITER_KEY, KeyStroke.KEY_DELIMITER, false, false);
     }
 
-    @Override
-	protected String getKeyStrokeDelimiter() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyStrokeDelimiter()
+     */
+    protected String getKeyStrokeDelimiter() {
         // We must do the look up every time, as our locale might change.
         if (org.eclipse.jface.util.Util.isWindows()) {
             return Util.translateString(RESOURCE_BUNDLE,
                     WIN32_KEY_STROKE_DELIMITER_KEY,
                     KeySequence.KEY_STROKE_DELIMITER, false, false);
+        } else {
+            return Util.translateString(RESOURCE_BUNDLE,
+                    KEY_STROKE_DELIMITER_KEY, KeySequence.KEY_STROKE_DELIMITER,
+                    false, false);
         }
-		return Util.translateString(RESOURCE_BUNDLE, KEY_STROKE_DELIMITER_KEY, KeySequence.KEY_STROKE_DELIMITER, false,
-				false);
     }
 
-    @Override
-	protected Comparator getModifierKeyComparator() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getModifierKeyComparator()
+     */
+    protected Comparator getModifierKeyComparator() {
         return MODIFIER_KEY_COMPARATOR;
     }
 }

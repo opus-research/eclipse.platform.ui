@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,15 +20,19 @@ import org.eclipse.swt.widgets.Menu;
 /**
  * A compound contribution is a contribution item consisting of a
  * dynamic list of contribution items.
- *
+ * 
  * @since 3.1
  */
 public abstract class CompoundContributionItem extends ContributionItem {
 
-    private IMenuListener menuListener = manager -> manager.markDirty();
-
+    private IMenuListener menuListener = new IMenuListener() {
+        public void menuAboutToShow(IMenuManager manager) {
+            manager.markDirty();
+        }
+    };
+    
     private IContributionItem[] oldItems;
-
+    
     /**
      * Creates a compound contribution item with a <code>null</code> id.
      */
@@ -44,18 +48,21 @@ public abstract class CompoundContributionItem extends ContributionItem {
     protected CompoundContributionItem(String id) {
         super(id);
     }
-
-    @Override
-	public void fill(Menu menu, int index) {
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets.Menu, int)
+     */
+    public void fill(Menu menu, int index) {
         if (index == -1) {
 			index = menu.getItemCount();
 		}
-
+        
         IContributionItem[] items = getContributionItemsToFill();
 		if (index > menu.getItemCount()) {
 			index = menu.getItemCount();
 		}
-        for (IContributionItem item : items) {
+        for (int i = 0; i < items.length; i++) {
+            IContributionItem item = items[i];
             int oldItemCount = menu.getItemCount();
             if (item.isVisible()) {
                 item.fill(menu, index);
@@ -65,44 +72,47 @@ public abstract class CompoundContributionItem extends ContributionItem {
             index += numAdded;
         }
     }
-
+    
     /**
 	 * Return a list of contributions items that will replace this item in the
 	 * parent manager. The list must contain new contribution items every call
 	 * since the old ones will be disposed.
-	 *
+	 * 
 	 * @return an array list of items to display. Must not be <code>null</code>.
 	 */
     protected abstract IContributionItem[] getContributionItems();
-
+    
     private IContributionItem[] getContributionItemsToFill() {
-		disposeOldItems();
-		oldItems = getContributionItems();
-		return oldItems;
-	}
-
-	private void disposeOldItems() {
         if (oldItems != null) {
-            for (IContributionItem oldItem : oldItems) {
+            for (int i = 0; i < oldItems.length; i++) {
+                IContributionItem oldItem = oldItems[i];
                 oldItem.dispose();
             }
             oldItems = null;
         }
+        oldItems = getContributionItems();
+        return oldItems;
     }
-
-    @Override
-	public boolean isDirty() {
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#isDirty()
+     */
+    public boolean isDirty() {
 		return true;
     }
-
-    @Override
-	public boolean isDynamic() {
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#isDynamic()
+     */
+    public boolean isDynamic() {
         return true;
     }
-
-
-    @Override
-	public void setParent(IContributionManager parent) {
+    
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#setParent(org.eclipse.jface.action.IContributionManager)
+     */
+    public void setParent(IContributionManager parent) {
         if (getParent() instanceof IMenuManager) {
             IMenuManager menuMgr = (IMenuManager) getParent();
             menuMgr.removeMenuListener(menuListener);
@@ -113,10 +123,4 @@ public abstract class CompoundContributionItem extends ContributionItem {
         }
         super.setParent(parent);
     }
-
-	@Override
-	public void dispose() {
-		disposeOldItems();
-		super.dispose();
-	}
 }

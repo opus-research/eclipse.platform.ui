@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440270
  *******************************************************************************/
 package org.eclipse.jface.fieldassist;
 
@@ -35,10 +34,10 @@ import org.eclipse.swt.graphics.Image;
  * itself can be specified when registering the decoration. In this case, the
  * life cycle should be managed by the specifying client.
  * </p>
- *
+ * 
  * @see FieldDecoration
  * @see ImageRegistry
- *
+ * 
  * @since 3.2
  */
 public class FieldDecorationRegistry {
@@ -70,7 +69,7 @@ public class FieldDecorationRegistry {
 	/**
 	 * Decoration id for the decoration that should be used to cue the user that
 	 * a field has additional information.
-	 *
+	 * 
 	 * @since 3.3
 	 */
 	public static final String DEC_INFORMATION = "DEC_INFORMATION"; //$NON-NLS-1$
@@ -78,7 +77,7 @@ public class FieldDecorationRegistry {
 	/**
 	 * Decoration id for the decoration that should be used to cue the user that
 	 * a field has an error with quick fix available.
-	 *
+	 * 
 	 * @since 3.3
 	 */
 	public static final String DEC_ERROR_QUICKFIX = "DEC_ERRORQUICKFIX"; //$NON-NLS-1$
@@ -91,7 +90,7 @@ public class FieldDecorationRegistry {
 	private static final String IMG_DEC_FIELD_REQUIRED = "org.eclipse.jface.fieldassist.IMG_DEC_FIELD_REQUIRED"; //$NON-NLS-1$
 
 	private static final String IMG_DEC_FIELD_ERROR = "org.eclipse.jface.fieldassist.IMG_DEC_FIELD_ERROR"; //$NON-NLS-1$
-
+	
 	private static final String IMG_DEC_FIELD_ERROR_QUICKFIX = "org.eclipse.jface.fieldassist.IMG_DEC_FIELD_ERROR_QUICKFIX"; //$NON-NLS-1$
 
 	private static final String IMG_DEC_FIELD_WARNING = "org.eclipse.jface.fieldassist.IMG_DEC_FIELD_WARNING"; //$NON-NLS-1$
@@ -107,25 +106,25 @@ public class FieldDecorationRegistry {
 		// Define the images used in the standard decorations.
 		imageRegistry.put(IMG_DEC_FIELD_CONTENT_PROPOSAL, ImageDescriptor
 				.createFromFile(FieldDecorationRegistry.class,
-						"images/contassist_ovr.png"));//$NON-NLS-1$
+						"images/contassist_ovr.gif"));//$NON-NLS-1$
 		imageRegistry.put(IMG_DEC_FIELD_ERROR, ImageDescriptor.createFromFile(
-				FieldDecorationRegistry.class, "images/error_ovr.png"));//$NON-NLS-1$
+				FieldDecorationRegistry.class, "images/error_ovr.gif"));//$NON-NLS-1$
 
 		imageRegistry.put(IMG_DEC_FIELD_WARNING, ImageDescriptor
 				.createFromFile(FieldDecorationRegistry.class,
-						"images/warn_ovr.png"));//$NON-NLS-1$
+						"images/warn_ovr.gif"));//$NON-NLS-1$
 
 		imageRegistry.put(IMG_DEC_FIELD_REQUIRED, ImageDescriptor
 				.createFromFile(FieldDecorationRegistry.class,
-						"images/required_field_cue.png"));//$NON-NLS-1$
-
+						"images/required_field_cue.gif"));//$NON-NLS-1$	
+		
 		imageRegistry.put(IMG_DEC_FIELD_ERROR_QUICKFIX, ImageDescriptor
 				.createFromFile(FieldDecorationRegistry.class,
-						"images/errorqf_ovr.png"));//$NON-NLS-1$
-
+						"images/errorqf_ovr.gif"));//$NON-NLS-1$
+		
 		imageRegistry.put(IMG_DEC_FIELD_INFO, ImageDescriptor
 				.createFromFile(FieldDecorationRegistry.class,
-						"images/info_ovr.png"));//$NON-NLS-1$
+						"images/info_ovr.gif"));//$NON-NLS-1$		
 
 		// Define the standard decorations. Some do not have standard
 		// descriptions. Use null in these cases.
@@ -141,7 +140,7 @@ public class FieldDecorationRegistry {
 				JFaceResources
 						.getString("FieldDecorationRegistry.errorMessage"), //$NON-NLS-1$
 				IMG_DEC_FIELD_ERROR, imageRegistry);
-
+		
 		getDefault().registerFieldDecoration(
 				DEC_ERROR_QUICKFIX,
 				JFaceResources
@@ -150,7 +149,7 @@ public class FieldDecorationRegistry {
 
 		getDefault().registerFieldDecoration(DEC_WARNING, null,
 				IMG_DEC_FIELD_WARNING, imageRegistry);
-
+		
 		getDefault().registerFieldDecoration(DEC_INFORMATION, null,
 				IMG_DEC_FIELD_INFO, imageRegistry);
 
@@ -223,11 +222,11 @@ public class FieldDecorationRegistry {
 	private int maxDecorationWidth = 0;
 	private int maxDecorationHeight = 0;
 
-	private HashMap<String, Entry> decorations = new HashMap<>();
+	private HashMap /* <String id, FieldDecoration> */decorations = new HashMap();
 
 	/**
 	 * Get the default FieldDecorationRegistry.
-	 *
+	 * 
 	 * @return the singleton FieldDecorationRegistry that is used to manage
 	 *         shared field decorations.
 	 */
@@ -240,7 +239,7 @@ public class FieldDecorationRegistry {
 
 	/**
 	 * Set the default FieldDecorationRegistry.
-	 *
+	 * 
 	 * @param defaultRegistry
 	 *            the singleton FieldDecorationRegistry that is used to manage
 	 *            shared field decorations.
@@ -262,7 +261,7 @@ public class FieldDecorationRegistry {
 	 * the registry. This value changes as decorations are added and retrieved.
 	 * This value can be used by clients to reserve space or otherwise compute
 	 * margins when aligning non-decorated fields with decorated fields.
-	 *
+	 * 
 	 * @return the maximum width in pixels of any accessed decoration
 	 */
 	public int getMaximumDecorationWidth() {
@@ -274,8 +273,8 @@ public class FieldDecorationRegistry {
 	 * the registry. This value changes as decorations are added and retrieved.
 	 * This value can be used by clients to reserve space or otherwise compute
 	 * margins when aligning non-decorated fields with decorated fields.
-	 *
-	 *
+	 * 
+	 * 
 	 * @return the maximum height in pixels of any accessed decoration
 	 */
 	public int getMaximumDecorationHeight() {
@@ -287,7 +286,7 @@ public class FieldDecorationRegistry {
 	 * supplied image should be managed by the client. That is, it will never be
 	 * disposed by this registry and the decoration should be removed from the
 	 * registry if the image is ever disposed elsewhere.
-	 *
+	 * 
 	 * @param id
 	 *            the String id used to identify and access the decoration.
 	 * @param description
@@ -307,7 +306,7 @@ public class FieldDecorationRegistry {
 	 * Registers a field decoration using the specified id. An image id of an
 	 * image located in the default JFaceResources image registry is supplied.
 	 * The image will not be created until the decoration is requested.
-	 *
+	 * 
 	 * @param id
 	 *            the String id used to identify and access the decoration.
 	 * @param description
@@ -330,7 +329,7 @@ public class FieldDecorationRegistry {
 	 * Registers a field decoration using the specified id. An image id and an
 	 * image registry are supplied. The image will not be created until the
 	 * decoration is requested.
-	 *
+	 * 
 	 * @param id
 	 *            the String id used to identify and access the decoration.
 	 * @param description
@@ -363,7 +362,7 @@ public class FieldDecorationRegistry {
 	 * be used in cases where the caller intends to dispose of the image
 	 * referred to by the decoration, or otherwise determines that the
 	 * decoration should no longer be used.
-	 *
+	 * 
 	 * @param id
 	 *            the String id of the decoration to be unregistered.
 	 */
@@ -374,7 +373,7 @@ public class FieldDecorationRegistry {
 
 	/**
 	 * Returns the field decoration registered by the specified id .
-	 *
+	 * 
 	 * @param id
 	 *            the String id used to access the decoration.
 	 * @return the FieldDecoration with the specified id, or <code>null</code>
@@ -394,12 +393,12 @@ public class FieldDecorationRegistry {
 	 * called in response to adding, removing, or replacing a decoration.
 	 */
 	private void recomputeMaximums() {
-		Iterator<Entry> entries = decorations.values().iterator();
-
+		Iterator entries = decorations.values().iterator();
+		
 		maxDecorationHeight = 0;
 		maxDecorationWidth = 0;
 		while (entries.hasNext()) {
-			Image image = entries.next().getDecoration().getImage();
+			Image image = ((Entry)entries.next()).getDecoration().getImage();
 			if (image != null) {
 				maxDecorationHeight = Math.max(maxDecorationHeight, image.getBounds().height);
 				maxDecorationWidth = Math.max(maxDecorationWidth, image.getBounds().width);

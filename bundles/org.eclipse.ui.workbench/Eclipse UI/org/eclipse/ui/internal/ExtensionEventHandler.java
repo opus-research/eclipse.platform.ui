@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionDelta;
@@ -39,7 +40,7 @@ import org.eclipse.ui.themes.ITheme;
 import org.eclipse.ui.themes.IThemeManager;
 
 class ExtensionEventHandler implements IRegistryChangeListener {
-
+    
     private Workbench workbench;
 
     private List changeList = new ArrayList(10);
@@ -48,8 +49,7 @@ class ExtensionEventHandler implements IRegistryChangeListener {
         this.workbench = workbench;
     }
 
-    @Override
-	public void registryChanged(IRegistryChangeEvent event) {
+    public void registryChanged(IRegistryChangeEvent event) {
         try {
             IExtensionDelta delta[] = event
                     .getExtensionDeltas(WorkbenchPlugin.PI_WORKBENCH);
@@ -70,31 +70,31 @@ class ExtensionEventHandler implements IRegistryChangeListener {
             int numPerspectives = 0;
             int numActionSetPartAssoc = 0;
 
-            // push action sets and perspectives to the top because incoming
-            // actionSetPartAssociations and perspectiveExtensions may depend upon
-            // them for their bindings.
-            for (IExtensionDelta extensionDelta : delta) {
-                id = extensionDelta.getExtensionPoint().getSimpleIdentifier();
-                if (extensionDelta.getKind() == IExtensionDelta.ADDED) {
+            // push action sets and perspectives to the top because incoming 
+            // actionSetPartAssociations and perspectiveExtensions may depend upon 
+            // them for their bindings.		
+            for (int i = 0; i < delta.length; i++) {
+                id = delta[i].getExtensionPoint().getSimpleIdentifier();
+                if (delta[i].getKind() == IExtensionDelta.ADDED) {
                     if (id.equals(IWorkbenchRegistryConstants.PL_ACTION_SETS)) {
-						appearList.add(0, extensionDelta);
+						appearList.add(0, delta[i]);
 					} else if (!id.equals(IWorkbenchRegistryConstants.PL_PERSPECTIVES)
                             && !id.equals(IWorkbenchRegistryConstants.PL_VIEWS)
                             && !id.equals(IWorkbenchRegistryConstants.PL_ACTION_SETS)) {
 						appearList.add(appearList.size() - numPerspectives,
-                                extensionDelta);
+                                delta[i]);
 					}
                 } else {
-                    if (extensionDelta.getKind() == IExtensionDelta.REMOVED) {
+                    if (delta[i].getKind() == IExtensionDelta.REMOVED) {
                         if (id
                                 .equals(IWorkbenchRegistryConstants.PL_ACTION_SET_PART_ASSOCIATIONS)) {
-                            revokeList.add(0, extensionDelta);
+                            revokeList.add(0, delta[i]);
                             numActionSetPartAssoc++;
                         } else if (id
                                 .equals(IWorkbenchRegistryConstants.PL_PERSPECTIVES)) {
-							revokeList.add(numActionSetPartAssoc, extensionDelta);
+							revokeList.add(numActionSetPartAssoc, delta[i]);
 						} else {
-							revokeList.add(extensionDelta);
+							revokeList.add(delta[i]);
 						}
                     }
                 }
@@ -126,10 +126,14 @@ class ExtensionEventHandler implements IRegistryChangeListener {
 
     private void asyncAppear(Display display, final IExtensionPoint extpt,
             final IExtension ext) {
-        Runnable run = () -> appear(extpt, ext);
+        Runnable run = new Runnable() {
+            public void run() {
+                appear(extpt, ext);
+            }
+        };
         display.syncExec(run);
     }
-
+    
     private void appear(IExtensionPoint extPt, IExtension ext) {
         String name = extPt.getSimpleIdentifier();
         if (name.equalsIgnoreCase(IWorkbenchRegistryConstants.PL_FONT_DEFINITIONS)) {
@@ -149,8 +153,9 @@ class ExtensionEventHandler implements IRegistryChangeListener {
         ThemeRegistryReader reader = new ThemeRegistryReader();
         reader.setRegistry((ThemeRegistry) WorkbenchPlugin.getDefault()
                 .getThemeRegistry());
-		for (IConfigurationElement configElement : ext.getConfigurationElements()) {
-			reader.readElement(configElement);
+        IConfigurationElement[] elements = ext.getConfigurationElements();
+        for (int i = 0; i < elements.length; i++) {
+			reader.readElement(elements[i]);
 		}
 
         Collection fonts = reader.getFontDefinitions();
@@ -167,8 +172,9 @@ class ExtensionEventHandler implements IRegistryChangeListener {
         ThemeRegistry registry = (ThemeRegistry) WorkbenchPlugin.getDefault()
                 .getThemeRegistry();
         reader.setRegistry(registry);
-		for (IConfigurationElement configElement : ext.getConfigurationElements()) {
-			reader.readElement(configElement);
+        IConfigurationElement[] elements = ext.getConfigurationElements();
+        for (int i = 0; i < elements.length; i++) {
+			reader.readElement(elements[i]);
 		}
 
         Collection colors = reader.getColorDefinitions();
@@ -195,7 +201,7 @@ class ExtensionEventHandler implements IRegistryChangeListener {
 			return;
 		}
 
-        final StringBuilder message = new StringBuilder(
+        final StringBuffer message = new StringBuffer(
                 ExtensionEventHandlerMessages.ExtensionEventHandler_following_changes);
 
         for (Iterator i = changeList.iterator(); i.hasNext();) {
@@ -204,29 +210,31 @@ class ExtensionEventHandler implements IRegistryChangeListener {
 
         message.append(ExtensionEventHandlerMessages.ExtensionEventHandler_need_to_reset);
 
-        display.asyncExec(() -> {
-		    Shell parentShell = null;
-		    IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-		    if (window == null) {
-		        if (workbench.getWorkbenchWindowCount() == 0) {
-					return;
-				}
-		        window = workbench.getWorkbenchWindows()[0];
-		    }
+        display.asyncExec(new Runnable() {
+            public void run() {
+                Shell parentShell = null;
+                IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+                if (window == null) {
+                    if (workbench.getWorkbenchWindowCount() == 0) {
+						return;
+					}
+                    window = workbench.getWorkbenchWindows()[0];
+                }
 
-		    parentShell = window.getShell();
+                parentShell = window.getShell();
 
-		    if (MessageDialog
-		            .openQuestion(
-		                    parentShell,
-		                    ExtensionEventHandlerMessages.ExtensionEventHandler_reset_perspective, message.toString())) {
-		        IWorkbenchPage page = window.getActivePage();
-		        if (page == null) {
-					return;
-				}
-		        page.resetPerspective();
-		    }
-		});
+                if (MessageDialog
+                        .openQuestion(
+                                parentShell,
+                                ExtensionEventHandlerMessages.ExtensionEventHandler_reset_perspective, message.toString())) {
+                    IWorkbenchPage page = window.getActivePage();
+                    if (page == null) {
+						return;
+					}
+                    page.resetPerspective();
+                }
+            }
+        });
 
     }
 }

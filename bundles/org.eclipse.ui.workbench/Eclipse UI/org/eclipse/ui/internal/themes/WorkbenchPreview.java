@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.ui.internal.themes;
 
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
@@ -35,12 +36,12 @@ import org.eclipse.ui.themes.IThemePreview;
  * @since 3.0
  */
 public class WorkbenchPreview implements IThemePreview {
-
+	
 	  // don't reset this dynamically, so just keep the information static.
 	// see bug:
 	//   75422 [Presentations] Switching presentation to R21 switches immediately, but only partially
     private static int tabPos = PlatformUI.getPreferenceStore().getInt(IWorkbenchPreferenceConstants.VIEW_TAB_POSITION);
-
+  
     private boolean disposed = false;
 
     private CTabFolder folder;
@@ -53,16 +54,20 @@ public class WorkbenchPreview implements IThemePreview {
 
     private ViewForm viewForm;
 
-    private IPropertyChangeListener fontAndColorListener = event -> {
-	    if (!disposed) {
-	        setColorsAndFonts();
-	        //viewMessage.setSize(viewMessage.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
-	        viewForm.layout(true);
-	    }
-	};
+    private IPropertyChangeListener fontAndColorListener = new IPropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent event) {
+            if (!disposed) {
+                setColorsAndFonts();
+                //viewMessage.setSize(viewMessage.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
+                viewForm.layout(true);
+            }
+        }
+    };
 
-    @Override
-	public void createControl(Composite parent, ITheme currentTheme) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPresentationPreview#createControl(org.eclipse.swt.widgets.Composite, org.eclipse.ui.themes.ITheme)
+     */
+    public void createControl(Composite parent, ITheme currentTheme) {
         this.theme = currentTheme;
         folder = new CTabFolder(parent, SWT.BORDER);
         folder.setUnselectedCloseVisible(false);
@@ -152,10 +157,14 @@ public class WorkbenchPreview implements IThemePreview {
 
         folder.setFont(theme.getFontRegistry().get(
                 IWorkbenchThemeConstants.TAB_TEXT_FONT));
+        viewMessage.setFont(theme.getFontRegistry().get(
+                IWorkbenchThemeConstants.VIEW_MESSAGE_TEXT_FONT));
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPresentationPreview#dispose()
+     */
+    public void dispose() {
         disposed = true;
         theme.removePropertyChangeListener(fontAndColorListener);
     }

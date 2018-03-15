@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,18 +27,15 @@ public final class ConfigurationElementMemento implements IMemento {
         this.configurationElement = configurationElement;
     }
 
-    @Override
-	public IMemento createChild(String type) {
+    public IMemento createChild(String type) {
         return null;
     }
 
-    @Override
-	public IMemento createChild(String type, String id) {
+    public IMemento createChild(String type, String id) {
         return null;
     }
 
-    @Override
-	public IMemento getChild(String type) {
+    public IMemento getChild(String type) {
         IConfigurationElement[] configurationElements = configurationElement
                 .getChildren(type);
 
@@ -49,15 +46,13 @@ public final class ConfigurationElementMemento implements IMemento {
         return null;
     }
 
-	@Override
 	public IMemento[] getChildren() {
 		IConfigurationElement[] configurationElements = configurationElement.getChildren();
 
 		return getMementoArray(configurationElements);
 	}
 
-    @Override
-	public IMemento[] getChildren(String type) {
+    public IMemento[] getChildren(String type) {
         IConfigurationElement[] configurationElements = configurationElement
                 .getChildren(type);
 
@@ -79,8 +74,7 @@ public final class ConfigurationElementMemento implements IMemento {
         return new IMemento[0];
 	}
 
-    @Override
-	public Float getFloat(String key) {
+    public Float getFloat(String key) {
         String string = configurationElement.getAttribute(key);
 
         if (string != null) {
@@ -93,23 +87,20 @@ public final class ConfigurationElementMemento implements IMemento {
         return null;
     }
 
-    @Override
-	public String getType() {
+    public String getType() {
         return configurationElement.getName();
     }
 
-    @Override
-	public String getID() {
+    public String getID() {
         return configurationElement.getAttribute(TAG_ID);
     }
 
-    @Override
-	public Integer getInteger(String key) {
+    public Integer getInteger(String key) {
         String string = configurationElement.getAttribute(key);
 
         if (string != null) {
 			try {
-				return Integer.valueOf(string);
+                return new Integer(string);
             } catch (NumberFormatException eNumberFormat) {
             }
 		}
@@ -117,13 +108,11 @@ public final class ConfigurationElementMemento implements IMemento {
         return null;
     }
 
-    @Override
-	public String getString(String key) {
+    public String getString(String key) {
         return configurationElement.getAttribute(key);
     }
 
-    @Override
-	public Boolean getBoolean(String key) {
+    public Boolean getBoolean(String key) {
         String string = configurationElement.getAttribute(key);
         if (string==null) {
         	return null;
@@ -131,44 +120,36 @@ public final class ConfigurationElementMemento implements IMemento {
         return Boolean.valueOf(string);
     }
 
-    @Override
-	public String getTextData() {
+    public String getTextData() {
         return configurationElement.getValue();
     }
-
-    @Override
-	public String[] getAttributeKeys() {
+    
+    public String[] getAttributeKeys() {
     	return configurationElement.getAttributeNames();
     }
 
-    @Override
-	public void putFloat(String key, float value) {
+    public void putFloat(String key, float value) {
     }
 
-    @Override
-	public void putInteger(String key, int value) {
+    public void putInteger(String key, int value) {
     }
 
-    @Override
-	public void putMemento(IMemento memento) {
+    public void putMemento(IMemento memento) {
     }
 
-    @Override
-	public void putString(String key, String value) {
+    public void putString(String key, String value) {
+    }
+    
+    public void putBoolean(String key, boolean value) {
     }
 
-    @Override
-	public void putBoolean(String key, boolean value) {
+    public void putTextData(String data) {
     }
-
-    @Override
-	public void putTextData(String data) {
-    }
-
+    
     public String getContributorName() {
     	return configurationElement.getContributor().getName();
     }
-
+    
     public String getExtensionID() {
     	return configurationElement.getDeclaringExtension().getUniqueIdentifier();
     }

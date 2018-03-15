@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.actions;
+
+import org.eclipse.e4.core.contexts.IEclipseContext;
 
 import java.util.Collections;
 import org.eclipse.core.commands.ExecutionException;
@@ -24,7 +25,6 @@ import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IEditorSite;
@@ -53,7 +53,7 @@ import org.eclipse.ui.services.IServiceLocator;
  * <p>
  * <b>Note:</b> Clients may instantiate.
  * </p>
- *
+ * 
  * @since 3.3
  */
 public final class ContributedAction extends CommandAction {
@@ -67,7 +67,7 @@ public final class ContributedAction extends CommandAction {
 
 	/**
 	 * Create an action that can call a command.
-	 *
+	 * 
 	 * @param locator
 	 *            The appropriate service locator to use. If you use a part site
 	 *            as your locator, this action will be tied to your part.
@@ -97,7 +97,7 @@ public final class ContributedAction extends CommandAction {
 				}
 			}
 			// legacy bridge part
-			IActionCommandMappingService mapping = locator
+			IActionCommandMappingService mapping = (IActionCommandMappingService) locator
 					.getService(IActionCommandMappingService.class);
 			if (mapping == null) {
 				throw new CommandNotMappedException(
@@ -126,11 +126,11 @@ public final class ContributedAction extends CommandAction {
 
 	private void updateSiteAssociations(IWorkbenchPartSite site,
 			String commandId, String actionId, IConfigurationElement element) {
-		IWorkbenchLocationService wls = site
+		IWorkbenchLocationService wls = (IWorkbenchLocationService) site
 				.getService(IWorkbenchLocationService.class);
 		IWorkbench workbench = wls.getWorkbench();
 		IWorkbenchWindow window = wls.getWorkbenchWindow();
-		IHandlerService serv = workbench
+		IHandlerService serv = (IHandlerService) workbench
 				.getService(IHandlerService.class);
 		appContext = new EvaluationContext(serv.getCurrentState(),
 				Collections.EMPTY_LIST);
@@ -150,7 +150,7 @@ public final class ContributedAction extends CommandAction {
 		appContext.addVariable(ISources.ACTIVE_WORKBENCH_WINDOW_SHELL_NAME,
 				window.getShell());
 
-		partHandler = lookUpHandler(site, commandId);
+		partHandler = lookUpHandler((IServiceLocator) site, commandId);
 		if (partHandler == null) {
 			localHandler = true;
 			// if we can't find the handler, then at least we can
@@ -161,7 +161,7 @@ public final class ContributedAction extends CommandAction {
 					null, null);
 		}
 		if (site instanceof MultiPageEditorSite) {
-			IHandlerService siteServ = site
+			IHandlerService siteServ = (IHandlerService) site
 					.getService(IHandlerService.class);
 			siteServ.activateHandler(commandId, partHandler);
 		}
@@ -183,7 +183,11 @@ public final class ContributedAction extends CommandAction {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.actions.CommandAction#runWithEvent(org.eclipse.swt.widgets.Event)
+	 */
 	public void runWithEvent(Event event) {
 		if (partHandler != null && getParameterizedCommand() != null) {
 			IHandler oldHandler = getParameterizedCommand().getCommand()
@@ -207,7 +211,11 @@ public final class ContributedAction extends CommandAction {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.Action#isEnabled()
+	 */
 	public boolean isEnabled() {
 		if (partHandler != null) {
 			if (partHandler instanceof IHandler2) {
@@ -231,26 +239,21 @@ public final class ContributedAction extends CommandAction {
 			}
 
 			partListener = new IPartListener() {
-				@Override
 				public void partActivated(IWorkbenchPart part) {
 				}
 
-				@Override
 				public void partBroughtToTop(IWorkbenchPart part) {
 				}
 
-				@Override
 				public void partClosed(IWorkbenchPart part) {
 					if (part == currentPart) {
 						ContributedAction.this.disposeAction();
 					}
 				}
 
-				@Override
 				public void partDeactivated(IWorkbenchPart part) {
 				}
 
-				@Override
 				public void partOpened(IWorkbenchPart part) {
 				}
 			};

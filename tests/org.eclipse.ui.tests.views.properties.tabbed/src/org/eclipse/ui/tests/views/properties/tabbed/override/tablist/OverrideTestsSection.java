@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -32,7 +32,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * <p>
  * The overridable tab list is a content provider that provides both the
  * sections and the tab labels.
- *
+ * 
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -40,7 +40,12 @@ public class OverrideTestsSection extends
 		AbstractOverridableTabListPropertySection {
 	private OverrideTestsTabListsContentsManager contentsManager;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#createControls(org.eclipse.swt.widgets.Composite,
+	 *      org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
+	 */
 	public void createControls(Composite parent,
 			TabbedPropertySheetPage tabbedPropertySheetPage) {
 		super.createControls(parent, tabbedPropertySheetPage);
@@ -48,7 +53,11 @@ public class OverrideTestsSection extends
 				tabbedPropertySheetPage, this);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#dispose()
+	 */
 	public void dispose() {
 		if (contentsManager != null) {
 			contentsManager.dispose();
@@ -56,7 +65,11 @@ public class OverrideTestsSection extends
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractOverridableTabListPropertySection#getTabs()
+	 */
 	public ITabItem[] getTabs() {
 		if (contentsManager != null) {
 			return contentsManager.getTabs();
@@ -64,14 +77,23 @@ public class OverrideTestsSection extends
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractOverridableTabListPropertySection#selectTab(int)
+	 */
 	public void selectTab(int index) {
 		if (contentsManager != null) {
 			contentsManager.selectTab(index);
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#setInput(org.eclipse.ui.IWorkbenchPart,
+	 *      org.eclipse.jface.viewers.ISelection)
+	 */
 	public void setInput(IWorkbenchPart part, ISelection selection) {
 		super.setInput(part, selection);
 		if (contentsManager != null) {
@@ -79,7 +101,11 @@ public class OverrideTestsSection extends
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#shouldUseExtraSpace()
+	 */
 	public boolean shouldUseExtraSpace() {
 		return true;
 	}

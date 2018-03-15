@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *******************************************************************************/
 package org.eclipse.ui.ide.undo;
 
@@ -29,7 +27,6 @@ import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -39,7 +36,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
@@ -56,7 +53,7 @@ import org.eclipse.ui.internal.ide.undo.UndoMessages;
 /**
  * WorkspaceUndoUtil defines common utility methods and constants used by
  * clients who create undoable workspace operations.
- *
+ * 
  * @since 3.3
  */
 public class WorkspaceUndoUtil {
@@ -68,7 +65,7 @@ public class WorkspaceUndoUtil {
 
 	/**
 	 * Return the undo context that should be used for workspace-wide operations
-	 *
+	 * 
 	 * @return the undo context suitable for workspace-level operations.
 	 */
 	public static IUndoContext getWorkspaceUndoContext() {
@@ -79,7 +76,7 @@ public class WorkspaceUndoUtil {
 	/**
 	 * Return the undo context that should be used for operations involving
 	 * tasks.
-	 *
+	 * 
 	 * @return the tasks undo context
 	 */
 	public static IUndoContext getTasksUndoContext() {
@@ -94,7 +91,7 @@ public class WorkspaceUndoUtil {
 	/**
 	 * Return the undo context that should be used for operations involving
 	 * bookmarks.
-	 *
+	 * 
 	 * @return the bookmarks undo context
 	 */
 	public static IUndoContext getBookmarksUndoContext() {
@@ -109,7 +106,7 @@ public class WorkspaceUndoUtil {
 	/**
 	 * Return the undo context that should be used for operations involving
 	 * problems.
-	 *
+	 * 
 	 * @return the problems undo context
 	 * @since 3.7
 	 */
@@ -129,20 +126,19 @@ public class WorkspaceUndoUtil {
 	 * {@link org.eclipse.core.commands.operations.IOperationHistory} method
 	 * that requires an {@link org.eclipse.core.runtime.IAdaptable}
 	 * <code>uiInfo</code> parameter.
-	 *
+	 * 
 	 * @param shell
 	 *            the shell that should be returned by the IAdaptable when asked
 	 *            to adapt a shell. If this parameter is <code>null</code>,
 	 *            the returned shell will also be <code>null</code>.
-	 *
+	 * 
 	 * @return an IAdaptable that will return the specified shell.
 	 */
 	public static IAdaptable getUIInfoAdapter(final Shell shell) {
 		return new IAdaptable() {
-			@Override
-			public <T> T getAdapter(Class<T> clazz) {
+			public Object getAdapter(Class clazz) {
 				if (clazz == Shell.class) {
-					return clazz.cast(shell);
+					return shell;
 				}
 				return null;
 			}
@@ -156,7 +152,7 @@ public class WorkspaceUndoUtil {
 	/**
 	 * Delete all of the specified resources, returning resource descriptions
 	 * that can be used to restore them.
-	 *
+	 * 
 	 * @param resourcesToDelete
 	 *            an array of resources to be deleted
 	 * @param monitor
@@ -167,7 +163,7 @@ public class WorkspaceUndoUtil {
 	 *            user if necessary. When this parameter is not
 	 *            <code>null</code>, it contains an adapter for the
 	 *            org.eclipse.swt.widgets.Shell.class
-	 *
+	 * 
 	 * @param deleteContent
 	 *            a boolean indicating whether project content should be deleted
 	 *            when a project resource is to be deleted
@@ -176,50 +172,63 @@ public class WorkspaceUndoUtil {
 	 * @throws CoreException
 	 *             propagates any CoreExceptions thrown from the resources API
 	 */
-	static ResourceDescription[] delete(IResource[] resourcesToDelete, IProgressMonitor mon, IAdaptable uiInfo,
-			boolean deleteContent) throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(mon, resourcesToDelete.length);
-
-		final List<CoreException> exceptions = new ArrayList<>();
+	static ResourceDescription[] delete(IResource[] resourcesToDelete,
+			IProgressMonitor monitor, IAdaptable uiInfo, boolean deleteContent)
+			throws CoreException {
+		final List exceptions = new ArrayList();
 		boolean forceOutOfSyncDelete = false;
 		ResourceDescription[] returnedResourceDescriptions = new ResourceDescription[resourcesToDelete.length];
-		subMonitor.setTaskName(UndoMessages.AbstractResourcesOperation_DeleteResourcesProgress);
-		for (int i = 0; i < resourcesToDelete.length; ++i) {
-			IResource resource = resourcesToDelete[i];
-			try {
-				returnedResourceDescriptions[i] = delete(resource, subMonitor.split(1), uiInfo,
-						forceOutOfSyncDelete, deleteContent);
-			} catch (CoreException e) {
-				if (resource.getType() == IResource.FILE) {
-					IStatus[] children = e.getStatus().getChildren();
-					if (children.length == 1 && children[0].getCode() == IResourceStatus.OUT_OF_SYNC_LOCAL) {
-						int result = queryDeleteOutOfSync(resource, uiInfo);
+		monitor.beginTask("", resourcesToDelete.length); //$NON-NLS-1$
+		monitor
+				.setTaskName(UndoMessages.AbstractResourcesOperation_DeleteResourcesProgress);
+		try {
+			for (int i = 0; i < resourcesToDelete.length; ++i) {
+				if (monitor.isCanceled()) {
+					throw new OperationCanceledException();
+				}
+				IResource resource = resourcesToDelete[i];
+				try {
+					returnedResourceDescriptions[i] = delete(resource,
+							new SubProgressMonitor(monitor, 1), uiInfo,
+							forceOutOfSyncDelete, deleteContent);
+				} catch (CoreException e) {
+					if (resource.getType() == IResource.FILE) {
+						IStatus[] children = e.getStatus().getChildren();
+						if (children.length == 1
+								&& children[0].getCode() == IResourceStatus.OUT_OF_SYNC_LOCAL) {
+							int result = queryDeleteOutOfSync(resource, uiInfo);
 
-						if (result == IDialogConstants.YES_ID) {
-							// retry the delete with a force out of sync
-							delete(resource, subMonitor.split(1), uiInfo, true, deleteContent);
-						} else if (result == IDialogConstants.YES_TO_ALL_ID) {
-							// all future attempts should force out of
-							// sync
-							forceOutOfSyncDelete = true;
-							delete(resource, subMonitor.split(1), uiInfo, forceOutOfSyncDelete,
-									deleteContent);
-						} else if (result == IDialogConstants.CANCEL_ID) {
-							throw new OperationCanceledException();
+							if (result == IDialogConstants.YES_ID) {
+								// retry the delete with a force out of sync
+								delete(resource, new SubProgressMonitor(
+										monitor, 1), uiInfo, true,
+										deleteContent);
+							} else if (result == IDialogConstants.YES_TO_ALL_ID) {
+								// all future attempts should force out of
+								// sync
+								forceOutOfSyncDelete = true;
+								delete(resource, new SubProgressMonitor(
+										monitor, 1), uiInfo,
+										forceOutOfSyncDelete, deleteContent);
+							} else if (result == IDialogConstants.CANCEL_ID) {
+								throw new OperationCanceledException();
+							} else {
+								exceptions.add(e);
+							}
 						} else {
 							exceptions.add(e);
 						}
 					} else {
 						exceptions.add(e);
 					}
-				} else {
-					exceptions.add(e);
 				}
 			}
-		}
-		IStatus result = createResult(exceptions);
-		if (!result.isOK()) {
-			throw new CoreException(result);
+			IStatus result = createResult(exceptions);
+			if (!result.isOK()) {
+				throw new CoreException(result);
+			}
+		} finally {
+			monitor.done();
 		}
 		return returnedResourceDescriptions;
 	}
@@ -227,7 +236,7 @@ public class WorkspaceUndoUtil {
 	/**
 	 * Copies the resources to the given destination. This method can be called
 	 * recursively to merge folders during folder copy.
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to be copied
 	 * @param destination
@@ -255,8 +264,9 @@ public class WorkspaceUndoUtil {
 	 * @throws CoreException
 	 *             propagates any CoreExceptions thrown from the resources API
 	 */
-	static ResourceDescription[] copy(IResource[] resources, IPath destination, List<IResource> resourcesAtDestination,
-			IProgressMonitor monitor, IAdaptable uiInfo, boolean pathIncludesName) throws CoreException {
+	static ResourceDescription[] copy(IResource[] resources, IPath destination,
+			List resourcesAtDestination, IProgressMonitor monitor,
+			IAdaptable uiInfo, boolean pathIncludesName) throws CoreException {
 		return copy(resources, destination, resourcesAtDestination, monitor,
 				uiInfo, pathIncludesName, false, false, null);
 	}
@@ -305,14 +315,18 @@ public class WorkspaceUndoUtil {
 	 * @throws CoreException
 	 *             propagates any CoreExceptions thrown from the resources API
 	 */
-	static ResourceDescription[] copy(IResource[] resources, IPath destination, List<IResource> resourcesAtDestination,
-			IProgressMonitor monitor, IAdaptable uiInfo, boolean pathIncludesName, boolean createVirtual,
-			boolean createLinks, String relativeToVariable) throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(monitor, resources.length);
-		subMonitor.setTaskName(UndoMessages.AbstractResourcesOperation_CopyingResourcesProgress);
-		List<ResourceDescription> overwrittenResources = new ArrayList<>();
-		for (IResource source : resources) {
-			SubMonitor iterationProgress = subMonitor.split(1).setWorkRemaining(100);
+	static ResourceDescription[] copy(IResource[] resources, IPath destination,
+			List resourcesAtDestination, IProgressMonitor monitor,
+			IAdaptable uiInfo, boolean pathIncludesName, boolean createVirtual,
+			boolean createLinks, String relativeToVariable)
+			throws CoreException {
+
+		monitor.beginTask("", resources.length); //$NON-NLS-1$
+		monitor
+				.setTaskName(UndoMessages.AbstractResourcesOperation_CopyingResourcesProgress);
+		List overwrittenResources = new ArrayList();
+		for (int i = 0; i < resources.length; i++) {
+			IResource source = resources[i];
 			IPath destinationPath;
 			if (pathIncludesName) {
 				destinationPath = destination;
@@ -334,40 +348,49 @@ public class WorkspaceUndoUtil {
 						children = filterNonLinkedResources(children);
 					ResourceDescription[] overwritten = copy(children,
 							destinationPath, resourcesAtDestination,
-							iterationProgress, uiInfo, false,
+							new SubProgressMonitor(monitor, 1), uiInfo, false,
 							createVirtual, createLinks, relativeToVariable);
 					// We don't record the copy since this recursive call will
 					// do so. Just record the overwrites.
-					for (ResourceDescription resourceDesc : overwritten) {
-						overwrittenResources.add(resourceDesc);
+					for (int j = 0; j < overwritten.length; j++) {
+						overwrittenResources.add(overwritten[j]);
 					}
 				} else {
 					// delete the destination folder, copying a linked folder
 					// over an unlinked one or vice versa. Fixes bug 28772.
-					ResourceDescription[] deleted = delete(new IResource[] { existing }, iterationProgress.split(1),
-							uiInfo, false);
-					iterationProgress.setWorkRemaining(100);
-					if ((createLinks || createVirtual) && (source.isLinked() == false)
+					ResourceDescription[] deleted = delete(
+							new IResource[] { existing },
+							new SubProgressMonitor(monitor, 0), uiInfo, false);
+					if ((createLinks || createVirtual)
+							&& (source.isLinked() == false)
 							&& (source.isVirtual() == false)) {
 						IFolder folder = workspaceRoot.getFolder(destinationPath);
 						if (createVirtual) {
-							folder.create(IResource.VIRTUAL, true, iterationProgress.split(1));
-							IResource[] members = ((IContainer) source).members();
+							folder.create(IResource.VIRTUAL, true,
+									new SubProgressMonitor(monitor, 1));
+							IResource[] members = ((IContainer) source)
+									.members();
 							if (members.length > 0) {
-								overwrittenResources.addAll(Arrays.asList(copy(members, destinationPath,
-										resourcesAtDestination, iterationProgress.split(99), uiInfo, false,
-										createVirtual, createLinks, relativeToVariable)));
+								overwrittenResources.addAll(Arrays.asList(copy(
+										members, destinationPath,
+										resourcesAtDestination,
+										new SubProgressMonitor(monitor, 1),
+										uiInfo, false, createVirtual,
+										createLinks, relativeToVariable)));
 
 							}
 						} else
-							folder.createLink(createRelativePath(source.getLocationURI(), relativeToVariable, folder),
-									0, iterationProgress.split(100));
+							folder.createLink(createRelativePath(source
+									.getLocationURI(), relativeToVariable, folder), 0,
+									new SubProgressMonitor(monitor, 1));
 					} else
-						source.copy(destinationPath, IResource.SHALLOW, iterationProgress.split(100));
+						source.copy(destinationPath, IResource.SHALLOW,
+								new SubProgressMonitor(monitor, 1));
 					// Record the copy
-					resourcesAtDestination.add(getWorkspace().getRoot().findMember(destinationPath));
-					for (ResourceDescription resourceDes : deleted) {
-						overwrittenResources.add(resourceDes);
+					resourcesAtDestination.add(getWorkspace().getRoot()
+							.findMember(destinationPath));
+					for (int j = 0; j < deleted.length; j++) {
+						overwrittenResources.add(deleted[j]);
 					}
 				}
 			} else {
@@ -379,39 +402,48 @@ public class WorkspaceUndoUtil {
 						// destination
 						ResourceDescription[] deleted = delete(
 								new IResource[] { existing },
-								iterationProgress.split(1), uiInfo,
+								new SubProgressMonitor(monitor, 0), uiInfo,
 								false);
-						iterationProgress.setWorkRemaining(100);
 						if (source.getType() == IResource.FILE) {
 							IFile file = workspaceRoot.getFile(destinationPath);
 							file.createLink(createRelativePath(
 									source.getLocationURI(), relativeToVariable, file), 0,
-									iterationProgress.split(100));
+									new SubProgressMonitor(monitor, 1));
 						} else {
 							IFolder folder = workspaceRoot
 									.getFolder(destinationPath);
 							if (createVirtual) {
-								folder.create(IResource.VIRTUAL, true, iterationProgress.split(1));
-								IResource[] members = ((IContainer) source).members();
+								folder.create(IResource.VIRTUAL, true,
+										new SubProgressMonitor(monitor, 1));
+								IResource[] members = ((IContainer) source)
+										.members();
 								if (members.length > 0) {
-									overwrittenResources.addAll(Arrays.asList(copy(members, destinationPath,
-											resourcesAtDestination, iterationProgress.split(99), uiInfo, false,
-											createVirtual, createLinks, relativeToVariable)));
+									overwrittenResources.addAll(Arrays
+											.asList(copy(members,
+													destinationPath,
+													resourcesAtDestination,
+													new SubProgressMonitor(
+															monitor, 1),
+													uiInfo, false,
+													createVirtual, createLinks,
+													relativeToVariable)));
+
 								}
 							} else
-								folder.createLink(
-										createRelativePath(source.getLocationURI(), relativeToVariable, folder), 0,
-										iterationProgress.split(100));
+								folder.createLink(createRelativePath(
+										source.getLocationURI(), relativeToVariable, folder),
+										0, new SubProgressMonitor(monitor, 1));
 						}
 						resourcesAtDestination.add(getWorkspace().getRoot()
 								.findMember(destinationPath));
-						for (ResourceDescription resourceDesc : deleted) {
-							overwrittenResources.add(resourceDesc);
+						for (int j = 0; j < deleted.length; j++) {
+							overwrittenResources.add(deleted[j]);
 						}
 					} else {
 						if (source.isLinked() == existing.isLinked()) {
-							overwrittenResources.add(copyOverExistingResource(source, existing,
-									iterationProgress.split(100), uiInfo, false));
+							overwrittenResources.add(copyOverExistingResource(
+									source, existing, new SubProgressMonitor(
+											monitor, 1), uiInfo, false));
 							// Record the "copy"
 							resourcesAtDestination.add(existing);
 						} else {
@@ -420,14 +452,15 @@ public class WorkspaceUndoUtil {
 							// 28772.
 							ResourceDescription[] deleted = delete(
 									new IResource[] { existing },
-									iterationProgress.split(1), uiInfo,
+									new SubProgressMonitor(monitor, 0), uiInfo,
 									false);
-							source.copy(destinationPath, IResource.SHALLOW, iterationProgress.split(99));
+							source.copy(destinationPath, IResource.SHALLOW,
+									new SubProgressMonitor(monitor, 1));
 							// Record the copy
 							resourcesAtDestination.add(getWorkspace().getRoot()
 									.findMember(destinationPath));
-							for (ResourceDescription resourceDesc : deleted) {
-								overwrittenResources.add(resourceDesc);
+							for (int j = 0; j < deleted.length; j++) {
+								overwrittenResources.add(deleted[j]);
 							}
 						}
 					}
@@ -446,25 +479,33 @@ public class WorkspaceUndoUtil {
 							IFile file = workspaceRoot.getFile(destinationPath);
 							file.createLink(createRelativePath(
 									source.getLocationURI(), relativeToVariable, file), 0,
-									iterationProgress.split(100));
+									new SubProgressMonitor(monitor, 1));
 						} else {
 							IFolder folder = workspaceRoot
 									.getFolder(destinationPath);
 							if (createVirtual) {
-								folder.create(IResource.VIRTUAL, true, iterationProgress.split(1));
+								folder.create(IResource.VIRTUAL, true,
+										new SubProgressMonitor(monitor, 1));
 								IResource[] members = ((IContainer) source).members();
 								if (members.length > 0) {
-									overwrittenResources.addAll(Arrays.asList(copy(members, destinationPath,
-											resourcesAtDestination, iterationProgress.split(99), uiInfo, false,
-											createVirtual, createLinks, relativeToVariable)));
+									overwrittenResources.addAll(Arrays
+											.asList(copy(members,
+													destinationPath,
+													resourcesAtDestination,
+													new SubProgressMonitor(
+															monitor, 1),
+													uiInfo, false,
+													createVirtual, createLinks,
+													relativeToVariable)));
+
 								}
 							} else
-								folder.createLink(
-										createRelativePath(source.getLocationURI(), relativeToVariable, folder), 0,
-										iterationProgress.split(100));
+								folder.createLink(createRelativePath(source.getLocationURI(), relativeToVariable, folder),
+										0, new SubProgressMonitor(monitor, 1));
 						}
 					} else
-						source.copy(destinationPath, IResource.SHALLOW, iterationProgress.split(100));
+						source.copy(destinationPath, IResource.SHALLOW,
+								new SubProgressMonitor(monitor, 1));
 					// Record the copy. If we had to generate a parent
 					// folder, that should be recorded as part of the copy
 					if (generatedParent == null) {
@@ -474,9 +515,14 @@ public class WorkspaceUndoUtil {
 						resourcesAtDestination.add(generatedParent);
 					}
 				}
+
+				if (monitor.isCanceled()) {
+					throw new OperationCanceledException();
+				}
 			}
 		}
-		return overwrittenResources
+		monitor.done();
+		return (ResourceDescription[]) overwrittenResources
 				.toArray(new ResourceDescription[overwrittenResources.size()]);
 	}
 
@@ -486,7 +532,7 @@ public class WorkspaceUndoUtil {
 	 * is "VAR" and points to "C:\foo\bar\").
 	 *
 	 * @param locationURI
-	 * @param resource
+	 * @param resource 
 	 * @return an URI that was made relative to a variable
 	 */
 	static private URI createRelativePath(URI locationURI, String relativeVariable, IResource resource) {
@@ -505,7 +551,7 @@ public class WorkspaceUndoUtil {
 	/**
 	 * Moves the resources to the given destination. This method can be called
 	 * recursively to merge folders during folder move.
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to be moved
 	 * @param destination
@@ -515,13 +561,13 @@ public class WorkspaceUndoUtil {
 	 *            A list used to record each moved resource.
 	 * @param reverseDestinations
 	 *            A list used to record each moved resource's original location
-	 * @param mon
+	 * @param monitor
 	 *            the progress monitor used to show progress
 	 * @param uiInfo
-	 *            the IAdaptable (or <code>null</code>) provided by the caller
-	 *            in order to supply UI information for prompting the user if
-	 *            necessary. When this parameter is not <code>null</code>, it
-	 *            contains an adapter for the
+	 *            the IAdaptable (or <code>null</code>) provided by the
+	 *            caller in order to supply UI information for prompting the
+	 *            user if necessary. When this parameter is not
+	 *            <code>null</code>, it contains an adapter for the
 	 *            org.eclipse.swt.widgets.Shell.class
 	 * @param pathIncludesName
 	 *            a boolean that indicates whether the specified path includes
@@ -535,86 +581,94 @@ public class WorkspaceUndoUtil {
 	 * @throws CoreException
 	 *             propagates any CoreExceptions thrown from the resources API
 	 */
-	static ResourceDescription[] move(IResource[] resources, IPath destination, List<IResource> resourcesAtDestination,
-			List<IPath> reverseDestinations, IProgressMonitor mon, IAdaptable uiInfo, boolean pathIncludesName)
-					throws CoreException {
+	static ResourceDescription[] move(IResource[] resources, IPath destination,
+			List resourcesAtDestination, List reverseDestinations,
+			IProgressMonitor monitor, IAdaptable uiInfo,
+			boolean pathIncludesName) throws CoreException {
 
-		SubMonitor subMonitor = SubMonitor.convert(mon, resources.length);
-		subMonitor.setTaskName(UndoMessages.AbstractResourcesOperation_MovingResources);
-		List<ResourceDescription> overwrittenResources = new ArrayList<>();
-		for (IResource resource : resources) {
-			SubMonitor iterationProgress = subMonitor.split(1);
+		monitor.beginTask("", resources.length); //$NON-NLS-1$
+		monitor
+				.setTaskName(UndoMessages.AbstractResourcesOperation_MovingResources);
+		List overwrittenResources = new ArrayList();
+		for (int i = 0; i < resources.length; i++) {
+			IResource source = resources[i];
 			IPath destinationPath;
 			if (pathIncludesName) {
 				destinationPath = destination;
 			} else {
-				destinationPath = destination.append(resource.getName());
+				destinationPath = destination.append(source.getName());
 			}
 			IWorkspaceRoot workspaceRoot = getWorkspaceRoot();
 			IResource existing = workspaceRoot.findMember(destinationPath);
-			if (resource.getType() == IResource.FOLDER && existing != null) {
+			if (source.getType() == IResource.FOLDER && existing != null) {
 				// The resource is a folder and it exists in the destination.
 				// Move its children to the existing destination.
-				if (resource.isLinked() == existing.isLinked()) {
-					IResource[] children = ((IContainer) resource).members();
-					// move only linked resource children (267173)
-					if (resource.isLinked() && resource.getLocation().equals(existing.getLocation()))
-						children = filterNonLinkedResources(children);
-					ResourceDescription[] overwritten = move(children, destinationPath, resourcesAtDestination,
-							reverseDestinations, iterationProgress.split(90), uiInfo, false);
-					// We don't record the moved resources since the recursive
-					// call has done so. Just record the overwrites.
-					for (ResourceDescription resourceDesc : overwritten) {
-						overwrittenResources.add(resourceDesc);
-					}
+				if (source.isLinked() == existing.isLinked()) {
+						IResource[] children = ((IContainer) source).members();
+						// move only linked resource children (267173)
+						if (source.isLinked() && source.getLocation().equals(existing.getLocation()))
+							children = filterNonLinkedResources(children);
+						ResourceDescription[] overwritten = move(children,
+								destinationPath, resourcesAtDestination,
+								reverseDestinations, new SubProgressMonitor(
+										monitor, 1), uiInfo, false);
+						// We don't record the moved resources since the recursive
+						// call has done so. Just record the overwrites.
+						for (int j = 0; j < overwritten.length; j++) {
+							overwrittenResources.add(overwritten[j]);
+						}
 					// Delete the source. No need to record it since it
 					// will get moved back.
-					delete(resource, iterationProgress.split(10), uiInfo, false, false);
+					delete(source, monitor, uiInfo, false, false);
 				} else {
 					// delete the destination folder, moving a linked folder
 					// over an unlinked one or vice versa. Fixes bug 28772.
-					ResourceDescription[] deleted = delete(new IResource[] { existing }, iterationProgress.split(10),
-							uiInfo, false);
+					ResourceDescription[] deleted = delete(
+							new IResource[] { existing },
+							new SubProgressMonitor(monitor, 0), uiInfo, false);
 					// Record the original path
-					reverseDestinations.add(resource.getFullPath());
-					resource.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
-							iterationProgress.split(90));
+					reverseDestinations.add(source.getFullPath());
+					source.move(destinationPath, IResource.SHALLOW
+							| IResource.KEEP_HISTORY, new SubProgressMonitor(
+							monitor, 1));
 					// Record the resource at its destination
-					resourcesAtDestination.add(getWorkspace().getRoot().findMember(destinationPath));
-					for (ResourceDescription resourceDesc : deleted) {
-						overwrittenResources.add(resourceDesc);
+					resourcesAtDestination.add(getWorkspace().getRoot()
+							.findMember(destinationPath));
+					for (int j = 0; j < deleted.length; j++) {
+						overwrittenResources.add(deleted[j]);
 					}
 				}
 			} else {
 				if (existing != null) {
-					if (resource.isLinked() == existing.isLinked()) {
+					if (source.isLinked() == existing.isLinked()) {
 						// Record the original path
-						reverseDestinations.add(resource.getFullPath());
-						overwrittenResources.add(copyOverExistingResource(resource, existing,
-								iterationProgress.split(100), uiInfo, true));
+						reverseDestinations.add(source.getFullPath());
+						overwrittenResources.add(copyOverExistingResource(
+								source, existing, new SubProgressMonitor(
+										monitor, 1), uiInfo, true));
 						resourcesAtDestination.add(existing);
 					} else {
 						// Moving a linked resource over unlinked or vice
 						// versa. Can't use setContents here. Fixes bug 28772.
 						ResourceDescription[] deleted = delete(
 								new IResource[] { existing },
-								iterationProgress.split(1), uiInfo,
+								new SubProgressMonitor(monitor, 0), uiInfo,
 								false);
-						reverseDestinations.add(resource.getFullPath());
-						resource.move(destinationPath, IResource.SHALLOW
+						reverseDestinations.add(source.getFullPath());
+						source.move(destinationPath, IResource.SHALLOW
 								| IResource.KEEP_HISTORY,
-								iterationProgress.split(99));
+								new SubProgressMonitor(monitor, 1));
 						// Record the resource at its destination
 						resourcesAtDestination.add(getWorkspace().getRoot()
 								.findMember(destinationPath));
-						for (ResourceDescription resourceDesc : deleted) {
-							overwrittenResources.add(resourceDesc);
+						for (int j = 0; j < deleted.length; j++) {
+							overwrittenResources.add(deleted[j]);
 						}
 					}
 				} else {
 					// No resources are being overwritten.
 					// First record the source path
-					reverseDestinations.add(resource.getFullPath());
+					reverseDestinations.add(source.getFullPath());
 					// ensure the destination path exists
 					IPath parentPath = destination;
 					if (pathIncludesName) {
@@ -622,8 +676,9 @@ public class WorkspaceUndoUtil {
 					}
 
 					IContainer generatedParent = generateContainers(parentPath);
-					resource.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
-							iterationProgress.split(100));
+					source.move(destinationPath, IResource.SHALLOW
+							| IResource.KEEP_HISTORY, new SubProgressMonitor(
+							monitor, 1));
 					// Record the move. If we had to generate a parent
 					// folder, that should be recorded as part of the copy
 					if (generatedParent == null) {
@@ -633,9 +688,14 @@ public class WorkspaceUndoUtil {
 						resourcesAtDestination.add(generatedParent);
 					}
 				}
+
+				if (monitor.isCanceled()) {
+					throw new OperationCanceledException();
+				}
 			}
 		}
-		return overwrittenResources
+		monitor.done();
+		return (ResourceDescription[]) overwrittenResources
 				.toArray(new ResourceDescription[overwrittenResources.size()]);
 
 	}
@@ -646,17 +706,17 @@ public class WorkspaceUndoUtil {
 	 * @return The linked resources
 	 */
 	private static IResource[] filterNonLinkedResources(IResource[] resources) {
-		List<IResource> result = new ArrayList<>();
-		for (IResource resource : resources) {
-			if (resource.isLinked())
-				result.add(resource);
+		List result = new ArrayList();
+		for (int i = 0; i < resources.length; i++) {
+			if (resources[i].isLinked())
+				result.add(resources[i]);
 		}
-		return result.toArray(new IResource[0]);
+		return (IResource[]) result.toArray(new IResource[0]);
 	}
 
 	/**
 	 * Recreate the resources from the specified resource descriptions.
-	 *
+	 * 
 	 * @param resourcesToRecreate
 	 *            the ResourceDescriptions describing resources to be recreated
 	 * @param monitor
@@ -673,20 +733,29 @@ public class WorkspaceUndoUtil {
 	 */
 	static IResource[] recreate(ResourceDescription[] resourcesToRecreate,
 			IProgressMonitor monitor, IAdaptable uiInfo) throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(monitor, resourcesToRecreate.length);
-		final List<CoreException> exceptions = new ArrayList<>();
+		final List exceptions = new ArrayList();
 		IResource[] resourcesToReturn = new IResource[resourcesToRecreate.length];
-		subMonitor.setTaskName(UndoMessages.AbstractResourcesOperation_CreateResourcesProgress);
-		for (int i = 0; i < resourcesToRecreate.length; ++i) {
-			try {
-				resourcesToReturn[i] = resourcesToRecreate[i].createResource(subMonitor.split(1));
-			} catch (CoreException e) {
-				exceptions.add(e);
+		monitor.beginTask("", resourcesToRecreate.length); //$NON-NLS-1$
+		monitor
+				.setTaskName(UndoMessages.AbstractResourcesOperation_CreateResourcesProgress);
+		try {
+			for (int i = 0; i < resourcesToRecreate.length; ++i) {
+				if (monitor.isCanceled()) {
+					throw new OperationCanceledException();
+				}
+				try {
+					resourcesToReturn[i] = resourcesToRecreate[i]
+							.createResource(new SubProgressMonitor(monitor, 1));
+				} catch (CoreException e) {
+					exceptions.add(e);
+				}
 			}
-		}
-		IStatus result = WorkspaceUndoUtil.createResult(exceptions);
-		if (!result.isOK()) {
-			throw new CoreException(result);
+			IStatus result = WorkspaceUndoUtil.createResult(exceptions);
+			if (!result.isOK()) {
+				throw new CoreException(result);
+			}
+		} finally {
+			monitor.done();
 		}
 		return resourcesToReturn;
 	}
@@ -694,7 +763,7 @@ public class WorkspaceUndoUtil {
 	/**
 	 * Delete the specified resources, returning a resource description that can
 	 * be used to restore it.
-	 *
+	 * 
 	 * @param resourceToDelete
 	 *            the resource to be deleted
 	 * @param monitor
@@ -720,18 +789,17 @@ public class WorkspaceUndoUtil {
 			IProgressMonitor monitor, IAdaptable uiInfo,
 			boolean forceOutOfSyncDelete, boolean deleteContent)
 			throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(monitor);
 		ResourceDescription resourceDescription = ResourceDescription
 				.fromResource(resourceToDelete);
 		if (resourceToDelete.getType() == IResource.PROJECT) {
 			// it is a project
-			subMonitor
+			monitor
 					.setTaskName(UndoMessages.AbstractResourcesOperation_DeleteResourcesProgress);
 			IProject project = (IProject) resourceToDelete;
-			project.delete(deleteContent, forceOutOfSyncDelete, subMonitor);
+			project.delete(deleteContent, forceOutOfSyncDelete, monitor);
 		} else {
 			// if it's not a project, just delete it
-			subMonitor.setWorkRemaining(2);
+			monitor.beginTask("", 2); //$NON-NLS-1$
 			monitor
 					.setTaskName(UndoMessages.AbstractResourcesOperation_DeleteResourcesProgress);
 			int updateFlags;
@@ -740,8 +808,11 @@ public class WorkspaceUndoUtil {
 			} else {
 				updateFlags = IResource.KEEP_HISTORY;
 			}
-			resourceToDelete.delete(updateFlags, subMonitor.split(1));
-			resourceDescription.recordStateFromHistory(resourceToDelete, subMonitor.split(1));
+			resourceToDelete.delete(updateFlags, new SubProgressMonitor(
+					monitor, 1));
+			resourceDescription.recordStateFromHistory(resourceToDelete,
+					new SubProgressMonitor(monitor, 1));
+			monitor.done();
 		}
 
 		return resourceDescription;
@@ -760,26 +831,35 @@ public class WorkspaceUndoUtil {
 		}
 		IFile file = (IFile) source;
 		IFile existingFile = (IFile) existing;
-		SubMonitor subMonitor = SubMonitor.convert(monitor,
-				UndoMessages.AbstractResourcesOperation_CopyingResourcesProgress, deleteSourceFile ? 3 : 2);
-		if (file != null) {
+		monitor
+				.beginTask(
+						UndoMessages.AbstractResourcesOperation_CopyingResourcesProgress,
+						3);
+		if (file != null && existingFile != null) {
 			if (validateEdit(file, existingFile, getShell(uiInfo))) {
 				// Remember the state of the existing file so it can be
 				// restored.
-				FileDescription fileDescription = new FileDescription(existingFile);
+				FileDescription fileDescription = new FileDescription(
+						existingFile);
 				// Reset the contents to that of the file being moved
-				existingFile.setContents(file.getContents(), IResource.KEEP_HISTORY, subMonitor.split(1));
-				fileDescription.recordStateFromHistory(existingFile, subMonitor.split(1));
+				existingFile.setContents(file.getContents(),
+						IResource.KEEP_HISTORY, new SubProgressMonitor(monitor,
+								1));
+				fileDescription.recordStateFromHistory(existingFile,
+						new SubProgressMonitor(monitor, 1));
 				// Now delete the source file if requested
 				// We don't need to remember anything about it, because
 				// any undo involving this operation will move the original
 				// content back to it.
 				if (deleteSourceFile) {
-					file.delete(IResource.KEEP_HISTORY, subMonitor.split(1));
+					file.delete(IResource.KEEP_HISTORY, new SubProgressMonitor(
+							monitor, 1));
 				}
+				monitor.done();
 				return fileDescription;
 			}
 		}
+		monitor.done();
 		return null;
 	}
 
@@ -820,7 +900,7 @@ public class WorkspaceUndoUtil {
 	/*
 	 * Ask the user whether the given resource should be deleted despite being
 	 * out of sync with the file system.
-	 *
+	 * 
 	 * Return one of the IDialogConstants constants indicating which of the Yes,
 	 * Yes to All, No, Cancel options has been selected by the user.
 	 */
@@ -835,17 +915,19 @@ public class WorkspaceUndoUtil {
 						.bind(
 								UndoMessages.AbstractResourcesOperation_outOfSyncQuestion,
 								resource.getName()), MessageDialog.QUESTION,
-						0,
-						IDialogConstants.YES_LABEL,
+				new String[] { IDialogConstants.YES_LABEL,
 						IDialogConstants.YES_TO_ALL_LABEL,
 						IDialogConstants.NO_LABEL,
-						IDialogConstants.CANCEL_LABEL) {
-			@Override
+						IDialogConstants.CANCEL_LABEL }, 0) {
 			protected int getShellStyle() {
 				return super.getShellStyle() | SWT.SHEET;
 			}
 		};
-		shell.getDisplay().syncExec(() -> dialog.open());
+		shell.getDisplay().syncExec(new Runnable() {
+			public void run() {
+				dialog.open();
+			}
+		});
 		int result = dialog.getReturnCode();
 		if (result == 0) {
 			return IDialogConstants.YES_ID;
@@ -863,19 +945,19 @@ public class WorkspaceUndoUtil {
 	 * Creates and return a result status appropriate for the given list of
 	 * exceptions.
 	 */
-	private static IStatus createResult(List<CoreException> exceptions) {
+	private static IStatus createResult(List exceptions) {
 		if (exceptions.isEmpty()) {
 			return Status.OK_STATUS;
 		}
 		final int exceptionCount = exceptions.size();
 		if (exceptionCount == 1) {
-			return exceptions.get(0).getStatus();
+			return ((CoreException) exceptions.get(0)).getStatus();
 		}
-		CoreException[] children = exceptions
+		CoreException[] children = (CoreException[]) exceptions
 				.toArray(new CoreException[exceptionCount]);
 		boolean outOfSync = false;
-		for (CoreException exception : children) {
-			if (exception.getStatus().getCode() == IResourceStatus.OUT_OF_SYNC_LOCAL) {
+		for (int i = 0; i < children.length; i++) {
+			if (children[i].getStatus().getCode() == IResourceStatus.OUT_OF_SYNC_LOCAL) {
 				outOfSync = true;
 				break;
 			}
@@ -932,20 +1014,22 @@ public class WorkspaceUndoUtil {
 	/**
 	 * Return the shell described by the specified adaptable, or the active
 	 * shell if no shell has been specified in the adaptable.
-	 *
+	 * 
 	 * @param uiInfo
 	 *            the IAdaptable (or <code>null</code>) provided by the
 	 *            caller in order to supply UI information for prompting the
 	 *            user if necessary. When this parameter is not
 	 *            <code>null</code>, it contains an adapter for the
 	 *            org.eclipse.swt.widgets.Shell.class
-	 *
+	 * 
 	 * @return the Shell that can be used to show information
 	 */
 	public static Shell getShell(IAdaptable uiInfo) {
-		Shell shell = Adapters.adapt(uiInfo, Shell.class);
-		if (shell != null) {
-			return shell;
+		if (uiInfo != null) {
+			Shell shell = (Shell) uiInfo.getAdapter(Shell.class);
+			if (shell != null) {
+				return shell;
+			}
 		}
 		return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 	}

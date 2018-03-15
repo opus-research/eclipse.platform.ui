@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2017 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,42 +26,23 @@ import org.eclipse.swt.widgets.Listener;
  * the control into owner draw mode and highlighting the currently selected
  * cell. To make the use this class you should create the control with the
  * {@link SWT#FULL_SELECTION} bit set
- *
+ * 
  * This class can be subclassed to configure how the coloring of the selected
  * cell.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
-	private boolean removeNonFocusedSelectionInformation;
-
 	/**
 	 * Create a new instance which can be passed to a
 	 * {@link TreeViewerFocusCellManager}
-	 *
+	 * 
 	 * @param viewer
 	 *            the viewer
 	 */
 	public FocusCellOwnerDrawHighlighter(ColumnViewer viewer) {
-		this(viewer, true);
-	}
-
-	/**
-	 * Create a new instance which can be passed to a
-	 * {@link TreeViewerFocusCellManager}
-	 *
-	 * @param viewer
-	 *            the viewer
-	 * @param removeNonFocusedSelectionInformation
-	 *            <code>true</code> if only the currently focused cell should be
-	 *            indicated as selected. <code>false</code> to indicate both the
-	 *            full selection and the currently focused cell.
-	 * @since 3.14
-	 */
-	public FocusCellOwnerDrawHighlighter(ColumnViewer viewer, boolean removeNonFocusedSelectionInformation) {
 		super(viewer);
-		this.removeNonFocusedSelectionInformation = removeNonFocusedSelectionInformation;
 		hookListener(viewer);
 	}
 
@@ -86,7 +67,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 
 			gc.setBackground(background);
 			gc.setForeground(foreground);
-
+			
 			if (onlyTextHighlighting(cell)) {
 				Rectangle area = event.getBounds();
 				Rectangle rect = cell.getTextBounds();
@@ -97,40 +78,44 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 			} else {
 				gc.fillRectangle(event.getBounds());
 			}
-
+			
 			event.detail &= ~SWT.SELECTED;
 		}
 	}
 
 	private void removeSelectionInformation(Event event, ViewerCell cell) {
 		GC gc = event.gc;
-		gc.setBackground(cell.getViewerRow().getBackground(cell.getColumnIndex()));
-		gc.setForeground(cell.getViewerRow().getForeground(cell.getColumnIndex()));
+		gc.setBackground(cell.getViewerRow().getBackground(
+				cell.getColumnIndex()));
+		gc.setForeground(cell.getViewerRow().getForeground(
+				cell.getColumnIndex()));
 		gc.fillRectangle(cell.getBounds());
 		event.detail &= ~SWT.SELECTED;
 	}
 
 	private void hookListener(final ColumnViewer viewer) {
 
-		Listener listener = event -> {
-			if ((event.detail & SWT.SELECTED) > 0) {
-				ViewerCell focusCell = getFocusCell();
-				ViewerRow row = viewer.getViewerRowFromItem(event.item);
+		Listener listener = new Listener() {
 
-				Assert
-						.isNotNull(row,
-								"Internal structure invalid. Item without associated row is not possible."); //$NON-NLS-1$
+			public void handleEvent(Event event) {
+				if ((event.detail & SWT.SELECTED) > 0) {
+					ViewerCell focusCell = getFocusCell();
+					ViewerRow row = viewer.getViewerRowFromItem(event.item);
 
-				ViewerCell cell = row.getCell(event.index);
+					Assert
+							.isNotNull(row,
+									"Internal structure invalid. Item without associated row is not possible."); //$NON-NLS-1$
 
-				if (focusCell == null || !cell.equals(focusCell)) {
-					if (removeNonFocusedSelectionInformation) {
+					ViewerCell cell = row.getCell(event.index);
+
+					if (focusCell == null || !cell.equals(focusCell)) {
 						removeSelectionInformation(event, cell);
+					} else {
+						markFocusedCell(event, cell);
 					}
-				} else {
-					markFocusedCell(event, cell);
 				}
 			}
+
 		};
 		viewer.getControl().addListener(SWT.EraseItem, listener);
 	}
@@ -138,20 +123,19 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	/**
 	 * The color to use when rendering the background of the selected cell when
 	 * the control has the input focus
-	 *
+	 * 
 	 * @param cell
 	 *            the cell which is colored
 	 * @return the color or <code>null</code> to use the default
 	 */
 	protected Color getSelectedCellBackgroundColor(ViewerCell cell) {
-		return removeNonFocusedSelectionInformation ? null
-				: cell.getItem().getDisplay().getSystemColor(SWT.COLOR_LIST_SELECTION);
+		return null;
 	}
 
 	/**
 	 * The color to use when rendering the foreground (=text) of the selected
 	 * cell when the control has the input focus
-	 *
+	 * 
 	 * @param cell
 	 *            the cell which is colored
 	 * @return the color or <code>null</code> to use the default
@@ -163,7 +147,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	/**
 	 * The color to use when rendering the foreground (=text) of the selected
 	 * cell when the control has <b>no</b> input focus
-	 *
+	 * 
 	 * @param cell
 	 *            the cell which is colored
 	 * @return the color or <code>null</code> to use the same used when
@@ -177,7 +161,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	/**
 	 * The color to use when rendering the background of the selected cell when
 	 * the control has <b>no</b> input focus
-	 *
+	 * 
 	 * @param cell
 	 *            the cell which is colored
 	 * @return the color or <code>null</code> to use the same used when
@@ -190,7 +174,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 
 	/**
 	 * Controls whether the whole cell or only the text-area is highlighted
-	 *
+	 * 
 	 * @param cell
 	 *            the cell which is highlighted
 	 * @return <code>true</code> if only the text area should be highlighted
@@ -200,7 +184,6 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 		return false;
 	}
 
-	@Override
 	protected void focusCellChanged(ViewerCell newCell, ViewerCell oldCell) {
 		super.focusCellChanged(newCell, oldCell);
 

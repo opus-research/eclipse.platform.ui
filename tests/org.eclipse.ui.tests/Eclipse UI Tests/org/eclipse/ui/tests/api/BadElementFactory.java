@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,9 +18,9 @@ import org.eclipse.ui.IPersistableElement;
 /**
  * Simple factory implementation that will fail on command. This is used to test
  * that working set restoration does not die if one of the factories dies.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class BadElementFactory implements IElementFactory {
 
@@ -28,7 +28,7 @@ public class BadElementFactory implements IElementFactory {
 	 * Set to cause the factory to fail.
 	 */
 	public static boolean fail = false;
-
+	
 
 	/**
 	 * Set to true when {@link #createElement(IMemento)} is called while fail is true.
@@ -42,7 +42,7 @@ public class BadElementFactory implements IElementFactory {
 		 * Set to cause save to fail.
 		 */
 		public static boolean fail = false;
-
+		
 
 		/**
 		 * Set to true when {@link #saveState(IMemento)} is called while fail is true.
@@ -50,21 +50,31 @@ public class BadElementFactory implements IElementFactory {
 		public static boolean failAttempted = false;
 
 
-		@SuppressWarnings("unchecked")
-		@Override
-		public <T> T getAdapter(Class<T> adapter) {
-			if (adapter.equals(IPersistableElement.class)) {
-				return (T) this;
-			}
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+		 */
+		public Object getAdapter(Class adapter) {
+			if (adapter.equals(IPersistableElement.class))
+				return this;
 			return null;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.IPersistableElement#getFactoryId()
+		 */
 		public String getFactoryId() {
 			return "org.eclipse.ui.tests.badFactory";
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.IPersistable#saveState(org.eclipse.ui.IMemento)
+		 */
 		public void saveState(IMemento memento) {
 			if (fail) {
 				failAttempted = true;
@@ -74,8 +84,8 @@ public class BadElementFactory implements IElementFactory {
 		}
 
 	}
+;
 
-	@Override
 	public IAdaptable createElement(IMemento memento) {
 		if (fail) {
 			failAttempted = true;

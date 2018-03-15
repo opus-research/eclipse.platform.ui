@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2012 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,15 +32,15 @@ import org.eclipse.ui.internal.ViewSite;
 /**
  * Bug 108033 Need a test to ensure that view tab order is the same on start up
  * as it was in the last session.
- *
+ * 
  * These tests more or less depend on being run in order. The workspace exists
  * from method to method.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class Bug108033Test extends TestCase {
-
+	
 	public static TestSuite suite() {
 		TestSuite ts = new TestSuite("org.eclipse.ui.tests.session.Bug108033Test");
 		ts.addTest(new Bug108033Test("testShowMultipleViews"));
@@ -67,7 +67,6 @@ public class Bug108033Test extends TestCase {
 		super(testName);
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		fWorkbench = PlatformUI.getWorkbench();
 
@@ -81,7 +80,7 @@ public class Bug108033Test extends TestCase {
 	 * expected order. These tests depend on being run in order in the same
 	 * environment, so we can't use the standard openWindow() to protect
 	 * ourselves from side effects.
-	 *
+	 * 
 	 * @throws Throwable
 	 *             an error
 	 */
@@ -99,7 +98,7 @@ public class Bug108033Test extends TestCase {
 	/**
 	 * Check the views are still in the correct order, then move the problems
 	 * view to the first tab.
-	 *
+	 * 
 	 * @throws Throwable
 	 *             an error
 	 */
@@ -108,26 +107,24 @@ public class Bug108033Test extends TestCase {
 
 		ViewSite site = (ViewSite) problemView.getSite();
 		MElementContainer<MUIElement> stack = getParent(site.getModel());
-
+		
 		verifyOrder(stack, new String[] { "Tasks", "Progress", "Problems" });
 		moveTab(stack, problemView, 0);
 
 		verifyOrder(stack, new String[] { "Problems", "Tasks", "Progress" });
 	}
-
+	
 	// TBD should this be in the ModelService or PartService?
 	private MElementContainer<MUIElement> getParent(MUIElement element) {
 		MElementContainer<MUIElement> parent = element.getParent();
-		if (parent != null) {
+		if (parent != null)
 			return parent;
-		}
 		MPlaceholder placeholder = element.getCurSharedRef();
-		if (placeholder != null) {
+		if (placeholder != null)
 			return placeholder.getParent();
-		}
 		return null;
 	}
-
+	
 	private void moveTab(MElementContainer<MUIElement> stack, IViewPart viewPart, int indexTo) {
 		ViewSite site = (ViewSite) viewPart.getSite();
 		MPart part = site.getModel();
@@ -142,7 +139,7 @@ public class Bug108033Test extends TestCase {
 	/**
 	 * Verify the views are ordered with the problems view first after the
 	 * restart.
-	 *
+	 * 
 	 * @throws Throwable
 	 *             an error
 	 */
@@ -157,7 +154,7 @@ public class Bug108033Test extends TestCase {
 
 	/**
 	 * Removes any NPEs.
-	 *
+	 * 
 	 * @return the problem view.
 	 * @throws PartInitException
 	 *             if a view fails to instantiate.
@@ -174,7 +171,7 @@ public class Bug108033Test extends TestCase {
 
 	/**
 	 * Verify the tabs are in the correct order.
-	 *
+	 * 
 	 * @param pres
 	 *            the stack presentation
 	 * @param order
@@ -185,9 +182,8 @@ public class Bug108033Test extends TestCase {
 		assertEquals("Different number of tabs", order.length, children.size());
 		for (int i = 0; i < children.size(); ++i) {
 			MUIElement child = children.get(i);
-			if (child instanceof MPlaceholder) {
+			if (child instanceof MPlaceholder)
 				child = ((MPlaceholder) child).getRef();
-			}
 			assertEquals("Failed on tab " + i, order[i], ((MUILabel)child).getLabel());
 		}
 	}

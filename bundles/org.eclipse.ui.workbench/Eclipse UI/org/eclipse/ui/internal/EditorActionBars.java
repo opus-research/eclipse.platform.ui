@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,32 +47,35 @@ public class EditorActionBars extends SubActionBars2 {
 
 	private class Overrides implements IContributionManagerOverrides {
 
-		@Override
 		public Integer getAccelerator(IContributionItem item) {
 			return null;
 		}
 
-		@Override
 		public String getAcceleratorText(IContributionItem item) {
 			return null;
 		}
 
-		@Override
 		public Boolean getEnabled(IContributionItem item) {
 			if (((item instanceof ActionContributionItem) && (((ActionContributionItem) item)
 					.getAction() instanceof RetargetAction))
 					|| enabledAllowed) {
 				return null;
+			} else {
+				return Boolean.FALSE;
 			}
-			return Boolean.FALSE;
 		}
 
-		@Override
 		public String getText(IContributionItem item) {
 			return null;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.action.IContributionManagerOverrides#getVisible
+		 * (org.eclipse.jface.action.IContributionItem)
+		 */
 		public Boolean getVisible(IContributionItem item) {
 			return null;
 		}
@@ -118,7 +121,6 @@ public class EditorActionBars extends SubActionBars2 {
 	/**
 	 * Activate the contributions.
 	 */
-	@Override
 	public void activate(boolean forceVisibility) {
 		setActive(true, forceVisibility);
 	}
@@ -130,12 +132,16 @@ public class EditorActionBars extends SubActionBars2 {
 		++refCount;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on SubActionBars.
+	 */
 	protected SubMenuManager createSubMenuManager(IMenuManager parent) {
 		return new EditorMenuManager(parent);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on SubActionBars.
+	 */
 	protected SubToolBarManager createSubToolBarManager(IToolBarManager parent) {
 		// return null, editor actions are managed by CoolItemToolBarManagers
 		return null;
@@ -144,7 +150,6 @@ public class EditorActionBars extends SubActionBars2 {
 	/**
 	 * Deactivate the contributions.
 	 */
-	@Override
 	public void deactivate(boolean forceVisibility) {
 		setActive(false, forceVisibility);
 	}
@@ -152,7 +157,6 @@ public class EditorActionBars extends SubActionBars2 {
 	/**
 	 * Dispose the contributions.
 	 */
-	@Override
 	public void dispose() {
 		super.dispose();
 		if (editorContributor != null) {
@@ -242,10 +246,9 @@ public class EditorActionBars extends SubActionBars2 {
 	 * Returns the tool bar manager. If items are added or removed from the
 	 * manager be sure to call <code>updateActionBars</code>. Overridden to
 	 * support CoolBars.
-	 *
+	 * 
 	 * @return the tool bar manager
 	 */
-	@Override
 	public IToolBarManager getToolBarManager() {
 
 		// by pass the sub coolBar and use the real cool bar.
@@ -315,7 +318,7 @@ public class EditorActionBars extends SubActionBars2 {
 	 * Returns whether the contribution list is visible. If the visibility is
 	 * <code>true</code> then each item within the manager appears within the
 	 * parent manager. Otherwise, the items are not visible.
-	 *
+	 * 
 	 * @return <code>true</code> if the manager is visible
 	 */
 	private boolean isVisible() {
@@ -331,7 +334,6 @@ public class EditorActionBars extends SubActionBars2 {
 	 * important because the action vector is shared by editors of the same
 	 * type.
 	 */
-	@Override
 	public void partChanged(IWorkbenchPart part) {
 		super.partChanged(part);
 		if (part instanceof IEditorPart) {
@@ -354,7 +356,7 @@ public class EditorActionBars extends SubActionBars2 {
 
 	/**
 	 * Activate / Deactivate the contributions.
-	 *
+	 * 
 	 * Workaround for flashing when editor contributes many menu/tool
 	 * contributions. In this case, the force visibility flag determines if the
 	 * contributions should be actually made visible/hidden or just change the
@@ -382,7 +384,7 @@ public class EditorActionBars extends SubActionBars2 {
 
 	/**
 	 * Sets the enablement ability of all the items contributed by the editor.
-	 *
+	 * 
 	 * @param enabledAllowed
 	 *            <code>true</code> if the items may enable
 	 * @since 2.0
@@ -393,7 +395,9 @@ public class EditorActionBars extends SubActionBars2 {
 		}
 		this.enabledAllowed = enabledAllowed;
 		if (coolItemToolBarMgr != null) {
-			for (IContributionItem item : coolItemToolBarMgr.getItems()) {
+			IContributionItem[] items = coolItemToolBarMgr.getItems();
+			for (int i = 0; i < items.length; i++) {
+				IContributionItem item = items[i];
 				if (item != null) {
 					item.update(IContributionManagerOverrides.P_ENABLED);
 				}
@@ -412,7 +416,7 @@ public class EditorActionBars extends SubActionBars2 {
 	 * Sets the visibility of the manager. If the visibility is
 	 * <code>true</code> then each item within the manager appears within the
 	 * parent manager. Otherwise, the items are not visible.
-	 *
+	 * 
 	 * @param visible
 	 *            the new visibility
 	 */
@@ -435,7 +439,7 @@ public class EditorActionBars extends SubActionBars2 {
 	 * This is a workaround for the layout flashing when editors contribute
 	 * large amounts of items.
 	 * </p>
-	 *
+	 * 
 	 * @param visible
 	 *            the new visibility
 	 * @param forceVisibility
@@ -461,7 +465,9 @@ public class EditorActionBars extends SubActionBars2 {
 
 		ICoolBarManager coolBarManager = getCastedParent().getCoolBarManager();
 		if ((coolItemToolBarMgr != null) && (coolBarManager != null)) {
-			for (IContributionItem item : coolItemToolBarMgr.getItems()) {
+			IContributionItem[] items = coolItemToolBarMgr.getItems();
+			for (int i = 0; i < items.length; i++) {
+				IContributionItem item = items[i];
 				item.setVisible(visible || !forceVisibility);
 				coolItemToolBarMgr.markDirty();
 				if (!coolBarManager.isDirty()) {
@@ -483,7 +489,7 @@ public class EditorActionBars extends SubActionBars2 {
 
 	/**
 	 * Returns the expression used for action handler activation.
-	 *
+	 * 
 	 * @return the expression used for action handler activation.
 	 */
 	public Expression getHandlerExpression() {

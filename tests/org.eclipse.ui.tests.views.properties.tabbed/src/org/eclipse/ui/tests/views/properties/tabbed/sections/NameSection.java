@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -28,7 +28,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
  * The name section on the element tab.
- *
+ * 
  * @author Anthony Hunter
  */
 public class NameSection
@@ -42,8 +42,7 @@ public class NameSection
      * @see org.eclipse.ui.views.properties.tabbed.ITabbedPropertySection#createControls(org.eclipse.swt.widgets.Composite,
      *      org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
      */
-    @Override
-	public void createControls(Composite parent,
+    public void createControls(Composite parent,
             TabbedPropertySheetPage tabbedPropertySheetPage) {
         super.createControls(parent, tabbedPropertySheetPage);
         Composite composite = getWidgetFactory()
@@ -70,7 +69,7 @@ public class NameSection
 
     /**
      * Get the element.
-     *
+     * 
      * @return the element.
      */
     public TreeNode getTreeNode() {
@@ -80,14 +79,12 @@ public class NameSection
     /*
      * @see org.eclipse.ui.views.properties.tabbed.view.ITabbedPropertySection#refresh()
      */
-    @Override
-	public void refresh() {
+    public void refresh() {
         Element element = (Element) getTreeNode().getValue();
         nameText.setText(element.getName());
     }
 
-    @Override
-	public void setInput(IWorkbenchPart part, ISelection selection) {
+    public void setInput(IWorkbenchPart part, ISelection selection) {
         super.setInput(part, selection);
         Assert.isTrue(selection instanceof IStructuredSelection);
         Object input = ((IStructuredSelection) selection).getFirstElement();

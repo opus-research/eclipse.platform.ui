@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,15 +20,14 @@ public class AdaptableResourceWrapper implements IAdaptable {
 
     IResource resource;
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
-        if (adapter == IResource.class) {
-			return (T) resource;
-		}
-        if (adapter == IWorkbenchAdapter.class) {
-			return (T) TestAdaptableWorkbenchAdapter.getInstance();
-		}
+    /*
+     * @see IAdaptable#getAdapter(Class)
+     */
+    public Object getAdapter(Class adapter) {
+        if (adapter == IResource.class)
+            return resource;
+        if (adapter == IWorkbenchAdapter.class)
+            return TestAdaptableWorkbenchAdapter.getInstance();
         return null;
     }
 
@@ -41,9 +40,8 @@ public class AdaptableResourceWrapper implements IAdaptable {
     }
 
     public AdaptableResourceWrapper getParent() {
-        if (resource.getParent() != null) {
-			return new AdaptableResourceWrapper(resource.getParent());
-		}
+        if (resource.getParent() != null)
+            return new AdaptableResourceWrapper(resource.getParent());
         return null;
     }
 

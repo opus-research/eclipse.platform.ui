@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,14 +15,12 @@ import java.util.HashSet;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.mapping.ResourceMapping;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -38,46 +36,38 @@ import org.eclipse.ui.ide.ResourceUtil;
  * This class contains convenience methods used by the various build commands
  * to determine enablement.  These utilities cannot be factored into a common
  * class because some build actions are API and some are not.
- *
+ * 
  * @since 3.1
  */
 public class BuildUtilities {
 	/**
 	 * Extracts the selected projects from a selection.
-	 *
+	 * 
 	 * @param selection The selection to analyze
 	 * @return The selected projects
 	 */
 	public static IProject[] extractProjects(Object[] selection) {
-		HashSet<IProject> projects = new HashSet<>();
-		for (Object currentSelection : selection) {
-			IResource resource = ResourceUtil.getResource(currentSelection);
+		HashSet projects = new HashSet();
+		for (int i = 0; i < selection.length; i++) {
+			IResource resource = ResourceUtil.getResource(selection[i]);
 			if (resource != null) {
 				projects.add(resource.getProject());
 			} else {
-				ResourceMapping mapping = ResourceUtil.getResourceMapping(currentSelection);
+				ResourceMapping mapping = ResourceUtil.getResourceMapping(selection[i]);
 				if (mapping != null) {
-					IProject[] theProjects = mapping.getProjects();
-					for (IProject theProject : theProjects) {
-						projects.add(theProject);
-					}
-				} else {
-					IMarker marker = Adapters.adapt(currentSelection, IMarker.class, false);
-					if (marker != null) {
-						IProject project = marker.getResource().getProject();
-						if (project != null) {
-							projects.add(project);
-						}
+					IProject[] theProjects = mapping.getProjects();					
+					for(int j=0; j < theProjects.length; j++) {
+						   projects.add(theProjects[j]);						
 					}
 				}
 			}
 		}
-		return projects.toArray(new IProject[projects.size()]);
+		return (IProject[]) projects.toArray(new IProject[projects.size()]);
 	}
 
 	/**
 	 * Finds and returns the selected projects in the given window
-	 *
+	 * 
 	 * @param window The window to find the selection in
 	 * @return The selected projects, or an empty array if no selection could be found.
 	 */
@@ -138,7 +128,7 @@ public class BuildUtilities {
 	/**
 	 * Returns whether one of the projects has a builder whose trigger setting
 	 * for the given trigger matches the given value.
-	 *
+	 * 
 	 * @param projects The projects to check
 	 * @param trigger The trigger to look for
 	 * @param value The trigger value to look for
@@ -152,8 +142,9 @@ public class BuildUtilities {
 			}
 			try {
 				IProjectDescription description = projects[i].getDescription();
-				for (ICommand buildSpec : description.getBuildSpec()) {
-					if (buildSpec.isBuilding(trigger) == value) {
+				ICommand[] buildSpec = description.getBuildSpec();
+				for (int j = 0; j < buildSpec.length; j++) {
+					if (buildSpec[j].isBuilding(trigger) == value) {
 						return true;
 					}
 				}
@@ -175,12 +166,16 @@ public class BuildUtilities {
 			return;
 		}
 		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
-		for (IWorkbenchWindow window : windows) {
-			for (IWorkbenchPage page : window.getPages()) {
+		for (int i = 0; i < windows.length; i++) {
+			IWorkbenchPage[] pages = windows[i].getPages();
+			for (int j = 0; j < pages.length; j++) {
+				IWorkbenchPage page = pages[j];
 				if (projects == null) {
 					page.saveAllEditors(false);
 				} else {
-					for (IEditorPart editor : page.getDirtyEditors()) {
+					IEditorPart[] editors = page.getDirtyEditors();
+					for (int k = 0; k < editors.length; k++) {
+						IEditorPart editor = editors[k];
 						IFile inputFile = ResourceUtil.getFile(editor.getEditorInput());
 						if (inputFile != null) {
 							if (projects.contains(inputFile.getProject())) {

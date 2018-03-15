@@ -8,6 +8,8 @@ package org.eclipse.e4.emf.xpath.test.model.xpathtest;
 
 import org.eclipse.emf.common.util.EList;
 
+import org.eclipse.emf.ecore.EObject;
+
 /**
  * <!-- begin-user-doc -->
  * A representation of the model object '<em><b>Node</b></em>'.
@@ -31,7 +33,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface Node extends MenuContainer {
+public interface Node extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Parent</b></em>' container reference.
 	 * It is bidirectional and its opposite is '{@link org.eclipse.e4.emf.xpath.test.model.xpathtest.Node#getChildren <em>Children</em>}'.

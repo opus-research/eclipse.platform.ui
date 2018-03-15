@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
  * Test cases covering the various interaction between bindings. Bindings that
  * have been removed. Bindings that have been added. Inheritance of various
  * properties.
- *
+ * 
  * @since 3.1
  */
 public final class BindingInteractionsTest extends UITestCase {
@@ -48,7 +48,7 @@ public final class BindingInteractionsTest extends UITestCase {
 
 	/**
 	 * Constructor for <code>BindingInteractionsTest</code>.
-	 *
+	 * 
 	 * @param name
 	 *            The name of the test
 	 */
@@ -60,7 +60,6 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * Creates a new context manager and a binding manager for use in the test
 	 * cases.
 	 */
-	@Override
 	protected void doSetUp() {
 		contextManager = new ContextManager();
 		bindingManager = new BindingManager(contextManager,
@@ -70,7 +69,6 @@ public final class BindingInteractionsTest extends UITestCase {
 	/**
 	 * Releases the context manager and binding manager for garbage collection.
 	 */
-	@Override
 	protected void doTearDown() {
 		contextManager = null;
 		bindingManager = null;
@@ -80,7 +78,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * <p>
 	 * Tests whether two identical bindings lead to a conflict.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -92,7 +90,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		scheme.define("name", "description", null);
 
 		bindingManager.setActiveScheme(scheme);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -119,7 +117,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * Tests whether a plug-in developer can override a binding in a child
 	 * context.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -143,7 +141,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		bindingManager.addBinding(binding2);
 
 		// Only "parent"
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("parent");
 		contextManager.setActiveContextIds(activeContextIds);
 		assertEquals(
@@ -173,7 +171,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * <p>
 	 * Tests whether a user-defined deletion actually works.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -185,7 +183,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		scheme.define("name", "description", null);
 
 		bindingManager.setActiveScheme(scheme);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -204,7 +202,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * Tests whether a user-defined deletion in one context will allow a binding
 	 * in a parent context to match.  Bug 105655.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -218,7 +216,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		scheme.define("name", "description", null);
 
 		bindingManager.setActiveScheme(scheme);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("parent");
 		activeContextIds.add("child");
 		contextManager.setActiveContextIds(activeContextIds);
@@ -245,7 +243,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * platforms, then deleted on a specific platform, and defined again as
 	 * something else.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -259,7 +257,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		scheme.define("name", "description", null);
 
 		bindingManager.setActiveScheme(scheme);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -284,7 +282,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * actually works. It shouldn't. Deletions should only work if they specify
 	 * a matching locale or platform.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -296,7 +294,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		scheme.define("name", "description", null);
 
 		bindingManager.setActiveScheme(scheme);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -322,7 +320,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * Tests whether a user can add a binding to the same conditions once
 	 * they've deleted the system binding.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -334,7 +332,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		scheme.define("name", "description", null);
 
 		bindingManager.setActiveScheme(scheme);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -354,7 +352,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	/**
 	 * This tests the case where a plug-in developer unbinds a key, and then a
 	 * user tries to bind to that key. The user should be allowed to bind.
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -366,7 +364,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		scheme.define("name", "description", null);
 
 		bindingManager.setActiveScheme(scheme);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -386,12 +384,12 @@ public final class BindingInteractionsTest extends UITestCase {
 						.getPerfectMatch(TestBinding.TRIGGER_SEQUENCE));
 
 	}
-
+	
 	/**
 	 * Tests that if more than one deletion is defined for the same binding,
 	 * that the deletion will still work.  Bug 106574 points out a case where it
 	 * is possible for a deletion to clobber another deletion.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public void testDoubleDeletedBinding() {
@@ -403,7 +401,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		parentContext.define(parent, parent, null);
 		final Context childContext = contextManager.getContext(child);
 		childContext.define(child, child, parent);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add(parent);
 		activeContextIds.add(child);
 		contextManager.setActiveContextIds(activeContextIds);
@@ -435,7 +433,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * This tests a complicated scenario that arises with the Emacs key binding
 	 * set in the Eclipse workbench. The first binding belongs to a parent
 	 * context, but a child scheme. The trigger sequences are not the same.
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -448,7 +446,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		parentContext.define(parent, parent, null);
 		final Context childContext = contextManager.getContext(child);
 		childContext.define(child, child, parent);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add(parent);
 		activeContextIds.add(child);
 		contextManager.setActiveContextIds(activeContextIds);
@@ -482,7 +480,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * Tests whether a plug-in developer can override a binding for a particular
 	 * locale.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -494,7 +492,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		scheme.define("name", "description", null);
 
 		bindingManager.setActiveScheme(scheme);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -518,7 +516,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * Tests whether a plug-in developer can override a binding for a particular
 	 * platform.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -530,7 +528,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		scheme.define("name", "description", null);
 
 		bindingManager.setActiveScheme(scheme);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -561,7 +559,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * <p>
 	 * Binding1 should win.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -576,7 +574,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		childScheme.define("child", "child scheme", "parent");
 
 		bindingManager.setActiveScheme(childScheme);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -596,7 +594,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * defines a binding in a parent context. The parent scheme bindings the
 	 * same trigger sequence in a child context. The child scheme definition
 	 * should win.
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -616,7 +614,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		childScheme.define("child", "child scheme", parent);
 
 		bindingManager.setActiveScheme(childScheme);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add(parentContext.getId());
 		activeContextIds.add(childContext.getId());
 		contextManager.setActiveContextIds(activeContextIds);
@@ -645,7 +643,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * <p>
 	 * Binding1 should win.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -660,7 +658,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		childScheme.define("child", "child scheme", "parent");
 
 		bindingManager.setActiveScheme(childScheme);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -680,7 +678,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * Tests whether two bindings defined for sibling active contexts leads to a
 	 * conflict.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -704,7 +702,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		bindingManager.addBinding(binding2);
 
 		// One sibling active
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("sibling1");
 		contextManager.setActiveContextIds(activeContextIds);
 		assertEquals(
@@ -741,7 +739,7 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * <p>
 	 * Binding1 should win.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -753,7 +751,7 @@ public final class BindingInteractionsTest extends UITestCase {
 		scheme.define("name", "description", null);
 
 		bindingManager.setActiveScheme(scheme);
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 

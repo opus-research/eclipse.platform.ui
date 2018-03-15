@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,28 +13,24 @@
  *     		[Workbench] Project copy doesn't validate location and uses invalid location as default
  *     Oakland Software Incorporated (Francis Upton) <francisu@ieee.org>
  *		    Bug 224997 [Workbench] Impossible to copy project
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -68,7 +64,7 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 	/**
 	 * Create a ProjectLocationSelectionDialog on the supplied project parented
 	 * by the parentShell.
-	 *
+	 * 
 	 * @param parentShell
 	 * @param existingProject
 	 */
@@ -81,21 +77,9 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 	}
 
 	/**
-	 * @since 3.14
-	 */
-	@Override
-	protected Button createButton(Composite parent, int id, String label, boolean defaultButton) {
-		if (id == IDialogConstants.OK_ID) {
-			return super.createButton(parent, id, IDEWorkbenchMessages.ProjectLocationSelectionDialog_copyButtonLabel,
-					defaultButton);
-		}
-		return super.createButton(parent, id, label, defaultButton);
-	}
-
-	/**
 	 * Check the message. If it is null then continue otherwise inform the user
 	 * via the status value and disable the OK.
-	 *
+	 * 
 	 * @param errorMsg
 	 *            the error message to show if it is not <code>null</code>
 	 */
@@ -157,7 +141,6 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 	 * <code>SelectionStatusDialog</code> method builds a two element list -
 	 * the first element is the project name and the second one is the location.
 	 */
-	@Override
 	protected void computeResult() {
 
 		ArrayList list = new ArrayList();
@@ -166,14 +149,18 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 		setResult(list);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in Window.
+	 */
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IIDEHelpContextIds.PROJECT_LOCATION_SELECTION_DIALOG);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	protected Control createDialogArea(Composite parent) {
 		// page group
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -193,9 +180,11 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 	 */
 	private void createNameListener() {
 
-		Listener listener = event -> {
-			setLocationForSelection();
-			applyValidationResult(checkValid(), false);
+		Listener listener = new Listener() {
+			public void handleEvent(Event event) {
+				setLocationForSelection();
+				applyValidationResult(checkValid(), false);
+			}
 		};
 
 		this.projectNameField.addListener(SWT.Modify, listener);
@@ -203,7 +192,7 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 
 	/**
 	 * Creates the project name specification controls.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 */
@@ -247,25 +236,26 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 			return projectName;
 		}
 
-		String newName = computeNewName(projectName);
+		int counter = 1;
 		while (true) {
-			if (!workspace.getRoot().getProject(newName).exists()) {
-				return newName;
+			String nameSegment;
+			if (counter > 1) {
+				nameSegment = NLS.bind(
+						IDEWorkbenchMessages.CopyProjectAction_copyNameTwoArgs,
+						new Integer(counter), projectName);
+			} else {
+				nameSegment = NLS.bind(
+						IDEWorkbenchMessages.CopyProjectAction_copyNameOneArg,
+						projectName);
 			}
-			newName = computeNewName(newName);
-		}
-	}
 
-	private static String computeNewName(String str) {
-		String fileNameNoExtension = str;
-		Pattern p = Pattern.compile("[0-9]+$"); //$NON-NLS-1$
-		Matcher m = p.matcher(fileNameNoExtension);
-		if (m.find()) {
-			// String ends with a number: increment it by 1
-			int newNumber = Integer.parseInt(m.group()) + 1;
-			return m.replaceFirst(Integer.toString(newNumber));
+			if (!workspace.getRoot().getProject(nameSegment).exists()) {
+				return nameSegment;
+			}
+
+			counter++;
 		}
-		return fileNameNoExtension + "2"; //$NON-NLS-1$
+
 	}
 
 	/**
@@ -284,13 +274,20 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 
 	/**
 	 * Get an error reporter for the receiver.
-	 *
+	 * 
 	 * @return IErrorMessageReporter
 	 */
 	private IErrorMessageReporter getErrorReporter() {
-		return (errorMessage, infoOnly) -> {
-			setMessage(errorMessage);
-			applyValidationResult(errorMessage, infoOnly);
+		return new IErrorMessageReporter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea.IErrorMessageReporter#reportError(java.lang.String)
+			 */
+			public void reportError(String errorMessage, boolean infoOnly) {
+				setMessage(errorMessage);
+				applyValidationResult(errorMessage, infoOnly);
+			}
 		};
 	}
 }

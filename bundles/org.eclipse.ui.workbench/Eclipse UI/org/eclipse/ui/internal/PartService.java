@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,8 +25,8 @@ import org.eclipse.ui.IWorkbenchPartReference;
 public class PartService implements IPageChangedListener, IPartListener, IPartListener2,
 		IPartService {
 
-	private ListenerList<IPartListener> partListeners = new ListenerList<>();
-	private ListenerList<IPartListener2> partListeners2 = new ListenerList<>();
+	private ListenerList partListeners = new ListenerList();
+	private ListenerList partListeners2 = new ListenerList();
 
 	private WorkbenchPage page;
 
@@ -44,198 +44,178 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 		this.page = page;
 	}
 
-	@Override
 	public void addPartListener(IPartListener listener) {
 		partListeners.add(listener);
 	}
 
-	@Override
 	public void addPartListener(IPartListener2 listener) {
 		partListeners2.add(listener);
 	}
 
-	@Override
 	public IWorkbenchPart getActivePart() {
 		return page == null ? null : page.getActivePart();
 	}
 
-	@Override
 	public IWorkbenchPartReference getActivePartReference() {
 		return page == null ? null : page.getActivePartReference();
 	}
 
-	@Override
 	public void removePartListener(IPartListener listener) {
 		partListeners.remove(listener);
 	}
 
-	@Override
 	public void removePartListener(IPartListener2 listener) {
 		partListeners2.remove(listener);
 	}
 
-	@Override
 	public void partActivated(final IWorkbenchPart part) {
-		for (final IPartListener listener : partListeners) {
+		Object[] listeners = partListeners.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() throws Exception {
-					listener.partActivated(part);
+					((IPartListener) listener).partActivated(part);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void partBroughtToTop(final IWorkbenchPart part) {
-		for (final IPartListener listener : partListeners) {
+		Object[] listeners = partListeners.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() throws Exception {
-					listener.partBroughtToTop(part);
+					((IPartListener) listener).partBroughtToTop(part);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void partClosed(final IWorkbenchPart part) {
-		for (final IPartListener listener : partListeners) {
+		Object[] listeners = partListeners.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() throws Exception {
-					listener.partClosed(part);
+					((IPartListener) listener).partClosed(part);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void partDeactivated(final IWorkbenchPart part) {
-		for (final IPartListener listener : partListeners) {
+		Object[] listeners = partListeners.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() throws Exception {
-					listener.partDeactivated(part);
+					((IPartListener) listener).partDeactivated(part);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void partOpened(final IWorkbenchPart part) {
-		for (final IPartListener listener : partListeners) {
+		Object[] listeners = partListeners.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() throws Exception {
-					listener.partOpened(part);
+					((IPartListener) listener).partOpened(part);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void partActivated(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() throws Exception {
-					listener.partActivated(partRef);
+					((IPartListener2) listener).partActivated(partRef);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void partBroughtToTop(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() throws Exception {
-					listener.partBroughtToTop(partRef);
+					((IPartListener2) listener).partBroughtToTop(partRef);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void partClosed(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() throws Exception {
-					listener.partClosed(partRef);
+					((IPartListener2) listener).partClosed(partRef);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void partDeactivated(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() throws Exception {
-					listener.partDeactivated(partRef);
+					((IPartListener2) listener).partDeactivated(partRef);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void partOpened(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() throws Exception {
-					listener.partOpened(partRef);
+					((IPartListener2) listener).partOpened(partRef);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void partHidden(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() throws Exception {
-					listener.partHidden(partRef);
+					((IPartListener2) listener).partHidden(partRef);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void partVisible(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() throws Exception {
-					listener.partVisible(partRef);
+					((IPartListener2) listener).partVisible(partRef);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void partInputChanged(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() throws Exception {
-					listener.partInputChanged(partRef);
+					((IPartListener2) listener).partInputChanged(partRef);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void pageChanged(final PageChangedEvent event) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			if (listener instanceof IPageChangedListener) {
 				SafeRunner.run(new SafeRunnable() {
-					@Override
 					public void run() throws Exception {
 						((IPageChangedListener) listener).pageChanged(event);
 					}

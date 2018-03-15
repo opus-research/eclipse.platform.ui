@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 Chris Horneck and others.
+ * Copyright (c) 2009 Chris Horneck and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,8 @@ package org.eclipse.jface.tests.viewers;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -25,11 +27,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Shell;
 
-import junit.framework.TestCase;
-
 /**
  * @since 3.4
- *
+ * 
  */
 public class Bug287765Test extends TestCase {
 	private TreeViewer treeViewer;
@@ -40,7 +40,7 @@ public class Bug287765Test extends TestCase {
 	 */
 	private static class Node {
 		private final Node parent;
-		private final List<Node> children = new ArrayList<>();
+		private final List children = new ArrayList();
 		private final int level;
 
 		private Node(Node parentNode, int nodeLevel) {
@@ -56,44 +56,36 @@ public class Bug287765Test extends TestCase {
 	private final class SimpleTreeContentProvider implements
 			ITreeContentProvider, ILabelProvider {
 
-		@Override
 		public Image getImage(Object element) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
-		@Override
 		public String getText(Object element) {
 			Node node = (Node) element;
 			return Integer.toString(node.level);
 		}
 
-		@Override
 		public void addListener(ILabelProviderListener listener) {
 		}
 
-		@Override
 		public boolean isLabelProperty(Object element, String property) {
 			return false;
 		}
 
-		@Override
 		public void removeListener(ILabelProviderListener listener) {
 		}
 
-		@Override
 		public Object[] getChildren(Object parentElement) {
 			Node node = (Node) parentElement;
 			return node.children.toArray();
 		}
 
-		@Override
 		public boolean hasChildren(Object element) {
 			Node node = (Node) element;
 			return node.children.size() > 0;
 		}
 
-		@Override
 		public Object[] getElements(Object inputElement) {
 			int depth = 4;
 
@@ -108,23 +100,19 @@ public class Bug287765Test extends TestCase {
 			return new Object[] { node };
 		}
 
-		@Override
 		public Object getParent(Object element) {
 			Node node = (Node) element;
 
 			return node.parent;
 		}
 
-		@Override
 		public void dispose() {
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -155,7 +143,6 @@ public class Bug287765Test extends TestCase {
 		shell.open();
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		treeViewer.getControl().getShell().dispose();
 		treeViewer = null;

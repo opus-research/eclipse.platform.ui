@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.harness.util;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import junit.framework.Assert;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -24,18 +22,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.tests.internal.util.VerifyDialog;
-
-import junit.framework.Assert;
 
 /**
  * A <code>DialogCheck</code> is used test a dialog in
- * various ways.
+ * various ways. 
  * <p>
  * For interactive tests use <code>assertDialog</code>.
  * For automated tests use <code>assert DialogTexts</code>.
- * </p>
+ * </p> 
  */
 public class DialogCheck {
     private DialogCheck() {
@@ -44,109 +40,61 @@ public class DialogCheck {
     private static VerifyDialog _verifyDialog;
 
     /**
-	 * Asserts that a given dialog is not null and that it passes certain visual
-	 * tests. These tests will be verified manually by the tester using an input
-	 * dialog. Use this assert method to verify a dialog's sizing, initial focus, or
-	 * accessibility. To ensure that both the input dialog and the test dialog are
-	 * accessible by the tester, the getShell() method should be used when creating
-	 * the test dialog.
-	 *
-	 * Example usage:
-	 * <code>Dialog dialog = new AboutDialog( DialogCheck.getShell() );
-	 * DialogCheck.assertDialog(dialog, this);</code>
-	 *
-	 * @param dialog
-	 *            the test dialog to be verified.
-	 * @param assertion
-	 *            this is the test case object, assertions will be executed on this
-	 *            object.
-	 *
-	 * @deprecated The <code>junit.framework.Assert</code> parameter is not used at
-	 *             all. Use {@link #assertDialog(Dialog) assertDialog(Dialog)}
-	 *             method.
-	 */
-	@Deprecated
-	public static void assertDialog(Dialog dialog, Assert assertion) {
-		assertDialog(dialog);
-	}
-
-	/**
-	 * Asserts that a given dialog is not null and that it passes certain visual
-	 * tests. These tests will be verified manually by the tester using an input
-	 * dialog. Use this assert method to verify a dialog's sizing, initial focus, or
-	 * accessibility. To ensure that both the input dialog and the test dialog are
-	 * accessible by the tester, the getShell() method should be used when creating
-	 * the test dialog.
-	 *
-	 * Example usage:
-	 * <code>Dialog dialog = new AboutDialog( DialogCheck.getShell() );
-	 * DialogCheck.assertDialog(dialog);</code>
-	 *
-	 * @param dialog
-	 *            the test dialog to be verified.
-	 */
-	public static void assertDialog(Dialog dialog) {
-		assertNotNull(dialog);
+     * Asserts that a given dialog is not null and that it passes
+     * certain visual tests.  These tests will be verified manually
+     * by the tester using an input dialog.  Use this assert method
+     * to verify a dialog's sizing, initial focus, or accessiblity.
+     * To ensure that both the input dialog and the test dialog are
+     * accessible by the tester, the getShell() method should be used
+     * when creating the test dialog.
+     * 
+     * Example usage:
+     * <code>Dialog dialog = new AboutDialog( DialogCheck.getShell() );
+     * DialogCheck.assertDialog(dialog, this);</code>
+     * 
+     * @param dialog the test dialog to be verified.
+     * @param assert this is the test case object, assertions will be
+     * executed on this object.
+     */
+    public static void assertDialog(Dialog dialog, Assert assertion) {
+        Assert.assertNotNull(dialog);
         if (_verifyDialog.getShell() == null) {
             //force the creation of the verify dialog
             getShell();
         }
         if (_verifyDialog.open(dialog) == IDialogConstants.NO_ID) {
-			assertTrue(_verifyDialog.getFailureText(), false);
+            Assert.assertTrue(_verifyDialog.getFailureText(), false);
         }
     }
 
     /**
-	 * Automated test that checks all the labels and buttons of a dialog to make
-	 * sure there is enough room to display all the text. Any text that wraps is
-	 * only approximated and is currently not accurate.
-	 *
-	 * @param dialog
-	 *            the test dialog to be verified.
-	 * @param assertion
-	 *            this is the test case object, assertions will be executed on this
-	 *            object.
-	 * @deprecated The <code>junit.framework.Assert</code> parameter is not used at
-	 *             all. Use {@link #assertDialogTexts(Dialog)
-	 *             assertDialogTexts(Dialog)} method.
-	 */
-	@Deprecated
+     * Automated test that checks all the labels and buttons of a dialog
+     * to make sure there is enough room to display all the text.  Any
+     * text that wraps is only approximated and is currently not accurate.
+     * 
+     * @param dialog the test dialog to be verified.
+     * @param assert this is the test case object, assertions will be
+     * executed on this object.
+     */
     public static void assertDialogTexts(Dialog dialog, Assert assertion) {
-		assertDialogTexts(dialog);
+        Assert.assertNotNull(dialog);
+        dialog.setBlockOnOpen(false);
+        dialog.open();
+        Shell shell = dialog.getShell();
+        verifyCompositeText(shell, assertion);
+        dialog.close();
     }
-
-	/**
-	 * Automated test that checks all the labels and buttons of a dialog to make
-	 * sure there is enough room to display all the text. Any text that wraps is
-	 * only approximated and is currently not accurate.
-	 *
-	 * @param dialog
-	 *            the test dialog to be verified.
-	 * @param assertion
-	 *            this is the test case object, assertions will be executed on this
-	 *            object.
-	 */
-	public static void assertDialogTexts(Dialog dialog) {
-		assertNotNull(dialog);
-		dialog.setBlockOnOpen(false);
-		dialog.open();
-		Shell shell = dialog.getShell();
-		verifyCompositeText(shell);
-		dialog.close();
-		// close "verify results" dialog, it makes other tests unhappy
-		_verifyDialog.buttonPressed(IDialogConstants.YES_ID);
-	}
 
     /**
      * This method should be called when creating dialogs to test.  This
      * ensures that the dialog's parent shell will be that of the
      * verification dialog.
-     *
+     * 
      * @return Shell The shell of the verification dialog to be used as
      * the parent shell of the test dialog.
      */
     public static Shell getShell() {
-		Shell shell = PlatformUI.getWorkbench()
+        Shell shell = WorkbenchPlugin.getDefault().getWorkbench()
                 .getActiveWorkbenchWindow().getShell();
         _verifyDialog = new VerifyDialog(shell);
         _verifyDialog.create();
@@ -157,10 +105,13 @@ public class DialogCheck {
      * Looks at all the child widgets of a given composite and
      * verifies the text on all labels and widgets.
      * @param composite The composite to look through
+     * @param assert The object to invoke assertions on.
      */
-	private static void verifyCompositeText(Composite composite) {
+    private static void verifyCompositeText(Composite composite,
+            Assert assertion) {
         Control children[] = composite.getChildren();
-		for (Control child : children) {
+        for (int i = 0; i < children.length; i++) {
+        	Control child = children[i];
             if (child instanceof TabFolder) {
                 TabFolder folder = (TabFolder) child;
                 int numPages = folder.getItemCount();
@@ -170,15 +121,15 @@ public class DialogCheck {
             }
             else if (child instanceof Button) {
                 //verify the text if the child is a button
-				verifyButtonText((Button) child);
+                verifyButtonText((Button) child, assertion);
             }
             else if (child instanceof Label) {
                 //child is not a button, maybe a label
-				verifyLabelText((Label) child);
+                verifyLabelText((Label) child, assertion);
             }
             else if (child instanceof Composite) {
                 //child is not a label, make a recursive call if it is a composite
-				verifyCompositeText((Composite) child);
+                verifyCompositeText((Composite) child, assertion);
             }
         }
     }
@@ -186,8 +137,9 @@ public class DialogCheck {
     /*
      * Verifies that a given button is large enough to display its text.
      * @param button The button to verify,
+     * @param assert The object to invoke assertions on.
      */
-	private static void verifyButtonText(Button button) {
+    private static void verifyButtonText(Button button, Assert assertion) {
         String widget = button.toString();
         Point size = button.getSize();
 
@@ -202,23 +154,22 @@ public class DialogCheck {
             }
         }
 
-        String message = new StringBuilder("Warning: ").append(widget).append(
+        String message = new StringBuffer("Warning: ").append(widget).append(
                 "\n\tActual Width -> ").append(size.x).append(
                 "\n\tRecommended Width -> ").append(preferred.x).toString();
         if (preferred.x > size.x) {
             //close the dialog
             button.getShell().dispose();
-			assertTrue(message.toString(), false);
+            Assert.assertTrue(message.toString(), false);
         }
     }
 
     /*
      * Verifies that a given label is large enough to display its text.
      * @param label The label to verify,
+     * @param assert The object to invoke assertions on.
      */
-	private static void verifyLabelText(Label label) {
-		if (!label.isVisible())
-			return;
+    private static void verifyLabelText(Label label, Assert assertion) {
         String widget = label.toString();
         Point size = label.getSize();
         String labelText = label.getText();
@@ -234,13 +185,13 @@ public class DialogCheck {
                 preferred.x /= (size.y / preferred.y);
             }
         }
-        String message = new StringBuilder("Warning: ").append(widget).append(
+        String message = new StringBuffer("Warning: ").append(widget).append(
                 "\n\tActual Width -> ").append(size.x).append(
                 "\n\tRecommended Width -> ").append(preferred.x).toString();
         if (preferred.x > size.x) {
             //close the dialog
             label.getShell().dispose();
-			assertTrue(message.toString(), false);
+            Assert.assertTrue(message.toString(), false);
         }
     }
 

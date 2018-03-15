@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  ******************************************************************************/
 
 package org.eclipse.ui.internal.about;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +27,10 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -52,7 +53,7 @@ import org.eclipse.ui.services.IServiceLocator;
 
 /**
  * @since 3.5
- *
+ * 
  */
 public class InstallationDialog extends TrayDialog implements
 		IInstallationPageContainer {
@@ -83,7 +84,8 @@ public class InstallationDialog extends TrayDialog implements
 			int visibleChildren = 0;
 			Button closeButton = getButton(IDialogConstants.CLOSE_ID);
 
-			for (Control control : children) {
+			for (int i = 0; i < children.length; i++) {
+				Control control = children[i];
 				if (closeButton == control)
 					closeButton.dispose();
 				else {
@@ -154,7 +156,13 @@ public class InstallationDialog extends TrayDialog implements
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
+	 * .Shell)
+	 */
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		String productName = ""; //$NON-NLS-1$
@@ -165,12 +173,22 @@ public class InstallationDialog extends TrayDialog implements
 				WorkbenchMessages.InstallationDialog_ShellTitle, productName));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+	 */
 	protected boolean isResizable() {
 		return true;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
+	 * .Composite)
+	 */
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
 
@@ -183,14 +201,19 @@ public class InstallationDialog extends TrayDialog implements
 		folderData.heightHint = convertVerticalDLUsToPixels(TAB_HEIGHT_IN_DLUS);
 		folder.setLayoutData(folderData);
 		folder.addSelectionListener(createFolderSelectionListener());
-		folder.addDisposeListener(e -> releaseContributions());
+		folder.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+				releaseContributions();
+			}
+		});
 		return composite;
 	}
 
 	protected void createFolderItems(TabFolder folder) {
 		IConfigurationElement[] elements = ConfigurationInfo
 				.getSortedExtensions(loadElements());
-		for (IConfigurationElement element : elements) {
+		for (int i = 0; i < elements.length; i++) {
+			IConfigurationElement element = elements[i];
 			TabItem item = new TabItem(folder, SWT.NONE);
 			item.setText(element
 					.getAttribute(IWorkbenchRegistryConstants.ATT_NAME));
@@ -204,7 +227,6 @@ public class InstallationDialog extends TrayDialog implements
 		}
 	}
 
-	@Override
 	protected Control createContents(Composite parent) {
 		Control control = super.createContents(parent);
 		boolean selected = false;
@@ -228,8 +250,13 @@ public class InstallationDialog extends TrayDialog implements
 		return control;
 	}
 
-	private SelectionListener createFolderSelectionListener() {
-		return widgetSelectedAdapter(e -> tabSelected((TabItem) e.item));
+	private SelectionAdapter createFolderSelectionListener() {
+		return new SelectionAdapter() {
+
+			public void widgetSelected(SelectionEvent e) {
+				tabSelected((TabItem) e.item);
+			}
+		};
 	}
 
 	/*
@@ -256,7 +283,12 @@ public class InstallationDialog extends TrayDialog implements
 						.getAttribute(IWorkbenchRegistryConstants.ATT_ID));
 				createButtons(page);
 				item.setData(page);
-				item.addDisposeListener(e -> page.dispose());
+				item.addDisposeListener(new DisposeListener() {
+
+					public void widgetDisposed(DisposeEvent e) {
+						page.dispose();
+					}
+				});
 				pageComposite.layout(true, true);
 
 			} catch (CoreException e1) {
@@ -291,7 +323,13 @@ public class InstallationDialog extends TrayDialog implements
 		lastSelectedTabId = pageId;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse
+	 * .swt.widgets.Composite)
+	 */
 	protected void createButtonsForButtonBar(Composite parent) {
 		// The button manager will handle the correct sizing of the buttons.
 		// We do not want columns equal width because we are going to add some
@@ -310,7 +348,6 @@ public class InstallationDialog extends TrayDialog implements
 		return point.getConfigurationElements();
 	}
 
-	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 		IDialogSettings settings = WorkbenchPlugin.getDefault()
 				.getDialogSettings();
@@ -325,21 +362,18 @@ public class InstallationDialog extends TrayDialog implements
 		buttonManager.clear();
 	}
 
-	@Override
 	public void closeModalContainers() {
 		close();
 		if (modalParent != null)
 			modalParent.close();
 	}
 
-	@Override
 	protected void buttonPressed(int buttonId) {
 		if (IDialogConstants.CLOSE_ID == buttonId) {
 			okPressed();
 		}
 	}
 
-	@Override
 	public void registerPageButton(InstallationPage page, Button button) {
 		buttonManager.addPageButton(pageToId(page), button);
 	}
@@ -354,11 +388,11 @@ public class InstallationDialog extends TrayDialog implements
 	 * Set the modal parent dialog that was used to launch this dialog. This
 	 * should be used by any launching dialog so that the {
 	 * {@link #closeModalContainers()} method can be properly implemented.
-	 *
+	 * 
 	 * @param parent
 	 *            the modal parent dialog that launched this dialog, or
 	 *            <code>null</code> if there was no parent.
-	 *
+	 * 
 	 *            This is an internal method and should not be used outside of
 	 *            platform UI.
 	 */

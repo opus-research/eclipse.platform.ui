@@ -26,17 +26,14 @@ public class CompressedJavaLibraries implements ICompressedNode {
 		this.compressedProject = compressedProject;
 	}
 
-	@Override
 	public Image getImage() {
 		return null;
 	}
 
-	@Override
 	public String getLabel() {
 		return "Compressed Libraries";
 	}
 
-	@Override
 	public Object[] getChildren(ITreeContentProvider delegateContentProvider) {
 
 		List classpathContainers = new ArrayList();

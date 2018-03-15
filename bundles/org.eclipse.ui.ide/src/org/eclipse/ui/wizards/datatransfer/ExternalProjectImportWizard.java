@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,7 +47,7 @@ public class ExternalProjectImportWizard extends Wizard implements
 	private WizardProjectsImportPage mainPage;
 	private IStructuredSelection currentSelection = null;
 	private String initialPath = null;
-
+	
     /**
      * Constructor for ExternalProjectImportWizard.
      */
@@ -57,7 +57,7 @@ public class ExternalProjectImportWizard extends Wizard implements
 
     /**
      * Constructor for ExternalProjectImportWizard.
-     *
+     * 
      * @param initialPath Default path for wizard to import
      * @since 3.5
      */
@@ -68,40 +68,48 @@ public class ExternalProjectImportWizard extends Wizard implements
         setNeedsProgressMonitor(true);
         IDialogSettings workbenchSettings = IDEWorkbenchPlugin.getDefault()
         		.getDialogSettings();
-
+        
 		IDialogSettings wizardSettings = workbenchSettings
 		        .getSection(EXTERNAL_PROJECT_SECTION);
 		if (wizardSettings == null) {
 			wizardSettings = workbenchSettings
 		            .addNewSection(EXTERNAL_PROJECT_SECTION);
 		}
-		setDialogSettings(wizardSettings);
+		setDialogSettings(wizardSettings);        
     }
 
-    @Override
-	public void addPages() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public void addPages() {
         super.addPages();
 		mainPage = new WizardProjectsImportPage(
 				"wizardExternalProjectsPage", initialPath, currentSelection); //$NON-NLS-1$
         addPage(mainPage);
     }
 
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         setWindowTitle(DataTransferMessages.DataTransfer_importTitle);
         setDefaultPageImageDescriptor(
 				IDEWorkbenchPlugin.getIDEImageDescriptor("wizban/importproj_wiz.png")); //$NON-NLS-1$
         this.currentSelection = currentSelection;
     }
 
-    @Override
-	public boolean performCancel() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public boolean performCancel() {
     	mainPage.performCancel();
         return true;
     }
 
-    @Override
-	public boolean performFinish() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public boolean performFinish() {
         return mainPage.createProjects();
     }
 

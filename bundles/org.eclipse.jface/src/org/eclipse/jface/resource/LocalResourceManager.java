@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.jface.resource;
 
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
@@ -31,53 +33,68 @@ import org.eclipse.swt.widgets.Control;
 public final class LocalResourceManager extends AbstractResourceManager {
 
     private ResourceManager parentRegistry;
-
+    
     /**
      * Creates a local registry that delegates to the given global registry
-     * for all resource allocation and deallocation.
-     *
-     * @param parentRegistry global registry
+     * for all resource allocation and deallocation. 
+     * 
+     * @param parentRegistry global registry 
      */
     public LocalResourceManager(ResourceManager parentRegistry) {
         this.parentRegistry = parentRegistry;
     }
-
+    
     /**
      * Creates a local registry that wraps the given global registry. Anything
      * allocated by this registry will be automatically cleaned up with the given
      * control is disposed. Note that registries created in this way should not
      * be used to allocate any resource that must outlive the given control.
-     *
+     * 
      * @param parentRegistry global registry that handles resource allocation
-     * @param owner control whose disposal will trigger cleanup of everything
+     * @param owner control whose disposal will trigger cleanup of everything 
      * in the registry.
      */
     public LocalResourceManager(ResourceManager parentRegistry, Control owner) {
         this(parentRegistry);
-
-        owner.addDisposeListener(e -> LocalResourceManager.this.dispose());
+        
+        owner.addDisposeListener(new DisposeListener() {
+	        /* (non-Javadoc)
+	         * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+	         */
+	        public void widgetDisposed(DisposeEvent e) {
+	            LocalResourceManager.this.dispose();
+	        } 
+        });
     }
-
-    @Override
-	public Device getDevice() {
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.ResourceManager#getDevice()
+     */
+    public Device getDevice() {
         return parentRegistry.getDevice();
     }
-
-    @Override
-	protected Object allocate(DeviceResourceDescriptor descriptor)
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.AbstractResourceManager#allocate(org.eclipse.jface.resource.DeviceResourceDescriptor)
+     */
+    protected Object allocate(DeviceResourceDescriptor descriptor)
             throws DeviceResourceException {
         return parentRegistry.create(descriptor);
     }
-
-    @Override
-	protected void deallocate(Object resource,
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.AbstractResourceManager#deallocate(java.lang.Object, org.eclipse.jface.resource.DeviceResourceDescriptor)
+     */
+    protected void deallocate(Object resource,
             DeviceResourceDescriptor descriptor) {
-
+        
         parentRegistry.destroy(descriptor);
     }
 
-    @Override
-	protected Image getDefaultImage() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.ResourceManager#getDefaultImage()
+     */
+    protected Image getDefaultImage() {
         return parentRegistry.getDefaultImage();
     }
 }

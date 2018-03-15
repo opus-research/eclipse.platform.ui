@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,26 +36,38 @@ public class ActiveContextExpression extends Expression {
 		expressionInfo = info;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.Expression#collectExpressionInfo(org.eclipse.core.expressions.ExpressionInfo)
+	 */
 	public void collectExpressionInfo(ExpressionInfo info) {
-		for (String element : expressionInfo) {
-			info.addVariableNameAccess(element);
+		for (int i = 0; i < expressionInfo.length; i++) {
+			info.addVariableNameAccess(expressionInfo[i]);
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.Expression#evaluate(org.eclipse.core.expressions.IEvaluationContext)
+	 */
 	public EvaluationResult evaluate(IEvaluationContext context) {
 		final Object variable = context
 				.getVariable(ISources.ACTIVE_CONTEXT_NAME);
 		if (variable != null) {
-			if (((Collection<?>) variable).contains(contextId)) {
+			if (((Collection) variable).contains(contextId)) {
 				return EvaluationResult.TRUE;
 			}
 		}
 		return EvaluationResult.FALSE;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(Object o) {
 		if (o instanceof ActiveContextExpression) {
 			ActiveContextExpression ace = (ActiveContextExpression) o;
@@ -64,7 +76,6 @@ public class ActiveContextExpression extends Expression {
 		return false;
 	}
 
-	@Override
 	protected final int computeHashCode() {
 		return HASH_INITIAL * HASH_FACTOR + hashCode(contextId);
 	}

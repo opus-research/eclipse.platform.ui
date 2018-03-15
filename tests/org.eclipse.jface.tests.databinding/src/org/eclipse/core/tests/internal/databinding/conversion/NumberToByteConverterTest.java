@@ -22,29 +22,41 @@ import com.ibm.icu.text.NumberFormat;
 public class NumberToByteConverterTest extends NumberToNumberTestHarness {
 	private NumberFormat numberFormat;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 
 		numberFormat = NumberFormat.getInstance();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetOutOfRangeNumber()
+	 */
 	protected Number doGetOutOfRangeNumber() {
-		return Integer.valueOf(Byte.MAX_VALUE + 1);
+		return new Integer(Byte.MAX_VALUE + 1);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToBoxedTypeValidator(java.lang.Class)
+	 */
 	protected IConverter doGetToBoxedTypeValidator(Class fromType) {
 		return new NumberToByteConverter(numberFormat, fromType, false);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToPrimitiveValidator(java.lang.Class)
+	 */
 	protected IConverter doGetToPrimitiveValidator(Class fromType) {
 		return new NumberToByteConverter(numberFormat, fromType, true);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToType()
+	 */
 	protected Class doGetToType(boolean primitive) {
 		return (primitive) ? Byte.TYPE : Byte.class;
 	}

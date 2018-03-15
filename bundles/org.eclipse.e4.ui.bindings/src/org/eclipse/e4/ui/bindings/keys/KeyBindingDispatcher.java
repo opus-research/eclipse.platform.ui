@@ -1,26 +1,22 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *  IBM Corporation - initial API and implementation
- *  Mickael Istria (Red Hat Inc.) - [517068] conflicts consider enabled commands
+ *     IBM Corporation - initial API and implementation
  ******************************************************************************/
 
 package org.eclipse.e4.ui.bindings.keys;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.e4.core.commands.EHandlerService;
@@ -63,7 +59,7 @@ public class KeyBindingDispatcher {
 	/**
 	 * A display filter for handling key bindings. This filter can either be enabled or disabled. If
 	 * disabled, the filter does not process incoming events. The filter starts enabled.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public final class KeyDownFilter implements Listener {
@@ -75,11 +71,10 @@ public class KeyBindingDispatcher {
 
 		/**
 		 * Handles an incoming traverse or key down event.
-		 *
+		 * 
 		 * @param event
 		 *            The event to process; must not be <code>null</code>.
 		 */
-		@Override
 		public final void handleEvent(final Event event) {
 			if (!enabled) {
 				return;
@@ -90,7 +85,7 @@ public class KeyBindingDispatcher {
 
 		/**
 		 * Returns whether the key binding filter is enabled.
-		 *
+		 * 
 		 * @return Whether the key filter is enabled.
 		 */
 		public final boolean isEnabled() {
@@ -99,7 +94,7 @@ public class KeyBindingDispatcher {
 
 		/**
 		 * Sets whether this filter should be enabled or disabled.
-		 *
+		 * 
 		 * @param enabled
 		 *            Whether key binding filter should be enabled.
 		 */
@@ -125,7 +120,7 @@ public class KeyBindingDispatcher {
 	/**
 	 * Generates any key strokes that are near matches to the given event. The first such key stroke
 	 * is always the exactly matching key stroke.
-	 *
+	 * 
 	 * @param event
 	 *            The event from which the key strokes should be generated; must not be
 	 *            <code>null</code>.
@@ -176,7 +171,7 @@ public class KeyBindingDispatcher {
 	 * Care must be taken in choosing which keys are chosen as out-of-order keys. This method has
 	 * only been designed and test to work with the unmodified "Escape" key stroke.
 	 * </p>
-	 *
+	 * 
 	 * @param keyStrokes
 	 *            The key stroke in which to look for out-of-order keys; must not be
 	 *            <code>null</code>.
@@ -215,7 +210,7 @@ public class KeyBindingDispatcher {
 	 * The single out-of-order listener used by the workbench. This listener is attached to one
 	 * widget at a time, and is used to catch key down events after all processing is done. This
 	 * technique is used so that some keys will have their native behaviour happen first.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	private final OutOfOrderListener outOfOrderListener = new OutOfOrderListener(this);
@@ -225,7 +220,7 @@ public class KeyBindingDispatcher {
 	 * one</code> StyledText</code> at a time, and is used to catch verify events after all
 	 * processing is done. This technique is used so that some keys will have their native behaviour
 	 * happen first.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	private final OutOfOrderVerifyListener outOfOrderVerifyListener = new OutOfOrderVerifyListener(
@@ -247,7 +242,7 @@ public class KeyBindingDispatcher {
 	 * Performs the actual execution of the command by looking up the current handler from the
 	 * command manager. If there is a handler and it is enabled, then it tries the actual execution.
 	 * Execution failures are logged. When this method completes, the key binding state is reset.
-	 *
+	 * 
 	 * @param parameterizedCommand
 	 *            The command that should be executed; should not be <code>null</code>.
 	 * @param trigger
@@ -267,29 +262,23 @@ public class KeyBindingDispatcher {
 		final EHandlerService handlerService = getHandlerService();
 		final Command command = parameterizedCommand.getCommand();
 
-		final IEclipseContext staticContext = createContext(trigger);
+		final IEclipseContext staticContext = EclipseContextFactory.create("keys-staticContext"); //$NON-NLS-1$
+		staticContext.set(Event.class, trigger);
 
 		final boolean commandDefined = command.isDefined();
 		// boolean commandEnabled;
-		boolean commandHandled = false;
+		boolean commandHandled;
 
 		try {
 			// commandEnabled = handlerService.canExecute(parameterizedCommand, staticContext);
-			Object obj = HandlerServiceImpl.lookUpHandler(context, command.getId());
-			if (obj != null) {
-				if (obj instanceof IHandler) {
-					commandHandled = ((IHandler) obj).isHandled();
-				} else {
-					commandHandled = true;
-				}
-			}
+			commandHandled = HandlerServiceImpl.lookUpHandler(context, command.getId()) != null;
 
-			handlerService.executeHandler(parameterizedCommand, staticContext);
-			final Object commandException = staticContext.get(HandlerServiceImpl.HANDLER_EXCEPTION);
-			if (commandException instanceof CommandException) {
+			try {
+				handlerService.executeHandler(parameterizedCommand, staticContext);
+			} catch (final Exception e) {
 				commandHandled = false;
-				if (logger != null && commandException instanceof ExecutionException) {
-					logger.error((Throwable) commandException);
+				if (logger != null) {
+					logger.error(e);
 				}
 			}
 			/*
@@ -305,12 +294,6 @@ public class KeyBindingDispatcher {
 		return (commandDefined && commandHandled);
 	}
 
-	private IEclipseContext createContext(final Event trigger) {
-		final IEclipseContext staticContext = EclipseContextFactory.create("keys-staticContext"); //$NON-NLS-1$
-		staticContext.set(Event.class, trigger);
-		return staticContext;
-	}
-
 	/**
 	 * <p>
 	 * Launches the command matching a the typed key. This filter an incoming
@@ -324,7 +307,7 @@ public class KeyBindingDispatcher {
 	 * useful work does it try to process key bindings. For example, "ESC" can cancel the current
 	 * widget action, if there is one, without triggering key bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param event
 	 *            The incoming event; must not be <code>null</code>.
 	 */
@@ -388,14 +371,14 @@ public class KeyBindingDispatcher {
 
 	private EBindingService getBindingService() {
 		if (bindingService == null) {
-			bindingService = context.get(EBindingService.class);
+			bindingService = (EBindingService) context.get(EBindingService.class.getName());
 		}
 		return bindingService;
 	}
 
 	private EHandlerService getHandlerService() {
 		if (handlerService == null) {
-			handlerService = context.get(EHandlerService.class);
+			handlerService = (EHandlerService) context.get(EHandlerService.class.getName());
 		}
 		return handlerService;
 	}
@@ -406,7 +389,7 @@ public class KeyBindingDispatcher {
 
 	/**
 	 * An accessor for the filter that processes key down and traverse events on the display.
-	 *
+	 * 
 	 * @return The global key down and traverse filter; never <code>null</code>.
 	 */
 	public KeyDownFilter getKeyDownFilter() {
@@ -414,11 +397,24 @@ public class KeyBindingDispatcher {
 	}
 
 	/**
+	 * Determines whether the key sequence is a perfect match for any command. If there is a match,
+	 * then the corresponding command identifier is returned.
+	 * 
+	 * @param keySequence
+	 *            The key sequence to check for a match; must never be <code>null</code>.
+	 * @return The perfectly matching command; <code>null</code> if no command matches.
+	 */
+	private ParameterizedCommand getPerfectMatch(KeySequence keySequence) {
+		Binding perfectMatch = getBindingService().getPerfectMatch(keySequence);
+		return perfectMatch == null ? null : perfectMatch.getParameterizedCommand();
+	}
+
+	/**
 	 * Changes the key binding state to the given value. This should be an incremental change, but
 	 * there are no checks to guarantee this is so. It also sets up a <code>Shell</code> to be
 	 * displayed after one second has elapsed. This shell will show the user the possible
 	 * completions for what they have typed.
-	 *
+	 * 
 	 * @param sequence
 	 *            The new key sequence for the state; should not be <code>null</code>.
 	 */
@@ -428,10 +424,13 @@ public class KeyBindingDispatcher {
 		startTime = System.currentTimeMillis();
 		final long myStartTime = startTime;
 		final Display display = getDisplay();
-		display.timerExec(DELAY, () -> {
-			if ((System.currentTimeMillis() > (myStartTime - DELAY)) && (startTime == myStartTime)) {
-				Collection<Binding> partialMatches = bindingService.getPartialMatches(sequence);
-				openKeyAssistShell(partialMatches);
+		display.timerExec(DELAY, new Runnable() {
+			public void run() {
+				if ((System.currentTimeMillis() > (myStartTime - DELAY))
+						&& (startTime == myStartTime)) {
+					Collection<Binding> partialMatches = bindingService.getPartialMatches(sequence);
+					openKeyAssistShell(partialMatches);
+				}
 			}
 		});
 
@@ -454,7 +453,7 @@ public class KeyBindingDispatcher {
 
 	/**
 	 * Determines whether the key sequence partially matches on of the active key bindings.
-	 *
+	 * 
 	 * @param keySequence
 	 *            The key sequence to check for a partial match; must never be <code>null</code>.
 	 * @return <code>true</code> if there is a partial match; <code>false</code> otherwise.
@@ -464,38 +463,14 @@ public class KeyBindingDispatcher {
 	}
 
 	/**
-	 * Determines whether the key sequence perfectly matches on of the active key
-	 * bindings.
-	 *
+	 * Determines whether the key sequence perfectly matches on of the active key bindings.
+	 * 
 	 * @param keySequence
-	 *            The key sequence to check for a perfect match; must never be
-	 *            <code>null</code>.
-	 * @param context
-	 * @return <code>true</code> if there is a perfect match; <code>false</code>
-	 *         otherwise.
+	 *            The key sequence to check for a perfect match; must never be <code>null</code>.
+	 * @return <code>true</code> if there is a perfect match; <code>false</code> otherwise.
 	 */
-	private boolean isUniqueMatch(KeySequence keySequence, IEclipseContext context) {
-		return getBindingService().isPerfectMatch(keySequence)
-				|| getExecutableMatches(keySequence, context).size() == 1;
-	}
-
-	/**
-	 * @param keySequence
-	 * @param context2
-	 * @return
-	 */
-	private Collection<Binding> getExecutableMatches(KeySequence keySequence, IEclipseContext context2) {
-		Binding binding = getBindingService().getPerfectMatch(keySequence);
-		if (binding != null) {
-			return Collections.singleton(binding);
-		}
-		Collection<Binding> conflicts = getBindingService().getConflictsFor(keySequence);
-		if (conflicts != null) {
-			return conflicts.stream()
-					.filter(match -> getHandlerService().canExecute(match.getParameterizedCommand(), context))
-					.collect(Collectors.toList());
-		}
-		return Collections.emptySet();
+	private boolean isPerfectMatch(KeySequence keySequence) {
+		return getBindingService().isPerfectMatch(keySequence);
 	}
 
 	/**
@@ -507,18 +482,16 @@ public class KeyBindingDispatcher {
 		KeySequence errorSequence = null;
 		Collection<Binding> errorMatch = null;
 
-		IEclipseContext createContext = createContext(event);
 		KeySequence sequenceBeforeKeyStroke = state;
-		for (KeyStroke keyStroke : potentialKeyStrokes) {
+		for (Iterator<KeyStroke> iterator = potentialKeyStrokes.iterator(); iterator.hasNext();) {
 			KeySequence sequenceAfterKeyStroke = KeySequence.getInstance(sequenceBeforeKeyStroke,
-					keyStroke);
+					iterator.next());
 			if (isPartialMatch(sequenceAfterKeyStroke)) {
 				incrementState(sequenceAfterKeyStroke);
 				return true;
 
-			} else if (isUniqueMatch(sequenceAfterKeyStroke, createContext)) {
-				final ParameterizedCommand cmd = getExecutableMatches(sequenceAfterKeyStroke, context).iterator().next()
-						.getParameterizedCommand();
+			} else if (isPerfectMatch(sequenceAfterKeyStroke)) {
+				final ParameterizedCommand cmd = getPerfectMatch(sequenceAfterKeyStroke);
 				try {
 					return executeCommand(cmd, event) || !sequenceBeforeKeyStroke.isEmpty();
 				} catch (final CommandException e) {
@@ -535,10 +508,11 @@ public class KeyBindingDispatcher {
 				return false;
 
 			} else {
-				Collection<Binding> errorMatches = getExecutableMatches(sequenceAfterKeyStroke, context);
-				if (errorMatches != null && !errorMatches.isEmpty()) {
+				Collection<Binding> matches = getBindingService().getConflictsFor(
+						sequenceAfterKeyStroke);
+				if (matches != null && !matches.isEmpty()) {
 					errorSequence = sequenceAfterKeyStroke;
-					errorMatch = errorMatches;
+					errorMatch = matches;
 				}
 			}
 		}
@@ -560,7 +534,7 @@ public class KeyBindingDispatcher {
 	 * If the active <code>Shell</code> is not the same as the one to which the state is associated,
 	 * then a reset occurs.
 	 * </p>
-	 *
+	 * 
 	 * @param keyStrokes
 	 *            The set of all possible matching key strokes; must not be <code>null</code>.
 	 * @param event

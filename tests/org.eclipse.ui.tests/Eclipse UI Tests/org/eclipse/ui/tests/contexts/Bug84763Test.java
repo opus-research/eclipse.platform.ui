@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
  * that the context manager was exposing its internal data structures, and the
  * binding manager was mangling them. Debug then responded to bad information in
  * the <code>previouslyEnabledContextIds</code> property on the context event.
- *
+ * 
  * @since 3.1
  */
 public final class Bug84763Test extends UITestCase {
@@ -65,11 +65,11 @@ public final class Bug84763Test extends UITestCase {
 	 * manager event. This value is set to <code>null</code> at the end of
 	 * each test.
 	 */
-	private Set<String> previousContextIds = null;
+	private Set previousContextIds = null;
 
 	/**
 	 * Constructor for <code>Bug84763Test</code>.
-	 *
+	 * 
 	 * @param name
 	 *            The name of the test
 	 */
@@ -81,18 +81,16 @@ public final class Bug84763Test extends UITestCase {
 	 * Creates a new context manager and a binding manager for use in the test
 	 * cases.
 	 */
-	@Override
 	protected void doSetUp() {
 		contextManager = new ContextManager();
 		contextManagerListener = new IContextManagerListener() {
 
-			@Override
 			public void contextManagerChanged(
 					ContextManagerEvent contextManagerEvent) {
 				previousContextIds = contextManagerEvent
 						.getPreviouslyActiveContextIds();
 				if (previousContextIds != null) {
-					previousContextIds = new HashSet<>(previousContextIds);
+					previousContextIds = new HashSet(previousContextIds);
 				}
 			}
 
@@ -105,7 +103,6 @@ public final class Bug84763Test extends UITestCase {
 	/**
 	 * Releases the context manager and binding manager for garbage collection.
 	 */
-	@Override
 	protected void doTearDown() {
 		contextManager = null;
 		contextManagerListener = null;
@@ -119,7 +116,7 @@ public final class Bug84763Test extends UITestCase {
 	 * context manager. In particular, whether the list of previous enabled
 	 * context identifiers will be changed.
 	 * </p>
-	 *
+	 * 
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 * @throws ParseException
@@ -157,7 +154,7 @@ public final class Bug84763Test extends UITestCase {
 		bindingManager.getActiveBindingsFor((ParameterizedCommand) null);
 
 		// Activate the dialog context and the sibling.
-		final Set<String> activeContextIds = new HashSet<>();
+		final Set activeContextIds = new HashSet();
 		activeContextIds.add(IContextIds.CONTEXT_ID_DIALOG);
 		activeContextIds.add(IContextIds.CONTEXT_ID_DIALOG_AND_WINDOW);
 		activeContextIds.add(windowChildContext.getId());

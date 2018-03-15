@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
@@ -34,14 +35,14 @@ public class FinishedJobs extends EventManager {
 
 		/**
 		 * A job to be kept has finished
-		 *
+		 * 
 		 * @param jte
 		 */
 		void finished(JobTreeElement jte);
 
 		/**
 		 * A kept job has been removed.
-		 *
+		 * 
 		 * @param jte
 		 */
 		void removed(JobTreeElement jte);
@@ -67,30 +68,24 @@ public class FinishedJobs extends EventManager {
 
 	private FinishedJobs() {
 		listener = new IJobProgressManagerListener() {
-			@Override
 			public void addJob(JobInfo info) {
 				checkForDuplicates(info);
 			}
 
-			@Override
 			public void addGroup(GroupInfo info) {
 				checkForDuplicates(info);
 			}
 
-			@Override
 			public void refreshJobInfo(JobInfo info) {
 				checkTasks(info);
 			}
 
-			@Override
 			public void refreshGroup(GroupInfo info) {
 			}
 
-			@Override
 			public void refreshAll() {
 			}
 
-			@Override
 			public void removeJob(JobInfo info) {
 				if (keep(info)) {
 					checkForDuplicates(info);
@@ -98,11 +93,9 @@ public class FinishedJobs extends EventManager {
 				}
 			}
 
-			@Override
 			public void removeGroup(GroupInfo group) {
 			}
 
-			@Override
 			public boolean showsDebug() {
 				return false;
 			}
@@ -153,9 +146,10 @@ public class FinishedJobs extends EventManager {
 	}
 
 	private void checkForDuplicates(GroupInfo info) {
-		for (Object child : info.getChildren()) {
-			if (child instanceof JobInfo) {
-				checkForDuplicates((JobInfo) child);
+		Object[] objects = info.getChildren();
+		for (int i = 0; i < objects.length; i++) {
+			if (objects[i] instanceof JobInfo) {
+				checkForDuplicates((JobInfo) objects[i]);
 			}
 		}
 	}
@@ -163,8 +157,8 @@ public class FinishedJobs extends EventManager {
 	private void checkForDuplicates(JobTreeElement info) {
 		JobTreeElement[] toBeRemoved = findJobsToRemove(info);
 		if (toBeRemoved != null) {
-			for (JobTreeElement element : toBeRemoved) {
-				remove(element);
+			for (int i = 0; i < toBeRemoved.length; i++) {
+				remove(toBeRemoved[i]);
 			}
 		}
 	}
@@ -175,24 +169,27 @@ public class FinishedJobs extends EventManager {
 	private void add(JobInfo info) {
 		boolean fire = false;
 
-		if (!keptjobinfos.contains(info)) {
-			keptjobinfos.add(info);
+		synchronized (keptjobinfos) {
+			if (!keptjobinfos.contains(info)) {
+				keptjobinfos.add(info);
 
-			long now = System.currentTimeMillis();
-			finishedTime.put(info, Long.valueOf(now));
+				long now = System.currentTimeMillis();
+				finishedTime.put(info, new Long(now));
 
-			Object parent = info.getParent();
-			if (!(parent == null || keptjobinfos.contains(parent))) {
-				keptjobinfos.add(parent);
-				finishedTime.put(parent, Long.valueOf(now));
+				Object parent = info.getParent();
+				if (!(parent == null || keptjobinfos.contains(parent))) {
+					keptjobinfos.add(parent);
+					finishedTime.put(parent, new Long(now));
+				}
+
+				fire = true;
 			}
-
-			fire = true;
 		}
 
 		if (fire) {
-			for (Object listener : getListeners()) {
-				KeptJobsListener jv = (KeptJobsListener) listener;
+			Object l[] = getListeners();
+			for (int i = 0; i < l.length; i++) {
+				KeptJobsListener jv = (KeptJobsListener) l[i];
 				jv.finished(info);
 			}
 		}
@@ -219,20 +216,25 @@ public class FinishedJobs extends EventManager {
 
 			if (myJob != null) {
 
-				Object prop = myJob.getProperty(ProgressManagerUtil.KEEPONE_PROPERTY);
+				Object prop = myJob
+						.getProperty(ProgressManagerUtil.KEEPONE_PROPERTY);
 				if (prop instanceof Boolean && ((Boolean) prop).booleanValue()) {
 					ArrayList found = null;
 					JobTreeElement[] all;
-					all = (JobTreeElement[]) keptjobinfos.toArray(new JobTreeElement[keptjobinfos.size()]);
-					for (JobTreeElement jobTreeElement : all) {
-						if (jobTreeElement != info && jobTreeElement.isJobInfo()) {
-							Job job = ((JobInfo) jobTreeElement).getJob();
+					synchronized (keptjobinfos) {
+						all = (JobTreeElement[]) keptjobinfos
+								.toArray(new JobTreeElement[keptjobinfos.size()]);
+					}
+					for (int i = 0; i < all.length; i++) {
+						JobTreeElement jte = all[i];
+						if (jte != info && jte.isJobInfo()) {
+							Job job = ((JobInfo) jte).getJob();
 							if (job != null && job != myJob
 									&& job.belongsTo(myJob)) {
 								if (found == null) {
 									found = new ArrayList();
 								}
-								found.add(jobTreeElement);
+								found.add(jte);
 							}
 						}
 					}
@@ -253,21 +255,25 @@ public class FinishedJobs extends EventManager {
 				JobTreeElement[] toBeRemoved = null;
 				boolean fire = false;
 				JobTreeElement element = (JobTreeElement) tinfo.getParent();
-				if (element == info && !keptjobinfos.contains(tinfo)) {
-					toBeRemoved = findJobsToRemove(element);
-					keptjobinfos.add(tinfo);
-					finishedTime.put(tinfo, new Long(System.currentTimeMillis()));
+				synchronized (keptjobinfos) {
+					if (element == info && !keptjobinfos.contains(tinfo)) {
+						toBeRemoved = findJobsToRemove(element);
+						keptjobinfos.add(tinfo);
+						finishedTime.put(tinfo, new Long(System
+								.currentTimeMillis()));
+					}
 				}
 
 				if (toBeRemoved != null) {
-					for (JobTreeElement jobTreeElement : toBeRemoved) {
-						remove(jobTreeElement);
+					for (int i = 0; i < toBeRemoved.length; i++) {
+						remove(toBeRemoved[i]);
 					}
 				}
 
 				if (fire) {
-					for (Object listener : getListeners()) {
-						KeptJobsListener jv = (KeptJobsListener) listener;
+					Object l[] = getListeners();
+					for (int i = 0; i < l.length; i++) {
+						KeptJobsListener jv = (KeptJobsListener) l[i];
 						jv.finished(info);
 					}
 				}
@@ -277,9 +283,9 @@ public class FinishedJobs extends EventManager {
 
 	public void removeErrorJobs() {
 		JobTreeElement[] infos = getKeptElements();
-		for (JobTreeElement info : infos) {
-			if (info.isJobInfo()) {
-				JobInfo info1 = (JobInfo) info;
+		for (int i = 0; i < infos.length; i++) {
+			if (infos[i].isJobInfo()) {
+				JobInfo info1 = (JobInfo) infos[i];
 				Job job = info1.getJob();
 				if (job != null) {
 					IStatus status = job.getResult();
@@ -300,32 +306,37 @@ public class FinishedJobs extends EventManager {
 		boolean fire = false;
 		boolean removed = false;
 
-		if (keptjobinfos.remove(jte)) {
-			removed = true;
-			finishedTime.remove(jte);
-			disposeAction(jte);
+		synchronized (keptjobinfos) {
+			if (keptjobinfos.remove(jte)) {
+				removed = true;
+				finishedTime.remove(jte);
+				disposeAction(jte);
 
-			// delete all elements that have jte as their direct or indirect
-			// parent
-			JobTreeElement jtes[] = (JobTreeElement[]) keptjobinfos.toArray(new JobTreeElement[keptjobinfos.size()]);
-			for (JobTreeElement jobTreeElement : jtes) {
-				JobTreeElement parent = (JobTreeElement) jobTreeElement.getParent();
-				if (parent != null) {
-					if (parent == jte || parent.getParent() == jte) {
-						if (keptjobinfos.remove(jobTreeElement)) {
-							disposeAction(jobTreeElement);
+				// delete all elements that have jte as their direct or indirect
+				// parent
+				JobTreeElement jtes[] = (JobTreeElement[]) keptjobinfos
+						.toArray(new JobTreeElement[keptjobinfos.size()]);
+				for (int i = 0; i < jtes.length; i++) {
+					JobTreeElement parent = (JobTreeElement) jtes[i]
+							.getParent();
+					if (parent != null) {
+						if (parent == jte || parent.getParent() == jte) {
+							if (keptjobinfos.remove(jtes[i])) {
+								disposeAction(jtes[i]);
+							}
+							finishedTime.remove(jtes[i]);
 						}
-						finishedTime.remove(jobTreeElement);
 					}
 				}
+				fire = true;
 			}
-			fire = true;
 		}
 
 		if (fire) {
 			// notify listeners
-			for (Object listener : getListeners()) {
-				KeptJobsListener jv = (KeptJobsListener) listener;
+			Object l[] = getListeners();
+			for (int i = 0; i < l.length; i++) {
+				KeptJobsListener jv = (KeptJobsListener) l[i];
 				jv.removed(jte);
 			}
 		}
@@ -345,13 +356,13 @@ public class FinishedJobs extends EventManager {
 			all = (JobTreeElement[]) keptjobinfos
 					.toArray(new JobTreeElement[keptjobinfos.size()]);
 		}
-
+		
 		return all;
 	}
 
 	/**
 	 * Get the date that indicates the finish time.
-	 *
+	 * 
 	 * @param jte
 	 * @return Date
 	 */
@@ -365,7 +376,7 @@ public class FinishedJobs extends EventManager {
 
 	/**
 	 * Return whether or not the kept infos have the element.
-	 *
+	 * 
 	 * @param element
 	 * @return boolean
 	 */
@@ -380,16 +391,17 @@ public class FinishedJobs extends EventManager {
 		synchronized (keptjobinfos) {
 			JobTreeElement[] all = (JobTreeElement[]) keptjobinfos
 					.toArray(new JobTreeElement[keptjobinfos.size()]);
-			for (JobTreeElement jobTreeElement : all) {
-				disposeAction(jobTreeElement);
+			for (int i = 0; i < all.length; i++) {
+				disposeAction(all[i]);
 			}
 			keptjobinfos.clear();
 			finishedTime.clear();
 		}
 
 		// notify listeners
-		for (Object listener : getListeners()) {
-			KeptJobsListener jv = (KeptJobsListener) listener;
+		Object l[] = getListeners();
+		for (int i = 0; i < l.length; i++) {
+			KeptJobsListener jv = (KeptJobsListener) l[i];
 			jv.removed(null);
 		}
 	}

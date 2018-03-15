@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,8 +20,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.equinox.bidi.StructuredTextTypeHandlerFactory;
-import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -43,7 +41,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
  */
 public class ResourceAndContainerGroup implements Listener {
 	// problem identifiers
-
+	
 	/**
 	 * Constant for no problem.
 	 */
@@ -78,7 +76,7 @@ public class ResourceAndContainerGroup implements Listener {
 	 */
 	public static final int PROBLEM_NAME_INVALID = 7;
 
-
+	
 	/**
 	 * Constant for path already occupied.
 	 */
@@ -108,7 +106,7 @@ public class ResourceAndContainerGroup implements Listener {
 
 	/**
 	 * The resource extension for the resource name field.
-	 *
+	 * 
 	 * @see ResourceAndContainerGroup#setResourceExtension(String)
 	 * @since 3.3
 	 */
@@ -120,7 +118,7 @@ public class ResourceAndContainerGroup implements Listener {
 	/**
 	 * Create an instance of the group to allow the user to enter/select a
 	 * container and specify a resource name.
-	 *
+	 * 
 	 * @param parent
 	 *            composite widget to parent the group
 	 * @param client
@@ -139,7 +137,7 @@ public class ResourceAndContainerGroup implements Listener {
 	/**
 	 * Create an instance of the group to allow the user to enter/select a
 	 * container and specify a resource name.
-	 *
+	 * 
 	 * @param parent
 	 *            composite widget to parent the group
 	 * @param client
@@ -162,7 +160,7 @@ public class ResourceAndContainerGroup implements Listener {
 	/**
 	 * Create an instance of the group to allow the user to enter/select a
 	 * container and specify a resource name.
-	 *
+	 * 
 	 * @param parent
 	 *            composite widget to parent the group
 	 * @param client
@@ -190,7 +188,7 @@ public class ResourceAndContainerGroup implements Listener {
 	/**
 	 * Returns a boolean indicating whether all controls in this group contain
 	 * valid values.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	public boolean areAllValuesValid() {
@@ -199,7 +197,7 @@ public class ResourceAndContainerGroup implements Listener {
 
 	/**
 	 * Creates this object's visual components.
-	 *
+	 * 
 	 * @param parent
 	 *            org.eclipse.swt.widgets.Composite
 	 * @param heightHint
@@ -246,7 +244,6 @@ public class ResourceAndContainerGroup implements Listener {
 		resourceNameField = new Text(nameGroup, SWT.BORDER);
 		resourceNameField.addListener(SWT.Modify, this);
 		resourceNameField.addFocusListener(new FocusAdapter() {
-			@Override
 			public void focusLost(FocusEvent e) {
 				handleResourceNameFocusLostEvent();
 			}
@@ -256,7 +253,6 @@ public class ResourceAndContainerGroup implements Listener {
 		data.widthHint = SIZING_TEXT_FIELD_WIDTH;
 		resourceNameField.setLayoutData(data);
 		resourceNameField.setFont(font);
-		BidiUtils.applyBidiProcessing(resourceNameField, StructuredTextTypeHandlerFactory.FILE);
 		validateControls();
 	}
 
@@ -264,7 +260,7 @@ public class ResourceAndContainerGroup implements Listener {
 	 * Returns the path of the currently selected container or null if no
 	 * container has been selected. Note that the container may not exist yet if
 	 * the user entered a new container name in the field.
-	 *
+	 * 
 	 * @return The path of the container, or <code>null</code>
 	 */
 	public IPath getContainerFullPath() {
@@ -275,7 +271,7 @@ public class ResourceAndContainerGroup implements Listener {
 	 * Returns an error message indicating the current problem with the value of
 	 * a control in the group, or an empty message if all controls in the group
 	 * contain valid values.
-	 *
+	 * 
 	 * @return java.lang.String
 	 */
 	public String getProblemMessage() {
@@ -284,7 +280,7 @@ public class ResourceAndContainerGroup implements Listener {
 
 	/**
 	 * Returns the type of problem with the value of a control in the group.
-	 *
+	 * 
 	 * @return one of the PROBLEM_* constants
 	 */
 	public int getProblemType() {
@@ -297,9 +293,9 @@ public class ResourceAndContainerGroup implements Listener {
 	 * <br>
 	 * The name will include the resource extension if the preconditions are
 	 * met.
-	 *
+	 * 
 	 * @see ResourceAndContainerGroup#setResourceExtension(String)
-	 *
+	 * 
 	 * @return The resource name
 	 * @since 3.3
 	 */
@@ -313,7 +309,7 @@ public class ResourceAndContainerGroup implements Listener {
 
 	/**
 	 * Returns the resource extension.
-	 *
+	 * 
 	 * @return The resource extension or <code>null</code>.
 	 * @see ResourceAndContainerGroup#setResourceExtension(String)
 	 * @since 3.3
@@ -326,7 +322,7 @@ public class ResourceAndContainerGroup implements Listener {
 	 * Determines whether the resource extension should be added to the resource
 	 * name field. <br>
 	 * <br>
-	 *
+	 * 
 	 * @see ResourceAndContainerGroup#setResourceExtension(String)
 	 * @return <code>true</code> if the preconditions are met; otherwise,
 	 *         <code>false</code>.
@@ -346,7 +342,7 @@ public class ResourceAndContainerGroup implements Listener {
 	 * Handle the focus lost event from the resource name field. <br>
 	 * Adds the resource extension to the resource name field when it loses
 	 * focus (if the preconditions are met).
-	 *
+	 * 
 	 * @see ResourceAndContainerGroup#setResourceExtension(String)
 	 * @since 3.3
 	 */
@@ -358,11 +354,10 @@ public class ResourceAndContainerGroup implements Listener {
 
 	/**
 	 * Handles events for all controls in the group.
-	 *
+	 * 
 	 * @param e
 	 *            org.eclipse.swt.widgets.Event
 	 */
-	@Override
 	public void handleEvent(Event e) {
 		validateControls();
 		if (client != null) {
@@ -380,7 +375,7 @@ public class ResourceAndContainerGroup implements Listener {
 
 	/**
 	 * Sets the value of this page's container.
-	 *
+	 * 
 	 * @param path
 	 *            Full path to the container.
 	 */
@@ -407,7 +402,7 @@ public class ResourceAndContainerGroup implements Listener {
 
 	/**
 	 * Sets the value of this page's resource name.
-	 *
+	 * 
 	 * @param value
 	 *            new value
 	 */
@@ -430,7 +425,7 @@ public class ResourceAndContainerGroup implements Listener {
 	 * <br>
 	 * The resource extension will not be reflected in the actual resource name
 	 * field until the resource name field loses focus.
-	 *
+	 * 
 	 * @param value
 	 *            The resource extension without the '.' prefix (e.g. 'java',
 	 *            'xml')
@@ -446,7 +441,7 @@ public class ResourceAndContainerGroup implements Listener {
 	 * represents a valid container resource in the workbench. An error message
 	 * is stored for future reference if the name does not represent a valid
 	 * container.
-	 *
+	 * 
 	 * @return <code>boolean</code> indicating validity of the container name
 	 */
 	protected boolean validateContainer() {
@@ -507,7 +502,7 @@ public class ResourceAndContainerGroup implements Listener {
 	 * resource path represents a valid new resource in the workbench. An error
 	 * message is stored for future reference if the path does not represent a
 	 * valid new resource path.
-	 *
+	 * 
 	 * @param resourcePath
 	 *            the path to validate
 	 * @return <code>boolean</code> indicating validity of the resource path
@@ -540,7 +535,7 @@ public class ResourceAndContainerGroup implements Listener {
 	 * rep- resents a valid resource name in the workbench. An error message is
 	 * stored for future reference if the name does not represent a valid
 	 * resource name.
-	 *
+	 * 
 	 * @return <code>boolean</code> indicating validity of the resource name
 	 */
 	protected boolean validateResourceName() {
@@ -565,7 +560,7 @@ public class ResourceAndContainerGroup implements Listener {
 
 	/**
 	 * Returns the flag indicating whether existing resources are permitted.
-	 *
+	 * 
 	 * @return The allow existing resources flag.
 	 * @see ResourceAndContainerGroup#setAllowExistingResources(boolean)
 	 * @since 3.4

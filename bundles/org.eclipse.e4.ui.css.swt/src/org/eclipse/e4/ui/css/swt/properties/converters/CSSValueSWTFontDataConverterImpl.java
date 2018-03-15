@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Angelo Zerr and others.
+ * Copyright (c) 2008, 2010 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,7 +43,6 @@ public class CSSValueSWTFontDataConverterImpl extends AbstractCSSValueConverter 
 		super(FontData.class);
 	}
 
-	@Override
 	public Object convert(CSSValue value, CSSEngine engine, Object context)
 			throws Exception {
 		FontData fontData = null;
@@ -77,39 +76,31 @@ public class CSSValueSWTFontDataConverterImpl extends AbstractCSSValueConverter 
 		return null;
 	}
 
-	@Override
 	public String convert(Object value, CSSEngine engine, Object context,
 			ICSSValueConverterConfig config) throws Exception {
 		FontData fontData = (FontData) value;
 		if (context instanceof String) {
 			String property = (String) context;
-			if ("font-family".equals(property)) {
+			if ("font-family".equals(property))
 				return CSSSWTFontHelper.getFontFamily(fontData);
-			}
-			if ("font-size".equals(property)) {
+			if ("font-size".equals(property))
 				return CSSSWTFontHelper.getFontSize(fontData);
-			}
-			if ("font-style".equals(property)) {
+			if ("font-style".equals(property))
 				return CSSSWTFontHelper.getFontStyle(fontData);
-			}
-			if ("font-weight".equals(property)) {
+			if ("font-weight".equals(property))
 				return CSSSWTFontHelper.getFontWeight(fontData);
-			}
-			if ("font".equals(property)) {
+			if ("font".equals(property))
 				return CSSSWTFontHelper.getFontComposite(fontData);
-			}
 		}
 		return null;
 
 	}
 
 	protected Display getDisplay(Object context) {
-		if (context instanceof Display) {
+		if (context instanceof Display)
 			return (Display) context;
-		}
-		if (context instanceof Control) {
+		if (context instanceof Control)
 			return ((Control) context).getDisplay();
-		}
 		return null;
 	}
 }

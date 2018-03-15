@@ -30,10 +30,10 @@ public class EmptyPerspective implements IPerspectiveFactory {
     public static final String PERSP_ID2 = "org.eclipse.ui.tests.harness.util.EmptyPerspective2";
 
     private static String LastPerspective;
-
+    
     /**
      * Returns the descriptor for the perspective last opened using this factory.
-     *
+     * 
      * @return the descriptor for the perspective last opened using this factory, or <code>null</code>
      */
 	public static String getLastPerspective() {
@@ -42,13 +42,13 @@ public class EmptyPerspective implements IPerspectiveFactory {
 
     /**
      * Sets the descriptor for the perspective last opened using this factory.
-     *
+     * 
      * @param persp the descriptor for the perspective last opened using this factory, or <code>null</code>
      */
 	public static void setLastPerspective(String perspId) {
 		LastPerspective = perspId;
 	}
-
+    
     /**
      * Constructs a new Default layout engine.
      */
@@ -57,7 +57,7 @@ public class EmptyPerspective implements IPerspectiveFactory {
     }
 
     /**
-     * Defines the initial layout for a perspective.
+     * Defines the initial layout for a perspective.  
      *
      * Implementors of this method may add additional views to a
      * perspective.  The perspective already contains an editor folder
@@ -70,8 +70,7 @@ public class EmptyPerspective implements IPerspectiveFactory {
      *
      * @param factory the factory used to add views to the perspective
      */
-    @Override
-	public void createInitialLayout(IPageLayout layout) {
+    public void createInitialLayout(IPageLayout layout) {
     	setLastPerspective(layout.getDescriptor().getId());
         // do no layout, this is the empty perspective
     }

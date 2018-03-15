@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,15 +22,17 @@ import org.eclipse.ui.navigator.ILinkHelper;
 import org.eclipse.ui.part.FileEditorInput;
 
 /**
- *
+ * 
  * Links IFileEditorInput to IFiles, and vice versa.
- *
+ * 
  * @since 3.2
  *
  */
 public class ResourceLinkHelper implements ILinkHelper {
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ILinkHelper#findSelection(org.eclipse.ui.IEditorInput)
+	 */
 	public IStructuredSelection findSelection(IEditorInput anInput) {
 		IFile file = ResourceUtil.getFile(anInput);
 		if (file != null) {
@@ -39,7 +41,9 @@ public class ResourceLinkHelper implements ILinkHelper {
 		return StructuredSelection.EMPTY;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ILinkHelper#activateEditor(org.eclipse.ui.IWorkbenchPage, org.eclipse.jface.viewers.IStructuredSelection)
+	 */
 	public void activateEditor(IWorkbenchPage aPage,
 			IStructuredSelection aSelection) {
 		if (aSelection == null || aSelection.isEmpty())

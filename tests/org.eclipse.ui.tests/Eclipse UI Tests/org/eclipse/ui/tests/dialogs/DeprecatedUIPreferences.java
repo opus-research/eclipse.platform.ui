@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,8 @@ package org.eclipse.ui.tests.dialogs;
 
 import java.util.Iterator;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -22,7 +24,7 @@ import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.help.WorkbenchHelp;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -31,8 +33,6 @@ import org.eclipse.ui.internal.dialogs.PropertyPageContributorManager;
 import org.eclipse.ui.internal.dialogs.PropertyPageManager;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.tests.harness.util.DialogCheck;
-
-import junit.framework.TestCase;
 
 public class DeprecatedUIPreferences extends TestCase {
 	private IProject _project;
@@ -51,9 +51,9 @@ public class DeprecatedUIPreferences extends TestCase {
 		try {
 			IProject projects[] = ResourcesPlugin.getWorkspace().getRoot()
 					.getProjects();
-			for (IProject project : projects) {
-				if (project.getName().equals(PROJECT_NAME)) {
-					project.delete(true, null);
+			for (int i = 0; i < projects.length; i++) {
+				if (projects[i].getName().equals(PROJECT_NAME)) {
+					projects[i].delete(true, null);
 					break;
 				}
 			}
@@ -73,11 +73,14 @@ public class DeprecatedUIPreferences extends TestCase {
 		if (manager != null) {
 			dialog = new PreferenceDialogWrapper(getShell(), manager);
 			dialog.create();
-			PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),
-					IWorkbenchHelpContextIds.PREFERENCE_DIALOG);
+			WorkbenchHelp
+					.setHelp(
+							dialog.getShell(),
+							new Object[] { IWorkbenchHelpContextIds.PREFERENCE_DIALOG });
 
-			for (Object element : manager.getElements(PreferenceManager.PRE_ORDER)) {
-				IPreferenceNode node = (IPreferenceNode) element;
+			for (Iterator iterator = manager.getElements(
+					PreferenceManager.PRE_ORDER).iterator(); iterator.hasNext();) {
+				IPreferenceNode node = (IPreferenceNode) iterator.next();
 				if (node.getId().equals(id)) {
 					dialog.showPage(node);
 					break;
@@ -103,13 +106,14 @@ public class DeprecatedUIPreferences extends TestCase {
 		PropertyPageContributorManager.getManager()
 				.contribute(manager, element);
 
-		IWorkbenchAdapter adapter = element.getAdapter(IWorkbenchAdapter.class);
+		IWorkbenchAdapter adapter = (IWorkbenchAdapter) element
+				.getAdapter(IWorkbenchAdapter.class);
 		if (adapter != null) {
 			name = adapter.getLabel(element);
 		}
 
 		// testing if there are pages in the manager
-		Iterator<IPreferenceNode> pages = manager.getElements(PreferenceManager.PRE_ORDER)
+		Iterator pages = manager.getElements(PreferenceManager.PRE_ORDER)
 				.iterator();
 		if (!pages.hasNext()) {
 			return null;
@@ -120,9 +124,11 @@ public class DeprecatedUIPreferences extends TestCase {
 				new StructuredSelection(element));
 		dialog.create();
 		dialog.getShell().setText(title);
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IWorkbenchHelpContextIds.PROPERTY_DIALOG);
-		for (Object element2 : manager.getElements(PreferenceManager.PRE_ORDER)) {
-			IPreferenceNode node = (IPreferenceNode) element2;
+		WorkbenchHelp.setHelp(dialog.getShell(),
+				new Object[] { IWorkbenchHelpContextIds.PROPERTY_DIALOG });
+		for (Iterator iterator = manager.getElements(
+				PreferenceManager.PRE_ORDER).iterator(); iterator.hasNext();) {
+			IPreferenceNode node = (IPreferenceNode) iterator.next();
 			if (node.getId().equals(id)) {
 				dialog.showPage(node);
 				break;
@@ -134,41 +140,41 @@ public class DeprecatedUIPreferences extends TestCase {
 
 	public void testWorkbenchPref() {
 		Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.Workbench");
-		DialogCheck.assertDialog(dialog);
+		DialogCheck.assertDialog(dialog, this);
 	}
 
 	public void testAppearancePref() {
 		Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.Views");
-		DialogCheck.assertDialog(dialog);
+		DialogCheck.assertDialog(dialog, this);
 	}
 
 	public void testDefaultTextEditorPref() {
 		Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.TextEditor");
-		DialogCheck.assertDialog(dialog);
+		DialogCheck.assertDialog(dialog, this);
 	}
 
 	public void testFileEditorsPref() {
 		Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.FileEditors");
-		DialogCheck.assertDialog(dialog);
+		DialogCheck.assertDialog(dialog, this);
 	}
 
 	public void testLocalHistoryPref() {
 		Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.FileStates");
-		DialogCheck.assertDialog(dialog);
+		DialogCheck.assertDialog(dialog, this);
 	}
 
 	public void testPerspectivesPref() {
 		Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.Perspectives");
-		DialogCheck.assertDialog(dialog);
+		DialogCheck.assertDialog(dialog, this);
 	}
 
 	public void testInfoProp() {
 		Dialog dialog = getPropertyDialog("org.eclipse.ui.propertypages.info.file");
-		DialogCheck.assertDialog(dialog);
+		DialogCheck.assertDialog(dialog, this);
 	}
 
 	public void testProjectReferencesProp() {
 		Dialog dialog = getPropertyDialog("org.eclipse.ui.propertypages.project.reference");
-		DialogCheck.assertDialog(dialog);
+		DialogCheck.assertDialog(dialog, this);
 	}
 }

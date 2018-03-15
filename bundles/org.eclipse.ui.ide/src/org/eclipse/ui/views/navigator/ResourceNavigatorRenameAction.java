@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,6 @@ import org.eclipse.ui.actions.RenameResourceAction;
  * @since 2.0
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class ResourceNavigatorRenameAction extends RenameResourceAction {
     private TreeViewer viewer;
 
@@ -44,8 +43,10 @@ public class ResourceNavigatorRenameAction extends RenameResourceAction {
         this.viewer = treeViewer;
     }
 
-    @Override
-	protected void runWithNewPath(IPath path, IResource resource) {
+    /* (non-Javadoc)
+     * Run the action to completion using the supplied path.
+     */
+    protected void runWithNewPath(IPath path, IResource resource) {
         IWorkspaceRoot root = resource.getProject().getWorkspace().getRoot();
         super.runWithNewPath(path, resource);
         if (this.viewer != null) {

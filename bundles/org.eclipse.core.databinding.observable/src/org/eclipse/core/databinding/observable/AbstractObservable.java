@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,22 +30,18 @@ public abstract class AbstractObservable extends ChangeManager implements IObser
 		ObservableTracker.observableCreated(this);
 	}
 
-	@Override
 	public synchronized void addChangeListener(IChangeListener listener) {
 		addListener(ChangeEvent.TYPE, listener);
 	}
 
-	@Override
 	public synchronized void removeChangeListener(IChangeListener listener) {
 		removeListener(ChangeEvent.TYPE, listener);
 	}
 
-	@Override
 	public synchronized void addStaleListener(IStaleListener listener) {
 		addListener(StaleEvent.TYPE, listener);
 	}
 
-	@Override
 	public synchronized void removeStaleListener(IStaleListener listener) {
 		removeListener(StaleEvent.TYPE, listener);
 	}
@@ -53,7 +49,6 @@ public abstract class AbstractObservable extends ChangeManager implements IObser
 	/**
 	 * @since 1.2
 	 */
-	@Override
 	public synchronized void addDisposeListener(IDisposeListener listener) {
 		addListener(DisposeEvent.TYPE, listener);
 	}
@@ -61,7 +56,6 @@ public abstract class AbstractObservable extends ChangeManager implements IObser
 	/**
 	 * @since 1.2
 	 */
-	@Override
 	public synchronized void removeDisposeListener(IDisposeListener listener) {
 		removeListener(DisposeEvent.TYPE, listener);
 	}
@@ -79,15 +73,13 @@ public abstract class AbstractObservable extends ChangeManager implements IObser
 	/**
 	 * @since 1.2
 	 */
-	@Override
 	public synchronized boolean isDisposed() {
 		return disposed;
 	}
 
 	/**
-	 *
+	 * 
 	 */
-	@Override
 	public synchronized void dispose() {
 		if (!disposed) {
 			disposed = true;
@@ -98,7 +90,7 @@ public abstract class AbstractObservable extends ChangeManager implements IObser
 
 	/**
 	 * Asserts that the realm is the current realm.
-	 *
+	 * 
 	 * @see Realm#isCurrent()
 	 * @throws AssertionFailedException if the realm is not the current realm
 	 */

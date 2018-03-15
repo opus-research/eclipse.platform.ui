@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.ui.IMemento;
  *
  */
 public abstract class MarkerFieldFilter {
-
+	
 	private MarkerField field;
 
 	/**
@@ -30,16 +30,16 @@ public abstract class MarkerFieldFilter {
 	 * @return boolean <code>true</code> if the marker should be shown.
 	 */
 	public abstract boolean select(MarkerItem item);
-
+	
 	/**
 	 * Initialise the receiver with the values in the values Map.
 	 * @param values
 	 * @see FiltersContributionParameters
 	 */
-	public void initialize(Map/*<String, String>*/ values) {
+	public void initialize(Map values){
 		//Do nothing by default
 	}
-
+	
 	/**
 	 * Populate the working copy with the copy of whatever fields are required.
 	 * @param copy
@@ -54,7 +54,7 @@ public abstract class MarkerFieldFilter {
 	 */
 	public final void setField(MarkerField markerField) {
 		field = markerField;
-
+		
 	}
 
 	/**

@@ -54,8 +54,7 @@ public class ResourceNavigatorTest extends UITestCase {
         super(testName);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         workbenchWindow = openTestWindow();
         activePage = workbenchWindow.getActivePage();
@@ -74,12 +73,10 @@ public class ResourceNavigatorTest extends UITestCase {
             p2 = FileUtil.createProject("TP2");
             f2 = null;
         }
-        if (f1 == null) {
-			f1 = FileUtil.createFile("f1.txt", p1);
-		}
-        if (f2 == null) {
-			f2 = FileUtil.createFile("f2.txt", p2);
-		}
+        if (f1 == null)
+            f1 = FileUtil.createFile("f1.txt", p1);
+        if (f2 == null)
+            f2 = FileUtil.createFile("f2.txt", p2);
     }
 
     public void fixTestGlobalBookmarkAction() throws Throwable {
@@ -107,11 +104,11 @@ public class ResourceNavigatorTest extends UITestCase {
                 oldCount + 1 == newCount);
     }
 
-    /*
+    /*	
      * This test should be moved to an interactive test suite as this
      * test causes a dialog to popup when the resource is deleted by
      * the delete action
-     *
+     * 
      public void testGlobalDeleteAction() throws Throwable {
      setupView();
      setupResources();
@@ -119,10 +116,10 @@ public class ResourceNavigatorTest extends UITestCase {
      // Select a file
      IStructuredSelection sel = new StructuredSelection(f1);
      ((ResourceNavigator) view).selectReveal(sel);
-
+     
      // Now try the delete action
      ActionUtil.runActionUsingPath(this, workbenchWindow, IWorkbenchActionConstants.M_EDIT + '/' + IWorkbenchActionConstants.DELETE);
-
+     
      // Make sure the resource was deleted
      assertTrue("Selected file was not deleted via Edit->Delete action.", p1.findMember(f1.getName()) == null);
      f1 = null;
@@ -140,7 +137,8 @@ public class ResourceNavigatorTest extends UITestCase {
         IStructuredSelection sel1 = new StructuredSelection(f1);
         part.selectReveal(sel1);
         // Get the selection the tree has
-		IStructuredSelection treeSel1 = tree.getStructuredSelection();
+        IStructuredSelection treeSel1 = (IStructuredSelection) tree
+                .getSelection();
         assertTrue("First selection wrong size, should be only one.", treeSel1
                 .size() == 1);
         IResource resource1 = (IResource) treeSel1.getFirstElement();
@@ -151,7 +149,8 @@ public class ResourceNavigatorTest extends UITestCase {
         IStructuredSelection sel2 = new StructuredSelection(p2);
         part.selectReveal(sel2);
         // Get the selection the tree has
-		IStructuredSelection treeSel2 = tree.getStructuredSelection();
+        IStructuredSelection treeSel2 = (IStructuredSelection) tree
+                .getSelection();
         assertTrue("Second selection wrong size, should be only one.", treeSel2
                 .size() == 1);
         IResource resource2 = (IResource) treeSel2.getFirstElement();

@@ -31,7 +31,7 @@ public class UIErrorDialogs extends TestCase {
     }
 
     /*
-     * Get an example ErrorDialog with a status and a couple of
+     * Get an example ErrorDialog with a status and a couple of 
      * child statuses.
      */
     private ErrorDialog getMultiStatusErrorDialog() {
@@ -50,7 +50,7 @@ public class UIErrorDialogs extends TestCase {
 
     public void testErrorClipboard() {
         Dialog dialog = getMultiStatusErrorDialog();
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 
 }

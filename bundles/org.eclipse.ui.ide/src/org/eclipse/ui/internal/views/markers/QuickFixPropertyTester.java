@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,9 +15,9 @@ import org.eclipse.ui.ide.IDE;
 
 /**
  * QuickFixPropertyTester is the property tester for the quick fix object.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class QuickFixPropertyTester extends PropertyTester {
 
@@ -30,7 +30,9 @@ public class QuickFixPropertyTester extends PropertyTester {
 		super();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object, java.lang.String, java.lang.Object[], java.lang.Object)
+	 */
 	public boolean test(Object receiver, String property, Object[] args,
 			Object expectedValue) {
 		if (property.equals(QUICK_FIX))

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 /**
  *	Operation for exporting a resource and its children to a new .zip or
  *  .tar.gz file.
- *
+ *  
  *  @since 3.1
  */
 public class ArchiveFileExportOperation implements IRunnableWithProgress {
@@ -43,16 +43,14 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
 
     private IProgressMonitor monitor;
 
-	private List<? extends IResource> resourcesToExport;
+    private List resourcesToExport;
 
     private IResource resource;
 
-	private List<IStatus> errorTable = new ArrayList<>(1); // IStatus
+    private List errorTable = new ArrayList(1); //IStatus
 
     private boolean useCompression = true;
-
-	private boolean resolveLinks = false;
-
+    
     private boolean useTarFormat = false;
 
     private boolean createLeadupStructure = true;
@@ -64,13 +62,13 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      *	@param resources java.util.Vector
      *	@param filename java.lang.String
      */
-	public ArchiveFileExportOperation(List<? extends IResource> resources, String filename) {
+    public ArchiveFileExportOperation(List resources, String filename) {
         super();
 
         // Eliminate redundancies in list of resources being exported
-		Iterator<? extends IResource> elementsEnum = resources.iterator();
+        Iterator elementsEnum = resources.iterator();
         while (elementsEnum.hasNext()) {
-            IResource currentResource = elementsEnum.next();
+            IResource currentResource = (IResource) elementsEnum.next();
             if (isDescendent(resources, currentResource)) {
 				elementsEnum.remove(); //Removes currentResource;
 			}
@@ -102,7 +100,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      *  @param resources java.util.Vector
      *  @param filename java.lang.String
      */
-	public ArchiveFileExportOperation(IResource res, List<IResource> resources, String filename) {
+    public ArchiveFileExportOperation(IResource res, List resources, String filename) {
         this(res, filename);
         resourcesToExport = resources;
     }
@@ -129,8 +127,9 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
 
         int count = 0;
         if (checkResource.isAccessible()) {
-			for (IResource child : ((IContainer) checkResource).members()) {
-				count += countChildrenOf(child);
+            IResource[] children = ((IContainer) checkResource).members();
+            for (int i = 0; i < children.length; i++) {
+				count += countChildrenOf(children[i]);
 			}
         }
 
@@ -145,9 +144,9 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      */
     protected int countSelectedResources() throws CoreException {
         int result = 0;
-		Iterator<? extends IResource> resources = resourcesToExport.iterator();
+        Iterator resources = resourcesToExport.iterator();
         while (resources.hasNext()) {
-			result += countChildrenOf(resources.next());
+			result += countChildrenOf((IResource) resources.next());
 		}
 
         return result;
@@ -163,7 +162,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
             throws InterruptedException {
         exportResource(exportResource, 1);
     }
-
+    
     /**
      * Creates and returns the string that should be used as the name of the entry in the archive.
      * @param exportResource the resource to export
@@ -174,7 +173,8 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
         if (createLeadupStructure) {
         	return fullPath.makeRelative().toString();
         }
-		return fullPath.removeFirstSegments(fullPath.segmentCount() - leadupDepth).makeRelative().toString();
+		return fullPath.removeFirstSegments(
+                fullPath.segmentCount() - leadupDepth).toString();
     }
 
     /**
@@ -186,7 +186,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      */
     protected void exportResource(IResource exportResource, int leadupDepth)
             throws InterruptedException {
-		if (!exportResource.isAccessible() || (!resolveLinks && exportResource.isLinked())) {
+        if (!exportResource.isAccessible()) {
 			return;
 		}
 
@@ -213,7 +213,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
                 // this should never happen because an #isAccessible check is done before #members is invoked
                 addError(NLS.bind(DataTransferMessages.DataTransfer_errorExporting, exportResource.getFullPath()), e);
             }
-
+            
             if (children.length == 0) { // create an entry for empty containers, see bug 278402
             	String destinationName = createDestinationName(leadupDepth, exportResource);
                 try {
@@ -223,8 +223,8 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
                 }
             }
 
-            for (IResource child : children) {
-				exportResource(child, leadupDepth + 1);
+            for (int i = 0; i < children.length; i++) {
+				exportResource(children[i], leadupDepth + 1);
 			}
 
         }
@@ -235,10 +235,10 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      *	resourcesToExport collection
      */
     protected void exportSpecifiedResources() throws InterruptedException {
-		Iterator<? extends IResource> resources = resourcesToExport.iterator();
+        Iterator resources = resourcesToExport.iterator();
 
         while (resources.hasNext()) {
-            IResource currentResource = resources.next();
+            IResource currentResource = (IResource) resources.next();
             exportResource(currentResource);
         }
     }
@@ -269,9 +269,9 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      */
     protected void initialize() throws IOException {
     	if(useTarFormat) {
-    		exporter = new TarFileExporter(destinationFilename, useCompression, resolveLinks);
+    		exporter = new TarFileExporter(destinationFilename, useCompression);
     	} else {
-        	exporter = new ZipFileExporter(destinationFilename, useCompression, resolveLinks);
+        	exporter = new ZipFileExporter(destinationFilename, useCompression);
     	}
     }
 
@@ -283,7 +283,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      *  @param resources java.util.Vector
      *  @param child org.eclipse.core.resources.IResource
      */
-	protected boolean isDescendent(List<? extends IResource> resources, IResource child) {
+    protected boolean isDescendent(List resources, IResource child) {
         if (child.getType() == IResource.PROJECT) {
 			return false;
 		}
@@ -300,8 +300,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      *	Export the resources that were previously specified for export
      *	(or if a single resource was specified then export it recursively)
      */
-    @Override
-	public void run(IProgressMonitor progressMonitor)
+    public void run(IProgressMonitor progressMonitor)
             throws InvocationTargetException, InterruptedException {
         this.monitor = progressMonitor;
 
@@ -362,25 +361,14 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
     public void setUseCompression(boolean value) {
         useCompression = value;
     }
-
+    
     /**
      * Set this boolean indicating whether the file should be output
      * in tar.gz format rather than .zip format.
-     *
+     * 
      * @param value boolean
      */
     public void setUseTarFormat(boolean value) {
     	useTarFormat = value;
     }
-
-	/**
-	 * Set this boolean indicating whether linked resources should be resolved
-	 * and exported (as opposed to simply ignored)
-	 *
-	 * @param value
-	 *            boolean
-	 */
-	public void setIncludeLinkedResources(boolean value) {
-		resolveLinks = value;
-	}
 }

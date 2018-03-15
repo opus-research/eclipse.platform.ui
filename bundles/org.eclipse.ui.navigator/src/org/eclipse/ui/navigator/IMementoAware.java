@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,9 +16,9 @@ import org.eclipse.ui.IMemento;
  * Clients may use mementos to persist interesting state between sessions.
  * Clients should ensure that the memento keys are unique; generally by using
  * the id of the content extension as a prefix.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public interface IMementoAware {
 
@@ -28,7 +28,7 @@ public interface IMementoAware {
 	 * This method allows the state of any actions that persist from session to
 	 * session to be restored.
 	 * </p>
-	 *
+	 * 
 	 * @param aMemento
 	 *            A memento that was given to the view part to restore its
 	 *            state.
@@ -44,7 +44,7 @@ public interface IMementoAware {
 	 * Extensions should qualify any keys stored in the memento with their
 	 * plugin id
 	 * </p>
-	 *
+	 * 
 	 * @param aMemento
 	 *            A memento that was given to the view part to save its state.
 	 */

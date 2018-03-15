@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import org.eclipse.ui.IWorkbenchPage;
  * by the <b>org.eclipse.ui.navigator.linkHelper </b> extension
  * point to gather information and trigger editor activations.
  * </p>
- *
+ *  
  * @since 3.2
  */
 public interface ILinkHelper {
@@ -35,7 +35,7 @@ public interface ILinkHelper {
 	 * Determine the correct structured selection for the Common Navigator given
 	 * anInput.
 	 * </p>
-	 *
+	 * 
 	 * @param anInput
 	 *            An Editor input
 	 * @return A selection to be set against the {@link CommonViewer}
@@ -46,7 +46,7 @@ public interface ILinkHelper {
 	 * <p>
 	 * Activate the correct editor for aSelection.
 	 * </p>
-	 *
+	 * 
 	 * @param aPage
 	 *            A WorkbenchPage to use for editor location and activation
 	 * @param aSelection

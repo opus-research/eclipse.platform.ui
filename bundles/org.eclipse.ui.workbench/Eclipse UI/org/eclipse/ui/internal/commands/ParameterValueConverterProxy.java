@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
  * A proxy for a parameter value converter that has been defined in the regisry.
  * This delays the class loading until the converter is really asked to do
  * string/object conversions.
- *
+ * 
  * @since 3.2
  */
 public final class ParameterValueConverterProxy extends
@@ -42,7 +42,7 @@ public final class ParameterValueConverterProxy extends
 	/**
 	 * Constructs a <code>ParameterValueConverterProxy</code> to represent the
 	 * real converter until it is needed.
-	 *
+	 * 
 	 * @param converterConfigurationElement
 	 *            The configuration element from which the real converter can be
 	 *            loaded.
@@ -57,13 +57,11 @@ public final class ParameterValueConverterProxy extends
 		this.converterConfigurationElement = converterConfigurationElement;
 	}
 
-	@Override
 	public final Object convertToObject(final String parameterValue)
 			throws ParameterValueConversionException {
 		return getConverter().convertToObject(parameterValue);
 	}
 
-	@Override
 	public final String convertToString(final Object parameterValue)
 			throws ParameterValueConversionException {
 		return getConverter().convertToString(parameterValue);
@@ -72,7 +70,7 @@ public final class ParameterValueConverterProxy extends
 	/**
 	 * Returns the real parameter value converter for this proxy or throws an
 	 * exception indicating the converter could not be obtained.
-	 *
+	 * 
 	 * @return the real converter for this proxy; never <code>null</code>.
 	 * @throws ParameterValueConversionException
 	 *             if the converter could not be obtained

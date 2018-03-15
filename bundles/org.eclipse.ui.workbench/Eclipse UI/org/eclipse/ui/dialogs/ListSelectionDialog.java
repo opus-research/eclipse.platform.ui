@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- * 	   Sebastian Davids <sdavids@gmx.de> - Fix for bug 90273 - [Dialogs]
+ * 	   Sebastian Davids <sdavids@gmx.de> - Fix for bug 90273 - [Dialogs] 
  * 			ListSelectionDialog dialog alignment
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,6 +21,8 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -98,7 +98,7 @@ public class ListSelectionDialog extends SelectionDialog {
 			setMessage(message);
 		} else {
 			setMessage(WorkbenchMessages.ListSelection_message);
-		}
+		} 
     }
 
     /**
@@ -117,18 +117,26 @@ public class ListSelectionDialog extends SelectionDialog {
         Button selectButton = createButton(buttonComposite,
                 IDialogConstants.SELECT_ALL_ID, SELECT_ALL_TITLE, false);
 
-        SelectionListener listener = widgetSelectedAdapter(e -> listViewer.setAllChecked(true));
+        SelectionListener listener = new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                listViewer.setAllChecked(true);
+            }
+        };
         selectButton.addSelectionListener(listener);
 
         Button deselectButton = createButton(buttonComposite,
                 IDialogConstants.DESELECT_ALL_ID, DESELECT_ALL_TITLE, false);
 
-        listener = widgetSelectedAdapter(e -> listViewer.setAllChecked(false));
+        listener = new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                listViewer.setAllChecked(false);
+            }
+        };
         deselectButton.addSelectionListener(listener);
     }
 
     /**
-     * Visually checks the previously-specified elements in this dialog's list
+     * Visually checks the previously-specified elements in this dialog's list 
      * viewer.
      */
     private void checkInitialSelections() {
@@ -139,20 +147,25 @@ public class ListSelectionDialog extends SelectionDialog {
 		}
     }
 
-    @Override
-	protected void configureShell(Shell shell) {
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+     */
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IWorkbenchHelpContextIds.LIST_SELECTION_DIALOG);
     }
 
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected Control createDialogArea(Composite parent) {
         // page group
         Composite composite = (Composite) super.createDialogArea(parent);
-
+        
         initializeDialogUnits(composite);
-
+        
         createMessageArea(composite);
 
         listViewer = CheckboxTableViewer.newCheckList(composite, SWT.BORDER);
@@ -174,13 +187,13 @@ public class ListSelectionDialog extends SelectionDialog {
 		}
 
         Dialog.applyDialogFont(composite);
-
+        
         return composite;
     }
 
     /**
      * Returns the viewer used to show the list.
-     *
+     * 
      * @return the viewer, or <code>null</code> if not yet created
      */
     protected CheckboxTableViewer getViewer() {
@@ -195,12 +208,11 @@ public class ListSelectionDialog extends SelectionDialog {
     }
 
     /**
-     * The <code>ListSelectionDialog</code> implementation of this
+     * The <code>ListSelectionDialog</code> implementation of this 
      * <code>Dialog</code> method builds a list of the selected elements for later
      * retrieval by the client and closes this dialog.
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
 
         // Get the input children.
         Object[] children = contentProvider.getElements(inputElement);
@@ -208,7 +220,8 @@ public class ListSelectionDialog extends SelectionDialog {
         // Build a list of selected children.
         if (children != null) {
             ArrayList list = new ArrayList();
-            for (Object element : children) {
+            for (int i = 0; i < children.length; ++i) {
+                Object element = children[i];
                 if (listViewer.getChecked(element)) {
 					list.add(element);
 				}

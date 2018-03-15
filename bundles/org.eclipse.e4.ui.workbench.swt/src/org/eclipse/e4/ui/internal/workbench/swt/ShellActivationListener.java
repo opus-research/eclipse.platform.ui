@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,11 +15,12 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
-import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -50,7 +51,6 @@ public class ShellActivationListener implements Listener {
 		this.application = application;
 	}
 
-	@Override
 	public void handleEvent(Event event) {
 		if (!(event.widget instanceof Shell)) {
 			return;
@@ -81,22 +81,18 @@ public class ShellActivationListener implements Listener {
 	private void processWindow(Event event, Shell shell, MWindow window) {
 		switch (event.type) {
 		case SWT.Activate:
-			final IEclipseContext local = window.getContext();
-			if (Policy.DEBUG_WORKBENCH) {
-				WorkbenchSWTActivator.trace(Policy.DEBUG_WORKBENCH_FLAG,
-						"setting mwindow context " + local, null);
-			}
+			final IEclipseContext local = ((MWindow) window).getContext();
+			WorkbenchSWTActivator.trace("/trace/workbench",
+					"setting mwindow context " + local, null);
 			// record this shell's context
 			shell.setData(ECLIPSE_CONTEXT_SHELL_CONTEXT, local);
 
 			SafeRunner.run(new ISafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					// reconstruct the active chain for this mwindow
 					local.activateBranch();
 				}
 
-				@Override
 				public void handleException(Throwable exception) {
 					WorkbenchSWTActivator.trace("/trace/workbench",
 							"failed correcting context chain", exception);
@@ -105,10 +101,8 @@ public class ShellActivationListener implements Listener {
 			break;
 		case SWT.Deactivate:
 			Object context = window.getContext();
-			if(Policy.DEBUG_WORKBENCH) {
-				WorkbenchSWTActivator.trace(Policy.DEBUG_WORKBENCH_FLAG,
-						"setting mwindow context " + context, null);
-			}
+			WorkbenchSWTActivator.trace("/trace/workbench",
+					"setting mwindow context " + context, null);
 			// record this shell's context
 			shell.setData(ECLIPSE_CONTEXT_SHELL_CONTEXT, context);
 			break;
@@ -121,13 +115,11 @@ public class ShellActivationListener implements Listener {
 				parentContext);
 
 		SafeRunner.run(new ISafeRunnable() {
-			@Override
 			public void run() throws Exception {
 				// activate this shell
 				shellContext.activate();
 			}
 
-			@Override
 			public void handleException(Throwable exception) {
 				WorkbenchSWTActivator.trace("/trace/workbench",
 						"failed setting dialog child", exception);
@@ -137,14 +129,36 @@ public class ShellActivationListener implements Listener {
 	}
 
 	private void deactivate(Shell shell) {
-		// bug 412001. Cannot assume anything about a non-modelled Shell's
-		// deactivation. It could be:
-		// * some other application got activated
-		// * some dialog we cannot see (IE's Find dialog in 412001) get's
-		// activated
-		// * another unmodelled shell is about to be activated
-		// * a modelled shell is about to be activated.
-		// No matter what, the time to do things is on activation
+		Shell parent = shell.isDisposed() ? null : (Shell) shell.getParent();
+		if (parent == null) {
+			// no parent shell, clear the chain to reflect reality, if there are
+			// other shells, the chain will be reconstructed on activation
+			IEclipseContext currentlyActive = application.getContext()
+					.getActiveChild();
+			if (currentlyActive != null)
+				currentlyActive.deactivate();
+			return;
+		}
+		final IEclipseContext prevChild = (IEclipseContext) parent
+				.getData(ECLIPSE_CONTEXT_SHELL_CONTEXT);
+		final IEclipseContext parentContext = application.getContext();
+		SafeRunner.run(new ISafeRunnable() {
+			public void run() throws Exception {
+				if (prevChild == null) {
+					IEclipseContext activeChild = parentContext.getActiveChild();
+					if (activeChild != null) {
+						activeChild.deactivate();
+					}
+				} else {
+					prevChild.activate();
+				}
+			}
+
+			public void handleException(Throwable exception) {
+				WorkbenchSWTActivator.trace("/trace/workbench",
+						"failed resetting previous child", exception);
+			}
+		});
 
 	}
 
@@ -152,7 +166,7 @@ public class ShellActivationListener implements Listener {
 	 * Retrieves the eclipse context for the specified shell. If one cannot be
 	 * found, a child context will be created off of the provided parent
 	 * context.
-	 *
+	 * 
 	 * @param shell
 	 *            the shell of interest, must not be <code>null</code>
 	 * @param parentContext
@@ -178,9 +192,11 @@ public class ShellActivationListener implements Listener {
 		EContextService contextService = context.get(EContextService.class);
 		contextService.activateContext(EBindingService.DIALOG_CONTEXT_ID);
 
-		shell.addDisposeListener(e -> {
-			deactivate(shell);
-			context.dispose();
+		shell.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+				deactivate(shell);
+				context.dispose();
+			}
 		});
 
 		return context;

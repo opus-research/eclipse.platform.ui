@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -27,7 +27,7 @@ import org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTest
  * properties view before the migration to the tabbed properties view and the
  * override tabs support. When elements are selected in the OverrideTestsView,
  * TabFolder/TabItem are displayed for the elements.
- *
+ * 
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -37,7 +37,11 @@ public abstract class AbstractTabFolder implements IOverrideTestsTabFolder {
 
 	private CTabFolder tabFolder;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see asd.views.folders.ISampleViewFolder#addSampleViewItemSelectionListener(asd.views.folders.ISampleViewItemSelectionListener)
+	 */
 	public void addItemSelectionListener(
 			IOverrideTestsTabItemSelectionListener listener) {
 		itemSelectionListeners.add(listener);
@@ -45,17 +49,20 @@ public abstract class AbstractTabFolder implements IOverrideTestsTabFolder {
 
 	/**
 	 * Determines if this folder applies to the element.
-	 *
+	 * 
 	 * @param element
 	 *            the element.
 	 * @return <code>true</code> if this folder applies to the element.
 	 */
-	@Override
 	public boolean appliesTo(Element element) {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see asd.views.folders.IAaaFolder#createControls(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createControls(Composite composite) {
 		tabFolder = new CTabFolder(composite, SWT.NONE);
 
@@ -73,7 +80,6 @@ public abstract class AbstractTabFolder implements IOverrideTestsTabFolder {
 
 		tabFolder.addSelectionListener(new SelectionAdapter() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				CTabItem aTabItem = (CTabItem) e.item;
 				Object[] listeners = itemSelectionListeners.getListeners();
@@ -86,18 +92,30 @@ public abstract class AbstractTabFolder implements IOverrideTestsTabFolder {
 		});
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see asd.views.folders.IAaaFolder#dispose()
+	 */
 	public void dispose() {
 		tabFolder.dispose();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see asd.views.folders.ISampleViewFolder#removeSampleViewItemSelectionListener(asd.views.folders.ISampleViewItemSelectionListener)
+	 */
 	public void removeItemSelectionListener(
 			IOverrideTestsTabItemSelectionListener listener) {
 		itemSelectionListeners.remove(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see asd.views.folders.IAaaFolder#selectionChanged(asd.views.elements.IAaaElement)
+	 */
 	public void selectionChanged(Element element) {
 		CTabItem[] items = tabFolder.getItems();
 		for (int i = 0; i < items.length; i++) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,12 +14,17 @@ import com.ibm.icu.text.Collator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+
 import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -53,8 +58,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
     /**
      * @see PreferencePage#createContents(Composite)
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
 
         Font font = parent.getFont();
 
@@ -82,7 +86,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
         return mainComposite;
     }
 
-    /**
+    /** 
      * Creates the widgets for the list of decorators.
      */
     private void createDecoratorsArea(Composite mainComposite) {
@@ -107,8 +111,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
                 new GridData(GridData.FILL_BOTH));
         checkboxViewer.getTable().setFont(decoratorsComposite.getFont());
         checkboxViewer.setLabelProvider(new LabelProvider() {
-            @Override
-			public String getText(Object element) {
+            public String getText(Object element) {
                 return ((DecoratorDefinition) element).getName();
             }
         });
@@ -118,26 +121,22 @@ public class DecoratorsPreferencePage extends PreferencePage implements
             private final Comparator comparer = new Comparator() {
                 private Collator collator = Collator.getInstance();
 
-                @Override
-				public int compare(Object arg0, Object arg1) {
+                public int compare(Object arg0, Object arg1) {
                     String s1 = ((DecoratorDefinition) arg0).getName();
                     String s2 = ((DecoratorDefinition) arg1).getName();
                     return collator.compare(s1, s2);
                 }
             };
 
-            @Override
-			public void dispose() {
+            public void dispose() {
                 //Nothing to do on dispose
             }
 
-            @Override
-			public void inputChanged(Viewer viewer, Object oldInput,
+            public void inputChanged(Viewer viewer, Object oldInput,
                     Object newInput) {
             }
 
-            @Override
-			public Object[] getElements(Object inputElement) {
+            public Object[] getElements(Object inputElement) {
                 //Make an entry for each decorator definition
                 Object[] elements = (Object[]) inputElement;
                 Object[] results = new Object[elements.length];
@@ -149,25 +148,31 @@ public class DecoratorsPreferencePage extends PreferencePage implements
         });
 
         checkboxViewer
-                .addSelectionChangedListener(event -> {
-				    if (event.getSelection() instanceof IStructuredSelection) {
-				        IStructuredSelection sel = (IStructuredSelection) event
-				                .getSelection();
-				        DecoratorDefinition definition = (DecoratorDefinition) sel
-				                .getFirstElement();
-				        if (definition == null) {
-							clearDescription();
-						} else {
-							showDescription(definition);
-						}
-				    }
-				});
+                .addSelectionChangedListener(new ISelectionChangedListener() {
+                    public void selectionChanged(SelectionChangedEvent event) {
+                        if (event.getSelection() instanceof IStructuredSelection) {
+                            IStructuredSelection sel = (IStructuredSelection) event
+                                    .getSelection();
+                            DecoratorDefinition definition = (DecoratorDefinition) sel
+                                    .getFirstElement();
+                            if (definition == null) {
+								clearDescription();
+							} else {
+								showDescription(definition);
+							}
+                        }
+                    }
+                });
 
-        checkboxViewer.addCheckStateListener(event -> checkboxViewer.setSelection(new StructuredSelection(event
-		        .getElement())));
+        checkboxViewer.addCheckStateListener(new ICheckStateListener() {
+            public void checkStateChanged(CheckStateChangedEvent event) {
+                checkboxViewer.setSelection(new StructuredSelection(event
+                        .getElement()));
+            }
+        });
     }
 
-    /**
+    /** 
      * Creates the widgets for the description.
      */
     private void createDescriptionArea(Composite mainComposite) {
@@ -182,7 +187,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
         textComposite.setFont(mainFont);
 
         Label descriptionLabel = new Label(textComposite, SWT.NONE);
-        descriptionLabel.setText(WorkbenchMessages.DecoratorsPreferencePage_description);
+        descriptionLabel.setText(WorkbenchMessages.DecoratorsPreferencePage_description); 
         descriptionLabel.setFont(mainFont);
 
         descriptionText = new Text(textComposite, SWT.MULTI | SWT.WRAP
@@ -197,8 +202,8 @@ public class DecoratorsPreferencePage extends PreferencePage implements
     private void populateDecorators() {
         DecoratorDefinition[] definitions = getAllDefinitions();
         checkboxViewer.setInput(definitions);
-        for (DecoratorDefinition definition : definitions) {
-            checkboxViewer.setChecked(definition, definition
+        for (int i = 0; i < definitions.length; i++) {
+            checkboxViewer.setChecked(definitions[i], definitions[i]
                     .isEnabled());
         }
     }
@@ -231,12 +236,14 @@ public class DecoratorsPreferencePage extends PreferencePage implements
     /**
      * @see PreferencePage#performDefaults()
      */
-    @Override
-	protected void performDefaults() {
+    protected void performDefaults() {
         super.performDefaults();
-		DecoratorManager manager = WorkbenchPlugin.getDefault().getDecoratorManager();
-		for (DecoratorDefinition definition : manager.getAllDecoratorDefinitions()) {
-            checkboxViewer.setChecked(definition, definition
+        DecoratorManager manager = WorkbenchPlugin.getDefault()
+				.getDecoratorManager();
+        DecoratorDefinition[] definitions = manager
+                .getAllDecoratorDefinitions();
+        for (int i = 0; i < definitions.length; i++) {
+            checkboxViewer.setChecked(definitions[i], definitions[i]
                     .getDefaultValue());
         }
     }
@@ -244,15 +251,16 @@ public class DecoratorsPreferencePage extends PreferencePage implements
     /**
      * @see IPreferencePage#performOk()
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         if (super.performOk()) {
             DecoratorManager manager = getDecoratorManager();
             //Clear the caches first to avoid unneccessary updates
             manager.clearCaches();
-			for (DecoratorDefinition definition : manager.getAllDecoratorDefinitions()) {
-                boolean checked = checkboxViewer.getChecked(definition);
-                definition.setEnabled(checked);
+            DecoratorDefinition[] definitions = manager
+                    .getAllDecoratorDefinitions();
+            for (int i = 0; i < definitions.length; i++) {
+                boolean checked = checkboxViewer.getChecked(definitions[i]);
+                definitions[i].setEnabled(checked);
 
             }
             //Have the manager clear again as there may have been
@@ -267,8 +275,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
     /**
      * @see IWorkbenchPreferencePage#init(IWorkbench)
      */
-    @Override
-	public void init(IWorkbench workbench) {
+    public void init(IWorkbench workbench) {
     }
 
     /**
@@ -280,7 +287,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
 
     /**
      * Get the DecoratorManager being used for this page.
-     *
+     * 
      * @return the decorator manager
      */
     private DecoratorManager getDecoratorManager() {

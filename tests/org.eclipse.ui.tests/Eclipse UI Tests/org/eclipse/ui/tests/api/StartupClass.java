@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2017 IBM Corporation and others.
+ * Copyright (c) 2003, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
+import junit.framework.Assert;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IStartup;
-import org.junit.Assert;
 
 public class StartupClass implements IStartup {
 
@@ -29,8 +29,10 @@ public class StartupClass implements IStartup {
      */
     private static boolean earlyStartupCompleted = false;
 
-    @Override
-	public void earlyStartup() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IStartup#earlyStartup()
+     */
+    public void earlyStartup() {
         earlyStartupCalled = true;
         Assert.assertNull("IStartup should run in non-UI thread", Display.getCurrent());
         try {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.ui.internal.registry.RegistryReader;
 /**
  * WorkbenchEncoding is a utility class for plug-ins that want to use the list
  * of encodings defined by default in the workbench.
- *
+ * 
  * @since 3.1
  */
 public class WorkbenchEncoding {
@@ -37,8 +37,8 @@ public class WorkbenchEncoding {
 	 * The method for java.nio.charset.Charset.isSupported(String), or <code>null</code>
 	 * if not present.  Reflection is used here to allow compilation against JCL Foundation (bug 80053).
 	 */
-	private static Method CharsetIsSupportedMethod = null;
-
+	private static Method CharsetIsSupportedMethod = null; 
+	
 	static {
 		try {
 			Class charsetClass = Class.forName("java.nio.charset.Charset"); //$NON-NLS-1$
@@ -47,23 +47,27 @@ public class WorkbenchEncoding {
 		catch (Exception e) {
 			// ignore
 		}
-
+			
 	}
-
+	
 	private static class EncodingsRegistryReader extends RegistryReader {
-
+		
 		private List encodings;
-
+		
 		/**
 		 * Create a new instance of the receiver.
-		 * @param definedEncodings
+		 * @param definedEncodings 
 		 */
 		public EncodingsRegistryReader(List definedEncodings) {
 			super();
 			encodings = definedEncodings;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.registry.RegistryReader#readElement(org.eclipse.core.runtime.IConfigurationElement)
+		 */
 		protected boolean readElement(IConfigurationElement element) {
 			String name = element.getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
 			if (name != null) {
@@ -75,7 +79,7 @@ public class WorkbenchEncoding {
 
 	/**
 	 * Get the default encoding from the virtual machine.
-	 *
+	 * 
 	 * @return String
 	 */
 	public static String getWorkbenchDefaultEncoding() {
@@ -85,7 +89,7 @@ public class WorkbenchEncoding {
 	/**
 	 * Return the list of encodings defined using the org.eclipse.ui.encodings
 	 * extension point.
-	 *
+	 * 
 	 * @return List of String
 	 */
 	public static List getDefinedEncodings() {
@@ -118,9 +122,9 @@ public class WorkbenchEncoding {
 
 	/**
 	 * Returns whether the given encoding is supported in the current runtime.
-	 *
+	 * 
 	 * @param encoding the encoding to test
-	 * @return <code>true</code> if supported or if its support could not be determined,
+	 * @return <code>true</code> if supported or if its support could not be determined, 
 	 *   <code>false</code> if not supported
 	 */
 	private static boolean isSupported(String encoding) {
@@ -135,7 +139,7 @@ public class WorkbenchEncoding {
 		} catch (IllegalAccessException e) {
 			// fall through
 		} catch (InvocationTargetException e) {
-			// Method.invoke can throw InvocationTargetException if there is
+			// Method.invoke can throw InvocationTargetException if there is 
 			// an exception in the invoked method.
 			// Charset.isSupported() is specified to throw IllegalCharsetNameException only
 			// which we want to return false for.

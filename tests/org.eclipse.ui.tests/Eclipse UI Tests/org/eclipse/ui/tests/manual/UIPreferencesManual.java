@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.manual;
 
+import java.util.Iterator;
+
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -41,21 +43,21 @@ public class UIPreferencesManual extends UIPreferencesAuto {
             dialog = new PreferenceDialogWrapper(getShell(), manager);
             dialog.create();
 
-            for (Object element : manager.getElements(
-                    PreferenceManager.PRE_ORDER)) {
-            IPreferenceNode node = (IPreferenceNode) element;
-            if (node
-			    .getId()
-			    .equals(
-			            "org.eclipse.ui.tests.manual.BrokenUpdatePreferencePage")) {
-			dialog.showPage(node);
-			BrokenUpdatePreferencePage page = (BrokenUpdatePreferencePage) dialog
-			        .getPage(node);
-			page.changeFont();
-			page.changePluginPreference();
-			break;
+            for (Iterator iterator = manager.getElements(
+                    PreferenceManager.PRE_ORDER).iterator(); iterator.hasNext();) {
+                IPreferenceNode node = (IPreferenceNode) iterator.next();
+                if (node
+                        .getId()
+                        .equals(
+                                "org.eclipse.ui.tests.manual.BrokenUpdatePreferencePage")) {
+                    dialog.showPage(node);
+                    BrokenUpdatePreferencePage page = (BrokenUpdatePreferencePage) dialog
+                            .getPage(node);
+                    page.changeFont();
+                    page.changePluginPreference();
+                    break;
+                }
             }
-         }
         }
 
     }

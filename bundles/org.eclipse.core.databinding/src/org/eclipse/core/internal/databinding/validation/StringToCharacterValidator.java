@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 Matt Carter and others.
+ * Copyright (c) 2007, 2008 Matt Carter and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,11 @@ public class StringToCharacterValidator implements IValidator {
 		this.converter = converter;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.databinding.validation.IValidator#validate(java.lang.Object)
+	 */
 	public IStatus validate(Object value) {
 		try {
 			converter.convert(value);

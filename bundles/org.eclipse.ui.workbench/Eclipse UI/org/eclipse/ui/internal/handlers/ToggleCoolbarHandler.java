@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -27,13 +26,19 @@ import org.eclipse.ui.menus.UIElement;
 /**
  * Handler that toggles the visibility of the coolbar/perspective bar in a given
  * window.
- *
+ * 
  * @since 3.3
  */
 public class ToggleCoolbarHandler extends AbstractHandler implements
 		IElementUpdater {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
+	 * ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		final IWorkbenchWindow activeWorkbenchWindow = HandlerUtil
 				.getActiveWorkbenchWindowChecked(event);
@@ -45,9 +50,15 @@ public class ToggleCoolbarHandler extends AbstractHandler implements
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.
+	 * menus.UIElement, java.util.Map)
+	 */
 	public void updateElement(UIElement element, Map parameters) {
-		IWorkbenchLocationService wls = element
+		IWorkbenchLocationService wls = (IWorkbenchLocationService) element
 				.getServiceLocator()
 				.getService(IWorkbenchLocationService.class);
 		IWorkbenchWindow window = wls.getWorkbenchWindow();
@@ -60,7 +71,7 @@ public class ToggleCoolbarHandler extends AbstractHandler implements
 
 	/**
 	 * Return whether the coolbar is currently visible.
-	 *
+	 * 
 	 * @param window
 	 * 		the window to test
 	 * @return whether or not the coolbar is visible

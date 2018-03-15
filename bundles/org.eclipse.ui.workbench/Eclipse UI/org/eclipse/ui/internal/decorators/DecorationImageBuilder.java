@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,9 +20,9 @@ import org.eclipse.swt.graphics.RGB;
 /**
  * DecorationImageBuilder is a utility class for merging images without data
  * loss.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 class DecorationImageBuilder {
 
@@ -159,37 +159,38 @@ class DecorationImageBuilder {
 			img.dispose();
 		}
 		src = base;
-
-		maskDepth = Math.max(maskDepth, baseMaskDepth = getTransparencyDepth(src));
-		Image img = new Image(device, src);
-		gc.drawImage(img, 0, 0);
-		img.dispose();
-
+		if (base != null) {
+			maskDepth = Math.max(maskDepth,
+					baseMaskDepth = getTransparencyDepth(src));
+			Image img = new Image(device, src);
+			gc.drawImage(img, 0, 0);
+			img.dispose();
+		}
 		ImageData topLeft = src = overlay[TOP_LEFT];
 		if (src != null) {
 			maskDepth = Math.max(maskDepth, getTransparencyDepth(src));
-			img = new Image(device, src);
+			Image img = new Image(device, src);
 			gc.drawImage(img, 0, 0);
 			img.dispose();
 		}
 		ImageData topRight = src = overlay[TOP_RIGHT];
 		if (src != null) {
 			maskDepth = Math.max(maskDepth, getTransparencyDepth(src));
-			img = new Image(device, src);
+			Image img = new Image(device, src);
 			gc.drawImage(img, base.width - src.width, 0);
 			img.dispose();
 		}
 		ImageData bottomLeft = src = overlay[BOTTOM_LEFT];
 		if (src != null) {
 			maskDepth = Math.max(maskDepth, getTransparencyDepth(src));
-			img = new Image(device, src);
+			Image img = new Image(device, src);
 			gc.drawImage(img, 0, base.height - src.height);
 			img.dispose();
 		}
 		ImageData bottomRight = src = overlay[BOTTOM_RIGHT];
 		if (src != null) {
 			maskDepth = Math.max(maskDepth, getTransparencyDepth(src));
-			img = new Image(device, src);
+			Image img = new Image(device, src);
 			gc.drawImage(img, base.width - src.width, base.height - src.height);
 			img.dispose();
 		}

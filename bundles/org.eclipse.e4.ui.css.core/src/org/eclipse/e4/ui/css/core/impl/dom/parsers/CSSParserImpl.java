@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,10 +14,10 @@ import org.eclipse.e4.ui.css.core.dom.parsers.CSSParser;
 
 /**
  * {@link CSSParser} implementation.
- *
+ * 
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- *
+ * 
  */
 public class CSSParserImpl extends AbstractCSSParser {
 

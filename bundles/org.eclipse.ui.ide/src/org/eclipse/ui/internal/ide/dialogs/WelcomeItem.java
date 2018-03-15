@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -87,17 +87,17 @@ public class WelcomeItem {
      */
     public boolean isLinkAt(int offset) {
         // Check if there is a link at the offset
-        for (int[] helpRange : helpRanges) {
-            if (offset >= helpRange[0]
-                    && offset < helpRange[0] + helpRange[1]) {
+        for (int i = 0; i < helpRanges.length; i++) {
+            if (offset >= helpRanges[i][0]
+                    && offset < helpRanges[i][0] + helpRanges[i][1]) {
                 return true;
             }
         }
 
         // Check if there is an action link at the offset
-        for (int[] actionRange : actionRanges) {
-            if (offset >= actionRange[0]
-                    && offset < actionRange[0] + actionRange[1]) {
+        for (int i = 0; i < actionRanges.length; i++) {
+            if (offset >= actionRanges[i][0]
+                    && offset < actionRanges[i][0] + actionRanges[i][1]) {
                 return true;
             }
         }
@@ -132,7 +132,7 @@ public class WelcomeItem {
             logActionLinkError(pluginId, className);
             return;
         }
-		Class<?> actionClass;
+        Class actionClass;
         IAction action;
         try {
         	actionClass = pluginBundle.loadClass(className);

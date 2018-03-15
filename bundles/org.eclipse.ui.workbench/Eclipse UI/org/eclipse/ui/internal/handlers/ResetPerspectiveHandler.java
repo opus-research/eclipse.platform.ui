@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 IBM Corporation and others.
+ * Copyright (c) 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -34,7 +33,13 @@ import org.eclipse.ui.internal.registry.PerspectiveRegistry;
  */
 public class ResetPerspectiveHandler extends AbstractHandler {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
+	 * ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) {
 
 		IWorkbenchWindow activeWorkbenchWindow = HandlerUtil.getActiveWorkbenchWindow(event);
@@ -67,13 +72,12 @@ public class ResetPerspectiveHandler extends AbstractHandler {
 							page.resetPerspective();
 						}
 					} else {
-						String message = NLS.bind(WorkbenchMessages.ResetPerspective_message, descriptor.getLabel());
-
-						int result = MessageDialog.open(MessageDialog.CONFIRM, activeWorkbenchWindow.getShell(),
-								WorkbenchMessages.ResetPerspective_title, message, SWT.SHEET, WorkbenchMessages.ResetPerspective_buttonLabel,
-								IDialogConstants.NO_LABEL);
-
-						if (result == Window.OK) {
+						String message = NLS.bind(WorkbenchMessages.ResetPerspective_message,
+								descriptor.getLabel());
+						boolean result = MessageDialog.open(MessageDialog.QUESTION,
+								activeWorkbenchWindow.getShell(),
+								WorkbenchMessages.ResetPerspective_title, message, SWT.SHEET);
+						if (result) {
 							page.resetPerspective();
 						}
 					}

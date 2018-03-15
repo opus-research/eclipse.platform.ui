@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,8 @@ import org.eclipse.core.resources.mapping.ResourceTraversal;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ui.IWorkingSet;
 
 /**
@@ -34,7 +35,7 @@ import org.eclipse.ui.IWorkingSet;
 public class WorkingSetResourceMapping extends ResourceMapping {
 
 	private IWorkingSet set;
-
+	
 	/**
 	 * Create the resource mapping
 	 * @param workingSet the working set
@@ -43,38 +44,55 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 		set = workingSet;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.mapping.ResourceMapping#getModelObject()
+	 */
 	public Object getModelObject() {
 		return set;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.mapping.ResourceMapping#getModelProviderId()
+	 */
 	public String getModelProviderId() {
 		return ModelProvider.RESOURCE_MODEL_PROVIDER_ID;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.mapping.ResourceMapping#getProjects()
+	 */
 	public IProject[] getProjects() {
-		Set<IProject> result = new HashSet<>();
-		for (ResourceMapping mapping : getMappings()) {
-			for (IProject project : mapping.getProjects()) {
+		Set result = new HashSet();
+		ResourceMapping[] mappings = getMappings();
+		for (int i = 0; i < mappings.length; i++) {
+			ResourceMapping mapping = mappings[i];
+			IProject[] projects = mapping.getProjects();
+			for (int j = 0; j < projects.length; j++) {
+				IProject project = projects[j];
 				result.add(project);
 			}
 		}
-		return result.toArray(new IProject[result.size()]);
+		return (IProject[]) result.toArray(new IProject[result.size()]);
 	}
 
-	@Override
-	public ResourceTraversal[] getTraversals(ResourceMappingContext context, IProgressMonitor mon)
-			throws CoreException {
-		ResourceMapping[] mappings = getMappings();
-		SubMonitor subMonitor = SubMonitor.convert(mon, mappings.length);
-
-		List<ResourceTraversal> result = new ArrayList<>();
-		for (ResourceMapping mapping : mappings) {
-			result.addAll(Arrays.asList(mapping.getTraversals(context, subMonitor.split(1))));
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.mapping.ResourceMapping#getTraversals(org.eclipse.core.resources.mapping.ResourceMappingContext, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public ResourceTraversal[] getTraversals(ResourceMappingContext context, IProgressMonitor monitor) throws CoreException {
+		if (monitor == null)
+			monitor = new NullProgressMonitor();
+		try {
+			ResourceMapping[] mappings = getMappings();
+			monitor.beginTask("", 100 * mappings.length); //$NON-NLS-1$
+			List result = new ArrayList();
+			for (int i = 0; i < mappings.length; i++) {
+				ResourceMapping mapping = mappings[i];
+				result.addAll(Arrays.asList(mapping.getTraversals(context, new SubProgressMonitor(monitor, 100))));
+			}
+			return (ResourceTraversal[]) result.toArray(new ResourceTraversal[result.size()]);
+		} finally {
+			monitor.done();
 		}
-		return result.toArray(new ResourceTraversal[result.size()]);
 	}
 
 	/**
@@ -82,22 +100,28 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 	 * @return the mappings contained in the set
 	 */
 	private ResourceMapping[] getMappings() {
-		List<ResourceMapping> result = new ArrayList<>();
-		for (IAdaptable adaptable : set.getElements()) {
-			ResourceMapping mapping = WorkingSetAdapterFactory.getContributedResourceMapping(adaptable);
+		IAdaptable[] elements = set.getElements();
+		List result = new ArrayList();
+		for (int i = 0; i < elements.length; i++) {
+			IAdaptable element = elements[i];
+			ResourceMapping mapping = WorkingSetAdapterFactory.getContributedResourceMapping(element);
 			if (mapping == null) {
-				mapping = WorkingSetAdapterFactory.getResourceMapping(adaptable);
+				mapping = WorkingSetAdapterFactory.getResourceMapping(element);
 			}
 			if (mapping != null) {
 				result.add(mapping);
 			}
 		}
-		return result.toArray(new ResourceMapping[result.size()]);
+		return (ResourceMapping[]) result.toArray(new ResourceMapping[result.size()]);
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.mapping.ResourceMapping#contains(org.eclipse.core.resources.mapping.ResourceMapping)
+	 */
 	public boolean contains(ResourceMapping mapping) {
-		for (ResourceMapping childMapping : getMappings()) {
+		ResourceMapping[] mappings = getMappings();
+		for (int i = 0; i < mappings.length; i++) {
+			ResourceMapping childMapping = mappings[i];
 			if (childMapping.contains(mapping)) {
 				return true;
 			}

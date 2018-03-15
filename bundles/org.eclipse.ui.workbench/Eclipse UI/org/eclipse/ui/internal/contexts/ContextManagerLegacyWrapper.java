@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.ui.contexts.IContextManagerListener;
 /**
  * A wrapper around the new API that supports the old API. This manager also
  * adds support for reading from the registry.
- *
+ * 
  * @since 3.1
  */
 public final class ContextManagerLegacyWrapper implements
@@ -42,7 +42,7 @@ public final class ContextManagerLegacyWrapper implements
 	 * within the tree. Context identifiers representing deeper items (i.e.,
 	 * items with more ancestors), have lesser values (i.e., would appear
 	 * earlier in a set).
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	private class ContextIdDepthComparator implements Comparator {
@@ -50,7 +50,6 @@ public final class ContextManagerLegacyWrapper implements
 		/**
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
-		@Override
 		public final int compare(final Object object1, final Object object2) {
 			final String contextId1 = (String) object1;
 			final String contextId2 = (String) object2;
@@ -100,14 +99,14 @@ public final class ContextManagerLegacyWrapper implements
 	 * based on how many ancestors the corresponding contexts have. Contexts
 	 * with no parents appear last, while contexts with the most ancestors
 	 * appear first.
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	private class DepthSortedContextIdSet extends TreeSet {
 
 		/**
 		 * Generated serial version UID for this class.
-		 *
+		 * 
 		 * @since 3.1
 		 */
 		private static final long serialVersionUID = 3257291326872892465L;
@@ -115,7 +114,7 @@ public final class ContextManagerLegacyWrapper implements
 		/**
 		 * Constructs a new instance of <code>DepthSortedContextIdSet</code>
 		 * with the set to be sorted.
-		 *
+		 * 
 		 * @param contextIds
 		 *            A set of context identifiers (strings); this may contain
 		 *            <code>null</code> values. The set may not be
@@ -134,7 +133,7 @@ public final class ContextManagerLegacyWrapper implements
 	/**
 	 * Constructs a new instance of <code>MutableContextManager</code>. The
 	 * registry is created on the platform's extension registry.
-	 *
+	 * 
 	 * @param contextManager
 	 *            The manager which will provided the real support; must not be
 	 *            <code>null</code>.
@@ -149,7 +148,6 @@ public final class ContextManagerLegacyWrapper implements
 		this.contextManager.addContextManagerListener(this);
 	}
 
-	@Override
 	public void addContextManagerListener(
 			IContextManagerListener contextManagerListener) {
 		if (contextManagerListener == null) {
@@ -165,7 +163,11 @@ public final class ContextManagerLegacyWrapper implements
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.contexts.IContextManagerListener#contextManagerChanged(org.eclipse.core.commands.contexts.ContextManagerEvent)
+	 */
 	public void contextManagerChanged(
 			org.eclipse.core.commands.contexts.ContextManagerEvent contextManagerEvent) {
 		final String contextId = contextManagerEvent.getContextId();
@@ -208,24 +210,20 @@ public final class ContextManagerLegacyWrapper implements
 		}
 	}
 
-	@Override
 	public IContext getContext(String contextId) {
 		return new ContextLegacyWrapper(contextManager.getContext(contextId),
 				contextManager);
 	}
 
-	@Override
 	public SortedSet getDefinedContextIds() {
 		return new DepthSortedContextIdSet(contextManager
 				.getDefinedContextIds());
 	}
 
-	@Override
 	public SortedSet getEnabledContextIds() {
 		return new DepthSortedContextIdSet(contextManager.getActiveContextIds());
 	}
 
-	@Override
 	public void removeContextManagerListener(
 			IContextManagerListener contextManagerListener) {
 		if (contextManagerListener == null) {

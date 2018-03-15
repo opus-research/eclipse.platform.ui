@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IContributionManager;
@@ -31,7 +32,7 @@ import org.eclipse.ui.services.IServiceLocator;
  * This class represents the action bars for an action set.
  */
 public class ActionSetActionBars extends SubActionBars2 {
-
+	
 	private IActionBarConfigurer2 actionBarConfigurer = null;
 
 	private String actionSetId;
@@ -47,14 +48,14 @@ public class ActionSetActionBars extends SubActionBars2 {
      */
     public ActionSetActionBars(IActionBars2 parent, IServiceLocator serviceLocator, IActionBarConfigurer2 actionBarConfigurer, String actionSetId) {
     	super(parent, serviceLocator);
-		this.actionSetId = actionSetId;
+		this.actionSetId = actionSetId;		
         this.actionBarConfigurer = actionBarConfigurer;
     }
 
 	/**
 	 * Adds to the list all the actions that are part of this action set but
 	 * belong to different cool bar items.
-	 *
+	 * 
 	 * @param item
 	 *            the item defined in this actionset but in a different tool Bar
 	 *            contribution item
@@ -63,12 +64,16 @@ public class ActionSetActionBars extends SubActionBars2 {
 		adjunctContributions.add(item);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Inherited from SubActionBars.
+	 */
 	protected SubMenuManager createSubMenuManager(IMenuManager parent) {
 		return new ActionSetMenuManager(parent, actionSetId);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Inherited from SubActionBars.
+	 */
 	protected SubToolBarManager createSubToolBarManager(IToolBarManager parent) {
 		// return null, action sets are managed by CoolItemToolBarManagers
 		return null;
@@ -77,16 +82,17 @@ public class ActionSetActionBars extends SubActionBars2 {
 	/**
 	 * Dispose the contributions.
 	 */
-	@Override
 	public void dispose() {
 		super.dispose();
 		if (coolItemToolBarMgr == null) {
 			return;
 		}
+		IContributionItem[] items = coolItemToolBarMgr.getItems();
 		// remove the action set's items from its action bar, don't use
 		// removeAll since other items from other actions sets may be in
 		// the action bar's cool item
-		for (IContributionItem item : coolItemToolBarMgr.getItems()) {
+		for (int i = 0; i < items.length; i++) {
+			IContributionItem item = items[i];
 			if (item instanceof PluginActionCoolBarContributionItem) {
 				PluginActionCoolBarContributionItem actionSetItem = (PluginActionCoolBarContributionItem) item;
 				if (actionSetItem.getActionSetId().equals(actionSetId)) {
@@ -118,7 +124,7 @@ public class ActionSetActionBars extends SubActionBars2 {
 	/**
 	 * Returns the contribution item that the given contribution item should be
 	 * inserted after.
-	 *
+	 * 
 	 * @param startId
 	 *            the location to start looking alphabetically.
 	 * @param itemId
@@ -127,7 +133,7 @@ public class ActionSetActionBars extends SubActionBars2 {
 	 *            the contribution manager.
 	 * @return the contribution item that the given items should be returned
 	 *         after.
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	private IContributionItem findAlphabeticalOrder(String startId,
@@ -173,10 +179,9 @@ public class ActionSetActionBars extends SubActionBars2 {
 
 	/**
 	 * Returns a tool bar manager for this Item.
-	 *
+	 * 
 	 * @return the tool bar manager
 	 */
-	@Override
 	public IToolBarManager getToolBarManager() {
 		ICoolBarManager coolBarManager = getCastedParent().getCoolBarManager();
 		if (coolBarManager == null) {
@@ -189,7 +194,7 @@ public class ActionSetActionBars extends SubActionBars2 {
 	 * Returns the correct tool bar for the given action id. If this action is
 	 * an adjunct type the it returns the toolbar manager from the cool bar
 	 * manager.
-	 *
+	 * 
 	 * @param id
 	 *            the id of the action
 	 * @return the tool bar manager
@@ -232,14 +237,14 @@ public class ActionSetActionBars extends SubActionBars2 {
 				toolBarContributionItem = tbcbItem;
 			}
 		} else {
-
+			
 			coolItemToolBarMgr = actionBarConfigurer.createToolBarManager();
-
+           
 			// If this is not an adjunct type then create a tool bar
 			// contribution item
 			// we don't create one for an adjunct type because another action
 			// set action bars contains one
-
+            
             IContributionItem toolBarContributionItem = actionBarConfigurer
 					.createToolBarContributionItem(coolItemToolBarMgr,
 							toolBarId);
@@ -270,7 +275,6 @@ public class ActionSetActionBars extends SubActionBars2 {
 	/**
 	 * Activate / Deactivate the contributions.
 	 */
-	@Override
 	protected void setActive(boolean set) {
 		super.setActive(set);
 
@@ -281,7 +285,9 @@ public class ActionSetActionBars extends SubActionBars2 {
 
 		// 1. Need to set visibility for all non-adjunct actions
 		if (coolItemToolBarMgr != null) {
-			for (IContributionItem item : coolItemToolBarMgr.getItems()) {
+			IContributionItem[] items = coolItemToolBarMgr.getItems();
+			for (int i = 0; i < items.length; i++) {
+				IContributionItem item = items[i];
 				if (item instanceof PluginActionCoolBarContributionItem) {
 					PluginActionCoolBarContributionItem actionSetItem = (PluginActionCoolBarContributionItem) item;
 					// Only if the action set id for this contribution item is

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,9 @@
 package org.eclipse.ui.tests.concurrency;
 
 import java.lang.reflect.InvocationTargetException;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.IThreadListener;
@@ -29,12 +27,10 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
  */
 public class TransferRuleTest extends UITestCase {
 	class TestRule implements ISchedulingRule {
-		@Override
 		public boolean contains(ISchedulingRule rule) {
 			return rule == this;
 		}
 
-		@Override
 		public boolean isConflicting(ISchedulingRule rule) {
 			return rule == this;
 		}
@@ -52,18 +48,16 @@ public class TransferRuleTest extends UITestCase {
 			this.rule = aRule;
 		}
 
-		@Override
 		public void run(IProgressMonitor monitor) {
 			//if we already have an error don't run the rest of the test
-			if (error != null) {
+			if (error != null)
 				return;
-			}
 			try {
 				try {
 					//acquire the rule that was transferred (will hang if the rule transfer failed)
-					Job.getJobManager().beginRule(rule, monitor);
+					Platform.getJobManager().beginRule(rule, monitor);
 				} finally {
-					Job.getJobManager().endRule(rule);
+					Platform.getJobManager().endRule(rule);
 				}
 			} catch (Throwable t) {
 				//remember any error so we can fail the test
@@ -71,7 +65,6 @@ public class TransferRuleTest extends UITestCase {
 			}
 		}
 
-		@Override
 		public void threadChange(Thread thread) {
 			try {
 				Platform.getJobManager().transferRule(rule, thread);

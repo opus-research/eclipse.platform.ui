@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,8 @@
 
 package org.eclipse.e4.ui.tests.application;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 import java.util.List;
+import junit.framework.TestCase;
 import org.eclipse.e4.ui.internal.workbench.E4XMIResource;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationFactory;
@@ -26,11 +23,13 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.junit.Test;
 
-public class ModelRobustnessTest {
+/**
+ *
+ */
+@SuppressWarnings("restriction")
+public class ModelRobustnessTest extends TestCase {
 
-	@Test
 	public void testLoadingInvalidContainments() {
 		// E4XMIResourceFactory factory = new E4XMIResourceFactory();
 		URI uri = URI.createPlatformPluginURI(
@@ -68,7 +67,6 @@ public class ModelRobustnessTest {
 				.getElementId());
 	}
 
-	@Test
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void testAddingInvalidElements() {
 		MApplication app = MApplicationFactory.INSTANCE.createApplication();
@@ -79,14 +77,6 @@ public class ModelRobustnessTest {
 			fail("The adding of this should have failed");
 		} catch (IllegalArgumentException e) {
 			// This exception is expected!
-		} catch (ArrayStoreException e) {
-			// EMF 2.9 now throws this instead of IllegalArgumentException. See
-			// bug 407539
-		} catch (ClassCastException e) {
-			// EList.add says this is the expected exception, although testing
-			// indicates its one of the two previous exceptions that is really
-			// thrown.
-			// See bug 407539
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

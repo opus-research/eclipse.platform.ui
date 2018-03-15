@@ -1,10 +1,10 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -20,9 +20,7 @@ import org.eclipse.e4.ui.model.application.ui.MExpression;
 import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MGenericTile;
 import org.eclipse.e4.ui.model.application.ui.MGenericTrimContainer;
-import org.eclipse.e4.ui.model.application.ui.MImperativeExpression;
 import org.eclipse.e4.ui.model.application.ui.MInput;
-import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
@@ -365,31 +363,22 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int UI_ELEMENT__ACCESSIBILITY_PHRASE = ApplicationPackageImpl.APPLICATION_ELEMENT_FEATURE_COUNT + 9;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE = ApplicationPackageImpl.APPLICATION_ELEMENT_FEATURE_COUNT + 10;
-
-	/**
 	 * The number of structural features of the '<em>UI Element</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int UI_ELEMENT_FEATURE_COUNT = ApplicationPackageImpl.APPLICATION_ELEMENT_FEATURE_COUNT + 11;
+	public static final int UI_ELEMENT_FEATURE_COUNT = ApplicationPackageImpl.APPLICATION_ELEMENT_FEATURE_COUNT + 10;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int UI_ELEMENT___UPDATE_LOCALIZATION = ApplicationPackageImpl.APPLICATION_ELEMENT_OPERATION_COUNT + 0;
+	public static final int UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE = ApplicationPackageImpl.APPLICATION_ELEMENT_OPERATION_COUNT + 0;
 
 	/**
 	 * The number of operations of the '<em>UI Element</em>' class.
@@ -556,15 +545,6 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE = UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE = UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -592,13 +572,13 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int ELEMENT_CONTAINER_FEATURE_COUNT = UI_ELEMENT_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int ELEMENT_CONTAINER___UPDATE_LOCALIZATION = UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Element Container</em>' class.
@@ -610,110 +590,13 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int ELEMENT_CONTAINER_OPERATION_COUNT = UI_ELEMENT_OPERATION_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.impl.GenericStackImpl <em>Generic Stack</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.GenericStackImpl
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getGenericStack()
-	 * @generated
-	 */
-	public static final int GENERIC_STACK = 6;
-
-	/**
-	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.impl.GenericTileImpl <em>Generic Tile</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.GenericTileImpl
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getGenericTile()
-	 * @generated
-	 */
-	public static final int GENERIC_TILE = 7;
-
-	/**
-	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.impl.GenericTrimContainerImpl <em>Generic Trim Container</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.GenericTrimContainerImpl
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getGenericTrimContainer()
-	 * @generated
-	 */
-	public static final int GENERIC_TRIM_CONTAINER = 8;
-
-	/**
-	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.impl.ExpressionImpl <em>Expression</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.ExpressionImpl
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getExpression()
-	 * @generated
-	 */
-	public static final int EXPRESSION = 9;
-
-	/**
-	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.impl.CoreExpressionImpl <em>Core Expression</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.CoreExpressionImpl
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getCoreExpression()
-	 * @generated
-	 */
-	public static final int CORE_EXPRESSION = 10;
-
-	/**
-	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.MSnippetContainer <em>Snippet Container</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see org.eclipse.e4.ui.model.application.ui.MSnippetContainer
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getSnippetContainer()
-	 * @generated
-	 */
-	public static final int SNIPPET_CONTAINER = 12;
-
-	/**
-	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.MLocalizable <em>Localizable</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see org.eclipse.e4.ui.model.application.ui.MLocalizable
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getLocalizable()
-	 * @generated
-	 */
-	public static final int LOCALIZABLE = 13;
-
-	/**
-	 * The number of structural features of the '<em>Localizable</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int LOCALIZABLE_FEATURE_COUNT = 0;
-
-	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int LOCALIZABLE___UPDATE_LOCALIZATION = 0;
-
-	/**
-	 * The number of operations of the '<em>Localizable</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int LOCALIZABLE_OPERATION_COUNT = 1;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int UI_LABEL__LABEL = LOCALIZABLE_FEATURE_COUNT + 0;
+	public static final int UI_LABEL__LABEL = 0;
 
 	/**
 	 * The feature id for the '<em><b>Icon URI</b></em>' attribute.
@@ -722,7 +605,7 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int UI_LABEL__ICON_URI = LOCALIZABLE_FEATURE_COUNT + 1;
+	public static final int UI_LABEL__ICON_URI = 1;
 
 	/**
 	 * The feature id for the '<em><b>Tooltip</b></em>' attribute.
@@ -731,25 +614,7 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int UI_LABEL__TOOLTIP = LOCALIZABLE_FEATURE_COUNT + 2;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int UI_LABEL__LOCALIZED_LABEL = LOCALIZABLE_FEATURE_COUNT + 3;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int UI_LABEL__LOCALIZED_TOOLTIP = LOCALIZABLE_FEATURE_COUNT + 4;
+	public static final int UI_LABEL__TOOLTIP = 2;
 
 	/**
 	 * The number of structural features of the '<em>UI Label</em>' class.
@@ -758,16 +623,25 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int UI_LABEL_FEATURE_COUNT = LOCALIZABLE_FEATURE_COUNT + 5;
+	public static final int UI_LABEL_FEATURE_COUNT = 3;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int UI_LABEL___UPDATE_LOCALIZATION = LOCALIZABLE___UPDATE_LOCALIZATION;
+	public static final int UI_LABEL___GET_LOCALIZED_LABEL = 0;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int UI_LABEL___GET_LOCALIZED_TOOLTIP = 1;
 
 	/**
 	 * The number of operations of the '<em>UI Label</em>' class.
@@ -776,7 +650,17 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int UI_LABEL_OPERATION_COUNT = LOCALIZABLE_OPERATION_COUNT + 0;
+	public static final int UI_LABEL_OPERATION_COUNT = 2;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.impl.GenericStackImpl <em>Generic Stack</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.impl.GenericStackImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getGenericStack()
+	 * @generated
+	 */
+	public static final int GENERIC_STACK = 6;
 
 	/**
 	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
@@ -914,15 +798,6 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int GENERIC_STACK__ACCESSIBILITY_PHRASE = ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int GENERIC_STACK__LOCALIZED_ACCESSIBILITY_PHRASE = ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -950,13 +825,13 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int GENERIC_STACK_FEATURE_COUNT = ELEMENT_CONTAINER_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int GENERIC_STACK___UPDATE_LOCALIZATION = ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int GENERIC_STACK___GET_LOCALIZED_ACCESSIBILITY_PHRASE = ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Generic Stack</em>' class.
@@ -966,6 +841,16 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int GENERIC_STACK_OPERATION_COUNT = ELEMENT_CONTAINER_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.impl.GenericTileImpl <em>Generic Tile</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.impl.GenericTileImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getGenericTile()
+	 * @generated
+	 */
+	public static final int GENERIC_TILE = 7;
 
 	/**
 	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
@@ -1103,15 +988,6 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int GENERIC_TILE__ACCESSIBILITY_PHRASE = ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int GENERIC_TILE__LOCALIZED_ACCESSIBILITY_PHRASE = ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1148,13 +1024,13 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int GENERIC_TILE_FEATURE_COUNT = ELEMENT_CONTAINER_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int GENERIC_TILE___UPDATE_LOCALIZATION = ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int GENERIC_TILE___GET_LOCALIZED_ACCESSIBILITY_PHRASE = ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Generic Tile</em>' class.
@@ -1164,6 +1040,16 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int GENERIC_TILE_OPERATION_COUNT = ELEMENT_CONTAINER_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.impl.GenericTrimContainerImpl <em>Generic Trim Container</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.impl.GenericTrimContainerImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getGenericTrimContainer()
+	 * @generated
+	 */
+	public static final int GENERIC_TRIM_CONTAINER = 8;
 
 	/**
 	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
@@ -1301,15 +1187,6 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int GENERIC_TRIM_CONTAINER__ACCESSIBILITY_PHRASE = ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int GENERIC_TRIM_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE = ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1346,13 +1223,13 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int GENERIC_TRIM_CONTAINER_FEATURE_COUNT = ELEMENT_CONTAINER_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int GENERIC_TRIM_CONTAINER___UPDATE_LOCALIZATION = ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int GENERIC_TRIM_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE = ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Generic Trim Container</em>' class.
@@ -1362,6 +1239,16 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int GENERIC_TRIM_CONTAINER_OPERATION_COUNT = ELEMENT_CONTAINER_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.impl.ExpressionImpl <em>Expression</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.impl.ExpressionImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getExpression()
+	 * @generated
+	 */
+	public static final int EXPRESSION = 9;
 
 	/**
 	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
@@ -1425,6 +1312,16 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int EXPRESSION_OPERATION_COUNT = ApplicationPackageImpl.APPLICATION_ELEMENT_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.impl.CoreExpressionImpl <em>Core Expression</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.impl.CoreExpressionImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getCoreExpression()
+	 * @generated
+	 */
+	public static final int CORE_EXPRESSION = 10;
 
 	/**
 	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
@@ -1508,104 +1405,14 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int CORE_EXPRESSION_OPERATION_COUNT = EXPRESSION_OPERATION_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.impl.ImperativeExpressionImpl <em>Imperative Expression</em>}' class.
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.MSnippetContainer <em>Snippet Container</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.ImperativeExpressionImpl
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getImperativeExpression()
+	 * @see org.eclipse.e4.ui.model.application.ui.MSnippetContainer
+	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getSnippetContainer()
 	 * @generated
 	 */
-	public static final int IMPERATIVE_EXPRESSION = 11;
-
-	/**
-	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int IMPERATIVE_EXPRESSION__ELEMENT_ID = EXPRESSION__ELEMENT_ID;
-
-	/**
-	 * The feature id for the '<em><b>Persisted State</b></em>' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int IMPERATIVE_EXPRESSION__PERSISTED_STATE = EXPRESSION__PERSISTED_STATE;
-
-	/**
-	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int IMPERATIVE_EXPRESSION__TAGS = EXPRESSION__TAGS;
-
-	/**
-	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int IMPERATIVE_EXPRESSION__CONTRIBUTOR_URI = EXPRESSION__CONTRIBUTOR_URI;
-
-	/**
-	 * The feature id for the '<em><b>Transient Data</b></em>' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int IMPERATIVE_EXPRESSION__TRANSIENT_DATA = EXPRESSION__TRANSIENT_DATA;
-
-	/**
-	 * The feature id for the '<em><b>Contribution URI</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int IMPERATIVE_EXPRESSION__CONTRIBUTION_URI = EXPRESSION_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>Object</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int IMPERATIVE_EXPRESSION__OBJECT = EXPRESSION_FEATURE_COUNT + 1;
-
-	/**
-	 * The feature id for the '<em><b>Tracking</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int IMPERATIVE_EXPRESSION__TRACKING = EXPRESSION_FEATURE_COUNT + 2;
-
-	/**
-	 * The number of structural features of the '<em>Imperative Expression</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int IMPERATIVE_EXPRESSION_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 3;
-
-	/**
-	 * The number of operations of the '<em>Imperative Expression</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int IMPERATIVE_EXPRESSION_OPERATION_COUNT = EXPRESSION_OPERATION_COUNT + 0;
+	public static final int SNIPPET_CONTAINER = 11;
 
 	/**
 	 * The feature id for the '<em><b>Snippets</b></em>' containment reference list.
@@ -1642,7 +1449,7 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getSideValue()
 	 * @generated
 	 */
-	public static final int SIDE_VALUE = 14;
+	public static final int SIDE_VALUE = 12;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -1726,21 +1533,7 @@ public class UiPackageImpl extends EPackageImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass imperativeExpressionEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	private EClass snippetContainerEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass localizableEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -2078,16 +1871,15 @@ public class UiPackageImpl extends EPackageImpl {
 
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.MUIElement#getLocalizedAccessibilityPhrase <em>Localized Accessibility Phrase</em>}'.
+	 * Returns the meta object for the '{@link org.eclipse.e4.ui.model.application.ui.MUIElement#getLocalizedAccessibilityPhrase() <em>Get Localized Accessibility Phrase</em>}' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Localized Accessibility Phrase</em>'.
+	 * @return the meta object for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * @see org.eclipse.e4.ui.model.application.ui.MUIElement#getLocalizedAccessibilityPhrase()
-	 * @see #getUIElement()
 	 * @generated
 	 */
-	public EAttribute getUIElement_LocalizedAccessibilityPhrase() {
-		return (EAttribute)uiElementEClass.getEStructuralFeatures().get(10);
+	public EOperation getUIElement__GetLocalizedAccessibilityPhrase() {
+		return uiElementEClass.getEOperations().get(0);
 	}
 
 
@@ -2143,30 +1935,28 @@ public class UiPackageImpl extends EPackageImpl {
 	}
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.MUILabel#getLocalizedLabel <em>Localized Label</em>}'.
+	 * Returns the meta object for the '{@link org.eclipse.e4.ui.model.application.ui.MUILabel#getLocalizedLabel() <em>Get Localized Label</em>}' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Localized Label</em>'.
+	 * @return the meta object for the '<em>Get Localized Label</em>' operation.
 	 * @see org.eclipse.e4.ui.model.application.ui.MUILabel#getLocalizedLabel()
-	 * @see #getUILabel()
 	 * @generated
 	 */
-	public EAttribute getUILabel_LocalizedLabel() {
-		return (EAttribute)uiLabelEClass.getEStructuralFeatures().get(3);
+	public EOperation getUILabel__GetLocalizedLabel() {
+		return uiLabelEClass.getEOperations().get(0);
 	}
 
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.MUILabel#getLocalizedTooltip <em>Localized Tooltip</em>}'.
+	 * Returns the meta object for the '{@link org.eclipse.e4.ui.model.application.ui.MUILabel#getLocalizedTooltip() <em>Get Localized Tooltip</em>}' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Localized Tooltip</em>'.
+	 * @return the meta object for the '<em>Get Localized Tooltip</em>' operation.
 	 * @see org.eclipse.e4.ui.model.application.ui.MUILabel#getLocalizedTooltip()
-	 * @see #getUILabel()
 	 * @generated
 	 */
-	public EAttribute getUILabel_LocalizedTooltip() {
-		return (EAttribute)uiLabelEClass.getEStructuralFeatures().get(4);
+	public EOperation getUILabel__GetLocalizedTooltip() {
+		return uiLabelEClass.getEOperations().get(1);
 	}
 
 
@@ -2325,33 +2115,6 @@ public class UiPackageImpl extends EPackageImpl {
 
 
 	/**
-	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.MImperativeExpression <em>Imperative Expression</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Imperative Expression</em>'.
-	 * @see org.eclipse.e4.ui.model.application.ui.MImperativeExpression
-	 * @generated
-	 */
-	public EClass getImperativeExpression() {
-		return imperativeExpressionEClass;
-	}
-
-
-	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.MImperativeExpression#isTracking <em>Tracking</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Tracking</em>'.
-	 * @see org.eclipse.e4.ui.model.application.ui.MImperativeExpression#isTracking()
-	 * @see #getImperativeExpression()
-	 * @generated
-	 */
-	public EAttribute getImperativeExpression_Tracking() {
-		return (EAttribute)imperativeExpressionEClass.getEStructuralFeatures().get(0);
-	}
-
-
-	/**
 	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.MSnippetContainer <em>Snippet Container</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2375,32 +2138,6 @@ public class UiPackageImpl extends EPackageImpl {
 	 */
 	public EReference getSnippetContainer_Snippets() {
 		return (EReference)snippetContainerEClass.getEStructuralFeatures().get(0);
-	}
-
-
-	/**
-	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.MLocalizable <em>Localizable</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Localizable</em>'.
-	 * @see org.eclipse.e4.ui.model.application.ui.MLocalizable
-	 * @generated
-	 */
-	public EClass getLocalizable() {
-		return localizableEClass;
-	}
-
-
-	/**
-	 * Returns the meta object for the '{@link org.eclipse.e4.ui.model.application.ui.MLocalizable#updateLocalization() <em>Update Localization</em>}' operation.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the '<em>Update Localization</em>' operation.
-	 * @see org.eclipse.e4.ui.model.application.ui.MLocalizable#updateLocalization()
-	 * @generated
-	 */
-	public EOperation getLocalizable__UpdateLocalization() {
-		return localizableEClass.getEOperations().get(0);
 	}
 
 
@@ -2468,7 +2205,7 @@ public class UiPackageImpl extends EPackageImpl {
 		createEReference(uiElementEClass, UI_ELEMENT__CUR_SHARED_REF);
 		createEReference(uiElementEClass, UI_ELEMENT__VISIBLE_WHEN);
 		createEAttribute(uiElementEClass, UI_ELEMENT__ACCESSIBILITY_PHRASE);
-		createEAttribute(uiElementEClass, UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE);
+		createEOperation(uiElementEClass, UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE);
 
 		elementContainerEClass = createEClass(ELEMENT_CONTAINER);
 		createEReference(elementContainerEClass, ELEMENT_CONTAINER__CHILDREN);
@@ -2478,8 +2215,8 @@ public class UiPackageImpl extends EPackageImpl {
 		createEAttribute(uiLabelEClass, UI_LABEL__LABEL);
 		createEAttribute(uiLabelEClass, UI_LABEL__ICON_URI);
 		createEAttribute(uiLabelEClass, UI_LABEL__TOOLTIP);
-		createEAttribute(uiLabelEClass, UI_LABEL__LOCALIZED_LABEL);
-		createEAttribute(uiLabelEClass, UI_LABEL__LOCALIZED_TOOLTIP);
+		createEOperation(uiLabelEClass, UI_LABEL___GET_LOCALIZED_LABEL);
+		createEOperation(uiLabelEClass, UI_LABEL___GET_LOCALIZED_TOOLTIP);
 
 		genericStackEClass = createEClass(GENERIC_STACK);
 
@@ -2495,14 +2232,8 @@ public class UiPackageImpl extends EPackageImpl {
 		createEAttribute(coreExpressionEClass, CORE_EXPRESSION__CORE_EXPRESSION_ID);
 		createEAttribute(coreExpressionEClass, CORE_EXPRESSION__CORE_EXPRESSION);
 
-		imperativeExpressionEClass = createEClass(IMPERATIVE_EXPRESSION);
-		createEAttribute(imperativeExpressionEClass, IMPERATIVE_EXPRESSION__TRACKING);
-
 		snippetContainerEClass = createEClass(SNIPPET_CONTAINER);
 		createEReference(snippetContainerEClass, SNIPPET_CONTAINER__SNIPPETS);
-
-		localizableEClass = createEClass(LOCALIZABLE);
-		createEOperation(localizableEClass, LOCALIZABLE___UPDATE_LOCALIZATION);
 
 		// Create enums
 		sideValueEEnum = createEEnum(SIDE_VALUE);
@@ -2560,9 +2291,7 @@ public class UiPackageImpl extends EPackageImpl {
 
 		// Add supertypes to classes
 		uiElementEClass.getESuperTypes().add(theApplicationPackage.getApplicationElement());
-		uiElementEClass.getESuperTypes().add(this.getLocalizable());
 		elementContainerEClass.getESuperTypes().add(this.getUIElement());
-		uiLabelEClass.getESuperTypes().add(this.getLocalizable());
 		g1 = createEGenericType(this.getElementContainer());
 		EGenericType g2 = createEGenericType(genericStackEClass_T);
 		g1.getETypeArguments().add(g2);
@@ -2577,8 +2306,6 @@ public class UiPackageImpl extends EPackageImpl {
 		genericTrimContainerEClass.getEGenericSuperTypes().add(g1);
 		expressionEClass.getESuperTypes().add(theApplicationPackage.getApplicationElement());
 		coreExpressionEClass.getESuperTypes().add(this.getExpression());
-		imperativeExpressionEClass.getESuperTypes().add(this.getExpression());
-		imperativeExpressionEClass.getESuperTypes().add(theApplicationPackage.getContribution());
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(contextEClass, MContext.class, "Context", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
@@ -2606,7 +2333,8 @@ public class UiPackageImpl extends EPackageImpl {
 		initEReference(getUIElement_CurSharedRef(), theAdvancedPackage.getPlaceholder(), null, "curSharedRef", null, 0, 1, MUIElement.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEReference(getUIElement_VisibleWhen(), this.getExpression(), null, "visibleWhen", null, 0, 1, MUIElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEAttribute(getUIElement_AccessibilityPhrase(), ecorePackage.getEString(), "accessibilityPhrase", null, 0, 1, MUIElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-		initEAttribute(getUIElement_LocalizedAccessibilityPhrase(), ecorePackage.getEString(), "localizedAccessibilityPhrase", null, 0, 1, MUIElement.class, IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+
+		initEOperation(getUIElement__GetLocalizedAccessibilityPhrase(), ecorePackage.getEString(), "getLocalizedAccessibilityPhrase", 0, 1, IS_UNIQUE, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(elementContainerEClass, MElementContainer.class, "ElementContainer", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		g1 = createEGenericType(elementContainerEClass_T);
@@ -2618,8 +2346,10 @@ public class UiPackageImpl extends EPackageImpl {
 		initEAttribute(getUILabel_Label(), ecorePackage.getEString(), "label", null, 0, 1, MUILabel.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEAttribute(getUILabel_IconURI(), ecorePackage.getEString(), "iconURI", null, 0, 1, MUILabel.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEAttribute(getUILabel_Tooltip(), ecorePackage.getEString(), "tooltip", null, 0, 1, MUILabel.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-		initEAttribute(getUILabel_LocalizedLabel(), ecorePackage.getEString(), "localizedLabel", "", 0, 1, MUILabel.class, IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED); //$NON-NLS-1$ //$NON-NLS-2$
-		initEAttribute(getUILabel_LocalizedTooltip(), ecorePackage.getEString(), "localizedTooltip", "", 0, 1, MUILabel.class, IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED); //$NON-NLS-1$ //$NON-NLS-2$
+
+		initEOperation(getUILabel__GetLocalizedLabel(), ecorePackage.getEString(), "getLocalizedLabel", 0, 1, IS_UNIQUE, IS_ORDERED); //$NON-NLS-1$
+
+		initEOperation(getUILabel__GetLocalizedTooltip(), ecorePackage.getEString(), "getLocalizedTooltip", 0, 1, IS_UNIQUE, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(genericStackEClass, MGenericStack.class, "GenericStack", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 
@@ -2635,15 +2365,8 @@ public class UiPackageImpl extends EPackageImpl {
 		initEAttribute(getCoreExpression_CoreExpressionId(), ecorePackage.getEString(), "coreExpressionId", "", 0, 1, MCoreExpression.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$ //$NON-NLS-2$
 		initEAttribute(getCoreExpression_CoreExpression(), ecorePackage.getEJavaObject(), "coreExpression", null, 0, 1, MCoreExpression.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
-		initEClass(imperativeExpressionEClass, MImperativeExpression.class, "ImperativeExpression", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
-		initEAttribute(getImperativeExpression_Tracking(), ecorePackage.getEBoolean(), "tracking", null, 0, 1, MImperativeExpression.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-
 		initEClass(snippetContainerEClass, MSnippetContainer.class, "SnippetContainer", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEReference(getSnippetContainer_Snippets(), this.getUIElement(), null, "snippets", null, 0, -1, MSnippetContainer.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-
-		initEClass(localizableEClass, MLocalizable.class, "Localizable", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
-
-		initEOperation(getLocalizable__UpdateLocalization(), null, "updateLocalization", 0, 1, IS_UNIQUE, IS_ORDERED); //$NON-NLS-1$
 
 		// Initialize enums and add enum literals
 		initEEnum(sideValueEEnum, SideValue.class, "SideValue"); //$NON-NLS-1$
@@ -2827,12 +2550,12 @@ public class UiPackageImpl extends EPackageImpl {
 		public static final EAttribute UI_ELEMENT__ACCESSIBILITY_PHRASE = eINSTANCE.getUIElement_AccessibilityPhrase();
 
 		/**
-		 * The meta object literal for the '<em><b>Localized Accessibility Phrase</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Get Localized Accessibility Phrase</b></em>' operation.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		public static final EAttribute UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE = eINSTANCE.getUIElement_LocalizedAccessibilityPhrase();
+		public static final EOperation UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE = eINSTANCE.getUIElement__GetLocalizedAccessibilityPhrase();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.MUILabel <em>UI Label</em>}' class.
@@ -2869,20 +2592,20 @@ public class UiPackageImpl extends EPackageImpl {
 		public static final EAttribute UI_LABEL__TOOLTIP = eINSTANCE.getUILabel_Tooltip();
 
 		/**
-		 * The meta object literal for the '<em><b>Localized Label</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Get Localized Label</b></em>' operation.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		public static final EAttribute UI_LABEL__LOCALIZED_LABEL = eINSTANCE.getUILabel_LocalizedLabel();
+		public static final EOperation UI_LABEL___GET_LOCALIZED_LABEL = eINSTANCE.getUILabel__GetLocalizedLabel();
 
 		/**
-		 * The meta object literal for the '<em><b>Localized Tooltip</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Get Localized Tooltip</b></em>' operation.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		public static final EAttribute UI_LABEL__LOCALIZED_TOOLTIP = eINSTANCE.getUILabel_LocalizedTooltip();
+		public static final EOperation UI_LABEL___GET_LOCALIZED_TOOLTIP = eINSTANCE.getUILabel__GetLocalizedTooltip();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl <em>Element Container</em>}' class.
@@ -2993,24 +2716,6 @@ public class UiPackageImpl extends EPackageImpl {
 		public static final EAttribute CORE_EXPRESSION__CORE_EXPRESSION = eINSTANCE.getCoreExpression_CoreExpression();
 
 		/**
-		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.impl.ImperativeExpressionImpl <em>Imperative Expression</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see org.eclipse.e4.ui.model.application.ui.impl.ImperativeExpressionImpl
-		 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getImperativeExpression()
-		 * @generated
-		 */
-		public static final EClass IMPERATIVE_EXPRESSION = eINSTANCE.getImperativeExpression();
-
-		/**
-		 * The meta object literal for the '<em><b>Tracking</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		public static final EAttribute IMPERATIVE_EXPRESSION__TRACKING = eINSTANCE.getImperativeExpression_Tracking();
-
-		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.MSnippetContainer <em>Snippet Container</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -3027,24 +2732,6 @@ public class UiPackageImpl extends EPackageImpl {
 		 * @generated
 		 */
 		public static final EReference SNIPPET_CONTAINER__SNIPPETS = eINSTANCE.getSnippetContainer_Snippets();
-
-		/**
-		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.MLocalizable <em>Localizable</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see org.eclipse.e4.ui.model.application.ui.MLocalizable
-		 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getLocalizable()
-		 * @generated
-		 */
-		public static final EClass LOCALIZABLE = eINSTANCE.getLocalizable();
-
-		/**
-		 * The meta object literal for the '<em><b>Update Localization</b></em>' operation.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		public static final EOperation LOCALIZABLE___UPDATE_LOCALIZATION = eINSTANCE.getLocalizable__UpdateLocalization();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.SideValue <em>Side Value</em>}' enum.

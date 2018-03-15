@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,7 @@ public class OleMessages {
 
     /**
      * Returns the formatted message for the given key in the resource bundle.
-     *
+     * 
      * @param key
      *            the resource name
      * @param args
@@ -43,7 +43,7 @@ public class OleMessages {
     /**
      * Returns the resource object with the given key in the resource bundle. If
      * there isn't any value under the given key, the key is returned.
-     *
+     * 
      * @param key
      *            the resource name
      * @return the string
@@ -59,7 +59,7 @@ public class OleMessages {
     /**
      * Returns the resource object with the given key in the resource bundle. If
      * there isn't any value under the given key, the default value is returned.
-     *
+     * 
      * @param key
      *            the resource name
      * @param def

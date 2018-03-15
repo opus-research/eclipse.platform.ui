@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,7 @@
 
 package org.eclipse.ui.tests.statushandlers;
 
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
+import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -54,13 +52,8 @@ import org.eclipse.ui.statushandlers.AbstractStatusAreaProvider;
 import org.eclipse.ui.statushandlers.IStatusAdapterConstants;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.eclipse.ui.statushandlers.StatusManager.INotificationListener;
 import org.eclipse.ui.statushandlers.WorkbenchErrorHandler;
 import org.eclipse.ui.statushandlers.WorkbenchStatusDialogManager;
-import org.eclipse.ui.tests.concurrency.FreezeMonitor;
-import org.eclipse.ui.tests.harness.util.UITestCase;
-
-import junit.framework.TestCase;
 
 public class StatusDialogManagerTest extends TestCase {
 
@@ -77,15 +70,13 @@ public class StatusDialogManagerTest extends TestCase {
 
 	private boolean automatedMode;
 	WorkbenchStatusDialogManager wsdm;
-
-	@Override
+	
 	protected void setUp() throws Exception {
-		super.setUp();
 		automatedMode = ErrorDialog.AUTOMATED_MODE;
 		wsdm = new WorkbenchStatusDialogManager(null, null);
 		ErrorDialog.AUTOMATED_MODE = false;
 		wsdm.setProperty(IStatusDialogConstants.ANIMATION, Boolean.FALSE);
-		FreezeMonitor.expectCompletionIn(60_000);
+		super.setUp();
 	}
 
 	public void testBlockingAppearance() {
@@ -113,51 +104,42 @@ public class StatusDialogManagerTest extends TestCase {
 		assertNotNull(shell);
 		assertTrue((shell.getStyle() & SWT.APPLICATION_MODAL) == SWT.APPLICATION_MODAL);
 	}
-
+	
 	public void testCheckingForMessageDuplication1() {
 		IStatus status = new IStatus() {
 
-			@Override
 			public IStatus[] getChildren() {
 				return new IStatus[0];
 			}
 
-			@Override
 			public int getCode() {
 				return IStatus.ERROR;
 			}
 
-			@Override
 			public Throwable getException() {
 				return new ArrayIndexOutOfBoundsException();
 			}
 
-			@Override
 			public String getMessage() {
 				return null;
 			}
 
-			@Override
 			public String getPlugin() {
 				return "plugin";
 			}
 
-			@Override
 			public int getSeverity() {
 				return IStatus.ERROR;
 			}
 
-			@Override
 			public boolean isMultiStatus() {
 				return false;
 			}
 
-			@Override
 			public boolean isOK() {
 				return false;
 			}
 
-			@Override
 			public boolean matches(int severityMask) {
 				return true;
 			}
@@ -208,7 +190,7 @@ public class StatusDialogManagerTest extends TestCase {
 		assertFalse(support[0].isDisposed());
 		assertEquals(sa, passed[0]);
 	}
-
+	
 	/**
 	 * Be sure that label provider is not disposed during modality switch.
 	 */
@@ -216,31 +198,25 @@ public class StatusDialogManagerTest extends TestCase {
 		final boolean[] disposed = new boolean[] { false };
 		ITableLabelProvider provider = new ITableLabelProvider() {
 
-			@Override
 			public Image getColumnImage(Object element, int columnIndex) {
 				return null;
 			}
 
-			@Override
 			public String getColumnText(Object element, int columnIndex) {
 				return "";
 			}
 
-			@Override
 			public void addListener(ILabelProviderListener listener) {
 			}
 
-			@Override
 			public void dispose() {
 				disposed[0] = true;
 			}
 
-			@Override
 			public boolean isLabelProperty(Object element, String property) {
 				return false;
 			}
 
-			@Override
 			public void removeListener(ILabelProviderListener listener) {
 			}
 
@@ -286,37 +262,31 @@ public class StatusDialogManagerTest extends TestCase {
 
 	public void testWithStatusAdapterAndLabelProvider1(){
 		wsdm.setMessageDecorator(new ILabelDecorator(){
-
-			@Override
+			
 			public Image decorateImage(Image image, Object element) {
 				return null;
 			}
-
-			@Override
+			
 			public String decorateText(String text, Object element) {
 				return text.replaceAll("[A-Z][A-Z][A-Z][0-9][0-9]", "");
 			}
-
-			@Override
+			
 			public void addListener(ILabelProviderListener listener) {
-
+				
 			}
-
-			@Override
+			
 			public void dispose() {
-
+				
 			}
-
-			@Override
+			
 			public boolean isLabelProperty(Object element, String property) {
 				return false;
 			}
-
-			@Override
+			
 			public void removeListener(ILabelProviderListener listener) {
-
+				
 			}
-
+			
 		});
 		wsdm.addStatusAdapter(createStatusAdapter("XYZ01" + MESSAGE_1), false);
 		Label titleLabel = StatusDialogUtil.getTitleLabel();
@@ -328,8 +298,8 @@ public class StatusDialogManagerTest extends TestCase {
 		assertEquals(WorkbenchMessages.WorkbenchStatusDialog_SeeDetails,
 				secondaryLabel.getText());
 	}
-
-
+	
+	
 	/**
 	 * Simple status with title. Check primary and secondary message. Verify
 	 * closing.
@@ -391,7 +361,6 @@ public class StatusDialogManagerTest extends TestCase {
 		StatusAdapter statusAdapter = new StatusAdapter(new Status(
 				IStatus.ERROR, "testplugin", message));
 		Job job = new Job("job") {
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				return null;
 			}
@@ -452,7 +421,7 @@ public class StatusDialogManagerTest extends TestCase {
 		wsdm.addStatusAdapter(statusAdapter, false);
 		openSupportArea(statusAdapter, passed);
 	}
-
+	
 	/**
 	 * Tests if support area appears by default if appropriate flag is set up.
 	 */
@@ -504,7 +473,7 @@ public class StatusDialogManagerTest extends TestCase {
 			assertTrue(details[0].isDisposed());
 		}
 	}
-
+	
 	public void testNullLabelProvider(){
 		try {
 			wsdm.setStatusListLabelProvider(null);
@@ -513,44 +482,38 @@ public class StatusDialogManagerTest extends TestCase {
 			assertTrue(true);
 		}
 	}
-
+	
 	//bug 235254
 	public void testNonNullLabelProvider(){
 		try {
 			final boolean [] called = new boolean[]{false};
 			wsdm.setStatusListLabelProvider(new ITableLabelProvider(){
 
-				@Override
 				public Image getColumnImage(Object element, int columnIndex) {
 					return null;
 				}
 
-				@Override
 				public String getColumnText(Object element, int columnIndex) {
 					called[0] = true;
 					return "";
 				}
 
-				@Override
 				public void addListener(ILabelProviderListener listener) {
-
+					
 				}
 
-				@Override
 				public void dispose() {
-
+					
 				}
 
-				@Override
 				public boolean isLabelProperty(Object element, String property) {
 					return false;
 				}
 
-				@Override
 				public void removeListener(ILabelProviderListener listener) {
-
+					
 				}
-
+				
 			});
 			wsdm.addStatusAdapter(createStatusAdapter(MESSAGE_1), true);
 			assertTrue(called[0]);
@@ -582,26 +545,8 @@ public class StatusDialogManagerTest extends TestCase {
 		// this verifies if support is opened for correct statusAdapter
 		openSupportArea(statusAdapter1, passed);
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null));
 		assertEquals(statusAdapter2, passed[0]);
-	}
-
-	private void processRemainingUiEvents() {
-		UITestCase.processEvents();
-		int count = 0;
-		while (count < 3 && (StatusDialogUtil.getStatusShell() != null)) {
-			UITestCase.processEvents();
-			count++;
-		}
-	}
-
-	private void assertStatusShellOpen() {
-		int count = 0;
-		while (count < 42 && (StatusDialogUtil.getStatusShell() == null)) {
-			UITestCase.processEvents();
-			count++;
-		}
-		assertNotNull("Status shell was not shown!", StatusDialogUtil.getStatusShell());
 	}
 
 	/**
@@ -628,8 +573,9 @@ public class StatusDialogManagerTest extends TestCase {
 
 		assertNotNull(details[0]);
 		assertFalse(details[0].isDisposed());
-		processRemainingUiEvents();
-
+		//process all remaining events
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null));
+		
 		assertEquals(statusAdapter2, passed[0]);
 	}
 
@@ -653,13 +599,14 @@ public class StatusDialogManagerTest extends TestCase {
 		assertEquals(MESSAGE_1, table.getItem(0).getText());
 
 		selectTable(table, 1);
-
-		processRemainingUiEvents();
+		
+		// process all remaining events
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null));
 
 		assertEquals(MESSAGE_2, titleLabel.getText());
 		assertEquals(JOB_NAME, table.getItem(1).getText());
 	}
-
+	
 	public void testBug260937(){
 		WorkbenchStatusDialogManager wsdm = new WorkbenchStatusDialogManager(
 				IStatus.CANCEL, null);
@@ -671,20 +618,19 @@ public class StatusDialogManagerTest extends TestCase {
 			fail();
 		}
 	}
-
+	
 	public void testBug276371(){
 		StatusAdapter bomb = new StatusAdapter(new Status(IStatus.ERROR,
 				"org.eclipse.ui.tests", "bomb"){
 			int i = 0;
 
-			@Override
 			public String getMessage() {
 				i++;
 				if (i == 1) {
 					throw new RuntimeException("the bomb!");
 				}
 				return super.getMessage();
-
+				
 			}
 		});
 		try{
@@ -698,7 +644,7 @@ public class StatusDialogManagerTest extends TestCase {
 		assertTrue("Dialog could not be initialized after failure",
 				StatusDialogUtil.getStatusShell() != null);
 	}
-
+	
 	// checking if the statuses are correctly ignored.
 	public void testOKStatus1() {
 		try {
@@ -714,12 +660,11 @@ public class StatusDialogManagerTest extends TestCase {
 				"Only one status should be visible (OK should be ignored)", 1,
 				wsdm.getStatusAdapters().size());
 	}
-
+	
 	public void testOKStatus2(){
 		final WorkbenchStatusDialogManager wsdm[] = new WorkbenchStatusDialogManager[] { null };
 		WorkbenchErrorHandler weh = new WorkbenchErrorHandler() {
 
-			@Override
 			protected void configureStatusDialog(
 					WorkbenchStatusDialogManager statusDialog) {
 				wsdm[0] = statusDialog;
@@ -730,14 +675,13 @@ public class StatusDialogManagerTest extends TestCase {
 		weh.handle(new StatusAdapter(Status.OK_STATUS), StatusManager.SHOW);
 		assertEquals(1, wsdm[0].getStatusAdapters().size());
 	}
-
+	
 	public void testBug211933() {
 		MultiStatus multi = new MultiStatus("testplugin", 0, "message", null);
 		multi.add(new Status(IStatus.CANCEL, "testplugin", "message 1"));
 		final WorkbenchStatusDialogManager wsdm[] = new WorkbenchStatusDialogManager[] { null };
 		WorkbenchErrorHandler weh = new WorkbenchErrorHandler() {
 
-			@Override
 			protected void configureStatusDialog(
 					WorkbenchStatusDialogManager statusDialog) {
 				wsdm[0] = statusDialog;
@@ -745,12 +689,12 @@ public class StatusDialogManagerTest extends TestCase {
 			}
 
 		};
-		StatusAdapter sa = new StatusAdapter(multi);
+		StatusAdapter sa = new StatusAdapter(multi); 
 		weh.handle(sa, StatusManager.SHOW);
 		// be sure that non error status is passed to the dialog
 		assertTrue(wsdm[0].getStatusAdapters().contains(sa));
 	}
-
+	
 	public void testBug275867(){
 		StatusAdapter statusAdapter = createStatusAdapter(MESSAGE_1);
 		final StatusAdapter[] passed = new StatusAdapter[] { null };
@@ -762,13 +706,12 @@ public class StatusDialogManagerTest extends TestCase {
 		Shell shell = StatusDialogUtil.getStatusShell();
 		assertEquals("Dialog is not centered correctly",getInitialLocation(shell), shell.getLocation());
 	}
-
+	
 	//error link present
-	public void testBug278965_1() {
+	public void testBug278965_1(){
 		final WorkbenchStatusDialogManager wsdm[] = new WorkbenchStatusDialogManager[] { null };
 		WorkbenchErrorHandler weh = new WorkbenchErrorHandler() {
 
-			@Override
 			protected void configureStatusDialog(
 					WorkbenchStatusDialogManager statusDialog) {
 				wsdm[0] = statusDialog;
@@ -778,30 +721,21 @@ public class StatusDialogManagerTest extends TestCase {
 		};
 		weh.handle(createStatusAdapter(MESSAGE_1), StatusManager.SHOW | StatusManager.LOG);
 		assertEquals(1, wsdm[0].getStatusAdapters().size());
-
-		assertStatusShellOpen();
-
-		Link errorLogLink = StatusDialogUtil.getErrorLogLink();
-		if (errorLogLink == null) {
-			// TODO test fails in Gerrit, but passes with GTK2/GTK3 locally
-			// The getErrorLogLink() can't find the link widget...
-			return;
-		}
-		assertNotNull("Link to error log should be present", errorLogLink);
+		assertNotNull("Link to error log should be present", StatusDialogUtil
+				.getErrorLogLink());
 		assertFalse("Link to error log should not be disposed",
-				errorLogLink.isDisposed());
+				StatusDialogUtil.getErrorLogLink().isDisposed());
 		assertTrue("Link to error log should be enabled",
-				errorLogLink.isEnabled());
+				StatusDialogUtil.getErrorLogLink().isEnabled());
 		assertTrue("Link to error log should be visible",
-				errorLogLink.isVisible());
+				StatusDialogUtil.getErrorLogLink().isVisible());
 	}
-
+	
 	//error link hidden
 	public void testBug278965_2(){
 		final WorkbenchStatusDialogManager wsdm[] = new WorkbenchStatusDialogManager[] { null };
 		WorkbenchErrorHandler weh = new WorkbenchErrorHandler() {
 
-			@Override
 			protected void configureStatusDialog(
 					WorkbenchStatusDialogManager statusDialog) {
 				wsdm[0] = statusDialog;
@@ -816,13 +750,12 @@ public class StatusDialogManagerTest extends TestCase {
 				|| !StatusDialogUtil.getErrorLogLink().isVisible();
 		assertTrue("Error log link should be null, disposed or invisible", status);
 	}
-
+	
 	//two statuses, present
 	public void testBug278965_3(){
 		final WorkbenchStatusDialogManager wsdm[] = new WorkbenchStatusDialogManager[] { null };
 		WorkbenchErrorHandler weh = new WorkbenchErrorHandler() {
 
-			@Override
 			protected void configureStatusDialog(
 					WorkbenchStatusDialogManager statusDialog) {
 				wsdm[0] = statusDialog;
@@ -832,23 +765,16 @@ public class StatusDialogManagerTest extends TestCase {
 		};
 		weh.handle(createStatusAdapter(MESSAGE_1), StatusManager.SHOW);
 		weh.handle(createStatusAdapter(MESSAGE_2), StatusManager.SHOW | StatusManager.LOG);
-
-		assertStatusShellOpen();
-		Link errorLogLink = StatusDialogUtil.getErrorLogLink();
-		if (errorLogLink == null) {
-			// TODO test fails in Gerrit, but passes with GTK2/GTK3 locally
-			// The getErrorLogLink() can't find the link widget...
-			return;
-		}
-		assertNotNull("Link to error log should be present", errorLogLink);
+		assertNotNull("Link to error log should be present", StatusDialogUtil
+				.getErrorLogLink());
 		assertFalse("Link to error log should not be disposed",
-				errorLogLink.isDisposed());
+				StatusDialogUtil.getErrorLogLink().isDisposed());
 		assertTrue("Link to error log should be enabled",
-				errorLogLink.isEnabled());
+				StatusDialogUtil.getErrorLogLink().isEnabled());
 		assertTrue("Link to error log should be visible",
-				errorLogLink.isVisible());
+				StatusDialogUtil.getErrorLogLink().isVisible());
 	}
-
+	
 	// two statuses, details, resize
 	public void testBug288770_1(){
 		wsdm.addStatusAdapter(createStatusAdapter(MESSAGE_1), false);
@@ -868,7 +794,7 @@ public class StatusDialogManagerTest extends TestCase {
 		assertEquals("All height should be consumed by details", height,
 				newHeight);
 	}
-
+	
 	// status, details, status, resize
 	public void testBug288770_2(){
 		wsdm.addStatusAdapter(createStatusAdapter(MESSAGE_1), false);
@@ -888,7 +814,7 @@ public class StatusDialogManagerTest extends TestCase {
 		assertEquals("All height should be consumed by details", height,
 				newHeight);
 	}
-
+	
 	public void testBug288770_3(){
 		wsdm.addStatusAdapter(createStatusAdapter(MESSAGE_1), false);
 		assertTrue("Details should be closed initially", StatusDialogUtil
@@ -905,7 +831,7 @@ public class StatusDialogManagerTest extends TestCase {
 		int newHeight = StatusDialogUtil.getTable().getSize().y;
 		assertTrue("List should resize when details are closed", height < newHeight);
 	}
-
+	
 	public void testBug288770_4(){
 		wsdm.addStatusAdapter(createStatusAdapter(MESSAGE_1), false);
 		assertTrue("Details should be closed initially", StatusDialogUtil
@@ -927,7 +853,7 @@ public class StatusDialogManagerTest extends TestCase {
 		int newHeight = StatusDialogUtil.getTable().getSize().y;
 		assertTrue("List should resize when details are closed", height < newHeight);
 	}
-
+	
 	public void testBug288765() {
 		wsdm.addStatusAdapter(createStatusAdapter(MESSAGE_1), false);
 		selectWidget(StatusDialogUtil.getDetailsButton());
@@ -946,7 +872,7 @@ public class StatusDialogManagerTest extends TestCase {
 		Rectangle newSize = shell.getBounds();
 		assertTrue(newSize.height > sizeY);
 	}
-
+	
 	public void testIgnoringOpenTrayOnShow() {
 		wsdm.enableDefaultSupportArea(true);
 		wsdm.enableErrorDialogCompatibility();
@@ -954,20 +880,20 @@ public class StatusDialogManagerTest extends TestCase {
 		WorkbenchStatusDialogManagerImpl manager = (WorkbenchStatusDialogManagerImpl) wsdm
 				.getProperty(IStatusDialogConstants.MANAGER_IMPL);
 		assertNull("Tray should not be opened", manager.getDialog().getTray());
-
+		
 		wsdm.addStatusAdapter(createStatusAdapter(MESSAGE_2,
 				new NullPointerException()), false);
-
+		
 		Table table = StatusDialogUtil.getTable();
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null));
 		assertNotNull("Tray should be opened", manager.getDialog().getTray());
-
+		
 		selectTable(table, 0);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null));
 		assertNull("Tray should not be opened", manager.getDialog().getTray());
 	}
-
+	
 	public void testAutoOpeningTrayOnShow() {
 		wsdm.enableDefaultSupportArea(true);
 		wsdm.enableErrorDialogCompatibility();
@@ -976,7 +902,7 @@ public class StatusDialogManagerTest extends TestCase {
 				.getProperty(IStatusDialogConstants.MANAGER_IMPL);
 		assertNotNull("Tray should be opened", manager.getDialog().getTray());
 	}
-
+	
 	/**
 	 * Enable default support area.
 	 * Open the dialog as non-modal.
@@ -995,17 +921,17 @@ public class StatusDialogManagerTest extends TestCase {
 		WorkbenchStatusDialogManagerImpl manager = (WorkbenchStatusDialogManagerImpl) wsdm
 				.getProperty(IStatusDialogConstants.MANAGER_IMPL);
 		assertNotNull("Tray should be opened", manager.getDialog().getTray());
-
+		
 		wsdm.addStatusAdapter(createStatusAdapter(MESSAGE_2), true);
 		assertNotNull("Tray should be opened", manager.getDialog().getTray());
 
 		Table table = StatusDialogUtil.getTable();
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null));
 		assertNull("Tray should not be opened", manager.getDialog().getTray());
 		assertNull(StatusDialogUtil.getSupportLink());
 	}
-
+	
 	public void testSupportLinkVisibility1(){
 		wsdm.enableDefaultSupportArea(true);
 		StatusAdapter sa = createStatusAdapter(MESSAGE_1, new NullPointerException());
@@ -1015,10 +941,10 @@ public class StatusDialogManagerTest extends TestCase {
 		wsdm.addStatusAdapter(sa2, false);
 		Table table = StatusDialogUtil.getTable();
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null));
 		assertNull(StatusDialogUtil.getSupportLink());
 	}
-
+	
 	public void testSupportLinkVisibility2() {
 		wsdm.enableDefaultSupportArea(true);
 		StatusAdapter sa = createStatusAdapter(MESSAGE_1);
@@ -1028,15 +954,14 @@ public class StatusDialogManagerTest extends TestCase {
 		wsdm.addStatusAdapter(sa2, false);
 		Table table = StatusDialogUtil.getTable();
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null));
 		assertNotNull(StatusDialogUtil.getSupportLink());
 	}
-
+	
 	public void testProvidingCustomSupportAreaProvider() {
 		final boolean[] consulted = new boolean[]{false};
 		AbstractStatusAreaProvider customProvider = new AbstractStatusAreaProvider() {
-
-			@Override
+			
 			public Control createSupportArea(Composite parent,
 					StatusAdapter statusAdapter) {
 				//intentionally does nothing as this provider
@@ -1044,117 +969,22 @@ public class StatusDialogManagerTest extends TestCase {
 				return null;
 			}
 
-			@Override
 			public boolean validFor(StatusAdapter statusAdapter) {
 				consulted[0] = true;
 				return false;
 			}
 		};
-
+		
 		wsdm.setSupportAreaProvider(customProvider);
 		StatusAdapter sa = createStatusAdapter(MESSAGE_1);
 		wsdm.addStatusAdapter(sa, false);
 		assertTrue("Custom support area provider should be consulted", consulted[0]);
 	}
-
-	public void testDeadlockFromBug501681() throws Exception {
-		assertNotNull("Test must run in UI thread", Display.getCurrent());
-
-		final StatusAdapter statusAdapter = createStatusAdapter("Oops");
-		AtomicReference<StatusAdapter[]> reported = new AtomicReference<>();
-		INotificationListener listener = (type, adapters) -> {
-			reported.set(adapters);
-		};
-
-		AtomicReference<ReentrantLock> lock = new AtomicReference<>();
-		lock.set(new ReentrantLock());
-		final Semaphore semaphore = new Semaphore(0);
-
-		// This simulates a thread locked some shared resource
-		// It will release lock only if "wait" is set to "false"
-		Thread t = new Thread(() -> {
-			lock.get().lock();
-			try {
-				semaphore.acquire();
-			} catch (InterruptedException e) {
-				//
-			}
-			lock.get().unlock();
-		});
-		t.start();
-
-		// Wait for thread to acquire the lock
-		while (!lock.get().isLocked()) {
-			Thread.sleep(50);
-		}
-		assertTrue(lock.get().isLocked());
-
-		// Verify status handling works (without blocking)
-		StatusManager.getManager().addListener(listener);
-		StatusManager.getManager().handle(statusAdapter, StatusManager.SHOW | StatusManager.LOG);
-		assertSame(statusAdapter, reported.get()[0]);
-		Shell shell = StatusDialogUtil.getStatusShell();
-		if (shell != null) {
-			shell.dispose();
-		}
-		reported.set(null);
-
-		// Verify status handling works with blocking
-		final StatusAdapter statusAdapter2 = createStatusAdapter("Oops2");
-		try {
-			// this job will try to report some "blocking" status
-			// if it does NOT deadlock, the "wait" will be unset and lock will
-			// be released
-			Job badJob = new Job("Will report blocking error") {
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					StatusManager.getManager().handle(statusAdapter2, StatusManager.BLOCK | StatusManager.LOG);
-					// stop blocking thread
-					semaphore.release();
-					return Status.OK_STATUS;
-				}
-			};
-
-			// start later so that we have time to lock ourselves
-			badJob.schedule(100);
-
-			// This will now block UI until the lock is released
-			// Without the patch for bug 501681 this will never happen
-			// because the job we start in a moment will wait for UI thread to
-			// show the blocking dialog
-			lock.get().lock();
-
-			// make sure job was done
-			badJob.join();
-		} finally {
-			// Will "unblock" the blocking dialog shown by the job, must be
-			// posted with delay, because dialog is not yet shown
-			postUnblockingTask();
-
-			// Allow the blocking dialog to be shown
-			UITestCase.processEvents();
-			StatusManager.getManager().removeListener(listener);
-		}
-		assertFalse("Job should successfully finish", semaphore.hasQueuedThreads());
-		assertNotNull("Status adapter was not logged", reported.get());
-		assertSame(statusAdapter2, reported.get()[0]);
-	}
-
-	private void postUnblockingTask() {
-		Display.getCurrent().timerExec(100, () -> {
-			Shell shell = StatusDialogUtil.getStatusShellImmediately();
-			if (shell != null) {
-				shell.dispose();
-			} else {
-				// shell not shown yet? re-post
-				postUnblockingTask();
-			}
-		});
-	}
+	
 
 	/**
 	 * Delivers custom support area.
-	 *
+	 * 
 	 * @param passed -
 	 *            status adapter passed to the support will be set as first
 	 *            element of this array.
@@ -1165,7 +995,6 @@ public class StatusDialogManagerTest extends TestCase {
 	private void setupSupportArea(final StatusAdapter[] passed,
 			final Composite[] support) {
 		Policy.setErrorSupportProvider(new AbstractStatusAreaProvider() {
-			@Override
 			public Control createSupportArea(Composite parent,
 					StatusAdapter statusAdapter) {
 				passed[0] = statusAdapter;
@@ -1182,7 +1011,7 @@ public class StatusDialogManagerTest extends TestCase {
 
 	/**
 	 * Opens support area.
-	 *
+	 * 
 	 * @param statusAdapter -
 	 *            a statusAdapter (for verification that support area uses
 	 *            correct one)
@@ -1207,7 +1036,7 @@ public class StatusDialogManagerTest extends TestCase {
 
 	/**
 	 * This method creates custom details area.
-	 *
+	 * 
 	 * @param passed -
 	 *            status adapter passed to the details will be set as first
 	 *            element of this array.
@@ -1218,7 +1047,6 @@ public class StatusDialogManagerTest extends TestCase {
 	private void setupDetails(final StatusAdapter[] passed,
 			final Composite[] details) {
 		wsdm.setDetailsAreaProvider(new AbstractStatusAreaProvider() {
-			@Override
 			public Control createSupportArea(Composite parent,
 					StatusAdapter statusAdapter) {
 				passed[0] = statusAdapter;
@@ -1235,7 +1063,7 @@ public class StatusDialogManagerTest extends TestCase {
 
 	/**
 	 * This method simulates mouse selection on Table (selects TableItem).
-	 *
+	 * 
 	 * @param table
 	 *            a Table to be selected.
 	 * @param i
@@ -1250,7 +1078,7 @@ public class StatusDialogManagerTest extends TestCase {
 
 	/**
 	 * This method simulates mouse selection on particular Control.
-	 *
+	 * 
 	 * @param control
 	 *            a Control to be selected.
 	 */
@@ -1262,7 +1090,7 @@ public class StatusDialogManagerTest extends TestCase {
 
 	/**
 	 * Creates StatusAdapter from passed parameters.
-	 *
+	 * 
 	 * @param message
 	 *            a message to be used in StatusAdapter
 	 * @return created StatusAdapter
@@ -1274,7 +1102,7 @@ public class StatusDialogManagerTest extends TestCase {
 
 	/**
 	 * Creates StatusAdapter from passed parameters.
-	 *
+	 * 
 	 * @param message
 	 *            a message to be used in StatusAdapter
 	 * @param throwable
@@ -1290,7 +1118,7 @@ public class StatusDialogManagerTest extends TestCase {
 	/**
 	 * Creates StatusAdapter from passed parameters. StatusAdapter will look
 	 * like it is coming from job.
-	 *
+	 * 
 	 * @param message
 	 *            a message to be used in StatusAdapter
 	 * @param jobname
@@ -1307,7 +1135,6 @@ public class StatusDialogManagerTest extends TestCase {
 			return sa;
 		}
 		Job job = new Job(jobname) {
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				return null;
 			}
@@ -1324,7 +1151,7 @@ public class StatusDialogManagerTest extends TestCase {
 
 	/**
 	 * Creates StatusAdapter from passed parameters.
-	 *
+	 * 
 	 * @param message
 	 *            a message to be used in StatusAdapter
 	 * @param title
@@ -1337,17 +1164,12 @@ public class StatusDialogManagerTest extends TestCase {
 		return sa;
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
+		wsdm = null;
 		Shell shell = StatusDialogUtil.getStatusShell();
-		FreezeMonitor.done();
 		if (shell != null) {
 			shell.dispose();
-			WorkbenchStatusDialogManagerImpl impl = (WorkbenchStatusDialogManagerImpl) wsdm
-					.getProperty(IStatusDialogConstants.MANAGER_IMPL);
-			assertNull(impl.getProperty(IStatusDialogConstants.CURRENT_STATUS_ADAPTER));
 		}
-		wsdm = null;
 		ErrorDialog.AUTOMATED_MODE = automatedMode;
 		Policy.setErrorSupportProvider(null);
 		super.tearDown();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,21 +18,21 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
- * This class is used to read marker help context ids and
+ * This class is used to read marker help context ids and 
  * resolutions from the platform registry.
  */
 public class MarkerHelpRegistryReader extends IDERegistryReader {
     private MarkerHelpRegistry markerHelpRegistry;
 
-	private ArrayList<String> currentAttributeNames;
+    private ArrayList currentAttributeNames;
 
-	private ArrayList<String> currentAttributeValues;
+    private ArrayList currentAttributeValues;
 
     private static final String TAG_HELP = "markerHelp";//$NON-NLS-1$
 
     private static final String TAG_RESOLUTION_GENERATOR = "markerResolutionGenerator";//$NON-NLS-1$
 
-    private static final String TAG_ATTRIBUTE = "attribute";//$NON-NLS-1$
+    private static final String TAG_ATTRIBUTE = "attribute";//$NON-NLS-1$ 
 
     private static final String ATT_TYPE = "markerType";//$NON-NLS-1$
 
@@ -45,8 +45,8 @@ public class MarkerHelpRegistryReader extends IDERegistryReader {
      * and add it to the given marker help registry.
      * <p>
      * Warning:
-     * The marker help registry must be passed in because this
-     * method is called during the process of setting up the
+     * The marker help registry must be passed in because this 
+     * method is called during the process of setting up the 
      * marker help registry and at this time it has not been
      * safely setup with the plugin.
      * </p>
@@ -63,8 +63,7 @@ public class MarkerHelpRegistryReader extends IDERegistryReader {
     /**
      * Processes one configuration element or child element.
      */
-    @Override
-	protected boolean readElement(IConfigurationElement element) {
+    protected boolean readElement(IConfigurationElement element) {
         if (element.getName().equals(TAG_HELP)) {
             readHelpElement(element);
             return true;
@@ -88,12 +87,12 @@ public class MarkerHelpRegistryReader extends IDERegistryReader {
         String type = element.getAttribute(ATT_TYPE);
 
         // read attributes and values
-		currentAttributeNames = new ArrayList<>();
-		currentAttributeValues = new ArrayList<>();
+        currentAttributeNames = new ArrayList();
+        currentAttributeValues = new ArrayList();
         readElementChildren(element);
-        String[] attributeNames = currentAttributeNames
+        String[] attributeNames = (String[]) currentAttributeNames
                 .toArray(new String[currentAttributeNames.size()]);
-        String[] attributeValues = currentAttributeValues
+        String[] attributeValues = (String[]) currentAttributeValues
                 .toArray(new String[currentAttributeValues.size()]);
 
         // add query to the registry
@@ -110,12 +109,12 @@ public class MarkerHelpRegistryReader extends IDERegistryReader {
         String type = element.getAttribute(ATT_TYPE);
 
         // read attributes and values
-		currentAttributeNames = new ArrayList<>();
-		currentAttributeValues = new ArrayList<>();
+        currentAttributeNames = new ArrayList();
+        currentAttributeValues = new ArrayList();
         readElementChildren(element);
-        String[] attributeNames = currentAttributeNames
+        String[] attributeNames = (String[]) currentAttributeNames
                 .toArray(new String[currentAttributeNames.size()]);
-        String[] attributeValues = currentAttributeValues
+        String[] attributeValues = (String[]) currentAttributeValues
                 .toArray(new String[currentAttributeValues.size()]);
 
         // add query to the registry

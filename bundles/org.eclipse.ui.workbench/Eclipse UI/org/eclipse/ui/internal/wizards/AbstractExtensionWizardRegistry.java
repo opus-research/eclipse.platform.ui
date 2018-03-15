@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
 
 /**
  * Abstract baseclass for wizard registries that listen to extension changes.
- *
+ * 
  * @since 3.1
  */
 public abstract class AbstractExtensionWizardRegistry extends
@@ -39,15 +39,17 @@ public abstract class AbstractExtensionWizardRegistry extends
 		super();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
+	 */
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		WizardsRegistryReader reader = new WizardsRegistryReader(getPlugin(),
 				getExtensionPoint());
 		reader.setInitialCollection(getWizardElements());
 		IConfigurationElement[] configurationElements = extension
 				.getConfigurationElements();
-		for (IConfigurationElement configurationElement : configurationElements) {
-			reader.readElement(configurationElement);
+		for (int i = 0; i < configurationElements.length; i++) {
+			reader.readElement(configurationElements[i]);
 		}
 		// no need to reset the wizard elements - getWizardElements will parse
 		// the
@@ -71,17 +73,23 @@ public abstract class AbstractExtensionWizardRegistry extends
 				localPrimaryWizards.length, additionalPrimary.length);
 		setPrimaryWizards(newPrimary);
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.wizards.AbstractWizardRegistry#dispose()
+	 */
 	public void dispose() {
 		super.dispose();
 		PlatformUI.getWorkbench().getExtensionTracker()
 				.unregisterHandler(this);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.wizards.AbstractWizardRegistry#doInitialize()
+	 */
 	protected void doInitialize() {
-
+        
 		PlatformUI.getWorkbench().getExtensionTracker().registerHandler(this, ExtensionTracker.createExtensionPointFilter(getExtensionPointFilter()));
 
 		WizardsRegistryReader reader = new WizardsRegistryReader(getPlugin(),
@@ -94,7 +102,7 @@ public abstract class AbstractExtensionWizardRegistry extends
 	/**
 	 * Return the extension point id that should be used for extension registry
 	 * queries.
-	 *
+	 * 
 	 * @return the extension point id
 	 */
 	protected abstract String getExtensionPoint();
@@ -106,14 +114,14 @@ public abstract class AbstractExtensionWizardRegistry extends
 
 	/**
 	 * Return the plugin id that should be used for extension registry queries.
-	 *
+	 * 
 	 * @return the plugin id
 	 */
 	protected abstract String getPlugin();
 
 	/**
 	 * Register the object with the workbench tracker.
-	 *
+	 * 
 	 * @param extension
 	 *            the originating extension
 	 * @param object
@@ -126,43 +134,49 @@ public abstract class AbstractExtensionWizardRegistry extends
 
 	/**
 	 * Register all wizards in the given collection with the extension tracker.
-	 *
+	 * 
 	 * @param collection
 	 *            the collection to register
 	 */
 	private void registerWizards(WizardCollectionElement collection) {
 		registerWizards(collection.getWorkbenchWizardElements());
 
-		for (WizardCollectionElement wizardCollectionElement : collection.getCollectionElements()) {
-			IConfigurationElement configurationElement = wizardCollectionElement.getConfigurationElement();
+		WizardCollectionElement[] collections = collection
+				.getCollectionElements();
+		for (int i = 0; i < collections.length; i++) {
+			IConfigurationElement configurationElement = collections[i]
+					.getConfigurationElement();
 			if (configurationElement != null) {
 				register(configurationElement.getDeclaringExtension(),
-						wizardCollectionElement);
+						collections[i]);
 			}
-			registerWizards(wizardCollectionElement);
+			registerWizards(collections[i]);
 		}
 	}
 
 	/**
 	 * Register all wizards in the given array.
-	 *
+	 * 
 	 * @param wizards
 	 *            the wizards to register
 	 */
 	private void registerWizards(WorkbenchWizardElement[] wizards) {
-		for (WorkbenchWizardElement wizard : wizards) {
-			register(wizard.getConfigurationElement()
-					.getDeclaringExtension(), wizard);
+		for (int i = 0; i < wizards.length; i++) {
+			register(wizards[i].getConfigurationElement()
+					.getDeclaringExtension(), wizards[i]);
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
+	 */
 	public void removeExtension(IExtension extension, Object[] objects) {
 		if (!extension.getExtensionPointUniqueIdentifier().equals(
 				getExtensionPointFilter().getUniqueIdentifier())) {
 			return;
 		}
-		for (Object object : objects) {
+		for (int i = 0; i < objects.length; i++) {
+			Object object = objects[i];
 			if (object instanceof WizardCollectionElement) {
 				// TODO: should we move child wizards to the "other" node?
 				WizardCollectionElement collection = (WizardCollectionElement) object;

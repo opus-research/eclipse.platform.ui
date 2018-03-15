@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.part;
 
@@ -39,6 +38,7 @@ import org.eclipse.ui.internal.services.IServiceLocatorCreator;
 import org.eclipse.ui.internal.services.IWorkbenchLocationService;
 import org.eclipse.ui.internal.services.ServiceLocator;
 import org.eclipse.ui.internal.services.WorkbenchLocationService;
+import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.services.IServiceScopes;
 
 /**
@@ -83,7 +83,7 @@ public class PageSite implements IPageSite, INestable {
 
 	/**
 	 * Creates a new sub view site of the given parent view site.
-	 *
+	 * 
 	 * @param parentViewSite
 	 *            the parent view site
 	 */
@@ -93,17 +93,19 @@ public class PageSite implements IPageSite, INestable {
 		subActionBars = new SubActionBars(parentViewSite.getActionBars(), this);
 
 		// Initialize the service locator.
-		IServiceLocatorCreator slc = parentSite
+		IServiceLocatorCreator slc = (IServiceLocatorCreator) parentSite
 				.getService(IServiceLocatorCreator.class);
 		e4Context = ((PartSite) parentViewSite).getContext().createChild("PageSite"); //$NON-NLS-1$
 		this.serviceLocator = (ServiceLocator) slc.createServiceLocator(parentViewSite, null,
-				() -> {
-					// final Control control =
-					// ((PartSite)parentViewSite).getPane().getControl();
-					// if (control != null && !control.isDisposed()) {
-					// ((PartSite)parentViewSite).getPane().doHide();
-					// }
-					// TODO compat: not tsure what this should do
+				new IDisposable() {
+					public void dispose() {
+						// final Control control =
+						// ((PartSite)parentViewSite).getPane().getControl();
+						// if (control != null && !control.isDisposed()) {
+						// ((PartSite)parentViewSite).getPane().doHide();
+						// }
+						// TODO compat: not tsure what this should do
+					}
 				}, e4Context);
 		initializeDefaultServices();
 	}
@@ -117,7 +119,11 @@ public class PageSite implements IPageSite, INestable {
 						getWorkbenchWindow().getWorkbench(),
 						getWorkbenchWindow(), parentSite, null, this, 3));
 		serviceLocator.registerService(IPageSiteHolder.class,
-				(IPageSiteHolder) () -> PageSite.this);
+				new IPageSiteHolder() {
+					public IPageSite getSite() {
+						return PageSite.this;
+					}
+				});
 
 		// create a local handler service so that when this page
 		// activates/deactivates, its handlers will also be taken into/out of
@@ -127,7 +133,7 @@ public class PageSite implements IPageSite, INestable {
 
 		e4Context.set(IContextService.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (contextService == null) {
 					contextService = new NestableContextService(context.getParent().get(
 							IContextService.class), new ActivePartExpression(parentSite.getPart()));
@@ -170,54 +176,65 @@ public class PageSite implements IPageSite, INestable {
 	/**
 	 * The PageSite implementation of this <code>IPageSite</code> method
 	 * returns the <code>SubActionBars</code> for this site.
-	 *
+	 * 
 	 * @return the subactionbars for this site
 	 */
-	@Override
 	public IActionBars getActionBars() {
 		return subActionBars;
 	}
 
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
+	public Object getAdapter(Class adapter) {
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPageSite.
+	 */
 	public IWorkbenchPage getPage() {
 		return parentSite.getPage();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPageSite.
+	 */
 	public ISelectionProvider getSelectionProvider() {
 		return selectionProvider;
 	}
 
-	@Override
-	public final <T> T getService(final Class<T> key) {
-		T service = serviceLocator.getService(key);
+	public final Object getService(final Class key) {
+		Object service = serviceLocator.getService(key);
 		if (active && service instanceof INestable) {
 			((INestable) service).activate();
 		}
 		return service;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPageSite.
+	 */
 	public Shell getShell() {
 		return parentSite.getShell();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPageSite.
+	 */
 	public IWorkbenchWindow getWorkbenchWindow() {
 		return parentSite.getWorkbenchWindow();
 	}
 
-	@Override
-	public final boolean hasService(final Class<?> key) {
+	public final boolean hasService(final Class key) {
 		return serviceLocator.hasService(key);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPageSite.
+	 */
 	public void registerContextMenu(String menuID, MenuManager menuMgr,
 			ISelectionProvider selProvider) {
 		if (menuExtenders == null) {
@@ -227,19 +244,23 @@ public class PageSite implements IPageSite, INestable {
 				e4Context, menuExtenders);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPageSite.
+	 */
 	public void setSelectionProvider(ISelectionProvider provider) {
 		selectionProvider = provider;
 	}
 
-	/* Package */IEclipseContext getSiteContext() {
-		return e4Context;
-	}
-
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.services.INestable#activate()
+	 * 
+	 * @since 3.2
+	 */
 	public void activate() {
 		active = true;
-
+		e4Context.activate();
 		serviceLocator.activate();
 
 		if (contextService != null) {
@@ -247,7 +268,13 @@ public class PageSite implements IPageSite, INestable {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.services.INestable#deactivate()
+	 * 
+	 * @since 3.2
+	 */
 	public void deactivate() {
 		active = false;
 		if (contextService != null) {
@@ -255,5 +282,6 @@ public class PageSite implements IPageSite, INestable {
 		}
 
 		serviceLocator.deactivate();
+		e4Context.deactivate();
 	}
 }

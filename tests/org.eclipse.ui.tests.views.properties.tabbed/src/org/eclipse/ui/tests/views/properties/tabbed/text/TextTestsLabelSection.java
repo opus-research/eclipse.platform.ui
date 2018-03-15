@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -19,7 +19,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
  * A section for the text test view.
- *
+ * 
  * @author Anthony Hunter
  */
 public class TextTestsLabelSection extends AbstractPropertySection {
@@ -31,7 +31,6 @@ public class TextTestsLabelSection extends AbstractPropertySection {
 		label = "A simple section for a selected word \"" + word + "\".";//$NON-NLS-1$//$NON-NLS-2$
 	}
 
-	@Override
 	public void createControls(Composite parent,
 			TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);

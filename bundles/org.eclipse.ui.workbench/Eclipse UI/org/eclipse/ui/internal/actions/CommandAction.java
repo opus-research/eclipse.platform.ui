@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.actions;
@@ -15,6 +14,7 @@ package org.eclipse.ui.internal.actions;
 import java.util.Map;
 
 import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.CommandEvent;
 import org.eclipse.core.commands.ICommandListener;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
@@ -36,7 +36,7 @@ import org.eclipse.ui.services.IServiceLocator;
  * <p>
  * <b>Note:</b> Clients my instantiate, but they must not subclass.
  * </p>
- *
+ * 
  * @since 3.3
  */
 public class CommandAction extends Action {
@@ -54,7 +54,7 @@ public class CommandAction extends Action {
 	/**
 	 * Creates the action backed by a command. For commands that don't take
 	 * parameters.
-	 *
+	 * 
 	 * @param serviceLocator
 	 *            The service locator that is closest in lifecycle to this
 	 *            action.
@@ -69,7 +69,7 @@ public class CommandAction extends Action {
 	 * Creates the action backed by a parameterized command. The parameterMap
 	 * must contain only all required parameters, and may contain the optional
 	 * parameters.
-	 *
+	 * 
 	 * @param serviceLocator
 	 *            The service locator that is closest in lifecycle to this
 	 *            action.
@@ -88,11 +88,13 @@ public class CommandAction extends Action {
 
 	protected ICommandListener getCommandListener() {
 		if (commandListener == null) {
-			commandListener = commandEvent -> {
-				if (commandEvent.isHandledChanged()
-						|| commandEvent.isEnabledChanged()) {
-					if (commandEvent.getCommand().isDefined()) {
-						setEnabled(commandEvent.getCommand().isEnabled());
+			commandListener = new ICommandListener() {
+				public void commandChanged(CommandEvent commandEvent) {
+					if (commandEvent.isHandledChanged()
+							|| commandEvent.isEnabledChanged()) {
+						if (commandEvent.getCommand().isDefined()) {
+							setEnabled(commandEvent.getCommand().isEnabled());
+						}
 					}
 				}
 			};
@@ -102,7 +104,7 @@ public class CommandAction extends Action {
 
 	/**
 	 * Build a command from the executable extension information.
-	 *
+	 * 
 	 * @param commandService
 	 *            to get the Command object
 	 * @param commandId
@@ -137,7 +139,11 @@ public class CommandAction extends Action {
 		parameterizedCommand = null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.Action#runWithEvent(org.eclipse.swt.widgets.Event)
+	 */
 	public void runWithEvent(Event event) {
 		if (handlerService == null) {
 			String commandId = (parameterizedCommand == null ? "unknownCommand" //$NON-NLS-1$
@@ -155,7 +161,11 @@ public class CommandAction extends Action {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.Action#run()
+	 */
 	public void run() {
 		// hopefully this is never called
 		runWithEvent(null);
@@ -167,11 +177,11 @@ public class CommandAction extends Action {
 			// already initialized
 			return;
 		}
-		handlerService = serviceLocator
+		handlerService = (IHandlerService) serviceLocator
 				.getService(IHandlerService.class);
-		ICommandService commandService = serviceLocator
+		ICommandService commandService = (ICommandService) serviceLocator
 				.getService(ICommandService.class);
-		ICommandImageService commandImageService = serviceLocator
+		ICommandImageService commandImageService = (ICommandImageService) serviceLocator
 				.getService(ICommandImageService.class);
 
 		createCommand(commandService, commandIdIn, parameterMap);
@@ -201,7 +211,6 @@ public class CommandAction extends Action {
 		return parameterizedCommand;
 	}
 
-	@Override
 	public String getActionDefinitionId() {
 		return super.getActionDefinitionId();
 	}

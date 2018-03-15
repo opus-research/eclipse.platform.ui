@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,9 +20,16 @@ import org.w3c.dom.css.CSSValue;
  * Abstract CSS Property SWT Handler to check if the <code>element</code>
  * coming from applyCSSProperty and retrieveCSSProperty methods is SWT Control.
  */
-public abstract class AbstractCSSPropertySWTHandler implements ICSSPropertyHandler {
+public abstract class AbstractCSSPropertySWTHandler implements
+		ICSSPropertyHandler {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.core.css.dom.properties.ICSSPropertyHandler#applyCSSProperty(java.lang.Object,
+	 *      java.lang.String, org.w3c.dom.css.CSSValue, java.lang.String,
+	 *      org.eclipse.e4.ui.core.css.engine.CSSEngine)
+	 */
 	public boolean applyCSSProperty(Object element, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		Control control = SWTElementHelpers.getControl(element);
@@ -35,8 +42,13 @@ public abstract class AbstractCSSPropertySWTHandler implements ICSSPropertyHandl
 		return false;
 	}
 
-	@Override
-	public String retrieveCSSProperty(Object element, String property, String pseudo,
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.core.css.dom.properties.ICSSPropertyHandler#retrieveCSSProperty(java.lang.Object,
+	 *      java.lang.String, org.eclipse.e4.ui.core.css.engine.CSSEngine)
+	 */
+	public String retrieveCSSProperty(Object element, String property, String pseudo, 
 			CSSEngine engine) throws Exception {
 		Control control = SWTElementHelpers.getControl(element);
 		if (control != null) {
@@ -51,7 +63,7 @@ public abstract class AbstractCSSPropertySWTHandler implements ICSSPropertyHandl
 	 * Apply CSS Property <code>property</code> (ex : background-color) with
 	 * CSSValue <code>value</code> (ex : red) into the SWT
 	 * <code>control</code> (ex : SWT Text, SWT Label).
-	 *
+	 * 
 	 * @param control
 	 * @param property
 	 * @param value
@@ -66,7 +78,7 @@ public abstract class AbstractCSSPropertySWTHandler implements ICSSPropertyHandl
 	 * Retrieve CSS value (ex : red) of CSS Property <code>property</code> (ex :
 	 * background-color) from the SWT <code>control</code> (ex : SWT Text, SWT
 	 * Label).
-	 *
+	 * 
 	 * @param control
 	 * @param property
 	 * @param engine

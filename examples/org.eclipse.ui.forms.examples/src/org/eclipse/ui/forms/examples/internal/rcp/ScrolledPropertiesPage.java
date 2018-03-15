@@ -15,7 +15,7 @@ import org.eclipse.ui.forms.examples.internal.ExamplesPlugin;
 import org.eclipse.ui.forms.widgets.*;
 /**
  * @author dejan
- *
+ * 
  * To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Generation - Code and Comments
  */
@@ -25,7 +25,6 @@ public class ScrolledPropertiesPage extends FormPage {
 		super(editor, "fourth", "Master Details");
 		block = new ScrolledPropertiesBlock(this);
 	}
-	@Override
 	protected void createFormContent(final IManagedForm managedForm) {
 		final ScrolledForm form = managedForm.getForm();
 		//FormToolkit toolkit = managedForm.getToolkit();

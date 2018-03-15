@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.preferences;
 
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -36,25 +35,17 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  * dialog.open();
  * </pre>
  * During the call to <code>open</code>, the wizard dialog is presented to the
- * user. When the user hits Finish, the user-selected workspace preferences
+ * user. When the user hits Finish, the user-selected workspace preferences 
  * are exported to the user-specified location in the local file system,
  * the dialog closes, and the call to <code>open</code> returns.
  * </p>
- *
+ * 
  * @since 3.1
- *
+ * 
  */
 public class PreferencesExportWizard extends Wizard implements IExportWizard {
 
-	private static final String EVENT_TOPIC_BASE = "org/eclipse/ui/internal/wizards/preferences/export/"; //$NON-NLS-1$
-
-	public static final String EVENT_EXPORT_BEGIN = EVENT_TOPIC_BASE + "begin"; //$NON-NLS-1$
-
-	public static final String EVENT_EXPORT_END = EVENT_TOPIC_BASE + "end"; //$NON-NLS-1$
-
     private WizardPreferencesExportPage1 mainPage;
-
-	private IEventBroker eventBroker;
 
     /**
      * Creates a wizard for exporting workspace preferences to the local file system.
@@ -69,34 +60,31 @@ public class PreferencesExportWizard extends Wizard implements IExportWizard {
         setDialogSettings(section);
     }
 
-    @Override
-	public void addPages() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public void addPages() {
         super.addPages();
         mainPage = new WizardPreferencesExportPage1();
         addPage(mainPage);
     }
 
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
-		eventBroker = workbench.getService(IEventBroker.class);
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         setWindowTitle(PreferencesMessages.PreferencesExportWizard_export);
         setDefaultPageImageDescriptor(WorkbenchImages
                 .getImageDescriptor(IWorkbenchGraphicConstants.IMG_WIZBAN_EXPORT_PREF_WIZ));
         setNeedsProgressMonitor(true);
     }
 
-    @Override
-	public boolean performFinish() {
-		sendEvent(EVENT_EXPORT_BEGIN);
-		boolean success = mainPage.finish();
-		sendEvent(EVENT_EXPORT_END);
-		return success;
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public boolean performFinish() {
+        return mainPage.finish();
     }
-
-	private void sendEvent(String topic) {
-		if (eventBroker != null) {
-			eventBroker.send(topic, null);
-		}
-	}
-
+    
+    
 }

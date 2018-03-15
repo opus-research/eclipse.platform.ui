@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.databinding.Binding;
+import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.Realm;
@@ -32,7 +33,7 @@ import org.eclipse.core.runtime.IStatus;
 
 /**
  * @since 1.0
- *
+ * 
  */
 public class ValidationStatusMap extends ObservableMap {
 
@@ -42,7 +43,11 @@ public class ValidationStatusMap extends ObservableMap {
 
 	private List dependencies = new ArrayList();
 
-	private IChangeListener markDirtyChangeListener = event -> markDirty();
+	private IChangeListener markDirtyChangeListener = new IChangeListener() {
+		public void handleChange(ChangeEvent event) {
+			markDirty();
+		}
+	};
 
 	/**
 	 * @param realm
@@ -54,17 +59,14 @@ public class ValidationStatusMap extends ObservableMap {
 		bindings.addChangeListener(markDirtyChangeListener);
 	}
 
-	@Override
 	public Object getKeyType() {
 		return Binding.class;
 	}
 
-	@Override
 	public Object getValueType() {
 		return IStatus.class;
 	}
 
-	@Override
 	protected void getterCalled() {
 		recompute();
 		super.getterCalled();
@@ -85,31 +87,26 @@ public class ValidationStatusMap extends ObservableMap {
 				}
 			}
 
-			@Override
 			public Set getAddedKeys() {
 				ensureCached();
 				return cachedDiff.getAddedKeys();
 			}
 
-			@Override
 			public Set getChangedKeys() {
 				ensureCached();
 				return cachedDiff.getChangedKeys();
 			}
 
-			@Override
 			public Object getNewValue(Object key) {
 				ensureCached();
 				return cachedDiff.getNewValue(key);
 			}
 
-			@Override
 			public Object getOldValue(Object key) {
 				ensureCached();
 				return cachedDiff.getOldValue(key);
 			}
 
-			@Override
 			public Set getRemovedKeys() {
 				ensureCached();
 				return cachedDiff.getRemovedKeys();
@@ -138,7 +135,11 @@ public class ValidationStatusMap extends ObservableMap {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.databinding.observable.list.ObservableList#dispose()
+	 */
 	public synchronized void dispose() {
 		bindings.removeChangeListener(markDirtyChangeListener);
 		removeElementChangeListener();
@@ -151,15 +152,13 @@ public class ValidationStatusMap extends ObservableMap {
 			observableValue.removeChangeListener(markDirtyChangeListener);
 		}
 	}
-
-	@Override
+	
 	public synchronized void addChangeListener(IChangeListener listener) {
 		// this ensures that the next change will be seen by the new listener.
 		recompute();
 		super.addChangeListener(listener);
 	}
-
-	@Override
+	
 	public synchronized void addMapChangeListener(IMapChangeListener listener) {
 		// this ensures that the next change will be seen by the new listener.
 		recompute();

@@ -36,6 +36,7 @@ import org.eclipse.jface.examples.databinding.model.SampleData;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -52,20 +53,17 @@ public class ComboScenarios extends ScenariosTestCase {
 	protected Catalog catalog = null;
 
 	ILabelProvider lodgingLabelProvider = new LabelProvider() {
-		@Override
 		public String getText(Object element) {
 			return ((Lodging) element).getName();
 		}
 	};
 
 	ILabelProvider accountLabelProvider = new LabelProvider() {
-		@Override
 		public String getText(Object element) {
 			return ((Account) element).getCountry();
 		}
 	};
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		getComposite().setLayout(new FillLayout());
@@ -76,7 +74,6 @@ public class ComboScenarios extends ScenariosTestCase {
 		catalog = SampleData.CATALOG_2005; // Lodging source
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		combo.dispose();
 		combo = null;
@@ -85,7 +82,8 @@ public class ComboScenarios extends ScenariosTestCase {
 	}
 
 	protected Object getViewerSelection() {
-		return cviewer.getStructuredSelection().getFirstElement();
+		return ((IStructuredSelection) cviewer.getSelection())
+				.getFirstElement();
 	}
 
 	/**
@@ -100,10 +98,10 @@ public class ComboScenarios extends ScenariosTestCase {
 	}
 
 	/**
-	 *
+	 * 
 	 * @return the combo's items (String[]), which is the same thing as the
 	 *         Viewer's labels
-	 *
+	 * 
 	 */
 	protected List getComboContent() {
 		String[] elements = combo.getItems();
@@ -141,10 +139,10 @@ public class ComboScenarios extends ScenariosTestCase {
 	 * a valid content and selection are bounded correctly Bind a collection of
 	 * Lodgings to a ComboViewer Bind the ComboViewer's selection to the
 	 * defaultLodging of an Adventure
-	 *
+	 * 
 	 * This test does not deal with null values, empty content, changed content,
 	 * property change of content elements, etc.
-	 *
+	 * 
 	 */
 	public void test_ROCombo_Scenario03_vanilla() {
 		IObservableList lodgings = BeansObservables.observeList(Realm
@@ -184,9 +182,9 @@ public class ComboScenarios extends ScenariosTestCase {
 	 * binding to the combo. It will bind a collection, add/remove/change
 	 * elements in the collection, and change element's properties to ensure
 	 * that the combo's labels were updated appropriatly.
-	 *
+	 * 
 	 * it also induce null values in properties, and elments.
-	 *
+	 * 
 	 * This test does not deal with the combo's selection.
 	 */
 	public void test_ROCombo_Scenario03_collectionBindings() {
@@ -294,7 +292,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	/**
 	 * This scenario tests a simple SWT combo that is bound to a list of Country
 	 * objects. The Country object's name property is listed in the Combo.
-	 *
+	 * 
 	 * The Combo's selection is bounded to the Country property of an Account.
 	 */
 	// public void test_ROCombo_Scenario02_SWTCombo() {
@@ -323,7 +321,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	/**
 	 * This scenario tests a simple SWT combo that is bound to a list of Country
 	 * objects. The Country object's name property is listed in the Combo.
-	 *
+	 * 
 	 * The Combo's selection is bounded to the Country property of an Account.
 	 */
 	// public void test_ROCombo_Scenario02_ComboViewer() {
@@ -403,8 +401,9 @@ public class ComboScenarios extends ScenariosTestCase {
 		// Ensure that setting the selection is driven forward to the other
 		// combo
 		cviewer.setSelection(new StructuredSelection(lodging));
-		assertEquals(cviewer.getStructuredSelection().getFirstElement(),
-				otherViewer.getStructuredSelection().getFirstElement());
+		assertEquals(((IStructuredSelection) cviewer.getSelection())
+				.getFirstElement(), ((IStructuredSelection) otherViewer
+				.getSelection()).getFirstElement());
 
 		// Change the list of one combo, and ensure it updates the other combo
 		catalog.removeLodging(lodging);
@@ -416,7 +415,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	 * This scenario tests a simple SWT CCombo that is bound to a list of
 	 * Country objects. The Country object's name property is listed in the
 	 * Combo.
-	 *
+	 * 
 	 * The Combo's selection is bounded to the Country property of an Account.
 	 */
 	public void test_ROCombo_SWTCCombo() {
@@ -452,7 +451,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	 * This scenario tests a simple SWT CCombo that is bound to a list of
 	 * Country objects. The Country object's name property is listed in the
 	 * Combo.
-	 *
+	 * 
 	 * The Combo's selection is bounded to the Country property of an Account.
 	 */
 	public void test_WCombo_SWTCCombo() {
@@ -497,7 +496,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	 * This scenario tests a simple SWT CCombo that is bound to a list of
 	 * Country objects. The Country object's name property is listed in the
 	 * Combo.
-	 *
+	 * 
 	 * The Combo's selection is bounded to the Country property of an Account.
 	 */
 	public void test_ROCombo_SWTList() {

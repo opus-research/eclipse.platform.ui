@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
  * An operation which delegates its work to a runnable that modifies the
@@ -37,7 +36,7 @@ public class WorkspaceModifyDelegatingOperation extends
     /**
      * Creates a new operation which will delegate its work to the given
      * runnable using the provided scheduling rule.
-     *
+     * 
      * @param content
      *            the runnable to delegate to when this operation is executed
      * @param rule
@@ -52,7 +51,7 @@ public class WorkspaceModifyDelegatingOperation extends
     /**
      * Creates a new operation which will delegate its work to the given
      * runnable. Schedule using the supplied s
-     *
+     * 
      * @param content
      *            the runnable to delegate to when this operation is executed
      */
@@ -61,8 +60,10 @@ public class WorkspaceModifyDelegatingOperation extends
         this.content = content;
     }
 
-    @Override
-	protected void execute(IProgressMonitor monitor) throws CoreException,
+    /*
+     * (non-Javadoc) Method declared on WorkbenchModifyOperation.
+     */
+    protected void execute(IProgressMonitor monitor) throws CoreException,
             InterruptedException {
         try {
             content.run(monitor);
@@ -76,7 +77,7 @@ public class WorkspaceModifyDelegatingOperation extends
             if (e.getTargetException() instanceof Error) {
 				throw (Error) e.getTargetException();
 			}
-			IDEWorkbenchPlugin.log(e.getTargetException().getMessage(), e.getTargetException());
+            e.getTargetException().printStackTrace();
         }
     }
 }

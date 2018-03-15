@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,17 +17,21 @@ import org.eclipse.ui.activities.ITriggerPoint;
  */
 public abstract class AbstractTriggerPoint implements ITriggerPoint {
 
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(Object obj) {
 		if (obj instanceof ITriggerPoint) {
 			return getId().equals(((ITriggerPoint)obj).getId());
 		}
-
+		
 		return false;
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	public int hashCode() {
 		return getId().hashCode();
 	}

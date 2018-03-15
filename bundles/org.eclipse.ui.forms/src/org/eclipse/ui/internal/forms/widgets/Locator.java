@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@ package org.eclipse.ui.internal.forms.widgets;
 
 import java.util.ArrayList;
 
-public class Locator implements Cloneable {
+public class Locator implements Cloneable { 
 	public int indent;
 	public int x, y;
 	public int width;
@@ -21,8 +21,8 @@ public class Locator implements Cloneable {
 	public int marginWidth;
 	public int marginHeight;
 	public int rowCounter;
-	public ArrayList<int[]> heights;
-
+	public ArrayList heights;
+	
 	public void newLine() {
 		resetCaret();
 		y += rowHeight;
@@ -47,18 +47,18 @@ public class Locator implements Cloneable {
 	}
 	public int getMiddle(int segmentHeight, boolean text) {
 		if (heights!=null && heights.size()>rowCounter) {
-			int [] rdata = heights.get(rowCounter);
+			int [] rdata = (int[])heights.get(rowCounter);
 			int rheight = rdata[0];
 			int rleading = rdata[1];
 			if (text)
 				return y + rheight/2 - segmentHeight/2 - rleading;
 			return y + rheight/2 - segmentHeight/2;
 		}
-		return y;
+		return y;		
 	}
 	public int getBaseline(int segmentHeight, boolean text) {
 		if (heights!=null && heights.size()>rowCounter) {
-			int [] rdata = heights.get(rowCounter);
+			int [] rdata = (int[])heights.get(rowCounter);
 			int rheight = rdata[0];
 			int rleading = rdata[1];
 			if (text)
@@ -67,7 +67,7 @@ public class Locator implements Cloneable {
 		}
 		return y;
 	}
-
+	
 	public void resetCaret() {
 		x = getStartX();
 	}

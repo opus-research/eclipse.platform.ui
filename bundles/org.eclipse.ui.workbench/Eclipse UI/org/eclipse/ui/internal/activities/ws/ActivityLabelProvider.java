@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.ui.activities.NotDefinedException;
  * Provides labels for <code>IActivity</code> objects. They may be passed
  * directly or as <code>String</code> identifiers that are matched against
  * the activity manager.
- *
+ * 
  * @since 3.0
  */
 public class ActivityLabelProvider extends LabelProvider {
@@ -29,7 +29,7 @@ public class ActivityLabelProvider extends LabelProvider {
 
     /**
      * Create a new instance of the receiver.
-     *
+     * 
      * @param activityManager
      * @since 3.0
      */
@@ -49,13 +49,21 @@ public class ActivityLabelProvider extends LabelProvider {
         }
     }
 
-    @Override
-	public Image getImage(Object element) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
+     */
+    public Image getImage(Object element) {
         return null;
     }
 
-    @Override
-	public String getText(Object element) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
+     */
+    public String getText(Object element) {
         if (element instanceof String) {
             return getActivityText(activityManager
                     .getActivity((String) element));

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,7 @@ class GridInfo {
 
     /**
      * Initialize the grid
-     *
+     * 
      * @param newControls
      * @param cols
      */
@@ -112,21 +112,23 @@ class GridInfo {
     public int getStartPos(int control, boolean row) {
         if (row) {
             return controlRow[control];
+        } else {
+            return controlCol[control];
         }
-		return controlCol[control];
     }
 
     /**
      * Returns the number of rows or columns
-     *
+     * 
      * @param isRow if true, returns the number of rows. If false, returns the number of columns
      * @return
      */
     public int getNumRows(boolean isRow) {
         if (isRow) {
             return rows;
+        } else {
+			return cols;
 		}
-		return cols;
     }
 
     public void getRow(int[] result, int rowId, boolean horizontal) {

@@ -1,26 +1,26 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
 package org.eclipse.e4.ui.model.application.ui.advanced.util;
 
 import org.eclipse.e4.ui.model.application.MApplicationElement;
-import org.eclipse.e4.ui.model.application.commands.MBindings;
-import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MGenericTile;
-import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
-import org.eclipse.e4.ui.model.application.ui.advanced.*;
+import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
@@ -108,10 +108,6 @@ public class AdvancedAdapterFactory extends AdapterFactoryImpl {
 				return createApplicationElementAdapter();
 			}
 			@Override
-			public Adapter caseLocalizable(MLocalizable object) {
-				return createLocalizableAdapter();
-			}
-			@Override
 			public Adapter caseUIElement(MUIElement object) {
 				return createUIElementAdapter();
 			}
@@ -134,14 +130,6 @@ public class AdvancedAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseContext(MContext object) {
 				return createContextAdapter();
-			}
-			@Override
-			public Adapter caseHandlerContainer(MHandlerContainer object) {
-				return createHandlerContainerAdapter();
-			}
-			@Override
-			public Adapter caseBindings(MBindings object) {
-				return createBindingsAdapter();
 			}
 			@Override
 			public <T extends MUIElement> Adapter caseGenericStack(MGenericStack<T> object) {
@@ -306,20 +294,6 @@ public class AdvancedAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.MLocalizable <em>Localizable</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.ui.MLocalizable
-	 * @generated
-	 */
-	public Adapter createLocalizableAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.MUILabel <em>UI Label</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -344,34 +318,6 @@ public class AdvancedAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createContextAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.commands.MHandlerContainer <em>Handler Container</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.commands.MHandlerContainer
-	 * @generated
-	 */
-	public Adapter createHandlerContainerAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.commands.MBindings <em>Bindings</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.commands.MBindings
-	 * @generated
-	 */
-	public Adapter createBindingsAdapter() {
 		return null;
 	}
 

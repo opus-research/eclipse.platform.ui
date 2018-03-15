@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 /**
  * A layout for a table. Call <code>addColumnData</code> to add columns.
  * The TableLayout {@link ColumnLayoutData} is only valid until the table
- * is resized. To keep the proportions constant when the table is resized
+ * is resized. To keep the proportions constant when the table is resized 
  * see {@link TableColumnLayout}
  */
 public class TableLayout extends Layout {
@@ -39,7 +39,7 @@ public class TableLayout extends Layout {
 	 * The number of extra pixels taken as horizontal trim by the table column.
 	 * To ensure there are N pixels available for the content of the column,
 	 * assign N+COLUMN_TRIM for the column width.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	private static int COLUMN_TRIM;
@@ -65,8 +65,6 @@ public class TableLayout extends Layout {
 	 */
 	private boolean firstTime = true;
 
-	private boolean adjustForScrollBar;
-
 	/**
 	 * Creates a new table layout.
 	 */
@@ -74,19 +72,8 @@ public class TableLayout extends Layout {
 	}
 
 	/**
-	 * Creates a new table layout.
-	 *
-	 * @param adjustForScrollBar <code>true</code> if the layout should reserve space for the
-	 *            vertical scroll bar
-	 * @since 3.9
-	 */
-	public TableLayout(boolean adjustForScrollBar) {
-		this.adjustForScrollBar = adjustForScrollBar;
-	}
-
-	/**
 	 * Adds a new column of data to this table layout.
-	 *
+	 * 
 	 * @param data
 	 *            the column layout data
 	 */
@@ -94,7 +81,9 @@ public class TableLayout extends Layout {
 		columns.add(data);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on Layout.
+	 */
 	public Point computeSize(Composite c, int wHint, int hHint, boolean flush) {
 		if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT) {
 			return new Point(wHint, hHint);
@@ -130,7 +119,9 @@ public class TableLayout extends Layout {
 		return result;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on Layout.
+	 */
 	public void layout(Composite c, boolean flush) {
 		// Only do initial layout. Trying to maintain proportions when resizing
 		// is too hard,
@@ -186,10 +177,6 @@ public class TableLayout extends Layout {
 
 		// Do we have columns that have a weight
 		if (numberOfWeightColumns > 0) {
-
-			if (adjustForScrollBar && c.getVerticalBar() != null)
-				width -= c.getVerticalBar().getThumbTrackBounds().width;
-
 			// Now distribute the rest to the columns with weight.
 			int rest = width - fixedWidth;
 			int totalDistributed = 0;
@@ -234,7 +221,7 @@ public class TableLayout extends Layout {
 
 	/**
 	 * Set the width of the item.
-	 *
+	 * 
 	 * @param item
 	 * @param width
 	 */
@@ -249,7 +236,7 @@ public class TableLayout extends Layout {
 
 	/**
 	 * Return the columns for the receiver.
-	 *
+	 * 
 	 * @param composite
 	 * @return Item[]
 	 */

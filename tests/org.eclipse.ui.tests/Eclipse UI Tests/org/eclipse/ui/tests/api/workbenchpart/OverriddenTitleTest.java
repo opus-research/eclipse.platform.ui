@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.api.workbenchpart;
 
+import junit.framework.Assert;
 
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -17,7 +18,6 @@ import org.eclipse.ui.IWorkbenchPart2;
 import org.eclipse.ui.IWorkbenchPartConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.tests.harness.util.UITestCase;
-import org.junit.Assert;
 
 /**
  * @since 3.0
@@ -43,8 +43,10 @@ public class OverriddenTitleTest extends UITestCase {
     boolean contentChangeEvent = false;
 
     private IPropertyListener propertyListener = new IPropertyListener() {
-        @Override
-		public void propertyChanged(Object source, int propId) {
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
+         */
+        public void propertyChanged(Object source, int propId) {
             switch (propId) {
             case IWorkbenchPartConstants.PROP_TITLE:
                 titleChangeEvent = true;
@@ -59,8 +61,7 @@ public class OverriddenTitleTest extends UITestCase {
         }
     };
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         window = openTestWindow();
         page = window.getActivePage();
@@ -72,8 +73,10 @@ public class OverriddenTitleTest extends UITestCase {
         contentChangeEvent = false;
     }
 
-    @Override
-	protected void doTearDown() throws Exception {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
+     */
+    protected void doTearDown() throws Exception {
         view.removePropertyListener(propertyListener);
         page.hideView(view);
         super.doTearDown();
@@ -98,7 +101,7 @@ public class OverriddenTitleTest extends UITestCase {
 
     /**
      * Ensure that we've received the given property change events since the start of the test
-     *
+     * 
      * @param titleEvent PROP_TITLE
      * @param nameEvent PROP_PART_NAME
      * @param descriptionEvent PROP_CONTENT_DESCRIPTION

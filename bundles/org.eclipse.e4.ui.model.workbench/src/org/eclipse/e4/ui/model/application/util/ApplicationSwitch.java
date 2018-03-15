@@ -1,17 +1,20 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
 package org.eclipse.e4.ui.model.application.util;
 
 import java.util.Map;
-import org.eclipse.e4.ui.model.application.*;
+import org.eclipse.e4.ui.model.application.MAddon;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.MApplicationElement;
+import org.eclipse.e4.ui.model.application.MContribution;
 import org.eclipse.e4.ui.model.application.commands.MBindingTableContainer;
 import org.eclipse.e4.ui.model.application.commands.MBindings;
 import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
@@ -19,7 +22,6 @@ import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptorConta
 import org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
-import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuContributions;
@@ -67,7 +69,7 @@ public class ApplicationSwitch<T1> extends Switch<T1> {
 	 * Checks whether this is a switch for the given package.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param ePackage the package in question.
+	 * @parameter ePackage the package in question.
 	 * @return whether this is a switch for the given package.
 	 * @generated
 	 */
@@ -107,7 +109,6 @@ public class ApplicationSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseSnippetContainer(application);
 				if (result == null) result = caseUIElement(application);
 				if (result == null) result = caseApplicationElement(application);
-				if (result == null) result = caseLocalizable(application);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -229,21 +230,6 @@ public class ApplicationSwitch<T1> extends Switch<T1> {
 	 * @generated
 	 */
 	public T1 caseStringToObjectMap(Map.Entry<String, Object> object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Localizable</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Localizable</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T1 caseLocalizable(MLocalizable object) {
 		return null;
 	}
 

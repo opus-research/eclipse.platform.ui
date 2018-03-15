@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   IBM Corporation - initial API and implementation
+ *   IBM Corporation - initial API and implementation 
  *   Sebastian Davids <sdavids@gmx.de> - Collapse all action (25826)
  *******************************************************************************/
 package org.eclipse.ui.views.navigator;
@@ -18,12 +18,11 @@ import org.eclipse.ui.handlers.CollapseAllHandler;
  * Collapse all project nodes.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class CollapseAllAction extends ResourceNavigatorAction {
 
     /**
      * Creates the action.
-     *
+     * 
      * @param navigator the resource navigator
      * @param label the label for the action
      */
@@ -38,8 +37,7 @@ public class CollapseAllAction extends ResourceNavigatorAction {
     /*
      * Implementation of method defined on <code>IAction</code>.
      */
-    @Override
-	public void run() {
+    public void run() {
         getNavigator().getViewer().collapseAll();
     }
 }

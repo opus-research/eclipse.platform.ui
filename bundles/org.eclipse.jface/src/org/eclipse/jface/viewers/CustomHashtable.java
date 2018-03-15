@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,13 +42,11 @@ import java.util.NoSuchElementException;
     }
 
     private static final class EmptyEnumerator implements Enumeration {
-        @Override
-		public boolean hasMoreElements() {
+        public boolean hasMoreElements() {
             return false;
         }
 
-        @Override
-		public Object nextElement() {
+        public Object nextElement() {
             throw new NoSuchElementException();
         }
     }
@@ -65,8 +63,7 @@ import java.util.NoSuchElementException;
             start = firstSlot;
         }
 
-        @Override
-		public boolean hasMoreElements() {
+        public boolean hasMoreElements() {
             if (entry != null) {
 				return true;
 			}
@@ -79,14 +76,14 @@ import java.util.NoSuchElementException;
             return false;
         }
 
-        @Override
-		public Object nextElement() {
+        public Object nextElement() {
             if (hasMoreElements()) {
                 Object result = key ? entry.key : entry.value;
                 entry = entry.next;
                 return result;
+            } else {
+				throw new NoSuchElementException();
 			}
-			throw new NoSuchElementException();
         }
     }
 
@@ -134,7 +131,7 @@ import java.util.NoSuchElementException;
      * element comparer.
      *
      * @param comparer the element comparer to use to compare keys and obtain
-     *   hash codes for keys, or <code>null</code>  to use the normal
+     *   hash codes for keys, or <code>null</code>  to use the normal 
      *   <code>equals</code> and <code>hashCode</code> methods
      */
     public CustomHashtable(IElementComparer comparer) {
@@ -144,11 +141,11 @@ import java.util.NoSuchElementException;
     /**
      * Constructs a new hash table with the given capacity and the given
      * element comparer.
-     *
+     * 
      * @param capacity the maximum number of elements that can be added without
      *   rehashing
      * @param comparer the element comparer to use to compare keys and obtain
-     *   hash codes for keys, or <code>null</code>  to use the normal
+     *   hash codes for keys, or <code>null</code>  to use the normal 
      *   <code>equals</code> and <code>hashCode</code> methods
      */
     public CustomHashtable(int capacity, IElementComparer comparer) {
@@ -169,9 +166,9 @@ import java.util.NoSuchElementException;
      * given hash table, then adds all key/value pairs in the given hash table
      * to the new one, using the given element comparer.
      * @param table the original hash table to copy from
-     *
+     * 
      * @param comparer the element comparer to use to compare keys and obtain
-     *   hash codes for keys, or <code>null</code>  to use the normal
+     *   hash codes for keys, or <code>null</code>  to use the normal 
      *   <code>equals</code> and <code>hashCode</code> methods
      */
     public CustomHashtable(CustomHashtable table, IElementComparer comparer) {
@@ -184,14 +181,14 @@ import java.util.NoSuchElementException;
             }
         }
     }
-
+    
     /**
      * Returns the element comparer used  to compare keys and to obtain
      * hash codes for keys, or <code>null</code> if no comparer has been
      * provided.
-     *
+     * 
      * @return the element comparer or <code>null</code>
-     *
+     * 
      * @since 3.2
      */
     public IElementComparer getComparer() {
@@ -265,8 +262,9 @@ import java.util.NoSuchElementException;
     private int hashCode(Object key) {
         if (comparer == null) {
 			return key.hashCode();
+		} else {
+			return comparer.hashCode(key);
 		}
-		return comparer.hashCode(key);
     }
 
     /**
@@ -275,8 +273,9 @@ import java.util.NoSuchElementException;
     private boolean keyEquals(Object a, Object b) {
         if (comparer == null) {
 			return a.equals(b);
+		} else {
+			return comparer.equals(a, b);
 		}
-		return comparer.equals(a, b);
     }
 
     /**
@@ -330,8 +329,9 @@ import java.util.NoSuchElementException;
             entry.key = key; // important to avoid hanging onto keys that are equal but "old" -- see bug 30607
             entry.value = value;
             return result;
+        } else {
+			throw new NullPointerException();
 		}
-		throw new NullPointerException();
     }
 
     /**
@@ -402,13 +402,17 @@ import java.util.NoSuchElementException;
         return elementCount;
     }
 
-    @Override
-	public String toString() {
+    /**
+     * Answers the string representation of this Hashtable.
+     *
+     * @return		the string representation of this Hashtable
+     */
+    public String toString() {
         if (size() == 0) {
 			return "{}"; //$NON-NLS-1$
 		}
 
-        StringBuilder buffer = new StringBuilder();
+        StringBuffer buffer = new StringBuffer();
         buffer.append('{');
         for (int i = elementData.length; --i >= 0;) {
             HashMapEntry entry = elementData[i];

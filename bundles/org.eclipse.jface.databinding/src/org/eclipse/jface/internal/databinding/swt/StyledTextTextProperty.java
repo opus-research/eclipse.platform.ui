@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,11 +20,11 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class StyledTextTextProperty extends WidgetStringValueProperty {
 	/**
-	 *
+	 * 
 	 */
 	public StyledTextTextProperty() {
 		this(null);
@@ -39,8 +39,8 @@ public class StyledTextTextProperty extends WidgetStringValueProperty {
 
 	private static int[] checkEvents(int[] events) {
 		if (events != null)
-			for (int event : events)
-				checkEvent(event);
+			for (int i = 0; i < events.length; i++)
+				checkEvent(events[i]);
 		return events;
 	}
 
@@ -53,28 +53,24 @@ public class StyledTextTextProperty extends WidgetStringValueProperty {
 
 	private static int[] staleEvents(int[] changeEvents) {
 		if (changeEvents != null)
-			for (int changeEvent : changeEvents)
-				if (changeEvent == SWT.Modify)
+			for (int i = 0; i < changeEvents.length; i++)
+				if (changeEvents[i] == SWT.Modify)
 					return null;
 		return new int[] { SWT.Modify };
 	}
 
-	@Override
 	String doGetStringValue(Object source) {
 		return ((StyledText) source).getText();
 	}
 
-	@Override
 	void doSetStringValue(Object source, String value) {
 		((StyledText) source).setText(value == null ? "" : value); //$NON-NLS-1$
 	}
 
-	@Override
 	public String toString() {
 		return "StyledText.text <String>"; //$NON-NLS-1$
 	}
 
-	@Override
 	protected ISWTObservableValue wrapObservable(IObservableValue observable,
 			Widget widget) {
 		return new SWTVetoableValueDecorator(widget, this, observable);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sebastian Davids <sdavids@gmx.de> - Fix for bug 93373 - [Intro]
+ *     Sebastian Davids <sdavids@gmx.de> - Fix for bug 93373 - [Intro] 
  *     		TipsAndTricksAction should not use magic numbers
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
@@ -27,8 +27,6 @@ import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.PartEventAction;
-import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
-import org.eclipse.ui.internal.WorkbenchImages;
 
 /**
  * Launch the tips and tricks action.
@@ -43,7 +41,7 @@ public class TipsAndTricksAction extends PartEventAction implements
 
     /**
      * Create an instance of this class.
-     *
+     * 
      * @param window the window
      */
     public TipsAndTricksAction(IWorkbenchWindow window) {
@@ -56,15 +54,13 @@ public class TipsAndTricksAction extends PartEventAction implements
         window.getWorkbench().getHelpSystem().setHelp(this,
 				IIDEHelpContextIds.TIPS_AND_TRICKS_ACTION);
         setActionDefinitionId(IWorkbenchCommandConstants.HELP_TIPS_AND_TRICKS);
-		setImageDescriptor(WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_ETOOL_TIPS_AND_TRICKS));
         workbenchWindow.getPartService().addPartListener(this);
     }
 
     /**
      *	The user has invoked this action
      */
-    @Override
-	public void run() {
+    public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
@@ -72,10 +68,10 @@ public class TipsAndTricksAction extends PartEventAction implements
         // Ask the user to select a feature
         AboutInfo[] featureInfos = IDEWorkbenchPlugin.getDefault()
                 .getFeatureInfos();
-		ArrayList<AboutInfo> tipsAndTricksFeatures = new ArrayList<>(featureInfos.length);
-        for (AboutInfo featureInfo : featureInfos) {
-            if (featureInfo.getTipsAndTricksHref() != null) {
-				tipsAndTricksFeatures.add(featureInfo);
+        ArrayList tipsAndTricksFeatures = new ArrayList(featureInfos.length);
+        for (int i = 0; i < featureInfos.length; i++) {
+            if (featureInfos[i].getTipsAndTricksHref() != null) {
+				tipsAndTricksFeatures.add(featureInfos[i]);
 			}
         }
 
@@ -97,7 +93,7 @@ public class TipsAndTricksAction extends PartEventAction implements
                 IIDEHelpContextIds.TIPS_AND_TRICKS_PAGE_SELECTION_DIALOG);
         d.create();
         d.getOkButton().setEnabled(false);
-
+        
         if (d.open() != Window.OK || d.getResult().length != 1) {
 			return;
 		}
@@ -110,8 +106,12 @@ public class TipsAndTricksAction extends PartEventAction implements
         if (feature != null) {
             final String href = feature.getTipsAndTricksHref();
             if (href != null) {
-                BusyIndicator.showWhile(shell.getDisplay(), () -> workbenchWindow.getWorkbench().getHelpSystem()
-						.displayHelpResource(href));
+                BusyIndicator.showWhile(shell.getDisplay(), new Runnable() {
+                    public void run() {
+                        workbenchWindow.getWorkbench().getHelpSystem()
+								.displayHelpResource(href);
+                    }
+                });
             } else {
                 IStatus status = new Status(
                         IStatus.ERROR,
@@ -126,13 +126,15 @@ public class TipsAndTricksAction extends PartEventAction implements
             IStatus status = new Status(IStatus.ERROR,
                     IDEWorkbenchPlugin.IDE_WORKBENCH, IStatus.INFO, IDEWorkbenchMessages.TipsAndTricksErrorDialog_noHref, null);
             ErrorDialog.openError(shell, IDEWorkbenchMessages.TipsAndTricksErrorDialog_title,
-                    IDEWorkbenchMessages.TipsAndTricksErrorDialog_noFeatures,
+                    IDEWorkbenchMessages.TipsAndTricksErrorDialog_noFeatures, 
                     status);
         }
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * Method declared on ActionFactory.IWorkbenchAction.
+     */
+    public void dispose() {
         if (workbenchWindow == null) {
             // action has already been disposed
             return;

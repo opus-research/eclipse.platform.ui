@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 
 package org.eclipse.ui.internal.quickaccess;
@@ -25,28 +24,25 @@ import org.eclipse.ui.internal.WorkbenchImages;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class PreferenceProvider extends QuickAccessProvider {
 
 	private QuickAccessElement[] cachedElements;
-	private Map<String, PreferenceElement> idToElement = new HashMap<>();
+	private Map<String, PreferenceElement> idToElement = new HashMap<String, PreferenceElement>();
 
-	@Override
 	public String getId() {
 		return "org.eclipse.ui.preferences"; //$NON-NLS-1$
 	}
 
-	@Override
 	public QuickAccessElement getElementForId(String id) {
 		getElements();
 		return idToElement.get(id);
 	}
 
-	@Override
 	public QuickAccessElement[] getElements() {
 		if (cachedElements == null) {
-			List<PreferenceElement> list = new ArrayList<>();
+			List<PreferenceElement> list = new ArrayList<PreferenceElement>();
 			collectElements("", PlatformUI.getWorkbench().getPreferenceManager().getRootSubNodes(), list); //$NON-NLS-1$
 			cachedElements = new PreferenceElement[list.size()];
 			for (int i = 0; i < list.size(); i++) {
@@ -72,18 +68,15 @@ public class PreferenceProvider extends QuickAccessProvider {
 		}
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return WorkbenchImages
 				.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_NODE);
 	}
 
-	@Override
 	public String getName() {
 		return QuickAccessMessages.QuickAccess_Preferences;
 	}
 
-	@Override
 	protected void doReset() {
 		cachedElements = null;
 		idToElement.clear();

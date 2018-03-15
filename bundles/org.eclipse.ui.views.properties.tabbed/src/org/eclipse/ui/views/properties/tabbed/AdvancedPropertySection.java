@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2015 IBM Corporation and others.
+ * Copyright (c) 2001, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -22,8 +22,8 @@ import org.eclipse.ui.views.properties.PropertySheetPage;
 /**
  * An advanced section that is intended to show the original table format properties view
  * provided by base Eclipse.
- *
- * @author Anthony Hunter
+ * 
+ * @author Anthony Hunter 
  */
 public class AdvancedPropertySection
 	extends AbstractPropertySection {
@@ -37,7 +37,6 @@ public class AdvancedPropertySection
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#createControls(org.eclipse.swt.widgets.Composite,
 	 *      org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
 	 */
-	@Override
 	public void createControls(Composite parent,
 			final TabbedPropertySheetPage atabbedPropertySheetPage) {
 		super.createControls(parent, atabbedPropertySheetPage);
@@ -52,10 +51,9 @@ public class AdvancedPropertySection
 		data.top = new FormAttachment(0, 0);
 		data.bottom = new FormAttachment(100, 0);
 		page.getControl().setLayoutData(data);
-
+		
 		page.getControl().addControlListener(new ControlAdapter() {
 
-			@Override
 			public void controlResized(ControlEvent e) {
 				atabbedPropertySheetPage.resizeScrolledComposite();
 			}
@@ -66,7 +64,6 @@ public class AdvancedPropertySection
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#setInput(org.eclipse.ui.IWorkbenchPart,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
-	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection) {
 		super.setInput(part, selection);
 		page.selectionChanged(part, selection);
@@ -75,7 +72,6 @@ public class AdvancedPropertySection
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#dispose()
 	 */
-	@Override
 	public void dispose() {
 		super.dispose();
 
@@ -89,7 +85,6 @@ public class AdvancedPropertySection
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#refresh()
 	 */
-	@Override
 	public void refresh() {
 		page.refresh();
 	}
@@ -97,7 +92,6 @@ public class AdvancedPropertySection
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#shouldUseExtraSpace()
 	 */
-	@Override
 	public boolean shouldUseExtraSpace() {
 		return true;
 	}

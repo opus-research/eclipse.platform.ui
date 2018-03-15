@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.ui.WorkbenchEncoding;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
- * The EncodingTestCase is the suite that tests the 3.1
+ * The EncodingTestCase is the suite that tests the 3.1 
  * encoding support.
  */
 public class EncodingTestCase extends UITestCase {
@@ -39,18 +39,18 @@ public class EncodingTestCase extends UITestCase {
 	 *
 	 */
 	public void testWorkbenchEncodings() {
-		List<String> encodings = WorkbenchEncoding.getDefinedEncodings();
-		Iterator<String> iterator = encodings.iterator();
+		List encodings = WorkbenchEncoding.getDefinedEncodings();
+		Iterator iterator = encodings.iterator();
 
 		while (iterator.hasNext()) {
-			String nextEncoding = iterator.next();
+			String nextEncoding = (String) iterator.next();
 			try {
 				Assert.isTrue(Charset.isSupported(nextEncoding), "Unsupported charset " + nextEncoding);
-
+				
 			} catch (IllegalCharsetNameException e) {
 				Assert.isTrue(false, "Unsupported charset " + nextEncoding);
 			}
-
+			
 
 		}
 	}

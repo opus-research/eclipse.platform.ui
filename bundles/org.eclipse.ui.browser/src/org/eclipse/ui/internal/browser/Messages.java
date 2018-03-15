@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,6 @@ public class Messages extends NLS {
 	public static String actionWebBrowserForward;
 	public static String actionWebBrowserStop;
 	public static String actionWebBrowserRefresh;
-	public static String actionWebBrowserAutoRefresh;
 	public static String dialogResourceDeletedTitle;
 	public static String dialogResourceDeletedMessage;
 	public static String dialogResourceDeletedIgnore;
@@ -55,7 +54,6 @@ public class Messages extends NLS {
 	public static String preferenceWebBrowserTitle;
 	public static String searching;
 	public static String errorDialogTitle;
-	public static String errorCouldNotLaunchExternalWebBrowser;
 	public static String errorCouldNotLaunchWebBrowser;
 	public static String errorNoBrowser;
 	public static String editExternalBrowser;

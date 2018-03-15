@@ -31,21 +31,24 @@ public class UserEditor extends TextEditor {
         super();
     }
 
-    @Override
-	public void createPartControl(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on WorkbenchPart
+     */
+    public void createPartControl(Composite parent) {
         super.createPartControl(parent);
         getSourceViewer().setDocument(
                 new Document(MessageUtil.getString("Editor_instructions"))); //$NON-NLS-1$
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-	public <T> T getAdapter(Class<T> adapter) {
+    /* (non-Javadoc)
+     * Method declared on IAdaptable
+     */
+    public Object getAdapter(Class adapter) {
         if (adapter.equals(IContentOutlinePage.class)) {
-            return (T) getContentOutline();
+            return getContentOutline();
         }
         if (adapter.equals(IPropertySheetPage.class)) {
-            return (T) getPropertySheet();
+            return getPropertySheet();
         }
         return super.getAdapter(adapter);
     }

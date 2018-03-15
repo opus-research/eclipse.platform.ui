@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Red Hat, Inc - Was ZipFileStructureProvider, performed changes from
+ *     Red Hat, Inc - Was ZipFileStructureProvider, performed changes from 
  *     IImportStructureProvider to ILeveledImportStructureProvider
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
@@ -30,7 +29,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 /**
  * This class provides information regarding the context structure and content
  * of specified zip file entry objects.
- *
+ * 
  * @since 3.1
  */
 public class ZipLeveledStructureProvider implements
@@ -39,16 +38,16 @@ public class ZipLeveledStructureProvider implements
 
 	private ZipEntry root = new ZipEntry("/");//$NON-NLS-1$
 
-	private Map<ZipEntry, List<ZipEntry>> children;
+	private Map children;
 
-	private Map<IPath, ZipEntry> directoryEntryCache = new HashMap<>();
+	private Map directoryEntryCache = new HashMap();
 
 	private int stripLevel;
 
 	/**
 	 * Creates a <code>ZipFileStructureProvider</code>, which will operate on
 	 * the passed zip file.
-	 *
+	 * 
 	 * @param sourceFile
 	 *            The source file to create the ZipLeveledStructureProvider
 	 *            around
@@ -60,14 +59,14 @@ public class ZipLeveledStructureProvider implements
 	}
 
 	/**
-	 * Creates a new container zip entry with the specified name, iff it has
+	 * Creates a new container zip entry with the specified name, iff it has 
 	 * not already been created. If the parent of the given element does not
 	 * already exist it will be recursively created as well.
 	 * @param pathname The path representing the container
 	 * @return The element represented by this pathname (it may have already existed)
 	 */
 	protected ZipEntry createContainer(IPath pathname) {
-		ZipEntry existingEntry = directoryEntryCache.get(pathname);
+		ZipEntry existingEntry = (ZipEntry) directoryEntryCache.get(pathname);
 		if (existingEntry != null) {
 			return existingEntry;
 		}
@@ -82,10 +81,10 @@ public class ZipLeveledStructureProvider implements
 		}
 		ZipEntry newEntry = new ZipEntry(pathname.toString());
 		directoryEntryCache.put(pathname, newEntry);
-		List<ZipEntry> childList = new ArrayList<>();
+		List childList = new ArrayList();
 		children.put(newEntry, childList);
 
-		List<ZipEntry> parentChildList = children.get(parent);
+		List parentChildList = (List) children.get(parent);
 		parentChildList.add(newEntry);
 		return newEntry;
 	}
@@ -99,24 +98,28 @@ public class ZipLeveledStructureProvider implements
 		if (pathname.segmentCount() == 1) {
 			parent = root;
 		} else {
-			parent = directoryEntryCache.get(pathname
+			parent = (ZipEntry) directoryEntryCache.get(pathname
 					.removeLastSegments(1));
 		}
 
-		List<ZipEntry> childList = children.get(parent);
+		List childList = (List) children.get(parent);
 		childList.add(entry);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	public List getChildren(Object element) {
 		if (children == null) {
 			initialize();
 		}
 
-		return (children.get(element));
+		return ((List) children.get(element));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	public InputStream getContents(Object element) {
 		try {
 			return zipFile.getInputStream((ZipEntry) element);
@@ -130,7 +133,7 @@ public class ZipLeveledStructureProvider implements
 	 * Strip the leading directories from the path
 	 */
 	private String stripPath(String path) {
-		String pathOrig = path;
+		String pathOrig = new String(path);
 		for (int i = 0; i < stripLevel; i++) {
 			int firstSep = path.indexOf('/');
 			// If the first character was a separator we must strip to the next
@@ -149,12 +152,16 @@ public class ZipLeveledStructureProvider implements
 		return path;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	public String getFullPath(Object element) {
 		return stripPath(((ZipEntry) element).getName());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	public String getLabel(Object element) {
 		if (element.equals(root)) {
 			return ((ZipEntry) element).getName();
@@ -165,17 +172,16 @@ public class ZipLeveledStructureProvider implements
 
 	/**
 	 * Returns the entry that this importer uses as the root sentinel.
-	 *
+	 * 
 	 * @return java.util.zip.ZipEntry
 	 */
-	@Override
 	public Object getRoot() {
 		return root;
 	}
 
 	/**
 	 * Returns the zip file that this provider provides structure for.
-	 *
+	 * 
 	 * @return The zip file
 	 */
 	public ZipFile getZipFile() {
@@ -183,7 +189,10 @@ public class ZipLeveledStructureProvider implements
 	}
 
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.internal.wizards.datatransfer.ILeveledImportStructureProvider#closeArchive()
+	 */
 	public boolean closeArchive(){
 		try {
 			getZipFile().close();
@@ -194,18 +203,18 @@ public class ZipLeveledStructureProvider implements
 		}
 		return true;
 	}
-
+	
 	/**
 	 * Initializes this object's children table based on the contents of the
 	 * specified source file.
 	 */
 	protected void initialize() {
-		children = new HashMap<>(1000);
+		children = new HashMap(1000);
 
-		children.put(root, new ArrayList<>());
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		children.put(root, new ArrayList());
+		Enumeration entries = zipFile.entries();
 		while (entries.hasMoreElements()) {
-			ZipEntry entry = entries.nextElement();
+			ZipEntry entry = (ZipEntry) entries.nextElement();
 			IPath path = new Path(entry.getName()).addTrailingSeparator();
 
 			if (entry.isDirectory()) {
@@ -223,17 +232,17 @@ public class ZipLeveledStructureProvider implements
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	public boolean isFolder(Object element) {
 		return ((ZipEntry) element).isDirectory();
 	}
 
-	@Override
 	public void setStrip(int level) {
 		stripLevel = level;
 	}
 
-	@Override
 	public int getStrip() {
 		return stripLevel;
 	}

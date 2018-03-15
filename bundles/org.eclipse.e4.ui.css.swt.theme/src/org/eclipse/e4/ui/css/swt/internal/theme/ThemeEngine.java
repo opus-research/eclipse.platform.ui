@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Tom Schindl and others.
+ * Copyright (c) 2010,2012 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,20 +8,19 @@
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     Brian de Alwis - added support for multiple CSS engines
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422702
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.internal.theme;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +42,6 @@ import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.core.util.impl.resources.FileResourcesLocatorImpl;
 import org.eclipse.e4.ui.css.core.util.impl.resources.OSGiResourceLocator;
 import org.eclipse.e4.ui.css.core.util.resources.IResourceLocator;
-import org.eclipse.e4.ui.css.swt.helpers.EclipsePreferencesHelper;
 import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -60,20 +58,20 @@ import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
 public class ThemeEngine implements IThemeEngine {
-	private List<Theme> themes = new ArrayList<>();
-	private List<CSSEngine> cssEngines = new ArrayList<>();
+	private List<Theme> themes = new ArrayList<Theme>();
+	private List<CSSEngine> cssEngines = new ArrayList<CSSEngine>();
 
 	// kept for theme notifications only
 	private Display display;
 
 	private ITheme currentTheme;
 
-	private List<String> globalStyles = new ArrayList<>();
-	private List<IResourceLocator> globalSourceLocators = new ArrayList<>();
+	private List<String> globalStyles = new ArrayList<String>();
+	private List<IResourceLocator> globalSourceLocators = new ArrayList<IResourceLocator>();
 
-	private HashMap<String, List<String>> stylesheets = new HashMap<>();
-	private HashMap<String, List<String>> modifiedStylesheets = new HashMap<>();
-	private HashMap<String, List<IResourceLocator>> sourceLocators = new HashMap<>();
+	private HashMap<String, List<String>> stylesheets = new HashMap<String, List<String>>();
+	private HashMap<String, List<String>> modifiedStylesheets = new HashMap<String, List<String>>();
+	private HashMap<String, List<IResourceLocator>> sourceLocators = new HashMap<String, List<IResourceLocator>>();
 
 	private static final String THEMEID_KEY = "themeid";
 
@@ -87,7 +85,7 @@ public class ThemeEngine implements IThemeEngine {
 				.getExtensionPoint("org.eclipse.e4.ui.css.swt.theme");
 
 		//load any modified style sheets
-		Location configLocation = org.eclipse.core.runtime.Platform.getConfigurationLocation();
+		Location configLocation = org.eclipse.core.runtime.Platform.getConfigurationLocation(); 
 		String e4CSSPath = null;
 		try {
 			URL locationURL = new URL(configLocation.getDataArea(ThemeEngine.THEME_PLUGIN_ID).toString());
@@ -95,13 +93,13 @@ public class ThemeEngine implements IThemeEngine {
 			e4CSSPath = locationFile.getPath();
 		} catch (IOException e1) {
 		}
-
+		
 		IPath path = new Path(e4CSSPath + System.getProperty("file.separator"));
 		File modDir= new File(path.toFile().toURI());
 		if (!modDir.exists()) {
 			modDir.mkdirs();
 		}
-
+		
 		//Check for old css files
 		File oldModDir= new File(
 				System.getProperty("user.home") + System.getProperty("file.separator") + ".e4css" + System.getProperty("file.separator")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -112,30 +110,28 @@ public class ThemeEngine implements IThemeEngine {
 				try {
 					done.createNewFile();
 					File[] oldModifiedFiles = oldModDir.listFiles();
-					for (File oldModifiedFile : oldModifiedFiles) {
-						if (oldModifiedFile.getName().contains(".css")) {
-							copyFile(oldModifiedFile.getPath(), path
+					for (int i = 0; i < oldModifiedFiles.length; i++) {
+						if (oldModifiedFiles[i].getName().contains(".css")) {
+							copyFile(oldModifiedFiles[i].getPath(), path
 									+ System.getProperty("file.separator")
-									+ oldModifiedFile.getName());
+									+ oldModifiedFiles[i].getName());
 						}
 					}
 				} catch (IOException e1) {
 				}
 			}
 		}
-
-
+		
+	 
 		File[] modifiedFiles = modDir.listFiles();
-
+		
 		for (IExtension e : extPoint.getExtensions()) {
 			for (IConfigurationElement ce : getPlatformMatches(e
 					.getConfigurationElements())) {
 				if (ce.getName().equals("theme")) {
 					try {
 						String version = ce.getAttribute("os_version");
-						if (version == null) {
-							version ="";
-						}
+						if (version == null) version ="";
 						String originalCSSFile;
 						String basestylesheeturi = originalCSSFile = ce
 								.getAttribute("basestylesheeturi");
@@ -149,25 +145,26 @@ public class ThemeEngine implements IThemeEngine {
 								themeId,
 								ce.getAttribute("label"), basestylesheeturi,
 								version);
-
+						
 						//check for modified files
 						if (modifiedFiles != null) {
 							int slash = originalCSSFile.lastIndexOf("/");
 							if (slash != -1) {
 								originalCSSFile = originalCSSFile.substring(slash + 1);
-								for (File modifiedFile : modifiedFiles) {
-									String modifiedFileName = modifiedFile.getName();
+								for (int i = 0; i < modifiedFiles.length; i++) {
+									String modifiedFileName = modifiedFiles[i].getName();
 									if (modifiedFileName.contains(".css") && modifiedFileName.equals(originalCSSFile)) {  //$NON-NLS-1$
-										//								modifiedStylesheets
-										ArrayList<String> styleSheets = new ArrayList<>();
-										styleSheets.add(modifiedFile.toURI().toString());
+		//								modifiedStylesheets
+										ArrayList<String> styleSheets = new ArrayList<String>();
+										styleSheets.add(modifiedFiles[i].toURI().toString());
 										modifiedStylesheets.put(themeId, styleSheets);
 									}
 								}
 							}
 						}
 					} catch (IllegalArgumentException e1) {
-						ThemeEngineManager.logError(e1.getMessage(), e1);
+						//TODO Can we somehow use logging?
+						e1.printStackTrace();
 					}
 				}
 			}
@@ -213,16 +210,13 @@ public class ThemeEngine implements IThemeEngine {
 			}
 		}
 
-		// register a default resolver for platform uri's
-		registerResourceLocator(new OSGiResourceLocator(
-				"platform:/plugin/org.eclipse.ui.themes/css/"));
-		// register a default resolver for file uri's
+		//Resolve to install dir
+		registerResourceLocator(new OSGiResourceLocator("platform:/plugin/org.eclipse.platform/css/"));
 		registerResourceLocator(new FileResourcesLocatorImpl());
 		// FIXME: perhaps ResourcesLocatorManager shouldn't have a default?
 		// registerResourceLocator(new HttpResourcesLocatorImpl());
 	}
 
-	@Override
 	public synchronized ITheme registerTheme(String id, String label,
 			String basestylesheetURI) throws IllegalArgumentException {
 		return  registerTheme(id, label, basestylesheetURI, "");
@@ -237,19 +231,16 @@ public class ThemeEngine implements IThemeEngine {
 			}
 		}
 		Theme theme = new Theme(id, label);
-		if (osVersion != "") {
-			theme.setOsVersion(osVersion);
-		}
+		if (osVersion != "") theme.setOsVersion(osVersion);
 		themes.add(theme);
 		registerStyle(id, basestylesheetURI);
 		return theme;
 	}
 
-	@Override
 	public synchronized void registerStylesheet(String uri, String... themes) {
 		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
 		String osname = bundle.getBundleContext().getProperty("osgi.os");
-		String wsname = bundle.getBundleContext().getProperty("osgi.ws");
+		String wsname = bundle.getBundleContext().getProperty("ogsi.ws");
 
 		uri = uri.replaceAll("\\$os\\$", osname).replaceAll("\\$ws\\$", wsname);
 
@@ -262,7 +253,6 @@ public class ThemeEngine implements IThemeEngine {
 		}
 	}
 
-	@Override
 	public synchronized void registerResourceLocator(IResourceLocator locator,
 			String... themes) {
 		if (themes.length == 0) {
@@ -271,18 +261,18 @@ public class ThemeEngine implements IThemeEngine {
 			for (String t : themes) {
 				List<IResourceLocator> list = sourceLocators.get(t);
 				if (list == null) {
-					list = new ArrayList<>();
+					list = new ArrayList<IResourceLocator>();
 					sourceLocators.put(t, list);
 				}
 				list.add(locator);
 			}
 		}
 	}
-
+	
 	private void registerStyle(String id, String stylesheet) {
 		List<String> s = stylesheets.get(id);
 		if (s == null) {
-			s = new ArrayList<>();
+			s = new ArrayList<String>();
 			stylesheets.put(id, s);
 		}
 		s.add(stylesheet);
@@ -292,24 +282,24 @@ public class ThemeEngine implements IThemeEngine {
 		// check for any modifications first
 		List<String> m = modifiedStylesheets.get(id);
 		if (m != null) {
-			m = new ArrayList<>(m);
+			m = new ArrayList<String>(m);
 			m.addAll(globalStyles);
 			return m;
 		}
-
+		
 		List<String> s = stylesheets.get(id);
 		if (s == null) {
 			s = Collections.emptyList();
 		}
 
-		s = new ArrayList<>(s);
+		s = new ArrayList<String>(s);
 		s.addAll(globalStyles);
 		return s;
-
+		
 	}
 
 	private List<IResourceLocator> getResourceLocators(String id) {
-		List<IResourceLocator> list = new ArrayList<>(
+		List<IResourceLocator> list = new ArrayList<IResourceLocator>(
 				globalSourceLocators);
 		List<IResourceLocator> s = sourceLocators.get(id);
 		if (s != null) {
@@ -322,7 +312,7 @@ public class ThemeEngine implements IThemeEngine {
 	/**
 	 * Get all elements that have os/ws attributes that best match the current
 	 * platform.
-	 *
+	 * 
 	 * @param elements
 	 *            the elements to check
 	 * @return the best matches, if any
@@ -332,46 +322,46 @@ public class ThemeEngine implements IThemeEngine {
 		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
 		String osname = bundle.getBundleContext().getProperty("osgi.os");
 		// TODO: Need to differentiate win32 versions
-		String wsname = bundle.getBundleContext().getProperty("osgi.ws");
-		ArrayList<IConfigurationElement> matchingElements = new ArrayList<>();
-		for (IConfigurationElement element : elements) {
+		String os_version = System.getProperty("os.version");
+		String wsname = bundle.getBundleContext().getProperty("ogsi.ws");
+		ArrayList<IConfigurationElement> matchingElements = new ArrayList<IConfigurationElement>();
+		for (int i = 0; i < elements.length; i++) {
+			IConfigurationElement element = elements[i];
 			String elementOs = element.getAttribute("os");
 			String elementWs = element.getAttribute("ws");
+			String elementOsVersion = element.getAttribute("os_version");
 			if (osname != null
 					&& (elementOs == null || elementOs.contains(osname))) {
+				if (os_version != null && os_version.equalsIgnoreCase(elementOsVersion)) {
+					// best match
+					matchingElements.add(element);
+					continue;
+				}
 				matchingElements.add(element);
 			} else if (wsname != null && wsname.equalsIgnoreCase(elementWs)) {
 				matchingElements.add(element);
 			}
 		}
-		return matchingElements
+		return (IConfigurationElement[]) matchingElements
 				.toArray(new IConfigurationElement[matchingElements.size()]);
 	}
 
-	@Override
 	public void setTheme(String themeId, boolean restore) {
 		String osVersion = System.getProperty("os.version");
 		if (osVersion != null) {
 			boolean found = false;
 			for (Theme t : themes) {
-				String osVersionList = t.getOsVersion();
-				if (osVersionList != null) {
-					String[] osVersions = osVersionList.split(","); //$NON-NLS-1$
-					for (String osVersionFromTheme : osVersions) {
-						if (osVersionFromTheme != null && osVersion.contains(osVersionFromTheme)) {
-							String themeVersion = themeId + osVersionList;
-							if (t.getId().equals(themeVersion)) {
-								setTheme(t, restore);
-								found = true;
-								break;
-							}
-						}
+				String version = t.getOsVersion();
+				if (version != null && osVersion.contains(version)) {
+					String themeVersion = themeId + version;
+					if (t.getId().equals(themeVersion)) {
+						setTheme(t, restore);
+						found = true;
+						break;
 					}
 				}
 			}
-			if (found) {
-				return;
-			}
+			if (found) return;
 		}
 		//try generic
 		for (Theme t : themes) {
@@ -382,7 +372,6 @@ public class ThemeEngine implements IThemeEngine {
 		}
 	}
 
-	@Override
 	public void setTheme(ITheme theme, boolean restore) {
 		setTheme(theme, restore, false);
 	}
@@ -396,7 +385,7 @@ public class ThemeEngine implements IThemeEngine {
 						.getId())) {
 					for (CSSEngine engine : cssEngines) {
 						engine.getResourcesLocatorManager()
-						.unregisterResourceLocator(l);
+								.unregisterResourceLocator(l);
 					}
 				}
 			}
@@ -409,7 +398,7 @@ public class ThemeEngine implements IThemeEngine {
 			for (IResourceLocator l : getResourceLocators(theme.getId())) {
 				for (CSSEngine engine : cssEngines) {
 					engine.getResourcesLocatorManager()
-					.registerResourceLocator(l);
+							.registerResourceLocator(l);
 				}
 			}
 			for (String stylesheet : getAllStyles(theme.getId())) {
@@ -425,40 +414,44 @@ public class ThemeEngine implements IThemeEngine {
 							source.setURI(url.toString());
 							engine.parseStyleSheet(source);
 						} catch (IOException e) {
-							ThemeEngineManager.logError(e.getMessage(), e);
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						} finally {
 							if (stream != null) {
 								try {
 									stream.close();
 								} catch (IOException e) {
-									ThemeEngineManager.logError(e.getMessage(), e);
+									// TODO Auto-generated catch block
+									e.printStackTrace();
 								}
 							}
 						}
 					}
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				} catch (IOException e) {
-					ThemeEngineManager.logError(e.getMessage(), e);
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
-		}
 
+			for (CSSEngine engine : cssEngines) {
+				engine.reapply();
+			}
+		}
+		
 		if (restore) {
 			IEclipsePreferences pref = getPreferences();
-			EclipsePreferencesHelper.setPreviousThemeId(pref.get(THEMEID_KEY, null));
-			EclipsePreferencesHelper.setCurrentThemeId(theme.getId());
-
 			pref.put(THEMEID_KEY, theme.getId());
 			try {
 				pref.flush();
 			} catch (BackingStoreException e) {
-				ThemeEngineManager.logError(e.getMessage(), e);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		sendThemeChangeEvent(restore);
-
-		for (CSSEngine engine : cssEngines) {
-			engine.reapply();
-		}
 	}
 
 	/**
@@ -469,7 +462,7 @@ public class ThemeEngine implements IThemeEngine {
 		if (eventAdmin == null) {
 			return;
 		}
-		Map<String, Object> data = new HashMap<>();
+		Map<String, Object> data = new HashMap<String, Object>();
 		data.put(IThemeEngine.Events.THEME_ENGINE, this);
 		data.put(IThemeEngine.Events.THEME, currentTheme);
 		data.put(IThemeEngine.Events.DEVICE, display);
@@ -494,12 +487,10 @@ public class ThemeEngine implements IThemeEngine {
 		return context.getService(eventAdminRef);
 	}
 
-	@Override
 	public synchronized List<ITheme> getThemes() {
 		return Collections.unmodifiableList(new ArrayList<ITheme>(themes));
 	}
 
-	@Override
 	public void applyStyles(Object widget, boolean applyStylesToChildNodes) {
 		for (CSSEngine engine : cssEngines) {
 			Object element = engine.getElement(widget);
@@ -514,11 +505,10 @@ public class ThemeEngine implements IThemeEngine {
 	}
 
 	private IEclipsePreferences getPreferences() {
-		return InstanceScope.INSTANCE.getNode(
-				FrameworkUtil.getBundle(
-						ThemeEngine.class).getSymbolicName());
+		return new InstanceScope().getNode(FrameworkUtil.getBundle(
+				ThemeEngine.class).getSymbolicName());
 	}
-
+	
 	void copyFile(String from, String to) throws IOException {
 		FileInputStream fStream = null;
 		BufferedOutputStream outputStream = null;
@@ -532,16 +522,13 @@ public class ThemeEngine implements IThemeEngine {
 			}
 
 		} finally {
-			if (fStream != null) {
+			if (fStream != null)
 				fStream.close();
-			}
-			if (outputStream != null) {
+			if (outputStream != null)
 				outputStream.close();
-			}
 		}
 	}
 
-	@Override
 	public void restore(String alternateTheme) {
 		String prefThemeId = getPreferenceThemeId();
 		boolean flag = true;
@@ -559,13 +546,11 @@ public class ThemeEngine implements IThemeEngine {
 			setTheme(alternateTheme, false);
 		}
 	}
-
-	@Override
+	
 	public ITheme getActiveTheme() {
 		return currentTheme;
 	}
-
-	@Override
+	
 	public CSSStyleDeclaration getStyle(Object widget) {
 		for (CSSEngine engine : cssEngines) {
 			CSSElementContext context = engine.getCSSElementContext(widget);
@@ -581,9 +566,9 @@ public class ThemeEngine implements IThemeEngine {
 
 	public List<String> getStylesheets(ITheme selection) {
 		List<String> ss  = stylesheets.get(selection.getId());
-		return ss == null ? new ArrayList<>() : ss;
+		return ss == null ? new ArrayList<String>() : ss;
 	}
-
+	
 	public void themeModified(ITheme theme, List<String> paths) {
 		modifiedStylesheets.put(theme.getId(), paths);
 		setTheme(theme, false, true);
@@ -594,27 +579,21 @@ public class ThemeEngine implements IThemeEngine {
 			setTheme(currentTheme, false, true);
 		}
 	}
-
+	
 	public List<String> getModifiedStylesheets(ITheme selection) {
 		List<String> ss  = modifiedStylesheets.get(selection.getId());
-		return ss == null ? new ArrayList<>() : ss;
+		return ss == null ? new ArrayList<String>() : ss;
 	}
-
+	
 	public void resetModifiedStylesheets(ITheme selection) {
-		modifiedStylesheets.remove(selection.getId());
+		List<String> ss = modifiedStylesheets.remove(selection.getId());
 	}
 
-	@Override
 	public void addCSSEngine(CSSEngine cssEngine) {
 		cssEngines.add(cssEngine);
 		resetCurrentTheme();
 	}
 
-	public Collection<CSSEngine> getCSSEngines() {
-		return cssEngines;
-	}
-
-	@Override
 	public void removeCSSEngine(CSSEngine cssEngine) {
 		cssEngines.remove(cssEngine);
 	}

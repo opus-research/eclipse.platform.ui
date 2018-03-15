@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,22 +16,20 @@ import org.eclipse.swt.widgets.Combo;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ComboSelectionProperty extends WidgetStringValueProperty {
 	/**
-	 *
+	 * 
 	 */
 	public ComboSelectionProperty() {
 		super(SWT.Modify);
 	}
 
-	@Override
 	String doGetStringValue(Object source) {
 		return ((Combo) source).getText();
 	}
 
-	@Override
 	void doSetStringValue(Object source, String value) {
 		Combo combo = (Combo) source;
 		String items[] = combo.getItems();
@@ -51,7 +49,6 @@ public class ComboSelectionProperty extends WidgetStringValueProperty {
 		}
 	}
 
-	@Override
 	public String toString() {
 		return "Combo.selection <String>"; //$NON-NLS-1$
 	}

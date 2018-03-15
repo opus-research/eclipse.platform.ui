@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  * A strategy to read working set extensions from the registry.
  */
 public class WorkingSetRegistryReader extends RegistryReader {
-
+    
 
     private WorkingSetRegistry registry;
 
@@ -33,7 +33,7 @@ public class WorkingSetRegistryReader extends RegistryReader {
 
     /**
      * Create a new instance of this reader.
-     *
+     * 
      * @param registry the registry to populate
      */
     public WorkingSetRegistryReader(WorkingSetRegistry registry) {
@@ -43,11 +43,10 @@ public class WorkingSetRegistryReader extends RegistryReader {
 
     /**
      * Overrides method in RegistryReader.
-     *
+     * 
      * @see RegistryReader#readElement(IConfigurationElement)
      */
-    @Override
-	public boolean readElement(IConfigurationElement element) {
+    public boolean readElement(IConfigurationElement element) {
         if (element.getName().equals(IWorkbenchRegistryConstants.TAG_WORKING_SET)) {
             try {
                 WorkingSetDescriptor desc = new WorkingSetDescriptor(element);
@@ -66,7 +65,7 @@ public class WorkingSetRegistryReader extends RegistryReader {
 
     /**
      * Reads the working set extensions within a registry.
-     *
+     * 
      * @param in the plugin registry to read from
      * @param out the working set registry to store read entries in.
      */

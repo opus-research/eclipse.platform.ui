@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,11 +17,11 @@ import java.util.List;
  * An abstract implementation of a wizard page that manages a
  * set of embedded wizards.
  * <p>
- * A wizard selection page should present a list of wizard nodes
+ * A wizard selection page should present a list of wizard nodes 
  * corresponding to other wizards. When the end user selects one of
  * them from the list, the first page of the selected wizard becomes
- * the next page. The only new methods introduced by this class are
- * <code>getSelectedNode</code> and <code>setSelectedNode</code>.
+ * the next page. The only new methods introduced by this class are 
+ * <code>getSelectedNode</code> and <code>setSelectedNode</code>. 
  * Otherwise, the subclass contract is the same as <code>WizardPage</code>.
  * </p>
  */
@@ -36,7 +36,7 @@ public abstract class WizardSelectionPage extends WizardPage {
      * List of wizard nodes that have cropped up in the past
      * (element type: <code>IWizardNode</code>).
      */
-    private List<IWizardNode> selectedWizardNodes = new ArrayList<>();
+    private List selectedWizardNodes = new ArrayList();
 
     /**
      * Creates a new wizard selection page with the given name, and
@@ -69,35 +69,32 @@ public abstract class WizardSelectionPage extends WizardPage {
     }
 
     /**
-     * The <code>WizardSelectionPage</code> implementation of
+     * The <code>WizardSelectionPage</code> implementation of 
      * this <code>IWizardPage</code> method returns <code>true</code>
      * if there is a selected node.
      */
-    @Override
-	public boolean canFlipToNextPage() {
+    public boolean canFlipToNextPage() {
         return selectedNode != null;
     }
 
-    /**
+    /**	
      * The <code>WizardSelectionPage</code> implementation of an <code>IDialogPage</code>
      * method disposes of all nested wizards. Subclasses may extend.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         // notify nested wizards
         for (int i = 0; i < selectedWizardNodes.size(); i++) {
-            selectedWizardNodes.get(i).dispose();
+            ((IWizardNode) selectedWizardNodes.get(i)).dispose();
         }
     }
 
     /**
-     * The <code>WizardSelectionPage</code> implementation of
-     * this <code>IWizardPage</code> method returns the first page
+     * The <code>WizardSelectionPage</code> implementation of 
+     * this <code>IWizardPage</code> method returns the first page 
      * of the currently selected wizard if there is one.
      */
-    @Override
-	public IWizardPage getNextPage() {
+    public IWizardPage getNextPage() {
         if (selectedNode == null) {
 			return null;
 		}
@@ -121,7 +118,7 @@ public abstract class WizardSelectionPage extends WizardPage {
 
     /**
      * Returns the currently selected wizard node within this page.
-     *
+     * 
      * @return the wizard node, or <code>null</code> if no node is selected
      */
     public IWizardNode getSelectedNode() {
@@ -129,8 +126,8 @@ public abstract class WizardSelectionPage extends WizardPage {
     }
 
     /**
-     * Sets or clears the currently selected wizard node within this page.
-     *
+     * Sets or clears the currently selected wizard node within this page. 
+     * 
      * @param node the wizard node, or <code>null</code> to clear
      */
     protected void setSelectedNode(IWizardNode node) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.activities.IActivity;
@@ -23,15 +24,15 @@ import org.eclipse.ui.activities.ICategory;
 import org.eclipse.ui.internal.activities.InternalActivityHelper;
 
 /**
- * Tree provider that provides <code>ICategory</code> objects in an
- * <code>IActivityManager</code> at the top level, with <code>IActivity</code>
+ * Tree provider that provides <code>ICategory</code> objects in an 
+ * <code>IActivityManager</code> at the top level, with <code>IActivity</code> 
  * objects as second level children under the <code>ICategory</code>.
  * <p>
- * Note that the <code>IActivity</code> objects are not instances of
- * <code>org.eclipse.ui.internal.activities.Activity</code>, but rather proxies
- * that also have a pointer to the <code>ICategory</code> for which the
- * <code>IActivity</code> should be represented under.
- *
+ * Note that the <code>IActivity</code> objects are not instances of 
+ * <code>org.eclipse.ui.internal.activities.Activity</code>, but rather proxies 
+ * that also have a pointer to the <code>ICategory</code> for which the 
+ * <code>IActivity</code> should be represented under. 
+ * 
  * @since 3.0
  */
 public class ActivityCategoryContentProvider implements ITreeContentProvider {
@@ -41,8 +42,10 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
      */
     private IActivityManager manager;
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+     */
+    public void dispose() {
         manager = null;
     }
 
@@ -67,7 +70,7 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 
 	/**
 	 * Get the duplicate activities found in the other defined categories.
-	 *
+	 * 
 	 * @param categorizedActivity
 	 *            The categorized activity.
 	 * @return the list of duplicate categorized activities.
@@ -88,8 +91,8 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 				currentCategory = manager.getCategory(currentCategoryId);
 				categoryActivities = getCategoryActivities(currentCategory);
 				// traverse the category's activities to find a duplicate
-				for (IActivity categoryActivity : categoryActivities) {
-					currentActivityId = categoryActivity.getId();
+				for (int index = 0; index < categoryActivities.length; index++) {
+					currentActivityId = categoryActivities[index].getId();
 					if (currentActivityId.equals(categorizedActivity
 							.getActivity().getId())) {
 						duplicateCategorizedactivities
@@ -109,7 +112,7 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 
 	/**
 	 * Get the child required activities.
-	 *
+	 * 
 	 * @param activityId
 	 *            The parent activity id.
 	 * @return the list of child required activities.
@@ -128,9 +131,9 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 			requiredActivityId = currentActivityRequirementBinding
 					.getRequiredActivityId();
 			currentCategoryIds = getActivityCategories(requiredActivityId);
-			for (Object currentCategoryId : currentCategoryIds) {
+			for (int index = 0; index < currentCategoryIds.length; index++) {
 				childRequiredActivities.add(new CategorizedActivity(manager
-						.getCategory((String) currentCategoryId),
+						.getCategory((String) currentCategoryIds[index]),
 						manager.getActivity(requiredActivityId)));
 			}
 
@@ -141,7 +144,7 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 
 	/**
 	 * Get the parent required activities.
-	 *
+	 * 
 	 * @param activityId
 	 *            The child activity id.
 	 * @return the list of parent required activities.
@@ -166,11 +169,11 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 						.equals(activityId)) {
 					// We found one - add it to the list
 					currentCategoryIds = getActivityCategories(currentActivityId);
-					for (Object currentCategoryId : currentCategoryIds) {
+					for (int index = 0; index < currentCategoryIds.length; index++) {
 						parentRequiredActivities
 								.add(new CategorizedActivity(
 										manager
-												.getCategory((String) currentCategoryId),
+												.getCategory((String) currentCategoryIds[index]),
 										manager.getActivity(currentActivityId)));
 					}
 				}
@@ -182,7 +185,7 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 
 	/**
 	 * Get the activity's categories (there could be more than one).
-	 *
+	 * 
 	 * @param activityId
 	 *            The activity id.
 	 * @return the activity's categories.
@@ -196,8 +199,8 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 			currentCategoryId = (String) i.next();
 			categoryActivities = getCategoryActivities(manager
 					.getCategory(currentCategoryId));
-			for (IActivity categoryActivity : categoryActivities) {
-				if (categoryActivity.getId().equals(activityId)) {
+			for (int index = 0; index < categoryActivities.length; index++) {
+				if (categoryActivities[index].getId().equals(activityId)) {
 					activityCategories.add(currentCategoryId);
 					break;
 				}
@@ -206,8 +209,10 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 		return activityCategories.toArray();
 	}
 
-    @Override
-	public Object[] getChildren(Object parentElement) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+     */
+    public Object[] getChildren(Object parentElement) {
         if (parentElement instanceof IActivityManager) {
             Set categoryIds = manager.getDefinedCategoryIds();
             ArrayList categories = new ArrayList(categoryIds.size());
@@ -225,31 +230,37 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
         return new Object[0];
     }
 
-    @Override
-	public Object[] getElements(Object inputElement) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+     */
+    public Object[] getElements(Object inputElement) {
         return getChildren(inputElement);
     }
 
-    @Override
-	public Object getParent(Object element) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
+     */
+    public Object getParent(Object element) {
         if (element instanceof CategorizedActivity) {
             return ((CategorizedActivity) element).getCategory();
         }
         return null;
     }
 
-    @Override
-	public boolean hasChildren(Object element) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
+     */
+    public boolean hasChildren(Object element) {
         if (element instanceof IActivityManager || element instanceof ICategory) {
 			return true;
 		}
         return false;
     }
 
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		if (newInput instanceof IActivityManager) {
-			manager = (IActivityManager) newInput;
-		}
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+     */
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        manager = (IActivityManager) newInput;
     }
 }

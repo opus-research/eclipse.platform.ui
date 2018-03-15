@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,6 @@ class ContentDescriptorContentProvider implements ITreeContentProvider {
 
 	private CheckboxTableViewer talbleViewer;
 
-	@Override
 	public void inputChanged(Viewer aViewer, Object anOldInput, Object aNewInput) {
 
 		if (aNewInput != null) {
@@ -47,28 +46,48 @@ class ContentDescriptorContentProvider implements ITreeContentProvider {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+	 */
 	public Object[] getChildren(Object aParentElement) {
 		return NO_CHILDREN;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
+	 */
 	public Object getParent(Object anElement) {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
+	 */
 	public boolean hasChildren(Object anElement) {
 		return getChildren(anElement).length != 0;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+	 */
 	public Object[] getElements(Object anInputElement) {
 		return contentService != null ? contentService.getVisibleExtensions()
 				: NO_CHILDREN;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+	 */
 	public void dispose() {
 
 	}
@@ -82,9 +101,9 @@ class ContentDescriptorContentProvider implements ITreeContentProvider {
 		boolean enabled;
 
 		TableItem[] descriptorTableItems = talbleViewer.getTable().getItems();
-		for (TableItem descriptorTableItem : descriptorTableItems) {
-			if (descriptorTableItem.getData() instanceof INavigatorContentDescriptor) {
-				descriptor = (INavigatorContentDescriptor) descriptorTableItem
+		for (int i = 0; i < descriptorTableItems.length; i++) {
+			if (descriptorTableItems[i].getData() instanceof INavigatorContentDescriptor) {
+				descriptor = (INavigatorContentDescriptor) descriptorTableItems[i]
 						.getData();
 				enabled = contentService.getActivationService()
 						.isNavigatorExtensionActive(descriptor.getId());

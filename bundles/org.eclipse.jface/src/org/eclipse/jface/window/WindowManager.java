@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,16 +17,16 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 
 /**
- * A manager for a group of windows. Window managers are an optional JFace
+ * A manager for a group of windows. Window managers are an optional JFace 
  * feature used in applications which create many different windows (dialogs,
  * wizards, etc.) in addition to a main window. A window manager can be used to
- * remember all the windows that an application has created (independent of
+ * remember all the windows that an application has created (independent of 
  * whether they are presently open or closed). There can be several window
- * managers, and they can be arranged into a tree. This kind of organization
+ * managers, and they can be arranged into a tree. This kind of organization 
  * makes it simple to close whole subgroupings of windows.
  * <p>
- * Creating a window manager is as simple as creating an instance of
- * <code>WindowManager</code>. Associating a window with a window manager is
+ * Creating a window manager is as simple as creating an instance of 
+ * <code>WindowManager</code>. Associating a window with a window manager is 
  * done with <code>WindowManager.add(Window)</code>. A window is automatically
  * removed from its window manager as a side effect of closing the window.
  * </p>
@@ -39,13 +39,13 @@ public class WindowManager {
      * List of windows managed by this window manager
      * (element type: <code>Window</code>).
      */
-    private ArrayList<Window> windows = new ArrayList<>();
+    private ArrayList windows = new ArrayList();
 
     /**
      * List of window managers who have this window manager
      * as their parent (element type: <code>WindowManager</code>).
      */
-    private List<WindowManager> subManagers;
+    private List subManagers;
 
     /**
      * Creates an empty window manager without a parent window
@@ -87,7 +87,7 @@ public class WindowManager {
      */
     private void addWindowManager(WindowManager wm) {
         if (subManagers == null) {
-			subManagers = new ArrayList<>();
+			subManagers = new ArrayList();
 		}
         if (!subManagers.contains(wm)) {
             subManagers.add(wm);
@@ -98,23 +98,23 @@ public class WindowManager {
      * Attempts to close all windows managed by this window manager,
      * as well as windows managed by any descendent window managers.
      *
-     * @return <code>true</code> if all windows were sucessfully closed,
+     * @return <code>true</code> if all windows were sucessfully closed, 
      * and <code>false</code> if any window refused to close
      */
     public boolean close() {
-        List<Window> t = new ArrayList<>(windows); // make iteration robust
-        Iterator<Window> e = t.iterator();
+        List t = (List) windows.clone(); // make iteration robust 
+        Iterator e = t.iterator();
         while (e.hasNext()) {
-            Window window = e.next();
+            Window window = (Window) e.next();
             boolean closed = window.close();
             if (!closed) {
 				return false;
 			}
         }
         if (subManagers != null) {
-            Iterator<WindowManager> i = subManagers.iterator();
-            while (i.hasNext()) {
-                WindowManager wm = i.next();
+            e = subManagers.iterator();
+            while (e.hasNext()) {
+                WindowManager wm = (WindowManager) e.next();
                 boolean closed = wm.close();
                 if (!closed) {
 					return false;
@@ -126,7 +126,7 @@ public class WindowManager {
 
     /**
      * Returns this window manager's number of windows
-     *
+     * 
      * @return the number of windows
      * @since 3.0
      */

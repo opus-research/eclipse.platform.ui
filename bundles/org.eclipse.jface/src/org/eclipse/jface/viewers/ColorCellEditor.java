@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -73,8 +73,7 @@ public class ColorCellEditor extends DialogCellEditor {
      * Internal class for laying out this cell editor.
      */
     private class ColorCellLayout extends Layout {
-        @Override
-		public Point computeSize(Composite editor, int wHint, int hHint,
+        public Point computeSize(Composite editor, int wHint, int hHint,
                 boolean force) {
             if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT) {
 				return new Point(wHint, hHint);
@@ -87,8 +86,7 @@ public class ColorCellEditor extends DialogCellEditor {
                     colorSize.y, rgbSize.y));
         }
 
-        @Override
-		public void layout(Composite editor, boolean force) {
+        public void layout(Composite editor, boolean force) {
             Rectangle bounds = editor.getClientArea();
             Point colorSize = colorLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT,
                     force);
@@ -106,7 +104,7 @@ public class ColorCellEditor extends DialogCellEditor {
 
     /**
      * Creates a new color cell editor parented under the given control.
-     * The cell editor value is black (<code>RGB(0,0,0)</code>) initially, and has no
+     * The cell editor value is black (<code>RGB(0,0,0)</code>) initially, and has no 
      * validator.
      *
      * @param parent the parent control
@@ -117,7 +115,7 @@ public class ColorCellEditor extends DialogCellEditor {
 
     /**
      * Creates a new color cell editor parented under the given control.
-     * The cell editor value is black (<code>RGB(0,0,0)</code>) initially, and has no
+     * The cell editor value is black (<code>RGB(0,0,0)</code>) initially, and has no 
      * validator.
      *
      * @param parent the parent control
@@ -131,7 +129,7 @@ public class ColorCellEditor extends DialogCellEditor {
 
     /**
      * Creates and returns the color image data for the given control
-     * and RGB value. The image's size is either the control's item extent
+     * and RGB value. The image's size is either the control's item extent 
      * or the cell editor's default extent, which is 16 pixels square.
      *
      * @param w the control
@@ -184,8 +182,10 @@ public class ColorCellEditor extends DialogCellEditor {
         return data;
     }
 
-    @Override
-	protected Control createContents(Composite cell) {
+    /* (non-Javadoc)
+     * Method declared on DialogCellEditor.
+     */
+    protected Control createContents(Composite cell) {
         Color bg = cell.getBackground();
         composite = new Composite(cell, getStyle());
         composite.setBackground(bg);
@@ -198,8 +198,10 @@ public class ColorCellEditor extends DialogCellEditor {
         return composite;
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * Method declared on CellEditor.
+     */
+    public void dispose() {
         if (image != null) {
             image.dispose();
             image = null;
@@ -207,8 +209,10 @@ public class ColorCellEditor extends DialogCellEditor {
         super.dispose();
     }
 
-    @Override
-	protected Object openDialogBox(Control cellEditorWindow) {
+    /* (non-Javadoc)
+     * Method declared on DialogCellEditor.
+     */
+    protected Object openDialogBox(Control cellEditorWindow) {
         ColorDialog dialog = new ColorDialog(cellEditorWindow.getShell());
         Object value = getValue();
         if (value != null) {
@@ -218,8 +222,10 @@ public class ColorCellEditor extends DialogCellEditor {
         return dialog.getRGB();
     }
 
-    @Override
-	protected void updateContents(Object value) {
+    /* (non-Javadoc)
+     * Method declared on DialogCellEditor.
+     */
+    protected void updateContents(Object value) {
         RGB rgb = (RGB) value;
         // XXX: We don't have a value the first time this method is called".
         if (rgb == null) {

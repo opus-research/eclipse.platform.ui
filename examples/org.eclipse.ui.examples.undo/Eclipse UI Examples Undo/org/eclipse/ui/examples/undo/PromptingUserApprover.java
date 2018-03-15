@@ -14,7 +14,6 @@ import org.eclipse.core.commands.operations.IOperationApprover;
 import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.IUndoableOperation;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -41,39 +40,47 @@ public final class PromptingUserApprover implements IOperationApprover {
 		this.context = context;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedRedoing(org.eclipse.core.commands.operations.IUndoableOperation,
+	 *      org.eclipse.core.commands.operations.IOperationHistory,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	public IStatus proceedRedoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable uiInfo) {
 
 		// return immediately if the operation is not relevant
-		if (!operation.hasContext(context)) {
+		if (!operation.hasContext(context))
 			return Status.OK_STATUS;
-		}
 
 		// allow the operation if we are not prompting
 		boolean prompt = UndoPlugin.getDefault().getPreferenceStore()
 				.getBoolean(PreferenceConstants.PREF_CONFIRMUNDO);
-		if (!prompt) {
+		if (!prompt)
 			return Status.OK_STATUS;
-		}
 		return prompt(false, operation, uiInfo);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedUndoing(org.eclipse.core.commands.operations.IUndoableOperation,
+	 *      org.eclipse.core.commands.operations.IOperationHistory,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	public IStatus proceedUndoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable uiInfo) {
 
 		// return immediately if the operation is not relevant
-		if (!operation.hasContext(context)) {
+		if (!operation.hasContext(context))
 			return Status.OK_STATUS;
-		}
 
 		// allow the operation if we are not prompting
 		boolean prompt = UndoPlugin.getDefault().getPreferenceStore()
 				.getBoolean(PreferenceConstants.PREF_CONFIRMUNDO);
-		if (!prompt) {
+		if (!prompt)
 			return Status.OK_STATUS;
-		}
 		return prompt(true, operation, uiInfo);
 	}
 
@@ -100,12 +107,10 @@ public final class PromptingUserApprover implements IOperationApprover {
 						message, UndoExampleMessages.UndoPreferences_DoNotConfirm, false, null, null);
 		UndoPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.PREF_CONFIRMUNDO, !dialog.getToggleState());
 
-		if (createdShell) {
+		if (createdShell)
 			shell.dispose();
-		}
-		if (dialog.getReturnCode() == Window.OK) {
+		if (dialog.getReturnCode() == Window.OK)
 			return Status.OK_STATUS;
-		}
 		return Status.CANCEL_STATUS;
 	}
 
@@ -115,10 +120,9 @@ public final class PromptingUserApprover implements IOperationApprover {
 	 */
 	Shell getShell(IAdaptable uiInfo) {
 		if (uiInfo != null) {
-			Shell shell = Adapters.adapt(uiInfo, Shell.class);
-			if (shell != null) {
+			Shell shell = (Shell) uiInfo.getAdapter(Shell.class);
+			if (shell != null)
 				return shell;
-			}
 		}
 		return null;
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,8 +27,8 @@ public class WelcomeEditorInputFactory implements IElementFactory {
     }
 
     /**
-     * Re-creates and returns an object from the state captured within the given
-     * memento.
+     * Re-creates and returns an object from the state captured within the given 
+     * memento. 
      * <p>
      * Under normal circumstances, the resulting object can be expected to be
      * persistable; that is,
@@ -41,8 +41,7 @@ public class WelcomeEditorInputFactory implements IElementFactory {
      * @param memento a memento containing the state for the object
      * @return an object, or <code>null</code> if the element could not be created
      */
-    @Override
-	public IAdaptable createElement(IMemento memento) {
+    public IAdaptable createElement(IMemento memento) {
         // Get the feature id.
         String versionedFeatureId = memento
                 .getString(WelcomeEditorInput.FEATURE_ID);

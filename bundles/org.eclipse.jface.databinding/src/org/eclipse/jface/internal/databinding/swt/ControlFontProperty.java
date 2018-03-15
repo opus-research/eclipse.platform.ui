@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,25 +18,21 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ControlFontProperty extends WidgetValueProperty {
-	@Override
 	public Object getValueType() {
 		return Font.class;
 	}
 
-	@Override
 	protected Object doGetValue(Object source) {
 		return ((Control) source).getFont();
 	}
 
-	@Override
 	protected void doSetValue(Object source, Object value) {
 		((Control) source).setFont((Font) value);
 	}
 
-	@Override
 	public String toString() {
 		return "Control.font <Font>"; //$NON-NLS-1$
 	}

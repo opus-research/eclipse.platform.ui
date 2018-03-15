@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,9 +21,9 @@ import com.ibm.icu.text.CollationKey;
 /**
  * The DeltaMarkerEntry is the class that wraps an {@link IMarkerDelta} for testing.
 
- *
+ * 
  * @since 3.6
- *
+ * 
  */
 class DeltaMarkerEntry extends MarkerEntry {
 
@@ -31,15 +31,14 @@ class DeltaMarkerEntry extends MarkerEntry {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * @param markerDelta
-	 *
+	 * @param markerDelta 
+	 * 
 	 */
 	public DeltaMarkerEntry(IMarkerDelta markerDelta) {
 		super(markerDelta.getMarker());
 		this.markerDelta=markerDelta;
 	}
 
-	@Override
 	Object getAttributeValue(String attribute) {
 		Object value = getCache().get(attribute);
 		if(value == null) {
@@ -53,24 +52,40 @@ class DeltaMarkerEntry extends MarkerEntry {
 		return value;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getCreationTime()
+	 */
 	long getCreationTime() {
 			//return markerDelta.getCreationTime();
 			return super.getCreationTime();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getID()
+	 */
 	long getID() {
 		return markerDelta.getId();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getMarkerTypeName()
+	 */
 	String getMarkerTypeName() {
 		return MarkerTypesModel.getInstance().getType(markerDelta.getType())
 				.getLabel();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.MarkerItem#getPath()
+	 */
 	public String getPath() {
 		String folder = getAttributeValue(MarkerViewUtil.PATH_ATTRIBUTE, null);
 		if (folder != null) {

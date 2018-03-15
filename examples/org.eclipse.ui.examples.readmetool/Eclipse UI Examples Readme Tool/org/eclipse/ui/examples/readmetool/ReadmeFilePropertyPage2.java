@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,14 +31,14 @@ import org.eclipse.ui.dialogs.PropertyPage;
 /**
  * This page will be added to the property page dialog
  * when "Properties..." popup menu item is selected
- * for Readme files.
+ * for Readme files. 
  *
  * This page demonstrates conditional property pages which look
  * different depending on the state of the element. In this example,
  * the arbitrary condition chosen is whether the Readme file is
  * greater than 256 bytes in length. If it is smaller than 256 bytes
- * in length, this will be a placeholder page containing
- * a simple message. If it is 256 bytes or larger, additional
+ * in length, this will be a placeholder page containing 
+ * a simple message. If it is 256 bytes or larger, additional 
  * information will be provided. This information is determined at
  * runtime.
  *
@@ -69,8 +69,10 @@ public class ReadmeFilePropertyPage2 extends PropertyPage {
         return composite;
     }
 
-    @Override
-	public Control createContents(Composite parent) {
+    /** (non-Javadoc)
+     * Method declared on PreferencePage
+     */
+    public Control createContents(Composite parent) {
         // ensure the page has no special buttons
         noDefaultAndApplyButton();
         Composite panel = createComposite(parent, 2);
@@ -187,13 +189,14 @@ public class ReadmeFilePropertyPage2 extends PropertyPage {
         IResource resource = (IResource) getElement();
 
         if (resource.getType() == IResource.FILE) {
+            InputStream contentStream = null;
             int length = 0;
-            IFile file = (IFile) resource;
-            try (InputStream contentStream = file.getContents();
-                    Reader in = new InputStreamReader(contentStream);) {
-
+            try {
+                IFile file = (IFile) resource;
+                contentStream = file.getContents();
+                Reader in = new InputStreamReader(contentStream);
                 int chunkSize = contentStream.available();
-                StringBuilder buffer = new StringBuilder(chunkSize);
+                StringBuffer buffer = new StringBuffer(chunkSize);
                 char[] readBuffer = new char[chunkSize];
                 int n = in.read(readBuffer);
 
@@ -208,6 +211,14 @@ public class ReadmeFilePropertyPage2 extends PropertyPage {
                 length = 0;
             } catch (IOException e) {
                 // do nothing
+            } finally {
+                if (contentStream != null) {
+                    try {
+                        contentStream.close();
+                    } catch (IOException e) {
+                        // do nothing
+                    }
+                }
             }
 
             if (length < 256)
@@ -221,8 +232,7 @@ public class ReadmeFilePropertyPage2 extends PropertyPage {
     /** (non-Javadoc)
      * Method declared on PreferencePage
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         // nothing to do - read-only page
         return true;
     }

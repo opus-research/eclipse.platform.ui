@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,8 +23,8 @@ import org.eclipse.core.resources.IFile;
  * File-oriented editors should support this as a valid input type, and allow
  * full read-write editing of its content.
  * </p><p>
- * A default implementation of this interface is provided by
- * org.eclipse.ui.part.FileEditorInput.
+ * A default implementation of this interface is provided by 
+ * org.eclipse.ui.part.FileEditorInput.  
  * </p><p>
  * All editor inputs must implement the <code>IAdaptable</code> interface;
  * extensions are managed by the platform's adapter manager.

@@ -1,10 +1,10 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -13,9 +13,9 @@ package org.eclipse.e4.ui.model.application.descriptor.basic.util;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.commands.MBindings;
 import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
-import org.eclipse.e4.ui.model.application.descriptor.basic.*;
+import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
+import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptorContainer;
 import org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicPackageImpl;
-import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
@@ -89,10 +89,6 @@ public class BasicAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseApplicationElement(MApplicationElement object) {
 				return createApplicationElementAdapter();
-			}
-			@Override
-			public Adapter caseLocalizable(MLocalizable object) {
-				return createLocalizableAdapter();
 			}
 			@Override
 			public Adapter caseUILabel(MUILabel object) {
@@ -207,20 +203,6 @@ public class BasicAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createApplicationElementAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.MLocalizable <em>Localizable</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.ui.MLocalizable
-	 * @generated
-	 */
-	public Adapter createLocalizableAdapter() {
 		return null;
 	}
 

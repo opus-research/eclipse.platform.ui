@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,26 +37,25 @@ public class ContainerContentProvider implements ITreeContentProvider {
      * The visual part that is using this content provider is about
      * to be disposed. Deallocate all allocated SWT resources.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
     }
 
     /*
      * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
      */
-    @Override
-	public Object[] getChildren(Object element) {
+    public Object[] getChildren(Object element) {
         if (element instanceof IWorkspace) {
             // check if closed projects should be shown
-			IProject[] allProjects = ((IWorkspace) element).getRoot().getProjects();
+            IProject[] allProjects = ((IWorkspace) element).getRoot()
+                    .getProjects();
             if (showClosedProjects) {
 				return allProjects;
 			}
 
             ArrayList accessibleProjects = new ArrayList();
-			for (IProject project : allProjects) {
-				if (project.isOpen()) {
-					accessibleProjects.add(project);
+            for (int i = 0; i < allProjects.length; i++) {
+                if (allProjects[i].isOpen()) {
+                    accessibleProjects.add(allProjects[i]);
                 }
             }
             return accessibleProjects.toArray();
@@ -65,9 +64,10 @@ public class ContainerContentProvider implements ITreeContentProvider {
             if (container.isAccessible()) {
                 try {
                     List children = new ArrayList();
-					for (IResource member : container.members()) {
-                        if (member.getType() != IResource.FILE) {
-                            children.add(member);
+                    IResource[] members = container.members();
+                    for (int i = 0; i < members.length; i++) {
+                        if (members[i].getType() != IResource.FILE) {
+                            children.add(members[i]);
                         }
                     }
                     return children.toArray();
@@ -82,16 +82,14 @@ public class ContainerContentProvider implements ITreeContentProvider {
     /*
      * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
      */
-    @Override
-	public Object[] getElements(Object element) {
+    public Object[] getElements(Object element) {
         return getChildren(element);
     }
 
     /*
      * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
      */
-    @Override
-	public Object getParent(Object element) {
+    public Object getParent(Object element) {
         if (element instanceof IResource) {
 			return ((IResource) element).getParent();
 		}
@@ -101,22 +99,20 @@ public class ContainerContentProvider implements ITreeContentProvider {
     /*
      * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
      */
-    @Override
-	public boolean hasChildren(Object element) {
+    public boolean hasChildren(Object element) {
         return getChildren(element).length > 0;
     }
 
     /*
      * @see org.eclipse.jface.viewers.IContentProvider#inputChanged
      */
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
     /**
-     * Specify whether or not to show closed projects in the tree
+     * Specify whether or not to show closed projects in the tree 
      * viewer.  Default is to show closed projects.
-     *
+     * 
      * @param show boolean if false, do not show closed projects in the tree
      */
     public void showClosedProjects(boolean show) {

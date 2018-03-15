@@ -1,13 +1,12 @@
 /*******************************************************************************
- *  Copyright (c) 2000, 2016 IBM Corporation and others.
+ *  Copyright (c) 2000, 2011 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
  *  http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  *  Contributors:
  *     IBM Corporation - initial API and implementation
- *     Ralf M Petter <ralf.petter@gmail.com> - Bug 509719
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 
@@ -26,7 +25,10 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -38,7 +40,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.IMessage;
@@ -73,7 +77,7 @@ public class FormHeading extends Canvas {
 
 	private Image gradientImage;
 
-	Hashtable<String, Color> colors = new Hashtable<>();
+	Hashtable colors = new Hashtable();
 
 	private int flags;
 
@@ -87,8 +91,6 @@ public class FormHeading extends Canvas {
 
 	private SizeCache messageCache = new SizeCache();
 
-	private SizeCache titleRegionCache = new SizeCache();
-
 	private TitleRegion titleRegion;
 
 	private MessageRegion messageRegion;
@@ -99,11 +101,9 @@ public class FormHeading extends Canvas {
 
 	private class DefaultMessageToolTipManager implements
 			IMessageToolTipManager {
-		@Override
 		public void createToolTip(Control control, boolean imageLabel) {
 		}
 
-		@Override
 		public void update() {
 			String details = getMessageType() == 0 ? null : MessageManager
 					.createDetails(getChildrenMessages());
@@ -125,25 +125,19 @@ public class FormHeading extends Canvas {
 	}
 
 	private class FormHeadingLayout extends Layout implements ILayoutExtension {
-		private static final int MIN_WIDTH = -2;
-
-		@Override
 		public int computeMinimumWidth(Composite composite, boolean flushCache) {
-			return layout(composite, false, 0, 0, MIN_WIDTH, SWT.DEFAULT, flushCache).x;
+			return computeSize(composite, 5, SWT.DEFAULT, flushCache).x;
 		}
 
-		@Override
 		public int computeMaximumWidth(Composite composite, boolean flushCache) {
 			return computeSize(composite, SWT.DEFAULT, SWT.DEFAULT, flushCache).x;
 		}
 
-		@Override
 		public Point computeSize(Composite composite, int wHint, int hHint,
 				boolean flushCache) {
 			return layout(composite, false, 0, 0, wHint, hHint, flushCache);
 		}
 
-		@Override
 		protected void layout(Composite composite, boolean flushCache) {
 			Rectangle rect = composite.getClientArea();
 			layout(composite, true, rect.x, rect.y, rect.width, rect.height,
@@ -152,8 +146,6 @@ public class FormHeading extends Canvas {
 
 		private Point layout(Composite composite, boolean move, int x, int y,
 				int width, int height, boolean flushCache) {
-			titleRegionCache.setControl(titleRegion);
-
 			Point tsize = null;
 			Point msize = null;
 			Point tbsize = null;
@@ -163,7 +155,6 @@ public class FormHeading extends Canvas {
 				clientCache.flush();
 				messageCache.flush();
 				toolbarCache.flush();
-				titleRegionCache.flush();
 			}
 			if (hasToolBar()) {
 				ToolBar tb = toolBarManager.getControl();
@@ -172,17 +163,17 @@ public class FormHeading extends Canvas {
 			}
 			if (headClient != null) {
 				clientCache.setControl(headClient);
-				int clientWidthHint = width;
-				if (clientWidthHint != SWT.DEFAULT && clientWidthHint != MIN_WIDTH) {
-					clientWidthHint -= HMARGIN * 2;
+				int cwhint = width;
+				if (cwhint != SWT.DEFAULT) {
+					cwhint -= HMARGIN * 2;
 					if (tbsize != null && getToolBarAlignment() == SWT.BOTTOM)
-						clientWidthHint -= tbsize.x + SPACING;
+						cwhint -= tbsize.x + SPACING;
 				}
-				clsize = computeSize(clientCache, clientWidthHint);
+				clsize = clientCache.computeSize(cwhint, SWT.DEFAULT);
 			}
 			int totalFlexWidth = width;
 			int flexWidth = totalFlexWidth;
-			if (totalFlexWidth != SWT.DEFAULT && totalFlexWidth != MIN_WIDTH) {
+			if (totalFlexWidth != SWT.DEFAULT) {
 				totalFlexWidth -= TITLE_HMARGIN * 2;
 				// complete right margin
 				if (hasToolBar() && getToolBarAlignment() == SWT.TOP
@@ -203,7 +194,7 @@ public class FormHeading extends Canvas {
 			 * titleRegion.computeSize(flexWidth, SWT.DEFAULT); if (flexWidth !=
 			 * SWT.DEFAULT && tsize.x < flexWidth) flexWidth += flexWidth -
 			 * tsize.x;
-			 *
+			 * 
 			 * if (hasMessageRegion()) {
 			 * messageCache.setControl(messageRegion.getMessageControl()); msize =
 			 * messageCache.computeSize(flexWidth, SWT.DEFAULT); int maxWidth =
@@ -214,11 +205,11 @@ public class FormHeading extends Canvas {
 			 * SWT.DEFAULT); } }
 			 */
 			if (!hasMessageRegion()) {
-				tsize = computeSize(titleRegionCache, flexWidth);
+				tsize = titleRegion.computeSize(flexWidth, SWT.DEFAULT);
 			} else {
 				// Total flexible area in the first row is flexWidth.
 				// Try natural widths of title and
-				Point tsizeNatural = titleRegionCache.computeSize(SWT.DEFAULT,
+				Point tsizeNatural = titleRegion.computeSize(SWT.DEFAULT,
 						SWT.DEFAULT);
 				messageCache.setControl(messageRegion.getMessageControl());
 				Point msizeNatural = messageCache.computeSize(SWT.DEFAULT,
@@ -226,7 +217,7 @@ public class FormHeading extends Canvas {
 				// try to fit all
 				tsize = tsizeNatural;
 				msize = msizeNatural;
-				if (flexWidth != SWT.DEFAULT && flexWidth != MIN_WIDTH) {
+				if (flexWidth != SWT.DEFAULT) {
 					int needed = tsizeNatural.x + msizeNatural.x;
 					if (needed > flexWidth) {
 						// too big - try to limit the message
@@ -344,27 +335,11 @@ public class FormHeading extends Canvas {
 			}
 			return size;
 		}
-
-		/**
-		 * Computes the preferred or minimum size of the given client cache.
-		 *
-		 * @param clientCache
-		 *            size cache for the control whose size is being computed
-		 * @param wHint
-		 *            the width of the control, in pixels, or SWT.DEFAULT if the
-		 *            preferred size is being computed, or MIN_WIDTH if the minimum size
-		 *            is being computed
-		 */
-		private Point computeSize(SizeCache clientCache, int wHint) {
-			if (wHint == MIN_WIDTH) {
-				int minWidth = clientCache.computeMinimumWidth();
-				return clientCache.computeSize(minWidth, SWT.DEFAULT);
-			}
-			return clientCache.computeSize(wHint, SWT.DEFAULT);
-		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#forceFocus()
+	 */
 	public boolean forceFocus() {
 		return false;
 	}
@@ -383,7 +358,7 @@ public class FormHeading extends Canvas {
 		private CLabel messageLabel;
 		private IMessage[] messages;
 		private Hyperlink messageHyperlink;
-		private ListenerList<IHyperlinkListener> listeners;
+		private ListenerList listeners;
 		private Color fg;
 		private int fontHeight = -1;
 		private int fontBaselineHeight = -1;
@@ -495,7 +470,7 @@ public class FormHeading extends Canvas {
 
 		public void addMessageHyperlinkListener(IHyperlinkListener listener) {
 			if (listeners == null)
-				listeners = new ListenerList<>();
+				listeners = new ListenerList();
 			listeners.add(listener);
 			ensureControlExists();
 			if (messageHyperlink != null)
@@ -524,12 +499,12 @@ public class FormHeading extends Canvas {
 				if (messageHyperlink == null) {
 					messageHyperlink = new Hyperlink(FormHeading.this, SWT.NULL);
 					messageHyperlink.setUnderlined(true);
-					messageHyperlink.setBackground(getBackground());
 					messageHyperlink.setText(message);
 					messageHyperlink.setHref(messages);
-					for (IHyperlinkListener element : listeners)
+					Object[] llist = listeners.getListeners();
+					for (int i = 0; i < llist.length; i++)
 						messageHyperlink
-								.addHyperlinkListener(element);
+								.addHyperlinkListener((IHyperlinkListener) llist[i]);
 					if (messageToolTipManager != null)
 						messageToolTipManager.createToolTip(messageHyperlink, false);
 				} else if (!messageHyperlink.getVisible()) {
@@ -543,7 +518,6 @@ public class FormHeading extends Canvas {
 					messageHyperlink.setVisible(false);
 				if (messageLabel == null) {
 					messageLabel = new CLabel(FormHeading.this, SWT.NULL);
-					messageLabel.setBackground(getBackground());
 					messageLabel.setText(message);
 					if (messageToolTipManager != null)
 						messageToolTipManager.createToolTip(messageLabel, false);
@@ -552,7 +526,6 @@ public class FormHeading extends Canvas {
 					messageLabel.setVisible(true);
 				}
 			}
-			updateForeground();
 			layout(true);
 		}
 
@@ -569,7 +542,6 @@ public class FormHeading extends Canvas {
 
 		public void setForeground(Color fg) {
 			this.fg = fg;
-			updateForeground();
 		}
 
 		private void updateForeground() {
@@ -591,37 +563,47 @@ public class FormHeading extends Canvas {
 
 	/**
 	 * Creates the form content control as a child of the provided parent.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent widget
 	 */
 	public FormHeading(Composite parent, int style) {
 		super(parent, style);
 		setBackgroundMode(SWT.INHERIT_DEFAULT);
-		addListener(SWT.Paint, e -> onPaint(e.gc));
-		addListener(SWT.Dispose, e -> {
-			if (gradientImage != null) {
-				FormImages.getInstance().markFinished(gradientImage, getDisplay());
-				gradientImage = null;
+		addListener(SWT.Paint, new Listener() {
+			public void handleEvent(Event e) {
+				onPaint(e.gc);
 			}
 		});
-		addListener(SWT.Resize, e -> {
-			if (gradientInfo != null || (backgroundImage != null && !isBackgroundImageTiled()))
-				updateGradientImage();
+		addListener(SWT.Dispose, new Listener() {
+			public void handleEvent(Event e) {
+				if (gradientImage != null) {
+					FormImages.getInstance().markFinished(gradientImage, getDisplay());
+					gradientImage = null;
+				}
+			}
 		});
-		addMouseMoveListener(e -> updateTitleRegionHoverState(e));
+		addListener(SWT.Resize, new Listener() {
+			public void handleEvent(Event e) {
+				if (gradientInfo != null
+						|| (backgroundImage != null && !isBackgroundImageTiled()))
+					updateGradientImage();
+			}
+		});
+		addMouseMoveListener(new MouseMoveListener() {
+			public void mouseMove(MouseEvent e) {
+				updateTitleRegionHoverState(e);
+			}
+		});
 		addMouseTrackListener(new MouseTrackListener() {
-			@Override
 			public void mouseEnter(MouseEvent e) {
 				updateTitleRegionHoverState(e);
 			}
 
-			@Override
 			public void mouseExit(MouseEvent e) {
 				titleRegion.setHoverState(TitleRegion.STATE_NORMAL);
 			}
 
-			@Override
 			public void mouseHover(MouseEvent e) {
 			}
 		});
@@ -632,7 +614,6 @@ public class FormHeading extends Canvas {
 	/**
 	 * Fully delegates the size computation to the internal layout manager.
 	 */
-	@Override
 	public final Point computeSize(int wHint, int hHint, boolean changed) {
 		return ((FormHeadingLayout) getLayout()).computeSize(this, wHint,
 				hHint, changed);
@@ -641,13 +622,12 @@ public class FormHeading extends Canvas {
 	/**
 	 * Prevents from changing the custom control layout.
 	 */
-	@Override
 	public final void setLayout(Layout layout) {
 	}
 
 	/**
 	 * Returns the title text that will be rendered at the top of the form.
-	 *
+	 * 
 	 * @return the title text
 	 */
 	public String getText() {
@@ -656,7 +636,7 @@ public class FormHeading extends Canvas {
 
 	/**
 	 * Returns the title image that will be rendered to the left of the title.
-	 *
+	 * 
 	 * @return the title image
 	 * @since 3.2
 	 */
@@ -667,7 +647,6 @@ public class FormHeading extends Canvas {
 	/**
 	 * Sets the background color of the header.
 	 */
-	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 		internalSetBackground(bg);
@@ -685,7 +664,6 @@ public class FormHeading extends Canvas {
 	/**
 	 * Sets the foreground color of the header.
 	 */
-	@Override
 	public void setForeground(Color fg) {
 		super.setForeground(fg);
 		titleRegion.setForeground(fg);
@@ -696,7 +674,7 @@ public class FormHeading extends Canvas {
 	/**
 	 * Sets the text to be rendered at the top of the form above the body as a
 	 * title.
-	 *
+	 * 
 	 * @param text
 	 *            the title text
 	 */
@@ -704,7 +682,6 @@ public class FormHeading extends Canvas {
 		titleRegion.setText(text);
 	}
 
-	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		titleRegion.setFont(font);
@@ -712,7 +689,7 @@ public class FormHeading extends Canvas {
 
 	/**
 	 * Sets the image to be rendered to the left of the title.
-	 *
+	 * 
 	 * @param image
 	 *            the title image or <code>null</code> to show no image.
 	 * @since 3.2
@@ -771,7 +748,6 @@ public class FormHeading extends Canvas {
 		return (flags & BACKGROUND_IMAGE_TILED) != 0;
 	}
 
-	@Override
 	public void setBackgroundImage(Image image) {
 		super.setBackgroundImage(image);
 		if (image != null) {
@@ -782,7 +758,7 @@ public class FormHeading extends Canvas {
 	/**
 	 * Returns the tool bar manager that is used to manage tool items in the
 	 * form's title area.
-	 *
+	 * 
 	 * @return form tool bar manager
 	 */
 	public IToolBarManager getToolBarManager() {
@@ -792,10 +768,12 @@ public class FormHeading extends Canvas {
 			toolbar.setBackground(getBackground());
 			toolbar.setForeground(getForeground());
 			toolbar.setCursor(FormsResources.getHandCursor());
-			addDisposeListener(e -> {
-				if (toolBarManager != null) {
-					toolBarManager.dispose();
-					toolBarManager = null;
+			addDisposeListener(new DisposeListener() {
+				public void widgetDisposed(DisposeEvent e) {
+					if (toolBarManager != null) {
+						toolBarManager.dispose();
+						toolBarManager = null;
+					}
 				}
 			});
 		}
@@ -805,7 +783,7 @@ public class FormHeading extends Canvas {
 	/**
 	 * Returns the menu manager that is used to manage tool items in the form's
 	 * title area.
-	 *
+	 * 
 	 * @return form drop-down menu manager
 	 * @since 3.3
 	 */
@@ -826,9 +804,6 @@ public class FormHeading extends Canvas {
 		if (!isSeparatorVisible() && getBackgroundImage() == null)
 			return;
 		Rectangle carea = getClientArea();
-		if (carea.width == 0 || carea.height == 0) {
-			return;
-		}
 		Image buffer = new Image(getDisplay(), carea.width, carea.height);
 		buffer.setBackground(getBackground());
 		GC igc = new GC(buffer);
@@ -879,8 +854,10 @@ public class FormHeading extends Canvas {
 
 	private void updateGradientImage() {
 		Rectangle rect = getBounds();
-		Image oldGradientImage = gradientImage;
-		gradientImage = null;
+		if (gradientImage != null) {
+			FormImages.getInstance().markFinished(gradientImage, getDisplay());
+			gradientImage = null;
+		}
 		if (gradientInfo != null) {
 			gradientImage = FormImages.getInstance().getGradient(gradientInfo.gradientColors, gradientInfo.percents,
 					gradientInfo.vertical ? rect.height : rect.width, gradientInfo.vertical, getColor(COLOR_BASE_BG), getDisplay());
@@ -891,9 +868,6 @@ public class FormHeading extends Canvas {
 			GC gc = new GC(gradientImage);
 			gc.drawImage(backgroundImage, 0, 0);
 			gc.dispose();
-		}
-		if (oldGradientImage != null) {
-			FormImages.getInstance().markFinished(oldGradientImage, getDisplay());
 		}
 		setBackgroundImage(gradientImage);
 	}
@@ -967,7 +941,7 @@ public class FormHeading extends Canvas {
 
 	/**
 	 * Tests if the form is in the 'busy' state.
-	 *
+	 * 
 	 * @return <code>true</code> if busy, <code>false</code> otherwise.
 	 */
 
@@ -978,7 +952,7 @@ public class FormHeading extends Canvas {
 	/**
 	 * Sets the form's busy state. Busy form will display 'busy' animation in
 	 * the area of the title image.
-	 *
+	 * 
 	 * @param busy
 	 *            the form's busy state
 	 */
@@ -1007,7 +981,7 @@ public class FormHeading extends Canvas {
 	}
 
 	public Color getColor(String key) {
-		return colors.get(key);
+		return (Color) colors.get(key);
 	}
 
 	public boolean hasColor(String key) {

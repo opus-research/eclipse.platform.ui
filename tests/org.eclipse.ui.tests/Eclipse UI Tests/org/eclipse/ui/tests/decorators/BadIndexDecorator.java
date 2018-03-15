@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,60 +27,77 @@ import org.eclipse.ui.tests.TestPlugin;
 
 public class BadIndexDecorator implements ILightweightLabelDecorator {
 
-	private Set<ILabelProviderListener> listeners = new HashSet<>();
+     private Set listeners = new HashSet();
 
     private ImageDescriptor descriptor;
+   
 
-
-    @Override
-	public void addListener(ILabelProviderListener listener) {
+    /*
+     * @see IBaseLabelProvider#addListener(ILabelProviderListener)
+     */
+    public void addListener(ILabelProviderListener listener) {
         listeners.add(listener);
     }
 
-    @Override
-	public void dispose() {
-		listeners = new HashSet<>();
+    /*
+     * @see IBaseLabelProvider#dispose()
+     */
+    public void dispose() {
+        listeners = new HashSet();
     }
 
-    @Override
-	public boolean isLabelProperty(Object element, String property) {
+    /*
+     * @see IBaseLabelProvider#isLabelProperty(Object, String)
+     */
+    public boolean isLabelProperty(Object element, String property) {
         return false;
     }
 
-    @Override
-	public void removeListener(ILabelProviderListener listener) {
+    /*
+     * @see IBaseLabelProvider#removeListener(ILabelProviderListener)
+     */
+    public void removeListener(ILabelProviderListener listener) {
         listeners.remove(listener);
     }
 
     /**
-     * Refresh the listeners to update the decorators for
+     * Refresh the listeners to update the decorators for 
      * element.
      */
 
     public void refreshListeners(Object element) {
-		Iterator<ILabelProviderListener> iterator = listeners.iterator();
-		while (iterator.hasNext()) {
-			LabelProviderChangedEvent event = new LabelProviderChangedEvent(this, element);
-			iterator.next().labelProviderChanged(event);
-		}
+        Iterator iterator = listeners.iterator();
+        while (iterator.hasNext()) {
+            LabelProviderChangedEvent event = new LabelProviderChangedEvent(
+                    this, element);
+            ((ILabelProviderListener) iterator.next())
+                    .labelProviderChanged(event);
+        }
     }
 
+    /**
+     * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#getOverlay(java.lang.Object)
+     */
     public ImageDescriptor getOverlay(Object element) {
-		Assert.isTrue(element instanceof IResource);
-		if (descriptor == null) {
-			URL source = TestPlugin.getDefault().getDescriptor().getInstallURL();
-			try {
-				descriptor = ImageDescriptor.createFromURL(new URL(source, "icons/binary_co.gif"));
-			} catch (MalformedURLException exception) {
-				return null;
-			}
-		}
-		return descriptor;
+        Assert.isTrue(element instanceof IResource);
+        if (descriptor == null) {
+            URL source = TestPlugin.getDefault().getDescriptor()
+                    .getInstallURL();
+            try {
+                descriptor = ImageDescriptor.createFromURL(new URL(source,
+                        "icons/binary_co.gif"));
+            } catch (MalformedURLException exception) {
+                return null;
+            }
+        }
+        return descriptor;
 
     }
 
-    @Override
-	public void decorate(Object element, IDecoration decoration) {
+    /**
+     * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate(java.lang.Object, org.eclipse.jface.viewers.IDecoration)
+     */
+    public void decorate(Object element, IDecoration decoration) {
         decoration.addOverlay(getOverlay(element), 17);
     }
 

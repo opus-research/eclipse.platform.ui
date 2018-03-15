@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
 package org.eclipse.ui.internal;
 
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -21,7 +21,7 @@ import org.eclipse.ui.internal.misc.UIStats;
  * Part listener list.
  */
 /*
- * This class should be deleted when IPartListener and IPartListener2
+ * This class should be deleted when IPartListener and IPartListener2 
  * renamed to IPartListener.
  */
 public class PartListenerList extends EventManager {
@@ -42,7 +42,7 @@ public class PartListenerList extends EventManager {
 
     /**
      * Calls a part listener with associated performance event instrumentation
-     *
+     * 
      * @param runnable
      * @param listener
      * @param part
@@ -54,7 +54,7 @@ public class PartListenerList extends EventManager {
     		label = description + part.getTitle();
     		UIStats.start(UIStats.NOTIFY_PART_LISTENERS, label);
     	}
-    	SafeRunner.run(runnable);
+    	Platform.run(runnable);
     	if (UIStats.isDebugging(UIStats.NOTIFY_PART_LISTENERS)) {
 			UIStats.end(UIStats.NOTIFY_PART_LISTENERS, listener, label);
 		}
@@ -64,14 +64,14 @@ public class PartListenerList extends EventManager {
      * Notifies the listener that a part has been activated.
      */
     public void firePartActivated(final IWorkbenchPart part) {
-		for (Object listener : getListeners()) {
-			final IPartListener partListener = (IPartListener) listener;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
-					partListener.partActivated(part);
+                public void run() {
+                    l.partActivated(part);
                 }
-			}, partListener, part, "activated::"); //$NON-NLS-1$
+            }, l, part, "activated::"); //$NON-NLS-1$
         }
     }
 
@@ -79,14 +79,14 @@ public class PartListenerList extends EventManager {
      * Notifies the listener that a part has been brought to top.
      */
     public void firePartBroughtToTop(final IWorkbenchPart part) {
-		for (Object listener : getListeners()) {
-			final IPartListener partListener = (IPartListener) listener;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
-					partListener.partBroughtToTop(part);
+                public void run() {
+                    l.partBroughtToTop(part);
                 }
-			}, partListener, part, "broughtToTop::"); //$NON-NLS-1$
+            }, l, part, "broughtToTop::"); //$NON-NLS-1$
         }
     }
 
@@ -94,14 +94,14 @@ public class PartListenerList extends EventManager {
      * Notifies the listener that a part has been closed
      */
     public void firePartClosed(final IWorkbenchPart part) {
-		for (Object element : getListeners()) {
-			final IPartListener partListener = (IPartListener) element;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
-					partListener.partClosed(part);
+                public void run() {
+                    l.partClosed(part);
                 }
-			}, partListener, part, "closed::"); //$NON-NLS-1$
+            }, l, part, "closed::"); //$NON-NLS-1$
         }
     }
 
@@ -109,14 +109,14 @@ public class PartListenerList extends EventManager {
      * Notifies the listener that a part has been deactivated.
      */
     public void firePartDeactivated(final IWorkbenchPart part) {
-		for (Object listener : getListeners()) {
-			final IPartListener partListener = (IPartListener) listener;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
-					partListener.partDeactivated(part);
+                public void run() {
+                    l.partDeactivated(part);
                 }
-			}, partListener, part, "deactivated::"); //$NON-NLS-1$
+            }, l, part, "deactivated::"); //$NON-NLS-1$
         }
     }
 
@@ -124,14 +124,14 @@ public class PartListenerList extends EventManager {
      * Notifies the listener that a part has been opened.
      */
     public void firePartOpened(final IWorkbenchPart part) {
-		for (Object listener : getListeners()) {
-			final IPartListener partListener = (IPartListener) listener;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
-					partListener.partOpened(part);
+                public void run() {
+                    l.partOpened(part);
                 }
-			}, partListener, part, "opened::"); //$NON-NLS-1$
+            }, l, part, "opened::"); //$NON-NLS-1$
         }
     }
 

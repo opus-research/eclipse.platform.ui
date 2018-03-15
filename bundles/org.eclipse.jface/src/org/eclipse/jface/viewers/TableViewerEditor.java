@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,9 +25,9 @@ import org.eclipse.swt.widgets.TableItem;
 
 /**
  * This is an editor-implementation for {@link Table}
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public final class TableViewerEditor extends ColumnViewerEditor {
 	/**
@@ -57,7 +57,7 @@ public final class TableViewerEditor extends ColumnViewerEditor {
 
 	/**
 	 * Create a customized editor with focusable cells
-	 *
+	 * 
 	 * @param viewer
 	 *            the viewer the editor is created for
 	 * @param focusCellManager
@@ -89,7 +89,7 @@ public final class TableViewerEditor extends ColumnViewerEditor {
 
 	/**
 	 * Create a customized editor whose activation process is customized
-	 *
+	 * 
 	 * @param viewer
 	 *            the viewer the editor is created for
 	 * @param editorActivationStrategy
@@ -110,12 +110,10 @@ public final class TableViewerEditor extends ColumnViewerEditor {
 		create(viewer, null, editorActivationStrategy, feature);
 	}
 
-	@Override
 	protected void setEditor(Control w, Item item, int columnNumber) {
 		tableEditor.setEditor(w, (TableItem) item, columnNumber);
 	}
 
-	@Override
 	protected void setLayoutData(LayoutData layoutData) {
 		tableEditor.grabHorizontal = layoutData.grabHorizontal;
 		tableEditor.horizontalAlignment = layoutData.horizontalAlignment;
@@ -127,7 +125,6 @@ public final class TableViewerEditor extends ColumnViewerEditor {
 		}
 	}
 
-	@Override
 	public ViewerCell getFocusCell() {
 		if (focusCellManager != null) {
 			return focusCellManager.getFocusCell();
@@ -136,7 +133,6 @@ public final class TableViewerEditor extends ColumnViewerEditor {
 		return super.getFocusCell();
 	}
 
-	@Override
 	protected void updateFocusCell(ViewerCell focusCell,
 			ColumnViewerEditorActivationEvent event) {
 		// Update the focus cell when we activated the editor with these 2

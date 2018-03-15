@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     Matthew Hall - initial API and implementation
  *     Matthew Hall - bugs 195222, 247997, 265561
  *     Ovidio Mallo - bug 301774
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.property.set;
@@ -40,29 +39,23 @@ import org.eclipse.core.internal.databinding.property.set.SimplePropertyObservab
  * <p>
  * In addition, we recommended overriding {@link #toString()} to return a
  * description suitable for debugging purposes.
- *
- * @param <S>
- *            type of the source object
- * @param <E>
- *            type of the elements in the set
+ * 
  * @since 1.2
  */
-public abstract class SimpleSetProperty<S, E> extends SetProperty<S, E> {
-	@Override
-	public IObservableSet<E> observe(Realm realm, S source) {
-		return new SimplePropertyObservableSet<>(realm, source, this);
+public abstract class SimpleSetProperty extends SetProperty {
+	public IObservableSet observe(Realm realm, Object source) {
+		return new SimplePropertyObservableSet(realm, source, this);
 	}
 
 	// Accessors
 
-	@Override
-	protected abstract Set<E> doGetSet(S source);
+	protected abstract Set doGetSet(Object source);
 
 	// Mutators
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param set
@@ -70,16 +63,15 @@ public abstract class SimpleSetProperty<S, E> extends SetProperty<S, E> {
 	 * @param diff
 	 *            a diff describing the change
 	 * @noreference This method is not intended to be referenced by clients.
-	 * @since 1.6
 	 */
-	public final void setSet(S source, Set<E> set, SetDiff<E> diff) {
+	public final void setSet(Object source, Set set, SetDiff diff) {
 		if (source != null && !diff.isEmpty())
 			doSetSet(source, set, diff);
 	}
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param set
@@ -88,17 +80,15 @@ public abstract class SimpleSetProperty<S, E> extends SetProperty<S, E> {
 	 *            a diff describing the change
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
-	protected abstract void doSetSet(S source, Set<E> set, SetDiff<E> diff);
+	protected abstract void doSetSet(Object source, Set set, SetDiff diff);
 
-	@Override
-	protected void doSetSet(S source, Set<E> set) {
-		SetDiff<E> diff = Diffs.computeLazySetDiff(doGetSet(source), set);
+	protected void doSetSet(Object source, Set set) {
+		SetDiff diff = Diffs.computeLazySetDiff(doGetSet(source), set);
 		doSetSet(source, set, diff);
 	}
 
-	@Override
-	protected void doUpdateSet(S source, SetDiff<E> diff) {
-		Set<E> set = new HashSet<E>(doGetSet(source));
+	protected void doUpdateSet(Object source, SetDiff diff) {
+		Set set = new HashSet(doGetSet(source));
 		diff.applyTo(set);
 		doSetSet(source, set, diff);
 	}
@@ -113,7 +103,7 @@ public abstract class SimpleSetProperty<S, E> extends SetProperty<S, E> {
 	 * <p>
 	 * This method returns null if the source object has no listener APIs for
 	 * this property.
-	 *
+	 * 
 	 * @param listener
 	 *            the property listener to receive events
 	 * @return a native listener which parlays property change events to the
@@ -121,5 +111,6 @@ public abstract class SimpleSetProperty<S, E> extends SetProperty<S, E> {
 	 *         APIs for this property.
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
-	public abstract INativePropertyListener<S> adaptListener(ISimplePropertyListener<S, SetDiff<E>> listener);
+	public abstract INativePropertyListener adaptListener(
+			ISimplePropertyListener listener);
 }

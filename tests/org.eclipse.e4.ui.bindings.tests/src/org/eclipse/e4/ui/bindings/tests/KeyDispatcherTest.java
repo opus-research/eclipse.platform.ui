@@ -1,23 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2013, 2014 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440893
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 436344
- *******************************************************************************/
 package org.eclipse.e4.ui.bindings.tests;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.TestCase;
 
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -34,9 +20,12 @@ import org.eclipse.e4.ui.bindings.BindingServiceAddon;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.bindings.internal.BindingTable;
 import org.eclipse.e4.ui.bindings.internal.BindingTableManager;
+import org.eclipse.e4.ui.bindings.internal.ContextSet;
 import org.eclipse.e4.ui.bindings.keys.KeyBindingDispatcher;
+import org.eclipse.e4.ui.internal.services.ActiveContextsFunction;
 import org.eclipse.e4.ui.services.ContextServiceAddon;
 import org.eclipse.e4.ui.services.EContextService;
+import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.swt.SWT;
@@ -46,12 +35,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 
-public class KeyDispatcherTest {
+public class KeyDispatcherTest extends TestCase {
 	private static final String ID_DIALOG = "org.eclipse.ui.contexts.dialog";
 	private static final String ID_DIALOG_AND_WINDOW = "org.eclipse.ui.contexts.dialogAndWindow";
 	private static final String ID_WINDOW = "org.eclipse.ui.contexts.window";
@@ -90,18 +75,18 @@ public class KeyDispatcherTest {
 	private CallHandler twoStrokeHandler;
 
 	private void defineCommands(IEclipseContext context) {
-		ECommandService cs = workbenchContext
-				.get(ECommandService.class);
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
 		Category category = cs.defineCategory(TEST_CAT1, "CAT1", null);
 		cs.defineCommand(TEST_ID1, "ID1", null, category, null);
 		cs.defineCommand(TEST_ID2, "ID2", null, category, null);
 		ParameterizedCommand cmd = cs.createCommand(TEST_ID1, null);
-		EHandlerService hs = workbenchContext
-				.get(EHandlerService.class);
+		EHandlerService hs = (EHandlerService) workbenchContext
+				.get(EHandlerService.class.getName());
 		handler = new CallHandler();
 		hs.activateHandler(TEST_ID1, handler);
-		EBindingService bs = workbenchContext
-				.get(EBindingService.class);
+		EBindingService bs = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 		TriggerSequence seq = bs.createSequence("CTRL+A");
 		Binding db = createDefaultBinding(bs, seq, cmd);
 		bs.activateBinding(db);
@@ -116,17 +101,17 @@ public class KeyDispatcherTest {
 
 	private Binding createDefaultBinding(EBindingService bs,
 			TriggerSequence sequence, ParameterizedCommand command) {
-
-		Map<String, String> attrs = new HashMap<>();
+		
+		Map<String, String> attrs = new HashMap<String,String>();
 		attrs.put("schemeId", "org.eclipse.ui.defaultAcceleratorConfiguration");
-
-		return bs.createBinding(sequence, command, ID_WINDOW, attrs);
+		
+		return bs.createBinding(sequence, command, ID_WINDOW, attrs);		
 	}
 
-	@Before
-	public void setUp() {
-		display = Display.getDefault();
-		IEclipseContext globalContext = Activator.getDefault().getGlobalContext();
+	@Override
+	protected void setUp() throws Exception {
+		display = new Display();
+		IEclipseContext globalContext = Activator.getDefault().getGlobalContext(); 
 		workbenchContext = globalContext.createChild("workbenchContext");
 		ContextInjectionFactory.make(CommandServiceAddon.class, workbenchContext);
 		ContextInjectionFactory.make(ContextServiceAddon.class, workbenchContext);
@@ -143,8 +128,8 @@ public class KeyDispatcherTest {
 			c.define(CONTEXTS[i + 1], null, CONTEXTS[i + 2]);
 		}
 
-		EContextService cs = context
-				.get(EContextService.class);
+		EContextService cs = (EContextService) context
+				.get(EContextService.class.getName());
 		cs.activateContext(ID_DIALOG_AND_WINDOW);
 		cs.activateContext(ID_WINDOW);
 	}
@@ -158,16 +143,15 @@ public class KeyDispatcherTest {
 		btm.addTable(new BindingTable(cm.getContext(ID_DIALOG)));
 	}
 
-	@After
-	public void tearDown() {
+	@Override
+	protected void tearDown() throws Exception {
 		workbenchContext.dispose();
 		workbenchContext = null;
 		display.dispose();
 		display = null;
 	}
 
-	@Test
-	public void testExecuteOneCommand() {
+	public void testExecuteOneCommand() throws Exception {
 		KeyBindingDispatcher dispatcher = new KeyBindingDispatcher();
 		ContextInjectionFactory.inject(dispatcher, workbenchContext);
 		final Listener listener = dispatcher.getKeyDownFilter();
@@ -192,8 +176,7 @@ public class KeyDispatcherTest {
 		assertTrue(handler.q2);
 	}
 
-	@Test
-	public void testExecuteMultiStrokeBinding() {
+	public void testExecuteMultiStrokeBinding() throws Exception {
 		KeyBindingDispatcher dispatcher = new KeyBindingDispatcher();
 		ContextInjectionFactory.inject(dispatcher, workbenchContext);
 		final Listener listener = dispatcher.getKeyDownFilter();
@@ -234,8 +217,6 @@ public class KeyDispatcherTest {
 		assertFalse(handler.q2);
 	}
 
-	@Test
-	@Ignore
 	public void TODOtestKeyDispatcherReset() throws Exception {
 		KeyBindingDispatcher dispatcher = new KeyBindingDispatcher();
 		ContextInjectionFactory.inject(dispatcher, workbenchContext);
@@ -279,9 +260,8 @@ public class KeyDispatcherTest {
 		assertTrue(handler.q2);
 	}
 
-	@Test
-	public void testSendKeyStroke() {
-		KeyBindingDispatcher dispatcher = ContextInjectionFactory
+	public void testSendKeyStroke() throws Exception {
+		KeyBindingDispatcher dispatcher = (KeyBindingDispatcher) ContextInjectionFactory
 				.make(KeyBindingDispatcher.class, workbenchContext);
 		final Listener listener = dispatcher.getKeyDownFilter();
 		display.addFilter(SWT.KeyDown, listener);

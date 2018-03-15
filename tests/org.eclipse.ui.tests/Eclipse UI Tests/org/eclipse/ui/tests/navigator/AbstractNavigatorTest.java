@@ -77,8 +77,7 @@ public abstract class AbstractNavigatorTest extends UITestCase {
                 NAVIGATOR_VIEW_ID);
     }
 
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         if (testProject != null) {
             try {
                 testProject.delete(true, null);

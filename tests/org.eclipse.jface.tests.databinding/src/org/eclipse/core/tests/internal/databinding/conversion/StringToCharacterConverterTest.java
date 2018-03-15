@@ -11,9 +11,9 @@
 
 package org.eclipse.core.tests.internal.databinding.conversion;
 
-import org.eclipse.core.internal.databinding.conversion.StringToCharacterConverter;
-
 import junit.framework.TestCase;
+
+import org.eclipse.core.internal.databinding.conversion.StringToCharacterConverter;
 
 /**
  * @since 1.1
@@ -23,7 +23,11 @@ public class StringToCharacterConverterTest extends TestCase {
 	private StringToCharacterConverter converter;
 	private StringToCharacterConverter primitiveConverter;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 		converter = StringToCharacterConverter.toCharacter(false);
@@ -31,7 +35,7 @@ public class StringToCharacterConverterTest extends TestCase {
 	}
 
 	public void testConvertsToCharacter() throws Exception {
-		Character value = Character.valueOf('X');
+		Character value = new Character('X');
 		Character result = (Character) converter.convert(Character
 				.toString(value.charValue()));
 
@@ -39,7 +43,7 @@ public class StringToCharacterConverterTest extends TestCase {
 	}
 
 	public void testConvertsToCharacterPrimitive() throws Exception {
-		Character value = Character.valueOf('Y');
+		Character value = new Character('Y');
 		Character result = (Character) primitiveConverter.convert(String
 				.valueOf(value.charValue()));
 		assertEquals(value, result);
@@ -76,7 +80,7 @@ public class StringToCharacterConverterTest extends TestCase {
 	public void testThrowsIllegalArgumentExceptionIfAskedToConvertNonString()
 			throws Exception {
 		try {
-			converter.convert(Integer.valueOf(1));
+			converter.convert(new Integer(1));
 			fail("exception should have been thrown");
 		} catch (IllegalArgumentException e) {
 		}

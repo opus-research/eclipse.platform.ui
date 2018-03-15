@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,18 +29,24 @@ import org.eclipse.ui.internal.registry.PerspectiveDescriptor;
 import org.eclipse.ui.internal.registry.PerspectiveRegistry;
 
 /**
- *
+ * 
  * @author Prakash G.R.
- *
+ * 
  * @since 3.7
- *
+ * 
  */
 public class SavePerspectiveHandler extends AbstractHandler {
 
 	@Inject
 	EModelService modelService;
-
-	@Override
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
+	 * ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) {
 
 		IWorkbenchWindow activeWorkbenchWindow = HandlerUtil.getActiveWorkbenchWindow(event);
@@ -64,10 +70,11 @@ public class SavePerspectiveHandler extends AbstractHandler {
 	 * Save a singleton over itself.
 	 */
 	private void saveSingleton(IWorkbenchPage page) {
+		String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
 		MessageDialog d = new MessageDialog(page.getWorkbenchWindow().getShell(),
 				WorkbenchMessages.SavePerspective_overwriteTitle, null,
-				WorkbenchMessages.SavePerspective_singletonQuestion, MessageDialog.QUESTION, 0,
-				IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL);
+				WorkbenchMessages.SavePerspective_singletonQuestion, MessageDialog.QUESTION,
+				buttons, 0);
 		if (d.open() == 0) {
 			page.savePerspective();
 		}

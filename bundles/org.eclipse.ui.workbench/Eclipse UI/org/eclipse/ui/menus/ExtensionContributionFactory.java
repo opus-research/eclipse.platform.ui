@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
  * rather than the {@link AbstractContributionFactory} as this class provides a
  * default constructor.
  * </p>
- *
+ * 
  * <p>
  * Clients must be aware that the results of {@link #getLocation()} and
  * {@link #getNamespace()} will not be valid until
@@ -32,7 +32,7 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
  * {@link #createContributionItems(org.eclipse.ui.services.IServiceLocator, IContributionRoot)}
  * is invoked.
  * </p>
- *
+ * 
  * @since 3.5
  */
 public abstract class ExtensionContributionFactory extends
@@ -48,12 +48,20 @@ public abstract class ExtensionContributionFactory extends
 		super(null, null);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.menus.AbstractContributionFactory#getLocation()
+	 */
 	public final String getLocation() {
 		return locationURI;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.menus.AbstractContributionFactory#getNamespace()
+	 */
 	public final String getNamespace() {
 		return namespace;
 	}
@@ -62,11 +70,10 @@ public abstract class ExtensionContributionFactory extends
 	 * Clients who wish to implement their own {@link IExecutableExtension}
 	 * behaviour <strong>must</strong> invoke this method prior to any
 	 * customization they perform.
-	 *
+	 * 
 	 * @throws CoreException
 	 *             so that a subclass may throw this
 	 */
-	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) throws CoreException {
 		locationURI = config

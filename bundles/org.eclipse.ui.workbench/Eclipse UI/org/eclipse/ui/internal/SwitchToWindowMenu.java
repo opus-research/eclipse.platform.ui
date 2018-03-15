@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -32,7 +32,7 @@ public class SwitchToWindowMenu extends ContributionItem {
 
     /**
      * Creates a new instance of this class.
-     *
+     * 
      * @param window the workbench window this action applies to
      * @param showSeparator whether to add a separator in the menu
      */
@@ -53,7 +53,7 @@ public class SwitchToWindowMenu extends ContributionItem {
 			return null;
 		}
 
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         if (number < 10) {
 			sb.append('&');
 		}
@@ -72,8 +72,7 @@ public class SwitchToWindowMenu extends ContributionItem {
      * Fills the given menu with menu items for all
      * opened workbench windows.
      */
-    @Override
-	public void fill(Menu menu, int index) {
+    public void fill(Menu menu, int index) {
 
         // Get workbench windows.
         IWorkbench workbench = workbenchWindow.getWorkbench();
@@ -91,7 +90,8 @@ public class SwitchToWindowMenu extends ContributionItem {
 
         // Add one item for each window.
         int count = 1;
-		for (IWorkbenchWindow window : array) {
+        for (int i = 0; i < array.length; i++) {
+            final IWorkbenchWindow window = array[i];
             // can encounter disposed shells if this update is in response to a shell closing
             if (!window.getShell().isDisposed()) {
                 String name = calcText(count, window);
@@ -100,14 +100,16 @@ public class SwitchToWindowMenu extends ContributionItem {
                     index++;
                     count++;
                     mi.setText(name);
-                    mi.addSelectionListener(widgetSelectedAdapter(e -> {
-					    Shell windowShell = window.getShell();
-					    if (windowShell.getMinimized()) {
-							windowShell.setMinimized(false);
-						}
-					    windowShell.setActive();
-					    windowShell.moveAbove(null);
-					}));
+                    mi.addSelectionListener(new SelectionAdapter() {
+                        public void widgetSelected(SelectionEvent e) {
+                            Shell windowShell = window.getShell();
+                            if (windowShell.getMinimized()) {
+								windowShell.setMinimized(false);
+							}
+                            windowShell.setActive();
+                            windowShell.moveAbove(null);
+                        }
+                    });
                     mi.setSelection(window == workbenchWindow);
                 }
             }
@@ -117,16 +119,14 @@ public class SwitchToWindowMenu extends ContributionItem {
     /**
      * Overridden to always return true and force dynamic menu building.
      */
-    @Override
-	public boolean isDirty() {
+    public boolean isDirty() {
 		return true;
     }
 
     /**
      * Overridden to always return true and force dynamic menu building.
      */
-    @Override
-	public boolean isDynamic() {
+    public boolean isDynamic() {
         return true;
     }
 }

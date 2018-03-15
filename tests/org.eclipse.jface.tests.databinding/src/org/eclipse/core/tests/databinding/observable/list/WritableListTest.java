@@ -19,6 +19,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.IObservableCollection;
 import org.eclipse.core.databinding.observable.Realm;
@@ -27,31 +31,19 @@ import org.eclipse.jface.databinding.conformance.MutableObservableListContractTe
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableCollectionContractDelegate;
 import org.eclipse.jface.databinding.conformance.util.CurrentRealm;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.widgets.Display;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
  */
 public class WritableListTest extends TestCase {
-
-	@Override
-	protected void setUp() throws Exception {
-		RealmTester.setDefault(new CurrentRealm(true));
-	}
-
-	@Override
 	protected void tearDown() throws Exception {
 		RealmTester.setDefault(null);
 	}
 
 	public void testSetRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				WritableList list = new WritableList();
 				list.add("");
@@ -62,7 +54,6 @@ public class WritableListTest extends TestCase {
 
 	public void testAddRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				WritableList list = new WritableList();
 				list.add("");
@@ -72,7 +63,6 @@ public class WritableListTest extends TestCase {
 
 	public void testAddByIndexRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				WritableList list = new WritableList();
 				list.add(0, "");
@@ -82,7 +72,6 @@ public class WritableListTest extends TestCase {
 
 	public void testAddAllRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				WritableList list = new WritableList();
 				list.addAll(Collections.EMPTY_LIST);
@@ -92,7 +81,6 @@ public class WritableListTest extends TestCase {
 
 	public void testAddAllByIndexRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				WritableList list = new WritableList();
 				list.addAll(0, Collections.EMPTY_LIST);
@@ -107,7 +95,6 @@ public class WritableListTest extends TestCase {
 		list.add("");
 
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				list.remove("");
 			}
@@ -122,7 +109,6 @@ public class WritableListTest extends TestCase {
 		list.add("");
 
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				list.remove(list.size() - 1);
 			}
@@ -133,7 +119,6 @@ public class WritableListTest extends TestCase {
 
 	public void testRemoveAllRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				WritableList list = new WritableList();
 				list.removeAll(Collections.EMPTY_LIST);
@@ -143,7 +128,6 @@ public class WritableListTest extends TestCase {
 
 	public void testRetainAllRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				WritableList list = new WritableList();
 				list.retainAll(Collections.EMPTY_LIST);
@@ -153,7 +137,6 @@ public class WritableListTest extends TestCase {
 
 	public void testClearRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				WritableList list = new WritableList();
 				list.clear();
@@ -162,7 +145,7 @@ public class WritableListTest extends TestCase {
 	}
 
 	public void testNullElementType() throws Exception {
-		RealmTester.setDefault(DisplayRealm.getRealm(Display.getDefault()));
+		RealmTester.setDefault(SWTObservables.getRealm(Display.getDefault()));
 		WritableList writableList = new WritableList();
 		assertNull(writableList.getElementType());
 
@@ -171,7 +154,7 @@ public class WritableListTest extends TestCase {
 	}
 
 	public void testWithElementType() throws Exception {
-		RealmTester.setDefault(DisplayRealm.getRealm(Display.getDefault()));
+		RealmTester.setDefault(SWTObservables.getRealm(Display.getDefault()));
 
 		Object elementType = String.class;
 		WritableList list = WritableList.withElementType(elementType);
@@ -229,17 +212,14 @@ public class WritableListTest extends TestCase {
 
 	/* package */static class Delegate extends
 			AbstractObservableCollectionContractDelegate {
-		@Override
 		public Object createElement(IObservableCollection collection) {
 			return String.valueOf(collection.size() + 1);
 		}
 
-		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return String.class;
 		}
 
-		@Override
 		public IObservableCollection createObservableCollection(Realm realm,
 				final int itemCount) {
 			WritableList observable = new WritableList(realm, new ArrayList(),
@@ -252,7 +232,6 @@ public class WritableListTest extends TestCase {
 			return observable;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			((WritableList) observable).add("");
 		}

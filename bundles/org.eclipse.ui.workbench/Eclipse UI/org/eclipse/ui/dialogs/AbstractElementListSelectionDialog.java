@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -34,7 +35,7 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * An abstract class to select elements out of a list of elements.
- *
+ * 
  * @since 2.0
  */
 public abstract class AbstractElementListSelectionDialog extends SelectionStatusDialog {
@@ -74,7 +75,8 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
      * @param parent The parent for the list.
      * @param renderer ILabelProvider for the list
      */
-	protected AbstractElementListSelectionDialog(Shell parent, ILabelProvider renderer) {
+    protected AbstractElementListSelectionDialog(Shell parent,
+            ILabelProvider renderer) {
         super(parent);
         fRenderer = renderer;
     }
@@ -167,7 +169,7 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
 
     /**
 	 * Sets the elements of the list (widget).
-	 *
+	 * 
 	 * @param elements
 	 *            the elements of the list.
 	 */
@@ -180,7 +182,7 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
     /**
 	 * This method is called when the elements of the backing list are changed
 	 * to refresh the standard dialog widgets.
-	 *
+	 * 
 	 * @since 3.8
 	 */
 	protected void handleElementsChanged() {
@@ -195,7 +197,7 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
 
 	/**
 	 * Sets the filter pattern.
-	 *
+	 * 
 	 * @param filter
 	 *            the filter pattern.
 	 */
@@ -273,8 +275,7 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
      * Creates the message text widget and sets layout data.
      * @param composite the parent composite of the message area.
      */
-    @Override
-	protected Label createMessageArea(Composite composite) {
+    protected Label createMessageArea(Composite composite) {
         Label label = super.createMessageArea(composite);
 
         GridData data = new GridData();
@@ -332,8 +333,10 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         return status.isOK();
     }
 
-    @Override
-	protected void cancelPressed() {
+    /*
+     * @see Dialog#cancelPressed
+     */
+    protected void cancelPressed() {
         setResult(null);
         super.cancelPressed();
     }
@@ -359,16 +362,14 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         data.verticalAlignment = GridData.FILL;
         list.setLayoutData(data);
         list.setFont(parent.getFont());
-        list.setFilter((fFilter == null ? "" : fFilter)); //$NON-NLS-1$
+        list.setFilter((fFilter == null ? "" : fFilter)); //$NON-NLS-1$		
 
         list.addSelectionListener(new SelectionListener() {
-            @Override
-			public void widgetDefaultSelected(SelectionEvent e) {
+            public void widgetDefaultSelected(SelectionEvent e) {
                 handleDefaultSelected();
             }
 
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 handleWidgetSelected();
             }
         });
@@ -378,7 +379,7 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         return list;
     }
 
-    // 3515
+    // 3515	
     private void handleWidgetSelected() {
         Object[] newSelection = fFilteredList.getSelection();
 
@@ -409,19 +410,21 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
 
         text.setText((fFilter == null ? "" : fFilter)); //$NON-NLS-1$
 
-        Listener listener = e -> fFilteredList.setFilter(fFilterText.getText());
+        Listener listener = new Listener() {
+            public void handleEvent(Event e) {
+                fFilteredList.setFilter(fFilterText.getText());
+            }
+        };
         text.addListener(SWT.Modify, listener);
 
         text.addKeyListener(new KeyListener() {
-            @Override
-			public void keyPressed(KeyEvent e) {
+            public void keyPressed(KeyEvent e) {
                 if (e.keyCode == SWT.ARROW_DOWN) {
 					fFilteredList.setFocus();
 				}
             }
 
-            @Override
-			public void keyReleased(KeyEvent e) {
+            public void keyReleased(KeyEvent e) {
             }
         });
 
@@ -430,8 +433,11 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         return text;
     }
 
-    @Override
-	public int open() {
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#open()
+     */
+    public int open() {
         super.open();
         return getReturnCode();
     }
@@ -440,22 +446,27 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         super.create();
     }
 
-    @Override
-	public void create() {
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#create()
+     */
+    public void create() {
 
-        BusyIndicator.showWhile(null, () -> {
-		    access$superCreate();
+        BusyIndicator.showWhile(null, new Runnable() {
+            public void run() {
+                access$superCreate();
 
-		    Assert.isNotNull(fFilteredList);
+                Assert.isNotNull(fFilteredList);
 
-		    if (fFilteredList.isEmpty()) {
-		        handleEmptyList();
-		    } else {
-		        validateCurrentSelection();
-		        fFilterText.selectAll();
-		        fFilterText.setFocus();
-		    }
-		});
+                if (fFilteredList.isEmpty()) {
+                    handleEmptyList();
+                } else {
+                    validateCurrentSelection();
+                    fFilterText.selectAll();
+                    fFilterText.setFocus();
+                }
+            }
+        });
 
     }
 
@@ -480,13 +491,13 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
 			okButton.setEnabled(getSelectedElements().length != 0);
 		}
     }
-
+    
     /**
      * Gets the optional validator used to check if the selection is valid.
      * The validator is invoked whenever the selection changes.
      * @return the validator to validate the selection, or <code>null</code>
      * if no validator has been set.
-     *
+     * 
      * @since 3.5
      */
     protected ISelectionStatusValidator getValidator() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 260329, 260337
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 442278, 434283
  *******************************************************************************/
 package org.eclipse.jface.examples.databinding.snippets;
 
@@ -19,12 +18,12 @@ import java.util.List;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeanProperties;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.ViewerSupport;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -62,13 +61,12 @@ public class Snippet019TreeViewerWithListFactory {
 
 	/**
 	 * Launch the application
-	 *
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		Display display = Display.getDefault();
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
-			@Override
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			public void run() {
 				try {
 					Snippet019TreeViewerWithListFactory window = new Snippet019TreeViewerWithListFactory();
@@ -119,7 +117,6 @@ public class Snippet019TreeViewerWithListFactory {
 
 		final Button addRootButton = new Button(group, SWT.NONE);
 		addRootButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				List list = input.getList();
 				Bean root = createBean("root");
@@ -135,7 +132,6 @@ public class Snippet019TreeViewerWithListFactory {
 
 		addChildBeanButton = new Button(group, SWT.NONE);
 		addChildBeanButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				Bean parent = getSelectedBean();
 				List list = new ArrayList(parent.getList());
@@ -152,7 +148,6 @@ public class Snippet019TreeViewerWithListFactory {
 
 		removeBeanButton = new Button(group, SWT.NONE);
 		removeBeanButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				TreeItem selectedItem = beanViewer.getTree().getSelection()[0];
 				TreeItem parentItem = selectedItem.getParentItem();
@@ -175,7 +170,6 @@ public class Snippet019TreeViewerWithListFactory {
 
 		copyButton = new Button(group, SWT.NONE);
 		copyButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				clipboard.setValue(getSelectedBean());
 			}
@@ -184,7 +178,6 @@ public class Snippet019TreeViewerWithListFactory {
 
 		pasteButton = new Button(group, SWT.NONE);
 		pasteButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				Bean copy = (Bean) clipboard.getValue();
 				if (copy == null)
@@ -206,7 +199,6 @@ public class Snippet019TreeViewerWithListFactory {
 
 		final Button refreshButton = new Button(group, SWT.NONE);
 		refreshButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				beanViewer.refresh();
 			}
@@ -237,21 +229,24 @@ public class Snippet019TreeViewerWithListFactory {
 	protected DataBindingContext initDataBindings() {
 		IObservableValue treeViewerSelectionObserveSelection = ViewersObservables
 				.observeSingleSelection(beanViewer);
-		IObservableValue textTextObserveWidget = WidgetProperties.text(SWT.Modify).observe(beanText);
-		IObservableValue treeViewerValueObserveDetailValue = BeanProperties.value(
-				(Class) treeViewerSelectionObserveSelection.getValueType(), "text", String.class).observeDetail(
-				treeViewerSelectionObserveSelection);
-
+		IObservableValue textTextObserveWidget = SWTObservables.observeText(
+				beanText, SWT.Modify);
+		IObservableValue treeViewerValueObserveDetailValue = BeansObservables
+				.observeDetailValue(treeViewerSelectionObserveSelection,
+						"text", String.class);
+		//
+		//
 		DataBindingContext bindingContext = new DataBindingContext();
-
+		//
 		bindingContext.bindValue(textTextObserveWidget,
 				treeViewerValueObserveDetailValue);
-
+		//
 		return bindingContext;
 	}
 
 	private Bean getSelectedBean() {
-		IStructuredSelection selection = beanViewer.getStructuredSelection();
+		IStructuredSelection selection = (IStructuredSelection) beanViewer
+				.getSelection();
 		if (selection.isEmpty())
 			return null;
 		return (Bean) selection.getFirstElement();
@@ -261,21 +256,19 @@ public class Snippet019TreeViewerWithListFactory {
 		final IObservableValue beanViewerSelection = ViewersObservables
 				.observeSingleSelection(beanViewer);
 		IObservableValue beanSelected = new ComputedValue(Boolean.TYPE) {
-			@Override
 			protected Object calculate() {
 				return Boolean.valueOf(beanViewerSelection.getValue() != null);
 			}
 		};
-		dbc.bindValue(WidgetProperties.enabled().observe(addChildBeanButton),
+		dbc.bindValue(SWTObservables.observeEnabled(addChildBeanButton),
 				beanSelected);
-		dbc.bindValue(WidgetProperties.enabled().observe(removeBeanButton),
+		dbc.bindValue(SWTObservables.observeEnabled(removeBeanButton),
 				beanSelected);
 
 		clipboard = new WritableValue();
-		dbc.bindValue(WidgetProperties.enabled().observe(copyButton), beanSelected);
-		dbc.bindValue(WidgetProperties.enabled().observe(pasteButton),
+		dbc.bindValue(SWTObservables.observeEnabled(copyButton), beanSelected);
+		dbc.bindValue(SWTObservables.observeEnabled(pasteButton),
 				new ComputedValue(Boolean.TYPE) {
-					@Override
 					protected Object calculate() {
 						return Boolean.valueOf(clipboard.getValue() != null);
 					}

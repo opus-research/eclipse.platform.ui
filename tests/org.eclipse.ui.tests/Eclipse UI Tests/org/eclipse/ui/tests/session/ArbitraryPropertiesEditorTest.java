@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,9 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.tests.session;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -26,14 +29,11 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.tests.api.workbenchpart.TitleTestEditor;
 import org.eclipse.ui.tests.harness.util.FileUtil;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 /**
  * If a view is not activated during a session, it's part is not instantiated.
  * This tests that case, and the outcome should be the view has it's last
  * session state when it is finally instantiated in the workbench.
- *
+ * 
  * @since 3.3
  */
 public class ArbitraryPropertiesEditorTest extends TestCase {
@@ -56,7 +56,7 @@ public class ArbitraryPropertiesEditorTest extends TestCase {
 	/**
 	 * This is the first part of a 3 part tests. First instantiate a view and
 	 * set a state.
-	 *
+	 * 
 	 * @throws Throwable
 	 */
 	public void testOpenEditor() throws Throwable {
@@ -80,7 +80,7 @@ public class ArbitraryPropertiesEditorTest extends TestCase {
 	/**
 	 * The second session doesn't activate the view, so it should not be
 	 * instantiated.
-	 *
+	 * 
 	 * @throws Throwable
 	 */
 	public void testSecondOpening() throws Throwable {
@@ -88,7 +88,8 @@ public class ArbitraryPropertiesEditorTest extends TestCase {
 		final IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
 				.getActivePage();
 		IEditorReference[] editors = page.getEditorReferences();
-		for (IEditorReference ref : editors) {
+		for (int i = 0; i < editors.length; i++) {
+			IEditorReference ref = editors[i];
 			if (ref.getEditorInput().getName().equals("state.txt")) {
 				assertNull("The editor should not be instantiated", ref
 						.getPart(false));
@@ -100,15 +101,19 @@ public class ArbitraryPropertiesEditorTest extends TestCase {
 	static class PropListener implements IPropertyChangeListener {
 		public int count = 0;
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+		 */
 		public void propertyChange(PropertyChangeEvent event) {
 			count++;
 		}
-	}
+	};
 
 	/**
 	 * Activate the view and it's state should re-appear.
-	 *
+	 * 
 	 * @throws Throwable
 	 */
 	public void testPartInstantiation() throws Throwable {
@@ -118,9 +123,9 @@ public class ArbitraryPropertiesEditorTest extends TestCase {
 
 		IEditorReference ref = null;
 		IEditorReference[] editors = page.getEditorReferences();
-		for (IEditorReference editor : editors) {
-			if (editor.getEditorInput().getName().equals("state.txt")) {
-				ref = editor;
+		for (int i = 0; i < editors.length; i++) {
+			if (editors[i].getEditorInput().getName().equals("state.txt")) {
+				ref = editors[i];
 			}
 		}
 

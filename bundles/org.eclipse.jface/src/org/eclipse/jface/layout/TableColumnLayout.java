@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,51 +25,31 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * The TableColumnLayout is the {@link Layout} used to maintain
  * {@link TableColumn} sizes in a {@link Table}.
- *
+ * 
  * <p>
  * <b>You can only add the {@link Layout} to a container whose <i>only</i> child
  * is the {@link Table} control you want the {@link Layout} applied to. Don't
  * assign the layout directly the {@link Table}</b>
  * </p>
- *
+ * 
  * @since 3.3
  */
 public class TableColumnLayout extends AbstractColumnLayout {
 
 	/**
-	 * Creates a new table column layout.
-	 */
-	public TableColumnLayout() {
-	}
-
-	/**
-	 * Creates a new table column layout.
-	 *
-	 * @param adjustForScrollBar
-	 *            <code>true</code> if the layout should reserve space for the
-	 *            vertical scroll bar
-	 * @since 3.12
-	 */
-	public TableColumnLayout(boolean adjustForScrollBar) {
-		super(adjustForScrollBar);
-	}
-
-	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 * @since 3.5
 	 */
-	@Override
 	protected int getColumnCount(Scrollable tableTree) {
 		return ((Table) tableTree).getColumnCount();
 	}
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 * @since 3.5
 	 */
-	@Override
 	protected void setColumnWidths(Scrollable tableTree, int[] widths) {
 		TableColumn[] columns = ((Table) tableTree).getColumns();
 		for (int i = 0; i < widths.length; i++) {
@@ -79,10 +59,9 @@ public class TableColumnLayout extends AbstractColumnLayout {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 * @since 3.5
 	 */
-	@Override
 	protected ColumnLayoutData getLayoutData(Scrollable tableTree,
 			int columnIndex) {
 		TableColumn column = ((Table) tableTree).getColumn(columnIndex);
@@ -96,7 +75,6 @@ public class TableColumnLayout extends AbstractColumnLayout {
 	/**
 	 * @since 3.5
 	 */
-	@Override
 	protected void updateColumnData(Widget column) {
 		TableColumn tColumn = (TableColumn) column;
 		Table t = tColumn.getParent();

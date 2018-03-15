@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * The main plugin class for the workbench Navigator.
- *
+ * 
  * @since 3.2
  */
 public class WorkbenchNavigatorPlugin extends AbstractUIPlugin {
@@ -59,15 +59,17 @@ public class WorkbenchNavigatorPlugin extends AbstractUIPlugin {
 		if (message != null) {
 			getDefault().getLog().log(
 					new Status(IStatus.ERROR, PLUGIN_ID, 0, message, null));
+			System.err.println(message + "\nReason:"); //$NON-NLS-1$
 		}
 		if(status != null) {
 			getDefault().getLog().log(status);
+			System.err.println(status.getMessage());
 		}
 	}
 
 	/**
 	 * Create a status associated with this plugin.
-	 *
+	 * 
 	 * @param severity
 	 * @param aCode
 	 * @param aMessage
@@ -82,7 +84,7 @@ public class WorkbenchNavigatorPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param aCode
 	 * @param aMessage
 	 * @param exception
@@ -93,10 +95,10 @@ public class WorkbenchNavigatorPlugin extends AbstractUIPlugin {
 			Throwable exception) {
 		return createStatus(IStatus.ERROR, aCode, aMessage, exception);
 	}
-
+	
 
 	/**
-	 *
+	 *  
 	 * @param aMessage
 	 * @param exception
 	 * @return A status configured with this plugin's id and the given
@@ -105,32 +107,32 @@ public class WorkbenchNavigatorPlugin extends AbstractUIPlugin {
 	public static IStatus createErrorStatus(String aMessage,	Throwable exception) {
 		return createStatus(IStatus.ERROR, 0, aMessage, exception);
 	}
-
+	
 	/**
-	 *
-	 * @param aMessage
+	 *  
+	 * @param aMessage 
 	 * @return A status configured with this plugin's id and the given
 	 *         parameters.
 	 */
 	public static IStatus createErrorStatus(String aMessage) {
 		return createStatus(IStatus.ERROR, 0, aMessage, null);
 	}
-
-
+	
+	
 	/**
-	 *
-	 * @param aMessage
+	 *  
+	 * @param aMessage 
 	 * @return A status configured with this plugin's id and the given
 	 *         parameters.
 	 */
 	public static IStatus createInfoStatus(String aMessage) {
 		return createStatus(IStatus.INFO, 0, aMessage, null);
 	}
-
-
+	
+	
 	/**
-	 *
-	 * @param aMessage
+	 *  
+	 * @param aMessage 
 	 * @return A status configured with this plugin's id and the given
 	 *         parameters.
 	 */

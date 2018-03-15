@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2014 db4objects Inc. (http://www.db4o.com) and others.
+ * Copyright (C) 2005, 2008 db4objects Inc. (http://www.db4o.com) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -37,7 +37,6 @@ public class ReadOnlyValidator implements IValidator {
 		return singleton;
 	}
 
-	@Override
 	public IStatus validate(Object value) {
 		// No changes are allowed
 		return ValidationStatus.error(BindingMessages

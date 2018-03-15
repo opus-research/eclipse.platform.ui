@@ -1,17 +1,16 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 EclipseSource and others. All rights reserved.
+ * Copyright (c) 2009 EclipseSource and others. All rights reserved.
  * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution, 
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *   EclipseSource - initial API and implementation
- *   IBM Corporation - ongoing development
- *   Lars Vogel <Lars.Vogel@gmail.com> - Bug 422702
  ******************************************************************************/
 package org.eclipse.e4.ui.css.core.impl.dom;
 
 import java.util.Comparator;
+
 import org.w3c.dom.css.CSSStyleDeclaration;
 
 /**
@@ -21,13 +20,12 @@ import org.w3c.dom.css.CSSStyleDeclaration;
  */
 final class StyleWrapper {
 
-	private static class StyleWrapperComparator implements Comparator<StyleWrapper> {
-
-		@Override
-		public int compare(final StyleWrapper object1, final StyleWrapper object2) {
+	private static class StyleWrapperComparator implements Comparator {
+	
+		public int compare(final Object object1, final Object object2) {
 			int result = 0;
-			StyleWrapper wrapper1 = object1;
-			StyleWrapper wrapper2 = object2;
+			StyleWrapper wrapper1 = (StyleWrapper) object1;
+			StyleWrapper wrapper2 = (StyleWrapper) object2;
 			if (wrapper1.specificity > wrapper2.specificity) {
 				result = 1;
 			} else if (wrapper1.specificity < wrapper2.specificity) {

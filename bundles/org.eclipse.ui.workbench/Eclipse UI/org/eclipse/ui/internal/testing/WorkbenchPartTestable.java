@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,16 +17,16 @@ import org.eclipse.ui.testing.IWorkbenchPartTestable;
 
 /**
  * Implementation of {@link IWorkbenchPartTestable}.
- *
+ * 
  * @since 3.3
  */
 public class WorkbenchPartTestable implements IWorkbenchPartTestable {
 
 	private Composite composite;
-
+	
 	/**
 	 * Create a new instance of this class based on the provided part.
-	 *
+	 * 
 	 * @param partSite the part to test
 	 */
 	public WorkbenchPartTestable(PartSite partSite) {
@@ -35,7 +35,9 @@ public class WorkbenchPartTestable implements IWorkbenchPartTestable {
 		this.composite = ((Composite) paneChildren[0]);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.testing.IWorkbenchPartTestable#getControl()
+	 */
 	public Composite getControl() {
 		return composite;
 	}

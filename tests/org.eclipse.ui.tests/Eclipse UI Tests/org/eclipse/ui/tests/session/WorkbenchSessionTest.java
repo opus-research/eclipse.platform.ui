@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,8 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.zip.ZipFile;
 
 import org.eclipse.core.runtime.IPath;
@@ -32,61 +32,61 @@ import org.eclipse.ui.tests.harness.util.FileTool;
 
 /**
  * Wrapper for workbench session tests.
- *
+ * 
  * @since 3.1
  */
 public class WorkbenchSessionTest extends SessionTestSuite {
-
-	private Map<String, String> arguments;
+	
+	private Map arguments;
 
 	private String dataLocation;
-
+	
 	/**
 	 * Create a new workbench session test.
-	 *
+	 * 
 	 * @param dataLocation
 	 *            the location of the workspace to test, relative to
 	 *            data/workspaces
 	 * @param clazz
 	 *            the <code>Test</code> class
 	 */
-	public WorkbenchSessionTest(String dataLocation, Class<?> clazz, Map<String, String> arguments) {
+	public WorkbenchSessionTest(String dataLocation, Class clazz, Map arguments) {
 		this(dataLocation, clazz);
 		this.arguments = arguments;
 	}
-
+	
 	/**
 	 * Create a new workbench session test.
-	 *
+	 * 
 	 * @param dataLocation
 	 *            the location of the workspace to test, relative to
 	 *            data/workspaces
 	 * @param arguments
 	 *            a map of arguments to use
 	 */
-	public WorkbenchSessionTest(String dataLocation, Map<String, String> arguments) {
+	public WorkbenchSessionTest(String dataLocation, Map arguments) {
 		this(dataLocation);
 		this.arguments = arguments;
 	}
-
+	
 	/**
 	 * Create a new workbench session test.
-	 *
+	 * 
 	 * @param dataLocation
 	 *            the location of the workspace to test, relative to
 	 *            data/workspaces
 	 * @param clazz
 	 *            the <code>Test</code> class
 	 */
-	public WorkbenchSessionTest(String dataLocation, Class<?> clazz) {
+	public WorkbenchSessionTest(String dataLocation, Class clazz) {
 		super("org.eclipse.ui.tests", clazz);
-		setApplicationId(SessionTestSuite.UI_TEST_APPLICATION);
+		setApplicationId(SessionTestSuite.UI_TEST_APPLICATION);		
 		this.dataLocation = dataLocation;
 	}
-
+	
 	/**
 	 * Create a new workbench session test.
-	 *
+	 * 
 	 * @param dataLocation
 	 *            the location of the workspace to test, relative to
 	 *            data/workspaces
@@ -94,34 +94,34 @@ public class WorkbenchSessionTest extends SessionTestSuite {
 	 */
 	public WorkbenchSessionTest(String dataLocation) {
 		super("org.eclipse.ui.tests");
-		setApplicationId(SessionTestSuite.UI_TEST_APPLICATION);
+		setApplicationId(SessionTestSuite.UI_TEST_APPLICATION);		
 		this.dataLocation = dataLocation;
 	}
 
 	/**
 	 * Ensures setup uses this suite's instance location.
-	 *
+	 * 
 	 * @throws SetupException
 	 */
-	@Override
 	protected Setup newSetup() throws SetupException {
 		Setup base = super.newSetup();
 		try {
 			base.setEclipseArgument(Setup.DATA, copyDataLocation());
 			if (arguments != null) {
-				for (Entry<String, String> entry : arguments.entrySet()) {
-					String key = entry.getKey();
-					String value = entry.getValue();
+				for(Iterator i = arguments.entrySet().iterator(); i.hasNext(); ) {
+					Map.Entry entry = (Map.Entry) i.next();
+					String key = (String) entry.getKey();
+					String value = (String) entry.getValue();
 					base.setEclipseArgument(key, value);
 				}
 			}
-
+			
 			// <== Kludge for the bug 345127. Force spawned VM to be 32 bit
 			// if we are in a 32bit Eclipse
 			if (Util.isCocoa()) {
 				String arch = System.getProperty("osgi.arch");
 				if (Constants.ARCH_X86.equals(arch)) {
-					Map<String, String> vmArguments = new HashMap<>(1);
+					Map vmArguments = new HashMap(1);
 					vmArguments.put("d32", null);
 					base.setVMArguments(vmArguments);
 				}
@@ -136,32 +136,29 @@ public class WorkbenchSessionTest extends SessionTestSuite {
 
 	/**
 	 * Copies the data to a temporary directory and returns the new location.
-	 *
+	 * 
 	 * @return the location
 	 */
 	private String copyDataLocation() throws IOException {
         TestPlugin plugin = TestPlugin.getDefault();
-        if (plugin == null) {
-			throw new IllegalStateException(
+        if (plugin == null)
+            throw new IllegalStateException(
                     "TestPlugin default reference is null");
-		}
-
+        
         URL fullPathString = plugin.getDescriptor().find(
 				new Path("data/workspaces/" + dataLocation + ".zip"));
-
-        if (fullPathString == null) {
-			throw new IllegalArgumentException();
-		}
-
+        
+        if (fullPathString == null) 
+        	throw new IllegalArgumentException();
+        
         IPath path = new Path(fullPathString.getPath());
 
         File origin = path.toFile();
-        if (!origin.exists()) {
+        if (!origin.exists())
 			throw new IllegalArgumentException();
-		}
-
-        ZipFile zFile = new ZipFile(origin);
-
+        
+        ZipFile zFile = new ZipFile(origin);        
+		
 		File destination = new File(FileSystemHelper.getRandomLocation(FileSystemHelper.getTempDir()).toOSString());
 		FileTool.unzip(zFile, destination);
 		return destination.getAbsolutePath();

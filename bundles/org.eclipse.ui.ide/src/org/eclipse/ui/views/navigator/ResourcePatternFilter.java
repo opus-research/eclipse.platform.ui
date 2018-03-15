@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Adapters;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -24,11 +24,10 @@ import org.eclipse.ui.internal.util.PrefUtil;
 
 /**
  * Filter used to determine whether resources are to be shown or not.
- *
+ * 
  * @since 2.0
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class ResourcePatternFilter extends ViewerFilter {
     private String[] patterns;
 
@@ -94,7 +93,7 @@ public class ResourcePatternFilter extends ViewerFilter {
         if (storedPatterns.length() == 0) {
             // revert to all filter extensions with selected == "true"
             // if there are no filters in the preference store
-			List<String> defaultFilters = FiltersContentProvider.getDefaultFilters();
+            List defaultFilters = FiltersContentProvider.getDefaultFilters();
             String[] patterns = new String[defaultFilters.size()];
             defaultFilters.toArray(patterns);
             setPatterns(patterns);
@@ -103,10 +102,10 @@ public class ResourcePatternFilter extends ViewerFilter {
 
         //Get the strings separated by a comma and filter them from the currently
         //defined ones
-		List<String> definedFilters = FiltersContentProvider.getDefinedFilters();
+        List definedFilters = FiltersContentProvider.getDefinedFilters();
         StringTokenizer entries = new StringTokenizer(storedPatterns,
                 COMMA_SEPARATOR);
-		List<String> patterns = new ArrayList<>();
+        List patterns = new ArrayList();
 
         while (entries.hasMoreElements()) {
             String nextToken = entries.nextToken();
@@ -122,13 +121,22 @@ public class ResourcePatternFilter extends ViewerFilter {
 
     }
 
-    @Override
-	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		IResource resource = Adapters.adapt(element, IResource.class);
+    /* (non-Javadoc)
+     * Method declared on ViewerFilter.
+     */
+    public boolean select(Viewer viewer, Object parentElement, Object element) {
+        IResource resource = null;
+        if (element instanceof IResource) {
+            resource = (IResource) element;
+        } else if (element instanceof IAdaptable) {
+            IAdaptable adaptable = (IAdaptable) element;
+            resource = (IResource) adaptable.getAdapter(IResource.class);
+        }
         if (resource != null) {
             String name = resource.getName();
-			for (StringMatcher testMatcher : getMatchers()) {
-                if (testMatcher.match(name)) {
+            StringMatcher[] testMatchers = getMatchers();
+            for (int i = 0; i < testMatchers.length; i++) {
+                if (testMatchers[i].match(name)) {
 					return false;
 				}
             }

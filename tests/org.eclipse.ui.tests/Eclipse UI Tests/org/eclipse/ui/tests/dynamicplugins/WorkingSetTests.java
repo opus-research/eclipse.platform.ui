@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *******************************************************************************/
 
 package org.eclipse.ui.tests.dynamicplugins;
+
+import junit.framework.TestSuite;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -22,8 +24,6 @@ import org.eclipse.ui.internal.WorkingSet;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.intro.IIntroPart;
 import org.osgi.framework.Bundle;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.3
@@ -46,28 +46,46 @@ public class WorkingSetTests extends DynamicTestCase {
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
+	 */
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicWorkingSetElementAdapter";
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#testClass()
+	 */
 	public void testClass() throws Exception {
 		super.testClass();
 		// commented out for now - it's causing grief
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
+	 */
 	protected String getExtensionId() {
 		return "newWorkingSet1.testDynamicWorkingSetAddition1";
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
+	 */
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_WORKINGSETS;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
+	 */
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newWorkingSet1";
 	}
@@ -87,7 +105,6 @@ public class WorkingSetTests extends DynamicTestCase {
 
 		IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
 
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				synchronized (this) {
 					events[0] = event;
@@ -162,12 +179,9 @@ public class WorkingSetTests extends DynamicTestCase {
 				.getWorkingSetManager();
 		IAdaptable adaptable = new IAdaptable() {
 
-			@SuppressWarnings("unchecked")
-			@Override
-			public <T> T getAdapter(Class<T> adapter) {
-				if (adapter == IResource.class) {
-					return (T) ResourcesPlugin.getWorkspace().getRoot();
-				}
+			public Object getAdapter(Class adapter) {
+				if (adapter == IResource.class)
+					return ResourcesPlugin.getWorkspace().getRoot();
 				return null;
 			}
 		};
@@ -210,12 +224,9 @@ public class WorkingSetTests extends DynamicTestCase {
 				.getWorkingSetManager();
 		IAdaptable adaptable = new IAdaptable() {
 
-			@SuppressWarnings("unchecked")
-			@Override
-			public <T> T getAdapter(Class<T> adapter) {
-				if (adapter == IResource.class) {
-					return (T) ResourcesPlugin.getWorkspace().getRoot();
-				}
+			public Object getAdapter(Class adapter) {
+				if (adapter == IResource.class)
+					return ResourcesPlugin.getWorkspace().getRoot();
 				return null;
 			}
 		};

@@ -32,23 +32,18 @@ public class TableViewerTest extends StructuredItemViewerTest {
 			implements ITableLabelProvider {
 		public boolean fExtended = false;
 
-		@Override
 		public String getText(Object element) {
-			if (fExtended) {
+			if (fExtended)
 				return providedString((String) element);
-			}
 			return element.toString();
 		}
 
-		@Override
 		public String getColumnText(Object element, int index) {
-			if (fExtended) {
+			if (fExtended)
 				return providedString((TestElement) element);
-			}
 			return element.toString();
 		}
 
-		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
@@ -61,7 +56,6 @@ public class TableViewerTest extends StructuredItemViewerTest {
 	/**
 	 * Creates the viewer used by this test, under the given parent widget.
 	 */
-	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		TableViewer viewer = createTableViewer(parent);
 		viewer.setContentProvider(getContentProvider());
@@ -88,13 +82,13 @@ public class TableViewerTest extends StructuredItemViewerTest {
 
 		return viewer;
 	}
-
+	
 	ViewerColumn getViewerColumn(ColumnViewer viewer, int index) {
 		Method method;
 		try {
 			method = ColumnViewer.class.getDeclaredMethod("getViewerColumn", new Class[]{int.class});
 			method.setAccessible(true);
-			return (ViewerColumn) method.invoke(viewer, new Object[]{Integer.valueOf(index)});
+			return (ViewerColumn) method.invoke(viewer, new Object[]{new Integer(index)});
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -106,10 +100,10 @@ public class TableViewerTest extends StructuredItemViewerTest {
 		assertNotNull(getViewerColumn((TableViewer) fViewer, 1));
 		assertNull(getViewerColumn((TableViewer) fViewer, 2));
     }
-
+	
 	/**
 	 * Get the content provider for the viewer.
-	 *
+	 * 
 	 * @return IContentProvider
 	 */
 	protected TestModelContentProvider getContentProvider() {
@@ -118,7 +112,7 @@ public class TableViewerTest extends StructuredItemViewerTest {
 
 	/**
 	 * Create the table viewer for the test
-	 *
+	 * 
 	 * @param parent
 	 * @return
 	 */
@@ -126,7 +120,6 @@ public class TableViewerTest extends StructuredItemViewerTest {
 		return new TableViewer(parent);
 	}
 
-	@Override
 	protected int getItemCount() {
 		TestElement first = fRootElement.getFirstChild();
 		TableItem ti = (TableItem) fViewer.testFindItem(first);
@@ -134,7 +127,6 @@ public class TableViewerTest extends StructuredItemViewerTest {
 		return table.getItemCount();
 	}
 
-	@Override
 	protected String getItemText(int at) {
 		Table table = (Table) fViewer.getControl();
 		return table.getItem(at).getText();
@@ -144,7 +136,6 @@ public class TableViewerTest extends StructuredItemViewerTest {
 		junit.textui.TestRunner.run(TableViewerTest.class);
 	}
 
-	@Override
 	public void testLabelProvider() {
 
 		TableViewer viewer = (TableViewer) fViewer;
@@ -163,7 +154,6 @@ public class TableViewerTest extends StructuredItemViewerTest {
 		// LabelProvider changes
 	}
 
-	@Override
 	public void testLabelProviderStateChange() {
 		TableViewer tableviewer = (TableViewer) fViewer;
 		TableTestLabelProvider provider = (TableTestLabelProvider) tableviewer
@@ -193,6 +183,6 @@ public class TableViewerTest extends StructuredItemViewerTest {
 
 	}
 
-
+	
 
 }

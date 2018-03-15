@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,28 +21,32 @@ public class ResourceAction implements IObjectActionDelegate {
 
     Object selectedItem;
 
-    @Override
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+    /*
+     * @see IObjectActionDelegate#setActivePart(IAction, IWorkbenchPart)
+     */
+    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
     }
 
-    @Override
-	public void run(IAction action) {
+    /*
+     * @see IActionDelegate#run(IAction)
+     */
+    public void run(IAction action) {
 
-        if (selectedItem != null) {
-			TestDecoratorContributor.contributor.refreshListeners(selectedItem);
-		}
+        if (selectedItem != null)
+            TestDecoratorContributor.contributor.refreshListeners(selectedItem);
 
     }
 
-    @Override
-	public void selectionChanged(IAction action, ISelection selection) {
+    /*
+     * @see IActionDelegate#selectionChanged(IAction, ISelection)
+     */
+    public void selectionChanged(IAction action, ISelection selection) {
         if (selection instanceof IStructuredSelection) {
             IStructuredSelection structured = (IStructuredSelection) selection;
-            if (structured.isEmpty()) {
-				selectedItem = null;
-			} else {
-				selectedItem = structured.getFirstElement();
-			}
+            if (structured.isEmpty())
+                selectedItem = null;
+            else
+                selectedItem = structured.getFirstElement();
         }
     }
 

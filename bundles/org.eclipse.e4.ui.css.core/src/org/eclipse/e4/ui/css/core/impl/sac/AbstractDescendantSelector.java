@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002, 2014  The Apache Software Foundation
+   Copyright 2002  The Apache Software Foundation 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -55,8 +55,7 @@ public abstract class AbstractDescendantSelector
      * Indicates whether some other object is "equal to" this one.
      * @param obj the reference object with which to compare.
      */
-    @Override
-	public boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (obj == null || (obj.getClass() != getClass())) {
             return false;
         }
@@ -67,8 +66,7 @@ public abstract class AbstractDescendantSelector
     /**
      * Returns the specificity of this selector.
      */
-    @Override
-	public int getSpecificity() {
+    public int getSpecificity() {
         return ((ExtendedSelector)ancestorSelector).getSpecificity() +
                ((ExtendedSelector)simpleSelector).getSpecificity();
     }
@@ -77,8 +75,7 @@ public abstract class AbstractDescendantSelector
      * <b>SAC</b>: Implements {@link
      * org.w3c.css.sac.DescendantSelector#getAncestorSelector()}.
      */
-    @Override
-	public Selector getAncestorSelector() {
+    public Selector getAncestorSelector() {
         return ancestorSelector;
     }
 
@@ -86,8 +83,7 @@ public abstract class AbstractDescendantSelector
      * <b>SAC</b>: Implements {@link
      * org.w3c.css.sac.DescendantSelector#getSimpleSelector()}.
      */
-    @Override
-	public SimpleSelector getSimpleSelector() {
+    public SimpleSelector getSimpleSelector() {
         return simpleSelector;
     }
 }

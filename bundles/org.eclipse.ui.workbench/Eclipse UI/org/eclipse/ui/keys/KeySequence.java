@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
+
 import org.eclipse.ui.internal.util.Util;
 
 /**
@@ -41,11 +42,10 @@ import org.eclipse.ui.internal.util.Util;
  * <code>KeySequence</code> objects are immutable. Clients are not permitted
  * to extend this class.
  * </p>
- *
+ * 
  * @deprecated Please use org.eclipse.jface.bindings.keys.KeySequence
  * @since 3.0
  */
-@Deprecated
 public final class KeySequence implements Comparable {
 
     /**
@@ -81,7 +81,7 @@ public final class KeySequence implements Comparable {
 
     /**
      * Gets an instance of <code>KeySequence</code>.
-     *
+     * 
      * @return a key sequence. This key sequence will have no key strokes.
      *         Guaranteed not to be <code>null</code>.
      */
@@ -92,7 +92,7 @@ public final class KeySequence implements Comparable {
     /**
      * Gets an instance of <code>KeySequence</code> given a key sequence and
      * a key stroke.
-     *
+     * 
      * @param keySequence
      *            a key sequence. Must not be <code>null</code>.
      * @param keyStroke
@@ -115,7 +115,7 @@ public final class KeySequence implements Comparable {
     /**
      * Gets an instance of <code>KeySequence</code> given a single key
      * stroke.
-     *
+     * 
      * @param keyStroke
      *            a single key stroke. Must not be <code>null</code>.
      * @return a key sequence. Guaranteed not to be <code>null</code>.
@@ -127,7 +127,7 @@ public final class KeySequence implements Comparable {
     /**
      * Gets an instance of <code>KeySequence</code> given an array of key
      * strokes.
-     *
+     * 
      * @param keyStrokes
      *            the array of key strokes. This array may be empty, but it
      *            must not be <code>null</code>. This array must not contain
@@ -141,7 +141,7 @@ public final class KeySequence implements Comparable {
     /**
      * Gets an instance of <code>KeySequence</code> given a list of key
      * strokes.
-     *
+     * 
      * @param keyStrokes
      *            the list of key strokes. This list may be empty, but it must
      *            not be <code>null</code>. If this list is not empty, it
@@ -151,11 +151,11 @@ public final class KeySequence implements Comparable {
     public static KeySequence getInstance(List keyStrokes) {
         return new KeySequence(keyStrokes);
     }
-
+	
 	/**
 	 * Gets an instance of <code>KeySequence</code> given a new-style key
 	 * sequence.
-	 *
+	 * 
 	 * @param newKeySequence
 	 *            The new-style key sequence to convert into a legacy key
 	 *            sequence; must not be <code>null</code>.
@@ -175,14 +175,14 @@ public final class KeySequence implements Comparable {
 							.getModifierKeys()
 							| newKeyStroke.getNaturalKey()));
 		}
-
+		
 		return new KeySequence(legacyKeyStrokes);
 	}
 
     /**
      * Gets an instance of <code>KeySequence</code> by parsing a given a
      * formal string representation.
-     *
+     * 
      * @param string
      *            the formal string representation to parse.
      * @return a key sequence. Guaranteed not to be <code>null</code>.
@@ -234,7 +234,7 @@ public final class KeySequence implements Comparable {
     /**
      * Constructs an instance of <code>KeySequence</code> given a list of key
      * strokes.
-     *
+     * 
      * @param keyStrokes
      *            the list of key strokes. This list may be empty, but it must
      *            not be <code>null</code>. If this list is not empty, it
@@ -252,8 +252,10 @@ public final class KeySequence implements Comparable {
         }
     }
 
-    @Override
-	public int compareTo(Object object) {
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public int compareTo(Object object) {
         KeySequence castedObject = (KeySequence) object;
         int compareTo = Util.compare(keyStrokes, castedObject.keyStrokes);
         return compareTo;
@@ -262,7 +264,7 @@ public final class KeySequence implements Comparable {
     /**
      * Returns whether or not this key sequence ends with the given key
      * sequence.
-     *
+     * 
      * @param keySequence
      *            a key sequence. Must not be <code>null</code>.
      * @param equals
@@ -279,8 +281,10 @@ public final class KeySequence implements Comparable {
         return Util.endsWith(keyStrokes, keySequence.keyStrokes, equals);
     }
 
-    @Override
-	public boolean equals(Object object) {
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object object) {
         if (!(object instanceof KeySequence)) {
 			return false;
 		}
@@ -290,7 +294,7 @@ public final class KeySequence implements Comparable {
 
     /**
      * Formats this key sequence into the current default look.
-     *
+     * 
      * @return A string representation for this key sequence using the default
      *         look; never <code>null</code>.
      */
@@ -300,7 +304,7 @@ public final class KeySequence implements Comparable {
 
     /**
      * Returns the list of key strokes for this key sequence.
-     *
+     * 
      * @return the list of key strokes keys. This list may be empty, but is
      *         guaranteed not to be <code>null</code>. If this list is not
      *         empty, it is guaranteed to only contain instances of <code>KeyStroke</code>.
@@ -309,8 +313,10 @@ public final class KeySequence implements Comparable {
         return keyStrokes;
     }
 
-    @Override
-	public int hashCode() {
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
         if (!hashCodeComputed) {
             hashCode = HASH_INITIAL;
             hashCode = hashCode * HASH_FACTOR + keyStrokes.hashCode();
@@ -323,7 +329,7 @@ public final class KeySequence implements Comparable {
     /**
      * Returns whether or not this key sequence is complete. Key sequences are
      * complete iff all of their key strokes are complete.
-     *
+     * 
      * @return <code>true</code>, iff the key sequence is complete.
      */
     public boolean isComplete() {
@@ -335,7 +341,7 @@ public final class KeySequence implements Comparable {
     /**
      * Returns whether or not this key sequence is empty. Key sequences are
      * complete iff they have no key strokes.
-     *
+     * 
      * @return <code>true</code>, iff the key sequence is empty.
      */
     public boolean isEmpty() {
@@ -345,7 +351,7 @@ public final class KeySequence implements Comparable {
     /**
      * Returns whether or not this key sequence starts with the given key
      * sequence.
-     *
+     * 
      * @param keySequence
      *            a key sequence. Must not be <code>null</code>.
      * @param equals
@@ -364,12 +370,12 @@ public final class KeySequence implements Comparable {
 
     /**
      * Returns the formal string representation for this key sequence.
-     *
+     * 
      * @return The formal string representation for this key sequence.
      *         Guaranteed not to be <code>null</code>.
+     * @see java.lang.Object#toString()
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return KeyFormatterFactory.getFormalKeyFormatter().format(this);
     }
 }

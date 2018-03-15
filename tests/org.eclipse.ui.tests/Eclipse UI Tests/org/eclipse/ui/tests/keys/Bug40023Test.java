@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Tests Bug 40023
- *
+ * 
  * @since 3.0
  */
 public class Bug40023Test extends UITestCase {
@@ -39,7 +39,7 @@ public class Bug40023Test extends UITestCase {
     /**
      * Retrieves a menu item matching or starting with the given name from an
      * array of menu items.
-     *
+     * 
      * @param menuItems
      *            The array of menu items to search; must not be <code>null</code>
      * @param text
@@ -47,9 +47,9 @@ public class Bug40023Test extends UITestCase {
      * @return The menu item, if any is found; <code>null</code> otherwise.
      */
     public static MenuItem getMenuItem(MenuItem[] menuItems, String text) {
-        for (MenuItem menuItem : menuItems) {
-            if (menuItem.getText().startsWith(text)) {
-                return menuItem;
+        for (int i = 0; i < menuItems.length; i++) {
+            if (menuItems[i].getText().startsWith(text)) {
+                return menuItems[i];
             }
         }
 
@@ -58,7 +58,7 @@ public class Bug40023Test extends UITestCase {
 
     /**
      * Constructor for Bug40023Test.
-     *
+     * 
      * @param name
      *            The name of the test
      */
@@ -69,7 +69,7 @@ public class Bug40023Test extends UITestCase {
     /**
      * Tests that check box items on the menu are checked when activated from
      * the keyboard.
-     *
+     * 
      * @throws CommandException
      *             If execution of the handler fails.
      * @throws CoreException
@@ -95,7 +95,7 @@ public class Bug40023Test extends UITestCase {
         PreferenceMutator.setKeyBinding(commandId, keySequenceText);
 
         // Press "CTRL+ALT+L" to lock the toolbars.
-		List<KeyStroke> keyStrokes = new ArrayList<>();
+        List keyStrokes = new ArrayList();
         keyStrokes.add(KeyStroke.getInstance(keySequenceText));
         Event event = new Event();
 		BindingService support = (BindingService) workbench

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,19 +18,19 @@ import org.eclipse.ui.navigator.ICommonViewerSite;
 
 /**
  * Provides a delegate implementation of {@link ICommonViewerSite}.
- *
+ * 
  * @since 3.2
  *
  */
 public class CommonViewerSiteDelegate implements ICommonViewerSite {
-
-
-	private String id;
-	private ISelectionProvider selectionProvider;
+	
+	
+	private String id; 
+	private ISelectionProvider selectionProvider; 
 	private Shell shell;
 
 	/**
-	 *
+	 * 
 	 * @param anId
 	 * @param aSelectionProvider
 	 * @param aShell
@@ -40,33 +40,28 @@ public class CommonViewerSiteDelegate implements ICommonViewerSite {
 		Assert.isNotNull(aSelectionProvider);
 		Assert.isNotNull(aShell);
 		id = anId;
-		selectionProvider = aSelectionProvider;
+		selectionProvider = aSelectionProvider;		
 		shell = aShell;
-	}
+	} 
 
-	@Override
 	public String getId() {
 		return id;
-	}
+	} 
 
-	@Override
 	public Shell getShell() {
 		return shell;
 	}
 
-	@Override
 	public ISelectionProvider getSelectionProvider() {
 		return selectionProvider;
-	}
+	}  
 
 
-	@Override
 	public void setSelectionProvider(ISelectionProvider aSelectionProvider) {
 		selectionProvider = aSelectionProvider;
 	}
 
-	@Override
-	public Object getAdapter(Class adapter) {
+	public Object getAdapter(Class adapter) { 
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 

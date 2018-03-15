@@ -10,7 +10,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
  * Our sample action implements workbench action delegate.
  * The action proxy will be created by the workbench and
  * shown in the UI. When the user tries to use the action,
- * this delegate will be created and execution will be
+ * this delegate will be created and execution will be 
  * delegated to it.
  * @see IWorkbenchWindowActionDelegate
  */
@@ -28,7 +28,6 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 	 * in the workbench UI.
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
-	@Override
 	public void run(IAction action) {
 		MessageDialog.openInformation(
 			window.getShell(),
@@ -37,13 +36,12 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 	}
 
 	/**
-	 * Selection in the workbench has been changed. We
+	 * Selection in the workbench has been changed. We 
 	 * can change the state of the 'real' action here
-	 * if we want, but this can only happen after
+	 * if we want, but this can only happen after 
 	 * the delegate has been created.
 	 * @see IWorkbenchWindowActionDelegate#selectionChanged
 	 */
-	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 	}
 
@@ -52,7 +50,6 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 	 * resources we previously allocated.
 	 * @see IWorkbenchWindowActionDelegate#dispose
 	 */
-	@Override
 	public void dispose() {
 	}
 
@@ -61,7 +58,6 @@ public class SampleAction implements IWorkbenchWindowActionDelegate {
 	 * be able to provide parent shell for the message dialog.
 	 * @see IWorkbenchWindowActionDelegate#init
 	 */
-	@Override
 	public void init(IWorkbenchWindow window) {
 		this.window = window;
 	}

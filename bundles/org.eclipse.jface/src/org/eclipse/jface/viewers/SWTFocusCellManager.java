@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
+import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Event;
@@ -42,7 +43,13 @@ abstract class SWTFocusCellManager {
 
 	private FocusCellHighlighter cellHighlighter;
 
-	private DisposeListener itemDeletionListener = e -> setFocusCell(null);
+	private DisposeListener itemDeletionListener = new DisposeListener() {
+
+		public void widgetDisposed(DisposeEvent e) {
+			setFocusCell(null);
+		}
+
+	};
 
 	/**
 	 * @param viewer
@@ -57,7 +64,7 @@ abstract class SWTFocusCellManager {
 		if( this.cellHighlighter != null ) {
 			this.cellHighlighter.setMgr(this);
 		}
-
+		
 		this.navigationStrategy = navigationDelegate;
 		hookListener(viewer);
 	}
@@ -118,7 +125,7 @@ abstract class SWTFocusCellManager {
 
 	/**
 	 * Handles the {@link SWT#FocusIn} event.
-	 *
+	 * 
 	 * @param event the event
 	 */
 	private void handleFocusIn(Event event) {
@@ -130,53 +137,59 @@ abstract class SWTFocusCellManager {
 	abstract ViewerCell getInitialFocusCell();
 
 	private void hookListener(final ColumnViewer viewer) {
-		Listener listener = event -> {
-			switch (event.type) {
-			case SWT.MouseDown:
-				handleMouseDown(event);
-				break;
-			case SWT.KeyDown:
-				handleKeyDown(event);
-				break;
-			case SWT.Selection:
-				handleSelection(event);
-				break;
-			case SWT.FocusIn:
-				handleFocusIn(event);
-				break;
+		Listener listener = new Listener() {
+
+			public void handleEvent(Event event) {
+				switch (event.type) {
+				case SWT.MouseDown:
+					handleMouseDown(event);
+					break;
+				case SWT.KeyDown:
+					handleKeyDown(event);
+					break;
+				case SWT.Selection:
+					handleSelection(event);
+					break;
+				case SWT.FocusIn:
+					handleFocusIn(event);
+					break;
+				}
 			}
 		};
 
 		viewer.getControl().addListener(SWT.MouseDown, listener);
 		viewer.getControl().addListener(SWT.KeyDown, listener);
 		viewer.getControl().addListener(SWT.Selection, listener);
-		viewer.addSelectionChangedListener(event -> {
-			if( event.selection.isEmpty() ) {
-				setFocusCell(null);
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
+			public void selectionChanged(SelectionChangedEvent event) {
+				if( event.selection.isEmpty() ) {
+					setFocusCell(null);
+				}
 			}
+
 		});
 		viewer.getControl().addListener(SWT.FocusIn, listener);
 		viewer.getControl().getAccessible().addAccessibleListener(
 				new AccessibleAdapter() {
-					@Override
 					public void getName(AccessibleEvent event) {
 						ViewerCell cell = getFocusCell();
 						if (cell == null)
 							return;
-
+						
 						ViewerRow row = cell.getViewerRow();
 						if (row == null)
 							return;
-
+						
 						ViewerColumn viewPart = viewer.getViewerColumn(cell
 								.getColumnIndex());
-
+						
 						if (viewPart == null)
 							return;
-
+						
 						CellLabelProvider labelProvider = viewPart
 								.getLabelProvider();
-
+						
 						if (labelProvider == null)
 							return;
 						labelProvider.update(cell);
@@ -193,7 +206,7 @@ abstract class SWTFocusCellManager {
 	public ViewerCell getFocusCell() {
 		return focusCell;
 	}
-
+	
 	final ViewerCell _getFocusCell() {
 		return focusCell;
 	}
@@ -214,9 +227,9 @@ abstract class SWTFocusCellManager {
 		if( focusCell != null ) {
 			focusCell.scrollIntoView();
 		}
-
+		
 		this.cellHighlighter.focusCellChanged(focusCell,oldCell);
-
+		
 		getViewer().getControl().getAccessible().setFocus(ACC.CHILDID_SELF);
 	}
 

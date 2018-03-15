@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,27 +34,38 @@ public class AddMarkersAction implements IWorkbenchWindowActionDelegate {
 
 	static final String CATEGORY_TEST_MARKER = "org.eclipse.ui.tests.categoryTestMarker";
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
+	 */
 	public void dispose() {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
+	 */
 	public void init(IWorkbenchWindow workbenchWindow) {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {
 
 		Job addJob = new Job("Add Markers") {
-			@Override
 			protected IStatus run(
 					org.eclipse.core.runtime.IProgressMonitor monitor) {
 				try {
 					IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
 							.getRoot();
-					Map<String, Object> attribs = new HashMap<>();
+					Map attribs = new HashMap();
 					for (int i = 0; i < 1000; i++) {
 
 						if (i / 2 == 0) {
@@ -64,7 +75,7 @@ public class AddMarkersAction implements IWorkbenchWindowActionDelegate {
 									"Test Path " + i);
 						}
 
-						attribs.put(IMarker.SEVERITY, Integer.valueOf(
+						attribs.put(IMarker.SEVERITY, new Integer(
 								IMarker.SEVERITY_ERROR));
 						attribs.put(IMarker.MESSAGE, "this is a test " + i);
 						attribs.put(IMarker.LOCATION, "Location " + i);
@@ -76,7 +87,7 @@ public class AddMarkersAction implements IWorkbenchWindowActionDelegate {
 					return e.getStatus();
 				}
 				return Status.OK_STATUS;
-			}
+			};
 		};
 
 		addJob.schedule();
@@ -84,7 +95,12 @@ public class AddMarkersAction implements IWorkbenchWindowActionDelegate {
 	}
 
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
+	 *      org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 		// TODO Auto-generated method stub
 

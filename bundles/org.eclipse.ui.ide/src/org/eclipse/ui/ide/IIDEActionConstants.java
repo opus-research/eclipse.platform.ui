@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Kaloyan Raev <kaloyan.r@zend.com> - Bug 322002
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
@@ -17,10 +16,10 @@ package org.eclipse.ui.ide;
  * This interface contains constants only; it is not intended to be implemented
  * or extended.
  * </p>
- *
+ * 
  * Note: want to move IDE-specific stuff out of IWorkbenchActionConstants.
  *   There's still some cleanup to be done here (and there).
- *
+ * 
  * @since 3.0
  * @noimplement This interface is not intended to be implemented by clients.
  */
@@ -137,52 +136,52 @@ public interface IIDEActionConstants {
 
     /**
      * Workbench toolbar id for file toolbar group.
-     *
+     * 
      * @since 2.1
      */
     public static final String TOOLBAR_FILE = "org.eclipse.ui.workbench.file"; //$NON-NLS-1$
 
     /**
      * Workbench toolbar id for navigate toolbar group.
-     *
+     * 
      * @since 2.1
      */
     public static final String TOOLBAR_NAVIGATE = "org.eclipse.ui.workbench.navigate"; //$NON-NLS-1$
 
-    // Workbench toolbar group ids.  To add an item at the beginning of the group,
+    // Workbench toolbar group ids.  To add an item at the beginning of the group, 
     // use the GROUP id.  To add an item at the end of the group, use the EXT id.
 
     /**
      * Group id for pin toolbar group.
-     *
+     * 
      * @since 2.1
      */
     public static final String PIN_GROUP = "pin.group"; //$NON-NLS-1$
 
     /**
      * Group ids for history toolbar group.
-     *
+     * 
      * @since 2.1
      */
     public static final String HISTORY_GROUP = "history.group"; //$NON-NLS-1$
 
     /**
      * Group ids for new toolbar group.
-     *
+     * 
      * @since 2.1
      */
     public static final String NEW_GROUP = "new.group"; //$NON-NLS-1$
 
     /**
      * Group ids for save toolbar group.
-     *
+     * 
      * @since 2.1
      */
     public static final String SAVE_GROUP = "save.group"; //$NON-NLS-1$
 
     /**
      * Group ids for build toolbar group.
-     *
+     * 
      * @since 2.1
      */
     public static final String BUILD_GROUP = "build.group"; //$NON-NLS-1$
@@ -199,20 +198,13 @@ public interface IIDEActionConstants {
     public static final String GROUP_FILE = "group.file"; //$NON-NLS-1$
 
     /**
-     * Pop-up menu and cool bar: name of group for Edit actions (value <code>"group.edit"</code>).
-     *
-     * @since 3.14
-     */
-    public static final String GROUP_EDIT = "group.edit"; //$NON-NLS-1$
-
-    /**
      * Coolbar: name of group for Navigate actions (value <code>"group.nav"</code>).
      */
     public static final String GROUP_NAV = "group.nav"; //$NON-NLS-1$
 
     /**
      * Pop-up menu: name of group for Show In actions (value <code>"group.showIn"</code>).
-     *
+     * 
      * @since 2.1
      */
     public static final String GROUP_SHOW_IN = "group.showIn"; //$NON-NLS-1$
@@ -256,7 +248,7 @@ public interface IIDEActionConstants {
     /**
      * Navigate menu: name of standard Go To Resource global action
      * (value <code>"goToResource"</code>).
-     *
+     * 
      * Note:should be in an action factory
      */
     public static final String GO_TO_RESOURCE = "goToResource"; // Global action. //$NON-NLS-1$

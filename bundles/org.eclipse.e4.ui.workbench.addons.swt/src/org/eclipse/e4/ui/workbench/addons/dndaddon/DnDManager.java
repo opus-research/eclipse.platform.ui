@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,12 +18,10 @@ import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.widgets.ImageBasedFrame;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.jface.util.Geometry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -39,7 +37,6 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
-import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -63,6 +60,8 @@ class DnDManager {
 	DnDInfo info;
 	DragAgent dragAgent;
 
+	DropAgent dropAgent;
+
 	private MWindow dragWindow;
 
 	private Shell dragHost;
@@ -75,11 +74,9 @@ class DnDManager {
 	private List<Rectangle> frames = new ArrayList<Rectangle>();
 
 	DragDetectListener dragDetector = new DragDetectListener() {
-		@Override
 		public void dragDetected(DragDetectEvent e) {
-			if (dragging || e.widget.isDisposed()) {
+			if (dragging || e.widget.isDisposed())
 				return;
-			}
 
 			info.update(e);
 			dragAgent = getDragAgent(info);
@@ -119,7 +116,7 @@ class DnDManager {
 		dragAgents.add(new PartDragAgent(this));
 
 		dropAgents.add(new StackDropAgent(this));
-		dropAgents.add(new SplitDropAgent2(this));
+		dropAgents.add(new SplitDropAgent(this));
 		dropAgents.add(new DetachedDropAgent(this));
 
 		// dragging trim
@@ -130,7 +127,6 @@ class DnDManager {
 		hookWidgets();
 
 		getDragShell().addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				dispose();
 			}
@@ -143,15 +139,8 @@ class DnDManager {
 	 */
 	private void hookWidgets() {
 		EventHandler stackWidgetHandler = new EventHandler() {
-			@Override
 			public void handleEvent(org.osgi.service.event.Event event) {
 				MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
-
-				// Only add listeners for stacks in *this* window
-				MWindow elementWin = getModelService().getTopLevelWindowFor(element);
-				if (elementWin != dragWindow) {
-					return;
-				}
 
 				// Listen for drags starting in CTabFolders
 				if (element.getWidget() instanceof CTabFolder
@@ -184,22 +173,13 @@ class DnDManager {
 	protected void dispose() {
 		clearOverlay();
 
-		if (overlayFrame != null && !overlayFrame.isDisposed()) {
+		if (overlayFrame != null && !overlayFrame.isDisposed())
 			overlayFrame.dispose();
-		}
 		overlayFrame = null;
-
-		for (DragAgent agent : dragAgents) {
-			agent.dispose();
-		}
-		for (DropAgent agent : dropAgents) {
-			agent.dispose();
-		}
 	}
 
 	private void track() {
 		Display.getCurrent().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				info.update();
 				dragAgent.track(info);
@@ -212,12 +192,11 @@ class DnDManager {
 
 	protected void startDrag() {
 		// Create a new tracker for this drag instance
-		tracker = new Tracker(Display.getCurrent().getActiveShell(), SWT.NULL);
+		tracker = new Tracker(Display.getCurrent(), SWT.NULL);
 		tracker.setStippled(true);
 		setRectangle(offScreenRect);
 
 		tracker.addKeyListener(new KeyListener() {
-			@Override
 			public void keyReleased(KeyEvent e) {
 				if (e.keyCode == SWT.MOD1) {
 					isModified = false;
@@ -225,7 +204,6 @@ class DnDManager {
 				}
 			}
 
-			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.MOD1) {
 					isModified = true;
@@ -235,7 +213,6 @@ class DnDManager {
 		});
 
 		tracker.addListener(SWT.Move, new Listener() {
-			@Override
 			public void handleEvent(final Event event) {
 				track();
 			}
@@ -296,19 +273,17 @@ class DnDManager {
 	}
 
 	public void setRectangle(Rectangle newRect) {
-		if (tracker == null) {
+		if (tracker == null)
 			return;
-		}
 
-		Rectangle[] rectArray = { Geometry.copy(newRect) };
+		Rectangle[] rectArray = { newRect };
 		tracker.setRectangles(rectArray);
 	}
 
 	public void hostElement(MUIElement element, int xOffset, int yOffset) {
 		if (element == null) {
-			if (dragHost != null && !dragHost.isDisposed()) {
+			if (dragHost != null && !dragHost.isDisposed())
 				dragHost.dispose();
-			}
 			dragHost = null;
 			return;
 		}
@@ -323,11 +298,10 @@ class DnDManager {
 		dragHost.setRegion(shellRgn);
 
 		dragCtrl = (Control) element.getWidget();
-		if (dragCtrl != null) {
+		if (dragCtrl != null)
 			dragHost.setSize(dragCtrl.getSize());
-		} else {
+		else
 			dragHost.setSize(400, 400);
-		}
 
 		if (feedbackStyle == HOSTED) {
 			// Special code to wrap the element in a CTF if it's coming from one
@@ -365,9 +339,8 @@ class DnDManager {
 	}
 
 	public void setDragHostVisibility(boolean visible) {
-		if (dragHost == null || dragHost.isDisposed()) {
+		if (dragHost == null || dragHost.isDisposed())
 			return;
-		}
 
 		if (visible) {
 			if (dragHost.getChildren().length > 0
@@ -397,9 +370,8 @@ class DnDManager {
 		images.clear();
 		imageRects.clear();
 
-		if (overlayFrame != null) {
+		if (overlayFrame != null)
 			overlayFrame.setVisible(false);
-		}
 	}
 
 	private void updateOverlay() {
@@ -410,17 +382,11 @@ class DnDManager {
 		}
 
 		if (overlayFrame == null) {
-			overlayFrame = new Shell(getDragShell(), SWT.NO_TRIM | SWT.ON_TOP);
-			overlayFrame.setData(DragAndDropUtil.IGNORE_AS_DROP_TARGET, Boolean.TRUE);
+			overlayFrame = new Shell(getDragShell(), SWT.NO_TRIM);
 			overlayFrame.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
 			overlayFrame.setAlpha(150);
 
-			IStylingEngine stylingEngine = dragWindow.getContext().get(IStylingEngine.class);
-			stylingEngine.setClassname(overlayFrame, "DragFeedback"); //$NON-NLS-1$
-			stylingEngine.style(overlayFrame);
-
 			overlayFrame.addPaintListener(new PaintListener() {
-				@Override
 				public void paintControl(PaintEvent e) {
 					for (int i = 0; i < images.size(); i++) {
 						Image image = images.get(i);
@@ -435,9 +401,8 @@ class DnDManager {
 		overlayFrame.setBounds(bounds);
 
 		Region curRegion = overlayFrame.getRegion();
-		if (curRegion != null && !curRegion.isDisposed()) {
+		if (curRegion != null && !curRegion.isDisposed())
 			curRegion.dispose();
-		}
 
 		Region rgn = new Region();
 
@@ -470,21 +435,7 @@ class DnDManager {
 		}
 
 		overlayFrame.setRegion(rgn);
-		// Region object needs to be disposed at the right point in time
-		addResourceDisposeListener(overlayFrame, rgn);
 		overlayFrame.setVisible(true);
-	}
-
-	private void addResourceDisposeListener(Control control, final Resource resource) {
-		control.addDisposeListener(new DisposeListener() {
-
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				if (!resource.isDisposed()) {
-					resource.dispose();
-				}
-			}
-		});
 	}
 
 	private Rectangle getOverlayBounds() {
@@ -493,22 +444,19 @@ class DnDManager {
 			if (fr.width > 6) {
 				Rectangle outerBounds = new Rectangle(fr.x - 3, fr.y - 3, fr.width + 6,
 						fr.height + 6);
-				if (bounds == null) {
+				if (bounds == null)
 					bounds = outerBounds;
-				}
 				bounds.add(outerBounds);
 			} else {
-				if (bounds == null) {
+				if (bounds == null)
 					bounds = fr;
-				}
 				bounds.add(fr);
 			}
 		}
 
 		for (Rectangle ir : imageRects) {
-			if (bounds == null) {
+			if (bounds == null)
 				bounds = ir;
-			}
 			bounds.add(ir);
 		}
 
@@ -517,15 +465,13 @@ class DnDManager {
 
 	public void frameRect(Rectangle bounds) {
 		clearOverlay();
-		if (bounds != null) {
+		if (bounds != null)
 			addFrame(bounds);
-		}
 	}
 
 	public void addDragAgent(DragAgent newAgent) {
-		if (!dragAgents.contains(newAgent)) {
+		if (!dragAgents.contains(newAgent))
 			dragAgents.add(newAgent);
-		}
 	}
 
 	public void removeDragAgent(DragAgent agentToRemove) {
@@ -533,9 +479,8 @@ class DnDManager {
 	}
 
 	public void addDropAgent(DropAgent newAgent) {
-		if (!dropAgents.contains(newAgent)) {
+		if (!dropAgents.contains(newAgent))
 			dropAgents.add(newAgent);
-		}
 	}
 
 	public void removeDropAgent(DropAgent agentToRemove) {
@@ -544,18 +489,16 @@ class DnDManager {
 
 	private DragAgent getDragAgent(DnDInfo info) {
 		for (DragAgent agent : dragAgents) {
-			if (agent.canDrag(info)) {
+			if (agent.canDrag(info))
 				return agent;
-			}
 		}
 		return null;
 	}
 
 	public DropAgent getDropAgent(MUIElement dragElement, DnDInfo info) {
 		for (DropAgent agent : dropAgents) {
-			if (agent.canDrop(dragElement, info)) {
+			if (agent.canDrop(dragElement, info))
 				return agent;
-			}
 		}
 		return null;
 	}
@@ -571,9 +514,8 @@ class DnDManager {
 	 * @param newBounds
 	 */
 	public void setHostBounds(Rectangle newBounds) {
-		if (dragHost == null || dragHost.isDisposed()) {
+		if (dragHost == null || dragHost.isDisposed())
 			return;
-		}
 
 		info.setDragHostBounds(newBounds);
 		update();

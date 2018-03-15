@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2017 Versant Corp. and others.
+ * Copyright (c) 2008, 2009 Versant Corp. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,9 +22,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IViewReference;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -37,7 +34,7 @@ import org.eclipse.ui.views.properties.PropertyShowInContext;
 
 /**
  * @since 3.5
- *
+ * 
  */
 public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 
@@ -47,22 +44,27 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.tests.propertysheet.AbstractPropertySheetTest#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		testNewPropertySheetHandler = new TestNewPropertySheetHandler();
 	}
 
 	private ExecutionEvent getExecutionEvent() {
-		IHandlerService handlerService = PlatformUI
+		IHandlerService handlerService = (IHandlerService) PlatformUI
 				.getWorkbench().getService(IHandlerService.class);
-		ICommandService commandService = PlatformUI
+		ICommandService commandService = (ICommandService) PlatformUI
 				.getWorkbench().getService(ICommandService.class);
 		IEvaluationContext evalContext = handlerService.getCurrentState();
 		Command command = commandService
 				.getCommand(TestNewPropertySheetHandler.ID);
 		ExecutionEvent executionEvent = new ExecutionEvent(command,
-				new HashMap<>(), null, evalContext);
+				new HashMap(), null, evalContext);
 		return executionEvent;
 	}
 
@@ -70,7 +72,7 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 	 * Test method for
 	 * {@link org.eclipse.ui.tests.propertysheet.TestNewPropertySheetHandler#getShowInContext(org.eclipse.core.commands.ExecutionEvent)}
 	 * .
-	 *
+	 * 
 	 * @throws ExecutionException
 	 * @throws PartInitException
 	 *             StructuredSelection.EMPTY,
@@ -91,22 +93,23 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 	 * Test method for
 	 * {@link org.eclipse.ui.tests.propertysheet.TestNewPropertySheetHandler#getShowInContext(org.eclipse.core.commands.ExecutionEvent)}
 	 * .
-	 *
+	 * 
 	 * @throws ExecutionException
 	 * @throws PartInitException
 	 */
 	public final void testGetShowInContextFromAShowInSource()
 			throws ExecutionException, PartInitException {
 		IAdapterFactory factory = new IAdapterFactory() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
-				return (T) (IShowInSource) () -> new ShowInContext(StructuredSelection.EMPTY,
-						StructuredSelection.EMPTY);
+			public Object getAdapter(Object adaptableObject, Class adapterType) {
+				return new IShowInSource() {
+					public ShowInContext getShowInContext() {
+						return new ShowInContext(StructuredSelection.EMPTY,
+								StructuredSelection.EMPTY);
+					}
+				};
 			}
 
-			@Override
-			public Class<?>[] getAdapterList() {
+			public Class[] getAdapterList() {
 				return new Class[] { IShowInSource.class };
 			}
 		};
@@ -132,7 +135,7 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 	 * Test method for
 	 * {@link org.eclipse.ui.tests.propertysheet.TestNewPropertySheetHandler#getShowInContext(org.eclipse.core.commands.ExecutionEvent)}
 	 * .
-	 *
+	 * 
 	 * @throws ExecutionException
 	 * @throws PartInitException
 	 */
@@ -151,32 +154,12 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 		assertEquals(selectionProviderView, context.getPart());
 	}
 
-	void hideAndAssertNoParts() {
-		IWorkbenchWindow[] windows = fWorkbench.getWorkbenchWindows();
-		for (IWorkbenchWindow w : windows) {
-			IWorkbenchPage ap = w.getActivePage();
-			hideAndAssertNoParts(ap);
-		}
-	}
-
-	void hideAndAssertNoParts(IWorkbenchPage page) {
-		IViewReference[] viewReferences = page.getViewReferences();
-		for (IViewReference view : viewReferences) {
-			page.hideView(view);
-		}
-		page.closeAllEditors(false);
-		processEvents();
-		assertNull(page.getActivePart());
-	}
-
 	/**
 	 * Test method for
 	 * {@link org.eclipse.ui.tests.propertysheet.TestNewPropertySheetHandler#getShowInContext(org.eclipse.core.commands.ExecutionEvent)}
 	 * .
 	 */
 	public final void testGetShowInContextWithNoActivePart() {
-		hideAndAssertNoParts();
-
 		try {
 			testNewPropertySheetHandler.getShowInContext(getExecutionEvent());
 		} catch (ExecutionException e) {
@@ -189,13 +172,14 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 	 * Test method for
 	 * {@link org.eclipse.ui.tests.propertysheet.TestNewPropertySheetHandler#findPropertySheet(org.eclipse.core.commands.ExecutionEvent, org.eclipse.ui.views.properties.PropertyShowInContext)}
 	 * .
-	 *
+	 * 
 	 * @throws ExecutionException
 	 * @throws PartInitException
 	 */
 	public final void testFindPropertySheetWithoutActivePart()
 			throws PartInitException, ExecutionException {
-		hideAndAssertNoParts();
+		assertNull(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getActivePage().getActivePart());
 
 		try {
 			testNewPropertySheetHandler.findPropertySheet(getExecutionEvent(),
@@ -210,7 +194,7 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 	 * Test method for
 	 * {@link org.eclipse.ui.tests.propertysheet.TestNewPropertySheetHandler#findPropertySheet(org.eclipse.core.commands.ExecutionEvent, org.eclipse.ui.views.properties.PropertyShowInContext)}
 	 * .
-	 *
+	 * 
 	 * @throws ExecutionException
 	 * @throws PartInitException
 	 */
@@ -233,7 +217,7 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 	 * Test method for
 	 * {@link org.eclipse.ui.tests.propertysheet.TestNewPropertySheetHandler#findPropertySheet(org.eclipse.core.commands.ExecutionEvent, org.eclipse.ui.views.properties.PropertyShowInContext)}
 	 * .
-	 *
+	 * 
 	 * @throws ExecutionException
 	 * @throws PartInitException
 	 */
@@ -256,7 +240,7 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 	 * Test method for
 	 * {@link org.eclipse.ui.tests.propertysheet.TestNewPropertySheetHandler#findPropertySheet(org.eclipse.core.commands.ExecutionEvent, org.eclipse.ui.views.properties.PropertyShowInContext)}
 	 * .
-	 *
+	 * 
 	 * @throws ExecutionException
 	 * @throws PartInitException
 	 */
@@ -281,14 +265,14 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 	 * Test method for
 	 * {@link org.eclipse.ui.tests.propertysheet.TestNewPropertySheetHandler#findPropertySheet(org.eclipse.core.commands.ExecutionEvent, org.eclipse.ui.views.properties.PropertyShowInContext)}
 	 * .
-	 *
+	 * 
 	 * @throws ExecutionException
 	 * @throws PartInitException
 	 */
 	public final void testFindPropertySheetWithUnpinnedPSandSPVActive()
 			throws PartInitException, ExecutionException {
 	    PropertySheetPerspectiveFactory.applyPerspective(activePage);
-
+	    
 		PropertySheet sheet = (PropertySheet) activePage
 				.showView(IPageLayout.ID_PROP_SHEET);
 		IViewPart showView = activePage.showView(SelectionProviderView.ID);

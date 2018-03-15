@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import org.eclipse.core.commands.common.NotDefinedException;
  * <p>
  * Clients may implement, but must not extend.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public interface IExecutionListenerWithChecks extends IExecutionListener {
@@ -32,7 +32,7 @@ public interface IExecutionListenerWithChecks extends IExecutionListener {
 	/**
 	 * Notifies the listener that an attempt was made to execute a command that
 	 * is not defined.
-	 *
+	 * 
 	 * @param commandId
 	 *            The identifier of command that is not defined; never
 	 *            <code>null</code>
@@ -44,7 +44,7 @@ public interface IExecutionListenerWithChecks extends IExecutionListener {
 	/**
 	 * Notifies the listener that an attempt was made to execute a command that
 	 * is disabled.
-	 *
+	 * 
 	 * @param commandId
 	 *            The identifier of command that is not enabled; never
 	 *            <code>null</code>

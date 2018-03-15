@@ -11,11 +11,11 @@
 
 package org.eclipse.core.tests.internal.databinding.conversion;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.internal.databinding.conversion.IntegerToStringConverter;
 
 import com.ibm.icu.text.NumberFormat;
-
-import junit.framework.TestCase;
 
 /**
  * @since 1.1
@@ -23,7 +23,11 @@ import junit.framework.TestCase;
 public class IntegerToStringConverterTest extends TestCase {
 	private NumberFormat integerFormat;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -47,7 +51,7 @@ public class IntegerToStringConverterTest extends TestCase {
 	}
 
 	public void testConvertShortToString() throws Exception {
-		Short value = Short.valueOf((short) 1);
+		Short value = new Short((short) 1);
 		String expected = integerFormat.format(value);
 
 		IntegerToStringConverter converter = IntegerToStringConverter
@@ -57,7 +61,7 @@ public class IntegerToStringConverterTest extends TestCase {
 	}
 
 	public void testConvertByteToString() throws Exception {
-		Byte value = Byte.valueOf((byte) 1);
+		Byte value = new Byte((byte) 1);
 		String expected = integerFormat.format(value);
 
 		IntegerToStringConverter converter = IntegerToStringConverter.fromByte(
@@ -75,7 +79,7 @@ public class IntegerToStringConverterTest extends TestCase {
 	public void testIllegalArgumentExceptionIfSourceIsNotExpectedType() throws Exception {
 		IntegerToStringConverter converter = IntegerToStringConverter.fromByte(false);
 		try {
-			converter.convert(Integer.valueOf(1));
+			converter.convert(new Integer(1));
 			fail("exception should have been thrown");
 		} catch (IllegalArgumentException e) {
 		}

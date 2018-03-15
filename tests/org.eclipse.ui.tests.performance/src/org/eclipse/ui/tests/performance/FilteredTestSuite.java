@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,11 +12,11 @@ package org.eclipse.ui.tests.performance;
 
 import java.util.Enumeration;
 
-import org.osgi.framework.BundleContext;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.osgi.framework.BundleContext;
 
 /**
  * Only includes tests that match filter. Filter is specified in the Java system variable
@@ -68,7 +68,7 @@ public class FilteredTestSuite extends TestSuite {
 				filterTestClassName = null;
 			else
 				filterTestClassName = filterString.substring(0, methodSeparator);
-
+			
 			if (methodSeparator + 1 < filterString.length())
 				filterTestName = filterString.substring(methodSeparator + 1);
 			else
@@ -79,8 +79,7 @@ public class FilteredTestSuite extends TestSuite {
 		}
     }
 
-    @Override
-	public void addTest(Test test) {
+    public void addTest(Test test) {
     	if ((filterTestClassName != null) || (filterTestName != null)) {
     		if (test instanceof TestSuite) {
     			addFilteredTestSuite((TestSuite)test);
@@ -95,9 +94,9 @@ public class FilteredTestSuite extends TestSuite {
     }
 
     private void addFilteredTestSuite(TestSuite testSuite) {
-		for (Enumeration<Test> allTests = testSuite.tests(); allTests.hasMoreElements();) {
+		for(Enumeration allTests = testSuite.tests(); allTests.hasMoreElements(); ) {
 			Object subTest = allTests.nextElement();
-
+			
 			if (subTest instanceof TestSuite) {
 				addFilteredTestSuite((TestSuite)subTest);
 				continue;
@@ -107,7 +106,7 @@ public class FilteredTestSuite extends TestSuite {
 				continue;
 
 			if (filterTestClassName != null) {
-				Class<?> testClass = subTest.getClass();
+				Class testClass = subTest.getClass();
 				String subTestQualName = testClass.getName(); // qualified class name
 				if (subTestQualName == null)
 					subTestQualName = "";

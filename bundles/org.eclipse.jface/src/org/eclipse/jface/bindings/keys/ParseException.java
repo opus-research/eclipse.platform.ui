@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,14 +20,14 @@ package org.eclipse.jface.bindings.keys;
  * <code>ParseException</code> objects are immutable. Clients are not
  * permitted to extend this class.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class ParseException extends Exception {
 
     /**
      * Generated serial version UID for this class.
-     *
+     * 
      * @since 3.1
      */
     private static final long serialVersionUID = 3257009864814376241L;
@@ -35,7 +35,7 @@ public final class ParseException extends Exception {
     /**
      * Constructs a <code>ParseException</code> with the specified detail
      * message.
-     *
+     * 
      * @param s
      *            the detail message.
      */

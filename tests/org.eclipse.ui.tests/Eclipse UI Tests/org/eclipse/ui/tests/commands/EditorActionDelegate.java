@@ -24,18 +24,24 @@ public class EditorActionDelegate implements IEditorActionDelegate {
 
 	static boolean executed = false;
 	static IEditorPart part = null;
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IEditorActionDelegate#setActiveEditor(org.eclipse.jface.action.IAction, org.eclipse.ui.IEditorPart)
+	 */
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
 		part = targetEditor;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {
 		executed = true;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 		// TODO Auto-generated method stub
 
