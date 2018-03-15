@@ -8,19 +8,17 @@
  * Contributors:
  *     Stefan Xenos (Google) - initial API and implementation
  ******************************************************************************/
-package org.eclipse.core.internal.databinding.observable.sideeffect;
+package org.eclipse.core.internal.databinding.observable;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.IObservable;
+import org.eclipse.core.databinding.observable.ISideEffect;
 import org.eclipse.core.databinding.observable.ObservableTracker;
 import org.eclipse.core.databinding.observable.Realm;
-import org.eclipse.core.databinding.observable.sideeffect.ISideEffect;
 import org.eclipse.core.runtime.Assert;
 
 /**
@@ -29,7 +27,6 @@ import org.eclipse.core.runtime.Assert;
  * @since 1.6
  */
 public final class SideEffect implements ISideEffect {
-
 	/**
 	 * Holds a singleton side-effect which does nothing.
 	 */
@@ -53,21 +50,6 @@ public final class SideEffect implements ISideEffect {
 		@Override
 		public void runIfDirty() {
 		}
-
-		@Override
-		public boolean isDisposed() {
-			// This side-effect never executes nor retains any references and
-			// callers may rely upon this, so we should return true.
-			return true;
-		}
-
-		@Override
-		public void addDisposeListener(Consumer<ISideEffect> disposalConsumer) {
-		}
-
-		@Override
-		public void removeDisposeListener(Consumer<ISideEffect> disposalConsumer) {
-		}
 	};
 
 	/**
@@ -81,11 +63,11 @@ public final class SideEffect implements ISideEffect {
 	 */
 	private boolean dirty;
 	/**
-	 * True if PrivateInterface is currently enqueued in a call to
+	 * True iff PrivateInterface is currently enqueued in a call to
 	 * realm.asyncExec
 	 */
 	private boolean asyncScheduled;
-	private int pauseDepth;
+	private boolean resumed;
 	private Runnable runnable;
 	/**
 	 * Dependencies which we are currently listening for change events from
@@ -94,11 +76,6 @@ public final class SideEffect implements ISideEffect {
 	private Realm realm;
 
 	private PrivateInterface privateInterface = new PrivateInterface();
-
-	/**
-	 * List of dispose listeners. Null if empty
-	 */
-	private List<Consumer<ISideEffect>> disposeListeners;
 
 	/**
 	 * Creates a SideEffect in the paused state that wraps the given runnable on
@@ -123,7 +100,6 @@ public final class SideEffect implements ISideEffect {
 		this.runnable = runnable;
 		this.realm = realm;
 		this.dirty = true;
-		this.pauseDepth = 1;
 	}
 
 	/**
@@ -139,7 +115,7 @@ public final class SideEffect implements ISideEffect {
 		this.dependencies = dependencies;
 		this.runnable = runnable;
 		this.dirty = false;
-		this.pauseDepth = 0;
+		this.resumed = true;
 		this.realm = Realm.getDefault();
 
 		for (IObservable next : dependencies) {
@@ -149,21 +125,22 @@ public final class SideEffect implements ISideEffect {
 
 	@Override
 	public void resume() {
-		checkRealm();
-		pauseDepth--;
-		if (pauseDepth < 0) {
-			throw new IllegalStateException(
-					"The resume() method was called more times than pause()."); //$NON-NLS-1$
-		} else if (dirty && pauseDepth == 0) {
+		checkState();
+		if (resumed) {
+			return;
+		}
+		resumed = true;
+		if (dirty) {
 			scheduleUpdate();
 		}
 	}
 
+
 	@Override
 	public void pause() {
-		checkRealm();
-		pauseDepth++;
-		if (dirty && pauseDepth == 1) {
+		checkState();
+		resumed = false;
+		if (dirty) {
 			// No need to continue listening if we're already dirtied, since
 			// we'll just end up running again after we're resumed
 			stopListening();
@@ -173,13 +150,13 @@ public final class SideEffect implements ISideEffect {
 
 	@Override
 	public void resumeAndRunIfDirty() {
-		checkRealm();
-		pauseDepth--;
+		checkState();
+		resumed = true;
 		update();
 	}
 
 	private void update() {
-		if (dirty && pauseDepth <= 0) {
+		if (dirty && resumed) {
 			dirty = false;
 			// Hold a reference to the old dependencies to prevent them from
 			// being garbage collected until we've computed the new set. In the
@@ -212,63 +189,19 @@ public final class SideEffect implements ISideEffect {
 	@Override
 	public void dispose() {
 		checkRealm();
-		if (isDisposed()) {
-			return;
-		}
-		pauseDepth = 0;
+		resumed = false;
 		stopListening();
 		dependencies = null;
 		runnable = null;
-		if (disposeListeners != null) {
-			List<Consumer<ISideEffect>> oldListeners = disposeListeners;
-			disposeListeners = null;
-			oldListeners.forEach(dc -> dc.accept(SideEffect.this));
-		}
 	}
 
-	@Override
-	public boolean isDisposed() {
+	private boolean isDisposed() {
 		return runnable == null;
-	}
-
-	/**
-	 * Add an disposal consumer for this {@link ISideEffect} instance.
-	 *
-	 * @param disposalConsumer
-	 *            a consumer which will be notified once this
-	 *            {@link ISideEffect} is disposed.
-	 */
-	@Override
-	public void addDisposeListener(Consumer<ISideEffect> disposalConsumer) {
-		checkRealm();
-		if (isDisposed()) {
-			return;
-		}
-		if (this.disposeListeners == null) {
-			this.disposeListeners = new ArrayList<>();
-		}
-		this.disposeListeners.add(disposalConsumer);
-	}
-
-	/**
-	 * Remove an disposal consumer for this {@link ISideEffect} instance.
-	 *
-	 * @param disposalConsumer
-	 *            a consumer which is supposed to be removed from the dispose
-	 *            listener list.
-	 */
-	@Override
-	public void removeDisposeListener(Consumer<ISideEffect> disposalConsumer) {
-		checkRealm();
-		if (this.disposeListeners == null) {
-			return;
-		}
-		this.disposeListeners.remove(disposalConsumer);
 	}
 
 	@Override
 	public void runIfDirty() {
-		checkRealm();
+		checkState();
 		update();
 	}
 
@@ -284,7 +217,7 @@ public final class SideEffect implements ISideEffect {
 		if (!dirty) {
 			dirty = true;
 
-			if (pauseDepth <= 0) {
+			if (resumed) {
 				scheduleUpdate();
 			} else {
 				stopListening();
@@ -300,6 +233,13 @@ public final class SideEffect implements ISideEffect {
 
 		this.asyncScheduled = true;
 		realm.asyncExec(privateInterface);
+	}
+
+	private void checkState() {
+		if (isDisposed()) {
+			throw new IllegalStateException("This SideEffect has been disposed!"); //$NON-NLS-1$
+		}
+		checkRealm();
 	}
 
 	private void checkRealm() {
@@ -339,9 +279,6 @@ public final class SideEffect implements ISideEffect {
 
 		@Override
 		public void run() {
-			if (isDisposed()) {
-				return;
-			}
 			asyncScheduled = false;
 			update();
 		}
