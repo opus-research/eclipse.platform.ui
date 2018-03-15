@@ -79,7 +79,7 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		final MMenu menuModel = renderer.getMenuModel(menuManager);
 		final Menu menu = menuManager.getMenu();
 
-		if (menuModel != null) {
+		if (menuModel != null && menuManager != null) {
 			cleanUp(menuModel, menuManager);
 		}
 		if (menuModel instanceof MPopupMenu) {

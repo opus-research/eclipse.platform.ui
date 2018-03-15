@@ -170,7 +170,7 @@ public class WelcomeParser extends DefaultHandler {
 
         private ArrayList helpHrefs = new ArrayList();
 
-        private StringBuilder text = new StringBuilder();
+        private StringBuffer text = new StringBuffer();
 
         protected int offset = 0;
 

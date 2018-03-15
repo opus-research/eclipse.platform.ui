@@ -1758,11 +1758,12 @@ class FilterCopy extends UIResourceFilterDescription {
 				Object arguments = getArguments();
 				if (arguments instanceof IResourceFilterDescription[]) {
 					IResourceFilterDescription[] filters = (IResourceFilterDescription[]) arguments;
-					for (IResourceFilterDescription filter : filters) {
-						FilterCopy child = new FilterCopy(UIResourceFilterDescription.wrap(filter));
-						child.parent = this;
-						children.add(child);
-					}
+					if (filters != null)
+						for (IResourceFilterDescription filter : filters) {
+							FilterCopy child = new FilterCopy(UIResourceFilterDescription.wrap(filter));
+							child.parent = this;
+							children.add(child);
+						}
 				}
 				if (arguments instanceof FilterCopy[]) {
 					FilterCopy[] filters = (FilterCopy[]) arguments;
@@ -3059,7 +3060,7 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 		String argumentString = (String) filter.getArguments();
 		FileInfoAttributesMatcher.Argument argument = FileInfoAttributesMatcher.decodeArguments(argumentString);
 
-		StringBuilder builder = new StringBuilder();
+		StringBuffer builder = new StringBuffer();
 		builder.append(MultiMatcherLocalization.getLocalMultiMatcherKey(argument.key));
 		builder.append(' ');
 		builder.append(MultiMatcherLocalization.getLocalMultiMatcherKey(argument.operator));

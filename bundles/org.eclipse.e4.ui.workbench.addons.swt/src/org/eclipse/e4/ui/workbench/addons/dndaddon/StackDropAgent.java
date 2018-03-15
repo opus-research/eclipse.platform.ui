@@ -173,6 +173,9 @@ public class StackDropAgent extends DropAgent {
 
 	private int getDropIndex(DnDInfo info) {
 		ArrayList<Rectangle> itemRects = computeInsertRects();
+		if (itemRects == null) {
+			return -1;
+		}
 
 		for (Rectangle itemRect : itemRects) {
 			if (itemRect.contains(info.cursorPos)) {
