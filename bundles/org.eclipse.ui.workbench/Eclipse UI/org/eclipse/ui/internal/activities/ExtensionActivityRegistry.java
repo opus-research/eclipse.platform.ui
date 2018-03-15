@@ -87,7 +87,7 @@ final class ExtensionActivityRegistry extends AbstractActivityRegistry {
             IExtension extension = configurationElement.getDeclaringExtension();
 
             if (extension != null) {
-				namespace = extension.getNamespaceIdentifier();
+				namespace = extension.getNamespace();
 			}
         }
 
@@ -152,7 +152,8 @@ final class ExtensionActivityRegistry extends AbstractActivityRegistry {
         IConfigurationElement[] configurationElements = extensionRegistry
                 .getConfigurationElementsFor(Persistence.PACKAGE_FULL);
 
-        for (IConfigurationElement configurationElement : configurationElements) {
+        for (int i = 0; i < configurationElements.length; i++) {
+            IConfigurationElement configurationElement = configurationElements[i];
             String name = configurationElement.getName();
 
             if (Persistence.TAG_ACTIVITY_REQUIREMENT_BINDING.equals(name)) {
