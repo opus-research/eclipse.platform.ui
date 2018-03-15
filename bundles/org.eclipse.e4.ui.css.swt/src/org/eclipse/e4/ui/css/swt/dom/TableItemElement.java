@@ -31,13 +31,13 @@ public class TableItemElement extends ItemElement {
 
 	@Override
 	public boolean isPseudoInstanceOf(String s) {
-		if ("odd".equalsIgnoreCase(s)) {
+		if ("odd".equals(s)) {
 			TableItem tableItem = getTableItem();
 			int index = tableItem.getParent().indexOf(tableItem);
 			return ((index & 1) == 1);
 
 		}
-		if ("even".equalsIgnoreCase(s)) {
+		if ("even".equals(s)) {
 			TableItem tableItem = getTableItem();
 			int index = tableItem.getParent().indexOf(tableItem);
 			return ((index & 1) == 0);

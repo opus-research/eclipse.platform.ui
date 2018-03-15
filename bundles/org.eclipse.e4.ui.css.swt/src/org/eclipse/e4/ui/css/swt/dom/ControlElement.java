@@ -110,19 +110,19 @@ public class ControlElement extends WidgetElement {
 
 	@Override
 	public boolean isPseudoInstanceOf(String s) {
-		if ("focus".equalsIgnoreCase(s)) {
+		if ("focus".equals(s)) {
 			return this.hasFocus;
 		}
-		if ("hover".equalsIgnoreCase(s)) {
+		if ("hover".equals(s)) {
 			return this.hasMouseHover;
 		}
-		if ("enabled".equalsIgnoreCase(s)) {
+		if ("enabled".equals(s)) {
 			return getControl().getEnabled();
 		}
-		if ("disabled".equalsIgnoreCase(s)) {
+		if ("disabled".equals(s)) {
 			return !getControl().getEnabled();
 		}
-		if ("visible".equalsIgnoreCase(s)) {
+		if ("visible".equals(s)) {
 			return getControl().getVisible();
 		}
 		return super.isPseudoInstanceOf(s);

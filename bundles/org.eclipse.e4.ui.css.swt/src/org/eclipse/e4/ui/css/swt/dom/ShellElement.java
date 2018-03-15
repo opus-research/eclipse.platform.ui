@@ -104,13 +104,13 @@ public class ShellElement extends CompositeElement {
 
 	@Override
 	public boolean isPseudoInstanceOf(String s) {
-		if ("active".equalsIgnoreCase(s)) {
+		if ("active".equals(s)) {
 			return this.isActive;
 		}
-		if ("swt-parented".equalsIgnoreCase(s)) {
+		if ("swt-parented".equals(s)) {
 			return getShell().getParent() != null;
 		}
-		if ("swt-unparented".equalsIgnoreCase(s)) {
+		if ("swt-unparented".equals(s)) {
 			return getShell().getParent() == null;
 		}
 		return super.isPseudoInstanceOf(s);
