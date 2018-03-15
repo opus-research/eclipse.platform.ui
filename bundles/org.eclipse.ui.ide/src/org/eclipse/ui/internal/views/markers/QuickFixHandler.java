@@ -84,7 +84,8 @@ public class QuickFixHandler extends MarkerViewHandler {
 			if (resolutions.length > 1) {
 				progressCount= progressCount / resolutions.length;
 			}
-			for (IMarkerResolution markerResolution : resolutions) {
+			for (int i = 0; i < resolutions.length; i++) {
+				IMarkerResolution markerResolution= resolutions[i];
 				if (markerResolution instanceof WorkbenchMarkerResolution) {
 					IMarker[] other = ((WorkbenchMarkerResolution)markerResolution).findOtherMarkers(allMarkers);
 					if (containsAllButFirst(other, selectedMarkers)) {

@@ -90,13 +90,17 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		synchronized(instances) {
 			if (event.getType() == BundleEvent.STARTED) {
 				// System.out.println("bundle started: " + event.getBundle().getSymbolicName()); //$NON-NLS-1$
-				for (NavigatorSaveablesService instance : instances) {
+				for (Iterator<NavigatorSaveablesService> it = instances.iterator(); it.hasNext();) {
+					NavigatorSaveablesService instance = it
+							.next();
 					instance.handleBundleStarted(event.getBundle()
 							.getSymbolicName());
 				}
 			} else if (event.getType() == BundleEvent.STOPPED) {
 				// System.out.println("bundle stopped: " + event.getBundle().getSymbolicName()); //$NON-NLS-1$
-				for (NavigatorSaveablesService instance : instances) {
+				for (Iterator<NavigatorSaveablesService> it = instances.iterator(); it.hasNext();) {
+					NavigatorSaveablesService instance = it
+							.next();
 					instance.handleBundleStopped(event.getBundle()
 							.getSymbolicName());
 				}
@@ -158,8 +162,8 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 			synchronized (instances) {
 				synchronized (NavigatorSaveablesService.this) {
 					if (saveablesProviders != null) {
-						for (SaveablesProvider saveablesProvider : saveablesProviders) {
-							saveablesProvider.dispose();
+						for (int i = 0; i < saveablesProviders.length; i++) {
+							saveablesProviders[i].dispose();
 						}
 					}
 					removeInstance(NavigatorSaveablesService.this);
@@ -235,9 +239,11 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		Set<Object> roots = new HashSet<Object>(Arrays.asList(contentProvider
 				.getElements(viewerInput)));
 		SaveablesProvider[] saveablesProviders = getSaveablesProviders();
-		for (SaveablesProvider saveablesProvider : saveablesProviders) {
+		for (int i = 0; i < saveablesProviders.length; i++) {
+			SaveablesProvider saveablesProvider = saveablesProviders[i];
 			Saveable[] saveables = saveablesProvider.getSaveables();
-			for (Saveable saveable : saveables) {
+			for (int j = 0; j < saveables.length; j++) {
+				Saveable saveable = saveables[j];
 				Object[] elements = saveablesProvider.getElements(saveable);
 				// the saveable is added to the result if at least one of the
 				// elements representing the saveable appears in the tree, i.e.
@@ -304,7 +310,8 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 			ITreeSelection selection) {
 		Set<Saveable> result = new HashSet<Saveable>();
 		TreePath[] paths = selection.getPaths();
-		for (TreePath path : paths) {
+		for (int i = 0; i < paths.length; i++) {
+			TreePath path = paths[i];
 			Saveable saveable = findSaveable(path);
 			if (saveable != null) {
 				result.add(saveable);
@@ -377,8 +384,8 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 	 * @return the saveable, or null
 	 */
 	private Saveable findSaveable(TreePath[] paths) {
-		for (TreePath path : paths) {
-			Saveable saveable = findSaveable(path);
+		for (int i = 0; i < paths.length; i++) {
+			Saveable saveable = findSaveable(paths[i]);
 			if (saveable != null) {
 				return saveable;
 			}
@@ -443,8 +450,8 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 			INavigatorContentDescriptor[] descriptors = contentService
 					.getActiveDescriptorsWithSaveables();
 			List<SaveablesProvider> result = new ArrayList<SaveablesProvider>();
-			for (INavigatorContentDescriptor iDescriptor : descriptors) {
-				NavigatorContentDescriptor descriptor = (NavigatorContentDescriptor) iDescriptor;
+			for (int i = 0; i < descriptors.length; i++) {
+				NavigatorContentDescriptor descriptor = (NavigatorContentDescriptor) descriptors[i];
 				String pluginId = descriptor
 						.getContribution().getPluginId();
 				if (Platform.getBundle(pluginId).getState() != Bundle.ACTIVE) {
@@ -493,8 +500,8 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 			// a bundle was stopped, dispose of all saveablesProviders and
 			// recompute
 			// TODO optimize this
-			for (SaveablesProvider saveablesProvider : saveablesProviders) {
-				saveablesProvider.dispose();
+			for (int i = 0; i < saveablesProviders.length; i++) {
+				saveablesProviders[i].dispose();
 			}
 			saveablesProviders = null;
 		} else if (startedBundleIdOrNull != null){

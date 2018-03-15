@@ -11,7 +11,6 @@
  *     Helena Halperin - Bug 298747
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 378485, 460555, 463262
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 486859
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -20,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
@@ -328,8 +328,10 @@ public class EditorSelectionDialog extends Dialog {
 				rememberTypeButton.addListener(SWT.Selection, listener);
 				data = new GridData();
 				data.horizontalSpan = 2;
+				data.horizontalIndent = 15;
 				rememberTypeButton.setLayoutData(data);
 				rememberTypeButton.setFont(font);
+				rememberTypeButton.setEnabled(false);
 			}
 		}
 
@@ -337,12 +339,16 @@ public class EditorSelectionDialog extends Dialog {
 		restoreWidgetValues(); // Place buttons to the appropriate state
 
 		// Run async to restore selection on *visible* dialog - otherwise three won't scroll
-		PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
-			if (editorTable.isDisposed()) {
-				return;
+		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				if (editorTable.isDisposed()) {
+					return;
+				}
+				fillEditorTable();
+				updateEnableState();
 			}
-			fillEditorTable();
-			updateEnableState();
 		});
 	    return contents;
 	}
@@ -430,11 +436,14 @@ public class EditorSelectionDialog extends Dialog {
 		if (externalEditors == null) {
 			IProgressService ps = PlatformUI.getWorkbench().getService(IProgressService.class);
 			// Since this can take a while, show the busy cursor.
-			IRunnableWithProgress runnable = monitor -> {
-				// Get the external editors available
-				EditorRegistry reg = (EditorRegistry) WorkbenchPlugin.getDefault().getEditorRegistry();
-				externalEditors = reg.getSortedEditorsFromOS();
-				externalEditors = filterEditors(externalEditors);
+			IRunnableWithProgress runnable = new IRunnableWithProgress() {
+				@Override
+				public void run(IProgressMonitor monitor) {
+					// Get the external editors available
+					EditorRegistry reg = (EditorRegistry) WorkbenchPlugin.getDefault().getEditorRegistry();
+					externalEditors = reg.getSortedEditorsFromOS();
+					externalEditors = filterEditors(externalEditors);
+				}
 			};
 			try {
 				// See bug 47556 - Program.getPrograms() requires a Display.getCurrent() != null
@@ -475,15 +484,15 @@ public class EditorSelectionDialog extends Dialog {
 		}
 
 		List<IEditorDescriptor> filteredList = new ArrayList<>();
-		for (IEditorDescriptor editor : editors) {
+		for (int i = 0; i < editors.length; i++) {
 			boolean add = true;
-			for (IEditorDescriptor element : editorsToFilter) {
-				if (editor.getId().equals(element.getId())) {
+			for (int j = 0; j < editorsToFilter.length; j++) {
+				if (editors[i].getId().equals(editorsToFilter[j].getId())) {
 					add = false;
 				}
 			}
 			if (add) {
-				filteredList.add(editor);
+				filteredList.add(editors[i]);
 			}
 		}
 
@@ -617,28 +626,23 @@ public class EditorSelectionDialog extends Dialog {
 		settings.put(STORE_ID_DESCR, selectedEditor.getId());
 		String editorId = selectedEditor.getId();
 		settings.put(STORE_ID_DESCR, editorId);
-		boolean associateEditor = false;
+		if (rememberEditorButton == null || !rememberEditorButton.getSelection()) {
+			return;
+		}
 		EditorRegistry reg = (EditorRegistry) WorkbenchPlugin.getDefault().getEditorRegistry();
-		// remember editor for specific file
-		if (rememberEditorButton != null && rememberEditorButton.getSelection()) {
+		if (rememberTypeButton == null || !rememberTypeButton.getSelection()) {
 			updateFileMappings(reg, true);
 			reg.setDefaultEditor(fileName, selectedEditor);
-			associateEditor = true;
-		}
-		// remember editor for given extension type
-		if (rememberTypeButton != null && rememberTypeButton.getSelection()) {
+		} else {
 			updateFileMappings(reg, false);
 			reg.setDefaultEditor("*." + getFileType(), selectedEditor); //$NON-NLS-1$
-			associateEditor = true;
 		}
-		if (associateEditor) {
-			// bug 468906: always re-set editor mappings: this is needed to
-			// rebuild internal editors map after setting the default editor
-			List<IFileEditorMapping> newMappings = new ArrayList<>();
-			newMappings.addAll(Arrays.asList(reg.getFileEditorMappings()));
-			reg.setFileEditorMappings(newMappings.toArray(new FileEditorMapping[newMappings.size()]));
-			reg.saveAssociations();
-		}
+		// bug 468906: always re-set editor mappings: this is needed to rebuild
+		// internal editors map after setting the default editor
+		List<IFileEditorMapping> newMappings = new ArrayList<>();
+		newMappings.addAll(Arrays.asList(reg.getFileEditorMappings()));
+		reg.setFileEditorMappings(newMappings.toArray(new FileEditorMapping[newMappings.size()]));
+		reg.saveAssociations();
 	}
 
 	/**
@@ -716,6 +720,9 @@ public class EditorSelectionDialog extends Dialog {
 	protected void updateEnableState() {
 		boolean enableExternal = externalButton.getSelection();
 		browseExternalEditorsButton.setEnabled(enableExternal);
+		if (rememberEditorButton != null && rememberTypeButton != null) {
+			rememberTypeButton.setEnabled(rememberEditorButton.getSelection());
+		}
 		updateOkButton();
 	}
 
@@ -765,16 +772,6 @@ public class EditorSelectionDialog extends Dialog {
 				} else {
 					selectedEditor = null;
 					okButton.setEnabled(false);
-				}
-			}
-			// 486859 both checked: checking one box unchecks the other
-			if (rememberEditorButton != null && rememberTypeButton != null && rememberEditorButton.getSelection()
-					&& rememberTypeButton.getSelection()) {
-				if (event.widget == rememberEditorButton) {
-					rememberTypeButton.setSelection(false);
-				}
-				if (event.widget == rememberTypeButton) {
-					rememberEditorButton.setSelection(false);
 				}
 			}
 			updateEnableState();

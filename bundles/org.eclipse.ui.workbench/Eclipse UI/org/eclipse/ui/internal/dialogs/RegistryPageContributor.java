@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -252,8 +252,8 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 		String nameFilter = pageElement
 				.getAttribute(PropertyPagesRegistryReader.ATT_NAME_FILTER);
 
-		for (Object obj : objs) {
-			object = obj;
+		for (int i = 0; i < objs.length; i++) {
+			object = objs[i];
 			// Name filter
 			if (nameFilter != null) {
 				String objectName = object.toString();
@@ -408,8 +408,8 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 			Map<String, String> map = new HashMap<>();
 			filterProperties = new SoftReference<>(map);
 			IConfigurationElement[] children = pageElement.getChildren();
-			for (IConfigurationElement element : children) {
-				processChildElement(map, element);
+			for (int i = 0; i < children.length; i++) {
+				processChildElement(map, children[i]);
 			}
 		}
 		return filterProperties.get();
@@ -451,9 +451,9 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 	}
 
 	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IConfigurationElement.class)) {
-			return adapter.cast(getConfigurationElement());
+			return getConfigurationElement();
 		}
 		return null;
 	}

@@ -178,8 +178,8 @@ public final class CommandImageManager extends EventManager {
 		}
 
 		final Object[] listeners = getListeners();
-		for (Object l : listeners) {
-			final ICommandImageManagerListener listener = (ICommandImageManagerListener) l;
+		for (int i = 0; i < listeners.length; i++) {
+			final ICommandImageManagerListener listener = (ICommandImageManagerListener) listeners[i];
 			listener.commandImageManagerChanged(event);
 		}
 	}
@@ -201,7 +201,8 @@ public final class CommandImageManager extends EventManager {
 		}
 
 		final Set existingStyles = new HashSet(3);
-		for (final Object styledImages : existingImages) {
+		for (int type = 0; type < existingImages.length; type++) {
+			final Object styledImages = existingImages[type];
 			if (styledImages instanceof ImageDescriptor) {
 				existingStyles.add(null);
 			} else if (styledImages instanceof Map) {

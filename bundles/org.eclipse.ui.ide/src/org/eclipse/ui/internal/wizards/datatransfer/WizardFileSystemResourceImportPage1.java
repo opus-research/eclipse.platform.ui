@@ -957,8 +957,8 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
 			}
 
             // set filenames history
-            for (String sourceName : sourceNames) {
-				sourceNameField.add(sourceName);
+            for (int i = 0; i < sourceNames.length; i++) {
+				sourceNameField.add(sourceNames[i]);
 			}
 
             // radio buttons and checkboxes
@@ -1121,11 +1121,11 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
                 if (files == null) {
                     throw new InterruptedException();
                 }
-                for (Object file : files) {
+                for (int i = 0; i < files.length; i++) {
                     if (monitor.isCanceled()) {
 						throw new InterruptedException();
 					}
-                    checkFile(file);
+                    checkFile(files[i]);
                 }
             }
 

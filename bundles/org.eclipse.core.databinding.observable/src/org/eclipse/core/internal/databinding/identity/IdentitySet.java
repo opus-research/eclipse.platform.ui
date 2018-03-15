@@ -82,8 +82,8 @@ public class IdentitySet<E> implements Set<E> {
 
 	@Override
 	public boolean containsAll(Collection<?> c) {
-		for (Object element : c)
-			if (!wrappedSet.contains(IdentityWrapper.wrap(element)))
+		for (Iterator<?> iterator = c.iterator(); iterator.hasNext();)
+			if (!wrappedSet.contains(IdentityWrapper.wrap(iterator.next())))
 				return false;
 		return true;
 	}
@@ -123,8 +123,8 @@ public class IdentitySet<E> implements Set<E> {
 	@Override
 	public boolean removeAll(Collection<?> c) {
 		boolean changed = false;
-		for (Object element : c)
-			changed |= remove(element);
+		for (Iterator<?> iterator = c.iterator(); iterator.hasNext();)
+			changed |= remove(iterator.next());
 		return changed;
 	}
 
@@ -187,7 +187,8 @@ public class IdentitySet<E> implements Set<E> {
 	@Override
 	public int hashCode() {
 		int hash = 0;
-		for (E element : this) {
+		for (Iterator<E> iterator = iterator(); iterator.hasNext();) {
+			E element = iterator.next();
 			hash += element == null ? 0 : element.hashCode();
 		}
 		return hash;

@@ -13,6 +13,7 @@
 package org.eclipse.ui.internal.ide.misc;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,7 +33,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.StringMatcher;
 
 /**
@@ -235,11 +235,20 @@ public class FileInfoAttributesMatcher extends AbstractFileInfoMatcher {
 			Method toMillis = fileTime.getMethod("toMillis"); //$NON-NLS-1$
 			Object result = toMillis.invoke(time);
 
-			if (result instanceof Long) {
+			if (result instanceof Long)
 				return ((Long) result).longValue();
-			}
-		} catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
-			IDEWorkbenchPlugin.log(e.getMessage(), e);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
 		}
 		return 0;
 	}

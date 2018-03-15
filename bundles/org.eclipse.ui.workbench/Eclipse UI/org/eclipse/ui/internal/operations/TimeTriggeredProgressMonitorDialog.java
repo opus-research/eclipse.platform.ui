@@ -156,15 +156,18 @@ public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
             InterruptedException {
     	final InvocationTargetException[] invokes = new InvocationTargetException[1];
         final InterruptedException[] interrupt = new InterruptedException[1];
-        Runnable dialogWaitRunnable = () -> {
-			try {
-				TimeTriggeredProgressMonitorDialog.super.run(fork, cancelable, runnable);
-			} catch (InvocationTargetException e1) {
-				invokes[0] = e1;
-			} catch (InterruptedException e2) {
-				interrupt[0]= e2;
-			}
-		};
+        Runnable dialogWaitRunnable = new Runnable() {
+    		@Override
+			public void run() {
+    			try {
+    				TimeTriggeredProgressMonitorDialog.super.run(fork, cancelable, runnable);
+    			} catch (InvocationTargetException e) {
+    				invokes[0] = e;
+    			} catch (InterruptedException e) {
+    				interrupt[0]= e;
+    			}
+    		}
+        };
         final Display display = PlatformUI.getWorkbench().getDisplay();
         if (display == null) {
 			return;

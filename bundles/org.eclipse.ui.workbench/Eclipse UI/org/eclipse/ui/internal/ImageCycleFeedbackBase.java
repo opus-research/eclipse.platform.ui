@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -81,6 +80,7 @@ public abstract class ImageCycleFeedbackBase extends AnimationFeedbackBase {
 
 	@Override
 	public void dispose() {
+		// TODO Auto-generated method stub
 		if (stoppedImage == null || stoppedImage.isDisposed())
 			return;
 		setStoppedImage(stoppedImage);
@@ -99,6 +99,7 @@ public abstract class ImageCycleFeedbackBase extends AnimationFeedbackBase {
 
 	@Override
 	public void renderStep(AnimationEngine engine) {
+		// TODO Auto-generated method stub
 		if (offScreenImage == null) {
 			offScreenImage = getOffscreenImage();
 		}
@@ -114,7 +115,13 @@ public abstract class ImageCycleFeedbackBase extends AnimationFeedbackBase {
 
 			final Image finalImage = image;
 
-			display.syncExec(() -> showImage(finalImage));
+			display.syncExec(new Runnable() {
+				@Override
+				public void run() {
+					showImage(finalImage);
+
+				}
+			});
 
 			/*
 			 * Sleep for the specified delay time (adding commonly-used

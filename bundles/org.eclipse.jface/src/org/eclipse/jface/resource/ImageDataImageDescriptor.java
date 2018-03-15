@@ -13,14 +13,13 @@ package org.eclipse.jface.resource;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageDataProvider;
 
 /**
  * @since 3.1
  */
 class ImageDataImageDescriptor extends ImageDescriptor {
 
-	private ImageDataProvider dataProvider;
+    private ImageData data;
 
     /**
      * Original image being described, or null if this image is described
@@ -34,37 +33,27 @@ class ImageDataImageDescriptor extends ImageDescriptor {
      * @param originalImage
      */
     ImageDataImageDescriptor(Image originalImage) {
-		this(originalImage::getImageData);
+        this(originalImage.getImageData());
         this.originalImage = originalImage;
     }
 
-	/**
-	 * Creates an image descriptor, given some image data.
-	 *
-	 * @param data describing the image
-	 * @deprecated use {@link #ImageDataImageDescriptor(ImageDataProvider)}
-	 */
-	@Deprecated
-	ImageDataImageDescriptor(ImageData data) {
-		this(zoom -> zoom == 100 ? data : null);
-	}
-
     /**
-	 * Creates an image descriptor, given an image data provider.
-	 *
-	 * @param provider describing the image
-	 */
-	ImageDataImageDescriptor(ImageDataProvider provider) {
-		dataProvider = provider;
-	}
+     * Creates an image descriptor, given some image data.
+     *
+     * @param data describing the image
+     */
 
-	@Override
+    ImageDataImageDescriptor(ImageData data) {
+        this.data = data;
+    }
+
+    @Override
 	public Object createResource(Device device) throws DeviceResourceException {
 
-        // If this descriptor is based on an existing image, then we can return the original image
+        // If this descriptor is an existing font, then we can return the original font
         // if this is the same device.
         if (originalImage != null) {
-            // If we're allocating on the same device as the original image, return the original.
+            // If we're allocating on the same device as the original font, return the original.
             if (originalImage.getDevice() == device) {
                 return originalImage;
             }
@@ -83,8 +72,8 @@ class ImageDataImageDescriptor extends ImageDescriptor {
     }
 
     @Override
-	public ImageData getImageData(int zoom) {
-        return dataProvider.getImageData(zoom);
+	public ImageData getImageData() {
+        return data;
     }
 
     @Override
@@ -92,7 +81,7 @@ class ImageDataImageDescriptor extends ImageDescriptor {
     	 if (originalImage != null) {
              return System.identityHashCode(originalImage);
          }
-         return dataProvider.getImageData(100).hashCode();
+         return data.hashCode();
     }
 
     @Override
@@ -110,7 +99,7 @@ class ImageDataImageDescriptor extends ImageDescriptor {
             return imgWrap.originalImage == originalImage;
         }
 
-        return (imgWrap.originalImage == null && dataProvider.equals(imgWrap.dataProvider));
+        return (imgWrap.originalImage == null && data.equals(imgWrap.data));
     }
 
 }
