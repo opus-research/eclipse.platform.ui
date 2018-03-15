@@ -183,16 +183,6 @@ If no value is supplied, a default ratio will be used.
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="useDependencyInjection" type="boolean">
-            <annotation>
-               <documentation>
-                  flag indicating whether this view allows to use the e4 dependency injection (e4 di) framework. 
-If set to false, the view will not use the e4 dependency injection framework, if set to true, e4 di will be used.
-The default is false.
-&lt;p&gt;&lt;em&gt;Since: 4.7&lt;/em&gt;&lt;/p&gt;
-               </documentation>
-            </annotation>
-         </attribute>
       </complexType>
    </element>
 
