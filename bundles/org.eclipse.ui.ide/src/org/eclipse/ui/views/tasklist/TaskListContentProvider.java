@@ -448,8 +448,8 @@ class TaskListContentProvider implements IStructuredContentProvider,
 
             int iKind = markerDelta.getKind();
 
-            for (String rootType : TasksFilter.ROOT_TYPES) {
-                if (markerDelta.isSubtypeOf(rootType)) {
+            for (String element : TasksFilter.ROOT_TYPES) {
+                if (markerDelta.isSubtypeOf(element)) {
 
                     /*
                      * Updates the total count of markers given the applicable

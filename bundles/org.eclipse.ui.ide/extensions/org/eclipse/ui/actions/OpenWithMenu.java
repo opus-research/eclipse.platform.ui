@@ -244,7 +244,8 @@ public class OpenWithMenu extends ContributionItem {
         //if the same editor goes to two mappings.
 		List<IEditorDescriptor> alreadyMapped = new ArrayList<>();
 
-		for (IEditorDescriptor editor : editors) {
+        for (IEditorDescriptor editor2 : editors) {
+			IEditorDescriptor editor= editor2;
             if (!alreadyMapped.contains(editor)) {
                 createMenuItem(menu, editor, preferredEditor);
 				if (defaultEditor != null && editor.getId().equals(defaultEditor.getId())) {

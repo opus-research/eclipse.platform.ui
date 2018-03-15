@@ -83,7 +83,9 @@ public class PlatformUIPreferenceListener implements
 				.equals(propertyName)) {
 			// IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
 			IWorkbench workbench = PlatformUI.getWorkbench();
-			for (IWorkbenchWindow window : workbench.getWorkbenchWindows()) {
+			IWorkbenchWindow[] workbenchWindows = workbench
+					.getWorkbenchWindows();
+			for (IWorkbenchWindow window : workbenchWindows) {
 				if (window instanceof WorkbenchWindow) {
 					// ((WorkbenchWindow) window)
 					// .setPerspectiveBarLocation(apiStore
@@ -100,7 +102,9 @@ public class PlatformUIPreferenceListener implements
 			// IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS);
 
 			IWorkbench workbench = PlatformUI.getWorkbench();
-			for (IWorkbenchWindow window : workbench.getWorkbenchWindows()) {
+			IWorkbenchWindow[] workbenchWindows = workbench
+					.getWorkbenchWindows();
+			for (IWorkbenchWindow window : workbenchWindows) {
 				if (window instanceof WorkbenchWindow) {
 					// ((WorkbenchWindow) window).setBannerCurve(newValue);
 				}
@@ -140,7 +144,8 @@ public class PlatformUIPreferenceListener implements
 						}
 						// Get default editors which are not OS or internal
 						// editors
-						for (IFileEditorMapping fileEditorMapping : editorRegistry.getFileEditorMappings()) {
+						IFileEditorMapping[] maps = editorRegistry.getFileEditorMappings();
+						for (IFileEditorMapping fileEditorMapping : maps) {
 							IEditorDescriptor descriptor = fileEditorMapping.getDefaultEditor();
 							if (descriptor != null && !editorMap.containsKey(descriptor.getId())) {
 								editorMap.put(descriptor.getId(), descriptor);

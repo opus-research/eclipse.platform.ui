@@ -149,15 +149,18 @@ public class Theme extends EventManager implements ITheme {
                  * @param fd the new FontData for defaulted fonts
                  */
                 private void processDefaultsTo(String key, FontData[] fd) {
-					FontDefinition[] defs = WorkbenchPlugin.getDefault().getThemeRegistry().getFontsFor(getId());
-                    for (FontDefinition fontDefinition : defs) {
-                        String defaultsTo = fontDefinition.getDefaultsTo();
+                    FontDefinition[] defs = WorkbenchPlugin.getDefault()
+                            .getThemeRegistry().getFontsFor(getId());
+                    for (FontDefinition def : defs) {
+                        String defaultsTo = def.getDefaultsTo();
                         if (defaultsTo != null && defaultsTo.equals(key)) {
-							IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
+                            IPreferenceStore store = WorkbenchPlugin
+                                    .getDefault().getPreferenceStore();
                             if (store.isDefault(ThemeElementHelper
-									.createPreferenceKey(Theme.this, fontDefinition.getId()))) {
-                                getFontRegistry().put(fontDefinition.getId(), fd);
-                                processDefaultsTo(fontDefinition.getId(), fd);
+                                    .createPreferenceKey(Theme.this, def
+                                            .getId()))) {
+                                getFontRegistry().put(def.getId(), fd);
+                                processDefaultsTo(def.getId(), fd);
                             }
                         }
                     }
@@ -170,15 +173,18 @@ public class Theme extends EventManager implements ITheme {
                  * @param rgb the new RGB value for defaulted colors
                  */
                 private void processDefaultsTo(String key, RGB rgb) {
-					ColorDefinition[] defs = WorkbenchPlugin.getDefault().getThemeRegistry().getColorsFor(getId());
-                    for (ColorDefinition colorDefinition : defs) {
-                        String defaultsTo = colorDefinition.getDefaultsTo();
+                    ColorDefinition[] defs = WorkbenchPlugin.getDefault()
+                            .getThemeRegistry().getColorsFor(getId());
+                    for (ColorDefinition def : defs) {
+                        String defaultsTo = def.getDefaultsTo();
                         if (defaultsTo != null && defaultsTo.equals(key)) {
-							IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
-							if (store.isDefault(
-									ThemeElementHelper.createPreferenceKey(Theme.this, colorDefinition.getId()))) {
-                                getColorRegistry().put(colorDefinition.getId(), rgb);
-                                processDefaultsTo(colorDefinition.getId(), rgb);
+                            IPreferenceStore store = WorkbenchPlugin
+                                    .getDefault().getPreferenceStore();
+                            if (store.isDefault(ThemeElementHelper
+                                    .createPreferenceKey(Theme.this, def
+                                            .getId()))) {
+                                getColorRegistry().put(def.getId(), rgb);
+                                processDefaultsTo(def.getId(), rgb);
                             }
                         }
                     }
@@ -249,9 +255,10 @@ public class Theme extends EventManager implements ITheme {
     }
 
     private void firePropertyChange(PropertyChangeEvent event) {
-		for (Object listener : getListeners()) {
-			((IPropertyChangeListener) listener).propertyChange(event);
-		}
+        Object[] listeners = getListeners();
+        for (Object listener : listeners) {
+            ((IPropertyChangeListener) listener).propertyChange(event);
+        }
     }
 
     @Override

@@ -79,7 +79,8 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 		if (operation == UNDO) {
 			for (ResourceDescription resourceDescription : resourceDescriptions) {
 				if (resourceDescription != null) {
-					IResource resource = resourceDescription.createResourceHandle();
+					IResource resource = resourceDescription
+							.createResourceHandle();
 					factory.create(resource);
 					modified = true;
 				}
@@ -166,9 +167,9 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 		// in the API, so assume that there could be mixes.
 		if (!deleteContent) {
 			ArrayList nonProjectResourcesToCheck = new ArrayList();
-			for (IResource resource : resourcesToCheck) {
-				if (resource.getType() != IResource.PROJECT) {
-					nonProjectResourcesToCheck.add(resource);
+			for (IResource element : resourcesToCheck) {
+				if (element.getType() != IResource.PROJECT) {
+					nonProjectResourcesToCheck.add(element);
 				}
 			}
 			if (nonProjectResourcesToCheck.isEmpty()) {

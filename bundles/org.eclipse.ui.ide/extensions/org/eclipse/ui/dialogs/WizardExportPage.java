@@ -541,7 +541,8 @@ public abstract class WizardExportPage extends WizardDataTransferPage {
         if (newSelectedTypes != null) { // ie.- did not press Cancel
             List result = new ArrayList(newSelectedTypes.length);
             for (Object newSelectedType : newSelectedTypes) {
-				result.add(((IFileEditorMapping) newSelectedType).getExtension());
+				result.add(((IFileEditorMapping) newSelectedType)
+                        .getExtension());
 			}
             setTypesToExport(result);
         }

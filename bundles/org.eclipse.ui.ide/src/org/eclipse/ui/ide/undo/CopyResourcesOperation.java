@@ -211,7 +211,8 @@ public class CopyResourcesOperation extends
 			for (ResourceDescription resourceDescription : resourceDescriptions) {
 				if (resourceDescription != null) {
 					update = true;
-					IResource resource = resourceDescription.createResourceHandle();
+					IResource resource = resourceDescription
+							.createResourceHandle();
 					factory.create(resource);
 				}
 			}

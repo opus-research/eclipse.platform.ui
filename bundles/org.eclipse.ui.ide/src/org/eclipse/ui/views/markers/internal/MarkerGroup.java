@@ -330,7 +330,8 @@ public class MarkerGroup {
 					entry.getMarkerGroup().mapAttribute(
 							attributeGrouping,
 							entry,
-							mapping.getAttribute(MarkerSupportRegistry.VALUE));
+							mapping
+									.getAttribute(MarkerSupportRegistry.VALUE));
 				} else {
 					IDEWorkbenchPlugin.log(NLS.bind(
 							"Reference to invaild markerGroupingEntry {0}", //$NON-NLS-1$
@@ -355,7 +356,8 @@ public class MarkerGroup {
 	 * @param entry
 	 */
 	private void addEntry(String markerType, EntryMapping entry) {
-		for (MarkerType type : getMarkerTypes(markerType)) {
+		MarkerType[] allDerived = getMarkerTypes(markerType);
+		for (MarkerType type : allDerived) {
 			Collection<EntryMapping> entries = new HashSet<>();
 			if (typesToMappings.containsKey(type.getId())) {
 				entries = typesToMappings.get(markerType);
@@ -463,7 +465,8 @@ public class MarkerGroup {
 		MarkerType type = model.getType(markerType);
 		if (type != null) {
 			types.add(type);
-			for (MarkerType sub : type.getAllSubTypes()) {
+			MarkerType[] subs = type.getAllSubTypes();
+			for (MarkerType sub : subs) {
 				types.add(sub);
 			}
 		}

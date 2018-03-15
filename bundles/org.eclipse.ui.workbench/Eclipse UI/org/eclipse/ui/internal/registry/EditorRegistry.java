@@ -277,7 +277,8 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
      */
     private void addExternalEditorsToEditorMap() {
         // Add registered editors (may include external editors).
-		for (FileEditorMapping map : typeEditorMappings.allMappings()) {
+        FileEditorMapping maps[] = typeEditorMappings.allMappings();
+        for (FileEditorMapping map : maps) {
             IEditorDescriptor[] descArray = map.getEditors();
             for (IEditorDescriptor desc : descArray) {
 				mapIDtoEditor.put(desc.getId(), desc);
@@ -306,12 +307,13 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
      * @see IEditorRegistry#PROP_CONTENTS
      */
     private void firePropertyChange(final int type) {
-		for (Object listener : getListeners()) {
-			final IPropertyListener propertyListener = (IPropertyListener) listener;
+        Object[] array = getListeners();
+        for (Object element : array) {
+            final IPropertyListener l = (IPropertyListener) element;
             SafeRunner.run(new SafeRunnable() {
                 @Override
 				public void run() {
-					propertyListener.propertyChanged(EditorRegistry.this, type);
+                    l.propertyChanged(EditorRegistry.this, type);
                 }
             });
         }
@@ -439,7 +441,9 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
      */
     public IEditorDescriptor[] getSortedEditorsFromOS() {
 		List<IEditorDescriptor> externalEditors = new ArrayList<>();
-		for (Program program : Program.getPrograms()) {
+        Program[] programs = Program.getPrograms();
+
+        for (Program program : programs) {
             //1FPLRL2: ITPUI:WINNT - NOTEPAD editor cannot be launched
             //Some entries start with %SystemRoot%
             //For such cases just use the file name as they are generally
@@ -454,7 +458,8 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 
             // determine the program icon this editor would need (do not let it
             // be cached in the workbench registry)
-			ImageDescriptor desc = new ExternalProgramImageDescriptor(program);
+            ImageDescriptor desc = new ExternalProgramImageDescriptor(
+                    program);
             editor.setImageDescriptor(desc);
             externalEditors.add(editor);
         }
@@ -638,10 +643,12 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
                 reader = new StringReader(xmlString);
             }
             XMLMemento memento = XMLMemento.createReadRoot(reader);
+            IMemento[] edMementos = memento
+                    .getChildren(IWorkbenchConstants.TAG_DESCRIPTOR);
             // Get the editors and validate each one
-			for (IMemento childMemento : memento.getChildren(IWorkbenchConstants.TAG_DESCRIPTOR)) {
+            for (IMemento edMemento : edMementos) {
 				EditorDescriptor editor = new EditorDescriptor();
-				boolean valid = editor.loadValues(childMemento);
+                boolean valid = editor.loadValues(edMemento);
                 if (!valid) {
                     continue;
                 }
@@ -731,26 +738,35 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
      *
      * @throws WorkbenchException
      */
-	public void readResources(Map<String, IEditorDescriptor> editorTable, Reader reader) throws WorkbenchException {
+	public void readResources(Map<String, IEditorDescriptor> editorTable, Reader reader)
+            throws WorkbenchException {
         XMLMemento memento = XMLMemento.createReadRoot(reader);
         String versionString = memento.getString(IWorkbenchConstants.TAG_VERSION);
         boolean versionIs31 = "3.1".equals(versionString); //$NON-NLS-1$
 
-		for (IMemento childMemento : memento.getChildren(IWorkbenchConstants.TAG_INFO)) {
-			String name = childMemento.getString(IWorkbenchConstants.TAG_NAME);
+        IMemento[] extMementos = memento
+                .getChildren(IWorkbenchConstants.TAG_INFO);
+        for (IMemento extMemento : extMementos) {
+            String name = extMemento
+                    .getString(IWorkbenchConstants.TAG_NAME);
             if (name == null) {
 				name = "*"; //$NON-NLS-1$
 			}
-			String extension = childMemento.getString(IWorkbenchConstants.TAG_EXTENSION);
-			IMemento[] idMementos = childMemento.getChildren(IWorkbenchConstants.TAG_EDITOR);
+            String extension = extMemento
+                    .getString(IWorkbenchConstants.TAG_EXTENSION);
+            IMemento[] idMementos = extMemento
+                    .getChildren(IWorkbenchConstants.TAG_EDITOR);
             String[] editorIDs = new String[idMementos.length];
             for (int j = 0; j < idMementos.length; j++) {
-				editorIDs[j] = idMementos[j].getString(IWorkbenchConstants.TAG_ID);
+                editorIDs[j] = idMementos[j]
+                        .getString(IWorkbenchConstants.TAG_ID);
             }
-			idMementos = childMemento.getChildren(IWorkbenchConstants.TAG_DELETED_EDITOR);
+            idMementos = extMemento
+                    .getChildren(IWorkbenchConstants.TAG_DELETED_EDITOR);
             String[] deletedEditorIDs = new String[idMementos.length];
             for (int j = 0; j < idMementos.length; j++) {
-				deletedEditorIDs[j] = idMementos[j].getString(IWorkbenchConstants.TAG_ID);
+                deletedEditorIDs[j] = idMementos[j]
+                        .getString(IWorkbenchConstants.TAG_ID);
             }
 			String key = name;
 			if (extension != null && extension.length() > 0) {
@@ -782,7 +798,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 			List<IEditorDescriptor> defaultEditors = new ArrayList<>();
 
             if (versionIs31) { // parse the new format
-				idMementos = childMemento
+				idMementos = extMemento
 						.getChildren(IWorkbenchConstants.TAG_DEFAULT_EDITOR);
 				String[] defaultEditorIds = new String[idMementos.length];
 				for (int j = 0; j < idMementos.length; j++) {
@@ -808,7 +824,9 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 
             // Add any new editors that have already been read from the registry
             // which were not deleted.
-			for (IEditorDescriptor descriptor : mapping.getEditors()) {
+            IEditorDescriptor[] editorsArray = mapping.getEditors();
+            for (IEditorDescriptor element : editorsArray) {
+				IEditorDescriptor descriptor = element;
 				if (descriptor != null && !contains(editors, descriptor) && !deletedEditors.contains(descriptor)) {
 					editors.add(descriptor);
                 }
@@ -967,11 +985,12 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
         XMLMemento memento = XMLMemento
                 .createWriteRoot(IWorkbenchConstants.TAG_EDITORS);
         memento.putString(IWorkbenchConstants.TAG_VERSION, "3.1"); //$NON-NLS-1$
-		for (FileEditorMapping fileEditorMapping : typeEditorMappings.userMappings()) {
+        FileEditorMapping maps[] = typeEditorMappings.userMappings();
+        for (FileEditorMapping type : maps) {
             IMemento editorMemento = memento.createChild(IWorkbenchConstants.TAG_INFO);
-			editorMemento.putString(IWorkbenchConstants.TAG_NAME, fileEditorMapping.getName());
-			editorMemento.putString(IWorkbenchConstants.TAG_EXTENSION, fileEditorMapping.getExtension());
-            IEditorDescriptor[] editorArray = fileEditorMapping.getEditors();
+			editorMemento.putString(IWorkbenchConstants.TAG_NAME, type.getName());
+			editorMemento.putString(IWorkbenchConstants.TAG_EXTENSION, type.getExtension());
+            IEditorDescriptor[] editorArray = type.getEditors();
 			for (IEditorDescriptor editor : editorArray) {
 				if (editor == null) {
 					continue;
@@ -982,7 +1001,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 				IMemento idMemento = editorMemento.createChild(IWorkbenchConstants.TAG_EDITOR);
 				idMemento.putString(IWorkbenchConstants.TAG_ID, editor.getId());
             }
-            editorArray = fileEditorMapping.getDeletedEditors();
+            editorArray = type.getDeletedEditors();
 			for (IEditorDescriptor editor : editorArray) {
 				if (editor == null) {
 					continue;
@@ -993,7 +1012,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 				IMemento idMemento = editorMemento.createChild(IWorkbenchConstants.TAG_DELETED_EDITOR);
 				idMemento.putString(IWorkbenchConstants.TAG_ID, editor.getId());
             }
-            editorArray = fileEditorMapping.getDeclaredDefaultEditors();
+            editorArray = type.getDeclaredDefaultEditors();
 			for (IEditorDescriptor editor : editorArray) {
 				if (editor == null) {
 					continue;
@@ -1557,8 +1576,10 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 
         List<IFileEditorMapping> allMappings = new ArrayList<>(Arrays.asList(standardMappings));
         // mock-up content type extensions into IFileEditorMappings
-		for (IContentType type : Platform.getContentTypeManager().getAllContentTypes()) {
-			for (String extension : type.getFileSpecs(IContentType.FILE_EXTENSION_SPEC)) {
+        IContentType [] contentTypes = Platform.getContentTypeManager().getAllContentTypes();
+        for (IContentType type : contentTypes) {
+			String [] extensions = type.getFileSpecs(IContentType.FILE_EXTENSION_SPEC);
+			for (String extension : extensions) {
 				boolean found = false;
 				for (IFileEditorMapping mapping : allMappings) {
 					if ("*".equals(mapping.getName()) && extension.equals(mapping.getExtension())) { //$NON-NLS-1$
@@ -1572,7 +1593,8 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 				}
 			}
 
-			for (String wholename : type.getFileSpecs(IContentType.FILE_NAME_SPEC)) {
+			String [] filenames = type.getFileSpecs(IContentType.FILE_NAME_SPEC);
+			for (String wholename : filenames) {
 				int idx = wholename.indexOf('.');
 				String name = idx == -1 ? wholename : wholename.substring(0, idx);
 				String extension = idx == -1 ? "" : wholename.substring(idx + 1); //$NON-NLS-1$

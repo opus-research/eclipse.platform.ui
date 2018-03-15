@@ -376,8 +376,8 @@ public final class LegacyResourceSupport {
 			return true;
 		}
 		Class[] interfaces= clazz.getInterfaces();
-		for (Class currentInterface : interfaces) {
-			if (isInstanceOf(currentInterface, type)) {
+		for (Class interface1 : interfaces) {
+			if (isInstanceOf(interface1, type)) {
 				return true;
 			}
 		}

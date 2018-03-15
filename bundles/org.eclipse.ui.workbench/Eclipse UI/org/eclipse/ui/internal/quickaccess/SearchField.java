@@ -438,17 +438,17 @@ public class SearchField {
 		Monitor[] monitors = toSearch.getMonitors();
 		Monitor result = monitors[0];
 
-		for (Monitor currentMonitor : monitors) {
-			Rectangle clientArea = currentMonitor.getClientArea();
+		for (Monitor current : monitors) {
+			Rectangle clientArea = current.getClientArea();
 
 			if (clientArea.contains(toFind)) {
-				return currentMonitor;
+				return current;
 			}
 
 			int distance = Geometry.distanceSquared(Geometry.centerPoint(clientArea), toFind);
 			if (distance < closest) {
 				closest = distance;
-				result = currentMonitor;
+				result = current;
 			}
 		}
 

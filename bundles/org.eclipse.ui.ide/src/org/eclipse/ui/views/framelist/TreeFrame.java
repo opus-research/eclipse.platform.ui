@@ -125,13 +125,13 @@ public class TreeFrame extends Frame {
         IMemento[] elementMem = memento.getChildren(TAG_ELEMENT);
         List elements = new ArrayList(elementMem.length);
 
-        for (IMemento currentMemento : elementMem) {
-            String factoryID = currentMemento.getString(TAG_FACTORY_ID);
+        for (IMemento element : elementMem) {
+            String factoryID = element.getString(TAG_FACTORY_ID);
             if (factoryID != null) {
                 IElementFactory factory = PlatformUI.getWorkbench()
                         .getElementFactory(factoryID);
                 if (factory != null) {
-					elements.add(factory.createElement(currentMemento));
+					elements.add(factory.createElement(element));
 				}
             }
         }

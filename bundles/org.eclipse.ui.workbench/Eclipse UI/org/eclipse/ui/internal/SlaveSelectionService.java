@@ -107,23 +107,30 @@ public class SlaveSelectionService implements ISelectionService, IDisposable {
 
 	@Override
 	public void dispose() {
-		for (Object listener : listeners.getListeners()) {
-			parentSelectionService.removeSelectionListener((ISelectionListener) listener);
+		Object list[] = listeners.getListeners();
+
+		for (Object element : list) {
+			parentSelectionService
+					.removeSelectionListener((ISelectionListener) element);
 		}
 		listeners.clear();
 
-		for (Object listener : postListeners.getListeners()) {
-			parentSelectionService.removePostSelectionListener((ISelectionListener) listener);
+		list = postListeners.getListeners();
+		for (Object element : list) {
+			parentSelectionService
+					.removePostSelectionListener((ISelectionListener) element);
 		}
 		postListeners.clear();
 
 		for (Entry<ISelectionListener, String> entry : listenersToPartId.entrySet()) {
-			parentSelectionService.removeSelectionListener(entry.getValue(), entry.getKey());
+			parentSelectionService.removeSelectionListener(
+					entry.getValue(), entry.getKey());
 		}
 		listenersToPartId.clear();
 
 		for (Entry<ISelectionListener, String> entry : postListenersToPartId.entrySet()) {
-			parentSelectionService.removePostSelectionListener(entry.getValue(), entry.getKey());
+			parentSelectionService.removePostSelectionListener(
+					entry.getValue(), entry.getKey());
 		}
 		postListenersToPartId.clear();
 	}

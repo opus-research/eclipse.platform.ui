@@ -209,9 +209,10 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 		public Object[] getChildren(Object parentElement) {
 			List elements = new ArrayList();
 			IContentType baseType = (IContentType) parentElement;
-			for (IContentType contentType : manager.getAllContentTypes()) {
-				if (Util.equals(contentType.getBaseType(), baseType)) {
-					elements.add(contentType);
+			IContentType[] contentTypes = manager.getAllContentTypes();
+			for (IContentType type : contentTypes) {
+				if (Util.equals(type.getBaseType(), baseType)) {
+					elements.add(type);
 				}
 			}
 			return elements.toArray();

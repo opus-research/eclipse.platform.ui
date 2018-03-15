@@ -79,16 +79,19 @@ class MarkerTypesModel {
                 ResourcesPlugin.PI_RESOURCES, ResourcesPlugin.PT_MARKERS);
         if (point != null) {
             // Gather all registered marker types.
-			for (IExtension extension : point.getExtensions()) {
-				String id = extension.getUniqueIdentifier();
-				String label = extension.getLabel();
+            IExtension[] extensions = point.getExtensions();
+            for (IExtension ext : extensions) {
+                String id = ext.getUniqueIdentifier();
+                String label = ext.getLabel();
                 if (label.equals("")) {//$NON-NLS-1$
                     label = getWellKnownLabel(id);
                 }
                 ArrayList supersList = new ArrayList();
-				for (IConfigurationElement configElement : extension.getConfigurationElements()) {
-                    if (configElement.getName().equalsIgnoreCase("super")) {//$NON-NLS-1$
-                        String sup = configElement.getAttribute("type");//$NON-NLS-1$
+                IConfigurationElement[] configElements = ext
+                        .getConfigurationElements();
+                for (IConfigurationElement elt : configElements) {
+                    if (elt.getName().equalsIgnoreCase("super")) {//$NON-NLS-1$
+                        String sup = elt.getAttribute("type");//$NON-NLS-1$
                         if (sup != null) {
                             supersList.add(sup);
                         }

@@ -373,8 +373,9 @@ class FiltersDialog extends TrayDialog {
     public void checkStateChanged(CheckStateChangedEvent event) {
         MarkerType type = (MarkerType) event.getElement();
         typesViewer.setSubtreeChecked(type, event.getChecked());
-		for (MarkerType markerSupertype : type.getAllSupertypes()) {
-			typesViewer.setChecked(markerSupertype, false);
+        MarkerType[] allSupertypes = type.getAllSupertypes();
+        for (MarkerType allSupertype : allSupertypes) {
+            typesViewer.setChecked(allSupertype, false);
         }
         updateEnabledState();
     }
@@ -638,7 +639,8 @@ class FiltersDialog extends TrayDialog {
     MarkerType[] getMarkerTypes() {
         if (markerTypes == null) {
             ArrayList typesList = new ArrayList();
-			for (MarkerType type : markerTypesModel.getTypes()) {
+            MarkerType[] types = markerTypesModel.getTypes();
+            for (MarkerType type : types) {
                 if (type.getLabel().length() > 0) {
                     if (type.isSubtypeOf(markerTypesModel
                             .getType(IMarker.PROBLEM))
@@ -669,9 +671,10 @@ class FiltersDialog extends TrayDialog {
      * @return the ids of the selected marker types
      */
     String[] getSelectedTypes() {
+        Object[] checked = typesViewer.getCheckedElements();
         ArrayList list = new ArrayList();
-		for (Object checkedElement : typesViewer.getCheckedElements()) {
-			MarkerType type = (MarkerType) checkedElement;
+        for (Object element : checked) {
+            MarkerType type = (MarkerType) element;
             // Skip it if any supertypes have already been included.
             // Relies on getCheckedElements() using a pre-order traversal
             // so parents are earlier in the list.
@@ -809,8 +812,9 @@ class FiltersDialog extends TrayDialog {
         if (superType == null) {
             return false;
         }
-		for (Object checkedElement : typesViewer.getCheckedElements()) {
-			if (((MarkerType) checkedElement).isSubtypeOf(superType)) {
+        Object[] checked = typesViewer.getCheckedElements();
+        for (Object element : checked) {
+            if (((MarkerType) element).isSubtypeOf(superType)) {
                 return true;
             }
         }

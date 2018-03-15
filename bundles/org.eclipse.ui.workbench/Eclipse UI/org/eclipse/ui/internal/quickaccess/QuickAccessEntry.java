@@ -148,7 +148,8 @@ class QuickAccessEntry {
 				textLayout.setText(provider.getName());
 				if (boldStyle != null) {
 					for (int[] matchRegion : providerMatchRegions) {
-						textLayout.setStyle(boldStyle, matchRegion[0], matchRegion[1]);
+						textLayout.setStyle(boldStyle, matchRegion[0],
+								matchRegion[1]);
 					}
 				}
 			} else {
