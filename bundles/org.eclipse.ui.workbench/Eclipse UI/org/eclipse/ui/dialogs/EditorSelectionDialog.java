@@ -47,6 +47,7 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -154,6 +155,8 @@ public class EditorSelectionDialog extends Dialog {
 
 	private IEditorDescriptor[] editorsToFilter;
 
+	private DialogListener listener = new DialogListener();
+
 	private ResourceManager resourceManager;
 
 	private TreeViewer editorTableViewer;
@@ -257,32 +260,20 @@ public class EditorSelectionDialog extends Dialog {
 
 		internalButton = new Button(group, SWT.RADIO | SWT.LEFT);
 		internalButton.setText(WorkbenchMessages.EditorSelection_internal);
-		internalButton.addListener(SWT.Selection, event -> updateEnableState());
+		internalButton.addListener(SWT.Selection, listener);
 		internalButton.setFont(font);
 
 		externalButton = new Button(group, SWT.RADIO | SWT.LEFT);
 		externalButton.setText(WorkbenchMessages.EditorSelection_external);
-		externalButton.addListener(SWT.Selection, event -> {
-			fillEditorTable();
-			updateEnableState();
-		});
+		externalButton.addListener(SWT.Selection, listener);
 		externalButton.setFont(font);
 
 		editorTable = new FilteredTree(contents, SWT.SINGLE | SWT.BORDER, new PatternFilter(), true);
 		editorTableViewer = editorTable.getViewer();
 		Tree tree = editorTableViewer.getTree();
-		Listener treeListener = event -> {
-			if (!editorTableViewer.getSelection().isEmpty()) {
-				selectedEditor = (EditorDescriptor) editorTableViewer.getStructuredSelection().getFirstElement();
-			} else {
-				selectedEditor = null;
-				okButton.setEnabled(false);
-			}
-			updateEnableState();
-		};
-		tree.addListener(SWT.Selection, treeListener);
-		tree.addListener(SWT.DefaultSelection, treeListener);
-		tree.addListener(SWT.MouseDoubleClick, event -> handleDoubleClickEvent());
+		tree.addListener(SWT.Selection, listener);
+		tree.addListener(SWT.DefaultSelection, listener);
+		tree.addListener(SWT.MouseDoubleClick, listener);
 		data = new GridData();
 		data.widthHint = convertHorizontalDLUsToPixels(TABLE_WIDTH);
 		data.horizontalAlignment = GridData.FILL;
@@ -311,10 +302,7 @@ public class EditorSelectionDialog extends Dialog {
 		browseExternalEditorsButton = new Button(contents, SWT.PUSH);
 		browseExternalEditorsButton
 				.setText(WorkbenchMessages.EditorSelection_browse);
-		browseExternalEditorsButton.addListener(SWT.Selection, event -> {
-			promptForExternalEditor();
-			updateEnableState();
-		});
+		browseExternalEditorsButton.addListener(SWT.Selection, listener);
 		data = new GridData();
 		int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
 		data.widthHint = Math.max(widthHint, browseExternalEditorsButton
@@ -327,14 +315,7 @@ public class EditorSelectionDialog extends Dialog {
 
 			rememberEditorButton = new Button(contents, SWT.CHECK | SWT.LEFT);
 			rememberEditorButton.setText(NLS.bind(WorkbenchMessages.EditorSelection_rememberEditor, fileName));
-			rememberEditorButton.addListener(SWT.Selection, event -> {
-				// 486859 both checked: checking one box unchecks the other
-				if (rememberTypeButton != null && rememberEditorButton.getSelection()
-						&& rememberTypeButton.getSelection()) {
-					rememberTypeButton.setSelection(false);
-				}
-				updateEnableState();
-			});
+			rememberEditorButton.addListener(SWT.Selection, listener);
 			data = new GridData();
 			data.horizontalSpan = 2;
 			rememberEditorButton.setLayoutData(data);
@@ -344,14 +325,7 @@ public class EditorSelectionDialog extends Dialog {
 			if (!fileType.isEmpty()) {
 				rememberTypeButton = new Button(contents, SWT.CHECK | SWT.LEFT);
 				rememberTypeButton.setText(NLS.bind(WorkbenchMessages.EditorSelection_rememberType, fileType));
-				rememberTypeButton.addListener(SWT.Selection, event -> {
-					// 486859 both checked: checking one box unchecks the other
-					if (rememberEditorButton != null && rememberEditorButton.getSelection()
-							&& rememberTypeButton.getSelection()) {
-						rememberEditorButton.setSelection(false);
-					}
-					updateEnableState();
-				});
+				rememberTypeButton.addListener(SWT.Selection, listener);
 				data = new GridData();
 				data.horizontalSpan = 2;
 				rememberTypeButton.setLayoutData(data);
@@ -501,15 +475,15 @@ public class EditorSelectionDialog extends Dialog {
 		}
 
 		List<IEditorDescriptor> filteredList = new ArrayList<>();
-		for (int i = 0; i < editors.length; i++) {
+		for (IEditorDescriptor editor : editors) {
 			boolean add = true;
-			for (int j = 0; j < editorsToFilter.length; j++) {
-				if (editors[i].getId().equals(editorsToFilter[j].getId())) {
+			for (IEditorDescriptor element : editorsToFilter) {
+				if (editor.getId().equals(element.getId())) {
 					add = false;
 				}
 			}
 			if (add) {
-				filteredList.add(editors[i]);
+				filteredList.add(editor);
 			}
 		}
 
@@ -771,6 +745,41 @@ public class EditorSelectionDialog extends Dialog {
 		}
 		// At this point, there is a selection
 		okButton.setEnabled(selectedEditor != null);
+	}
+
+	private class DialogListener implements Listener {
+
+		@Override
+		public void handleEvent(Event event) {
+			if (event.type == SWT.MouseDoubleClick) {
+				handleDoubleClickEvent();
+				return;
+			}
+			if (event.widget == externalButton) {
+				fillEditorTable();
+			} else if (event.widget == browseExternalEditorsButton) {
+				promptForExternalEditor();
+			} else if (event.widget == editorTableViewer.getTree()) {
+				if (!editorTableViewer.getSelection().isEmpty()) {
+					selectedEditor = (EditorDescriptor) editorTableViewer.getStructuredSelection().getFirstElement();
+				} else {
+					selectedEditor = null;
+					okButton.setEnabled(false);
+				}
+			}
+			// 486859 both checked: checking one box unchecks the other
+			if (rememberEditorButton != null && rememberTypeButton != null && rememberEditorButton.getSelection()
+					&& rememberTypeButton.getSelection()) {
+				if (event.widget == rememberEditorButton) {
+					rememberTypeButton.setSelection(false);
+				}
+				if (event.widget == rememberTypeButton) {
+					rememberEditorButton.setSelection(false);
+				}
+			}
+			updateEnableState();
+		}
+
 	}
 
 	@Override
