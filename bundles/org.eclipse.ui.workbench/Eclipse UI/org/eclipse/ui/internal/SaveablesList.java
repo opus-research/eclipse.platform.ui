@@ -495,7 +495,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 
 				MessageDialog dialog;
 				if (stillOpenElsewhere) {
-					LinkedHashMap<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
+					Map<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
 					buttonLabelToIdMap.put(WorkbenchMessages.Save, IDialogConstants.OK_ID);
 					buttonLabelToIdMap.put(WorkbenchMessages.Dont_Save, IDialogConstants.NO_ID);
 					if (canCancel) {

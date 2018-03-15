@@ -608,7 +608,6 @@ public class IDEWorkbenchMessages extends NLS {
 
 	// --- Startup preferences ---
 	public static String StartupPreferencePage_refreshButton;
-	public static String StartupPreferencePage_showProblemsButton;
 	public static String StartupPreferencePage_launchPromptButton;
 	public static String StartupPreferencePage_exitPromptButton;
 
