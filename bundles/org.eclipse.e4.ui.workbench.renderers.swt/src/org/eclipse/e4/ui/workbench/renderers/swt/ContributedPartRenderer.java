@@ -24,7 +24,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
-import org.eclipse.e4.ui.workbench.filter.IPartFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -49,10 +48,6 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 	@Optional
 	private Logger logger;
 
-	@Inject
-	@Optional
-	private IPartFilter partFilter;
-
 	private MPart partToActivate;
 
 	private Listener activationListener = event -> {
@@ -71,8 +66,7 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 
 	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
-		if (!(element instanceof MPart) || !(parent instanceof Composite)
-				|| (partFilter != null && partFilter.filterPart((MPart) element))) {
+		if (!(element instanceof MPart) || !(parent instanceof Composite)) {
 			return null;
 		}
 

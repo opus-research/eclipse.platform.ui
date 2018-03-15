@@ -15,12 +15,9 @@ package org.eclipse.ui.internal.quickaccess;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.workbench.filter.IPartFilter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -38,9 +35,6 @@ import org.eclipse.ui.views.IViewRegistry;
  */
 public class ViewProvider extends QuickAccessProvider {
 
-	@Inject
-	@Optional
-	private IPartFilter partFilter;
 	private MApplication application;
 	private MWindow window;
 	private Map<String, QuickAccessElement> idToElement = new HashMap<>();
@@ -82,18 +76,13 @@ public class ViewProvider extends QuickAccessProvider {
 						if (uri.equals(CompatibilityPart.COMPATIBILITY_VIEW_URI)) {
 							IViewDescriptor viewDescriptor = viewRegistry.find(element.getId());
 							// Ignore if restricted
-							if (viewDescriptor == null) {
+							if (viewDescriptor == null)
 								continue;
-							}
 							// Ignore if filtered
 							if (!WorkbenchActivityHelper.filterItem(viewDescriptor)) {
 								idToElement.put(element.getId(), element);
 							}
 						} else {
-							// Ignore view the e4 way
-							if (partFilter != null && partFilter.filterPart(descriptor)) {
-								continue;
-							}
 							idToElement.put(id, element);
 						}
 					}

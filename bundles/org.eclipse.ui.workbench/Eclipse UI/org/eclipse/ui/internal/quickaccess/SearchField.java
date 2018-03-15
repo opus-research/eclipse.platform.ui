@@ -32,7 +32,6 @@ import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.e4.core.commands.ECommandService;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
@@ -160,11 +159,9 @@ public class SearchField {
 		hookUpSelectAll();
 
 		final CommandProvider commandProvider = new CommandProvider();
-		final ViewProvider viewProvider = new ViewProvider(application, window);
-		ContextInjectionFactory.inject(viewProvider, application.getContext());
 		QuickAccessProvider[] providers = new QuickAccessProvider[] {
 				new PreviousPicksProvider(previousPicksList),
-				new EditorProvider(), viewProvider,
+				new EditorProvider(), new ViewProvider(application, window),
 				new PerspectiveProvider(), commandProvider, new ActionProvider(),
 				new WizardProvider(), new PreferenceProvider(), new PropertiesProvider() };
 		for (QuickAccessProvider provider : providers) {

@@ -66,7 +66,6 @@ import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
-import org.eclipse.e4.ui.workbench.filter.IMenuElementFilter;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.action.AbstractGroupMarker;
@@ -1119,12 +1118,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			if (rc instanceof Boolean) {
 				visible = ((Boolean) rc).booleanValue();
 			}
-		}
-		// check if an menu element filter is registered and apply it
-		IMenuElementFilter menuElementFilter = evalContext.eclipseContext.get(IMenuElementFilter.class);
-		if (menuElementFilter != null && menuElementFilter.filterElement(element, evalContext.eclipseContext)) {
-			evaluated = true;
-			visible = false;
 		}
 		if (visible && element.getVisibleWhen() != null) {
 			evaluated = true;
