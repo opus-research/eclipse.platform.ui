@@ -240,27 +240,6 @@ public class CompatibilityView extends CompatibilityPart {
 		}
 	}
 
-	private void clearOpaqueToolBarItems(ToolBarManagerRenderer tbmr, MToolBar toolbar) {
-		// remove opaque mappings
-		for (Iterator<MToolBarElement> it = toolbar.getChildren().iterator(); it.hasNext();) {
-			MToolBarElement element = it.next();
-			IContributionItem contribution = tbmr.getContribution(element);
-			if (contribution != null) {
-				tbmr.clearModelToContribution(element, contribution);
-			}
-			if (OpaqueElementUtil.isOpaqueToolItem(element)) {
-				IContributionItem item = tbmr.getContribution(element);
-				if (item != null) {
-					tbmr.clearModelToContribution(element, item);
-				}
-				// clear the reference
-				OpaqueElementUtil.clearOpaqueItem(element);
-				// remove the opaque item
-				it.remove();
-			}
-		}
-	}
-
 	@Override
 	void disposeSite(PartSite site) {
 		IEclipseContext context = getModel().getContext();
@@ -293,4 +272,22 @@ public class CompatibilityView extends CompatibilityPart {
 
 		super.disposeSite(site);
 	}
+
+	private void clearOpaqueToolBarItems(ToolBarManagerRenderer tbmr, MToolBar toolbar) {
+		// remove opaque mappings
+		for (Iterator<MToolBarElement> it = toolbar.getChildren().iterator(); it.hasNext();) {
+			MToolBarElement element = it.next();
+			IContributionItem contribution = tbmr.getContribution(element);
+			if (contribution != null) {
+				tbmr.clearModelToContribution(element, contribution);
+			}
+			if (OpaqueElementUtil.isOpaqueToolItem(element)) {
+				// clear the reference
+				OpaqueElementUtil.clearOpaqueItem(element);
+				// remove the opaque item
+				it.remove();
+			}
+		}
+	}
+
 }
