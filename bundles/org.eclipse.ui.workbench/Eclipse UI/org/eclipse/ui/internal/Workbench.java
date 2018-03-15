@@ -147,8 +147,6 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.DeviceData;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageDataProvider;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -904,26 +902,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 			InputStream input = null;
 			try {
 				input = new BufferedInputStream(new FileInputStream(splashLoc));
-				// Use HighDPI Image Constructor, to handle splash at zoom > 100
-				String value = System.getProperty("swt.enable.autoScale"); //$NON-NLS-1$
-				final boolean autoScaleEnable;
-				if (value != null && "false".equalsIgnoreCase(value)) { //$NON-NLS-1$
-					autoScaleEnable = false;
-				} else {
-					autoScaleEnable = true;
-				}
-				final ImageData data = new ImageData(input);
-				background = new Image(display, new ImageDataProvider() {
-					@Override
-					public ImageData getImageData(int zoom) {
-						String deviceZoomStr = System.getProperty("org.eclipse.swt.internal.deviceZoom"); //$NON-NLS-1$
-						int currentDeviceZoom = deviceZoomStr != null ? Integer.parseInt(deviceZoomStr) : 100;
-						float scaleFactor = autoScaleEnable ? ((float) zoom / currentDeviceZoom) : 1f;
-						return scaleFactor == 1f ? data
-								: data.scaledTo(Math.round(data.width * scaleFactor),
-										Math.round(data.height * scaleFactor));
-					}
-				});
+				background = new Image(display, input);
 			} catch (SWTException e) {
 				StatusManager.getManager().handle(
 						StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
