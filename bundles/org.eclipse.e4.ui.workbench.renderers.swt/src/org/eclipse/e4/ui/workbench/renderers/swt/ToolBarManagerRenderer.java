@@ -14,7 +14,6 @@
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990
  *     Sopot Cela <scela@redhat.com> - Bug 472761
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 473184
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 506306
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -60,6 +59,7 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
@@ -502,7 +502,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			IContributionManagerOverrides overrides = null;
 			MApplicationElement parentElement = element.getParent();
 			if (parentElement == null) {
-				parentElement = modelService.getContainer(element);
+				parentElement = (MApplicationElement) ((EObject) element).eContainer();
 			}
 
 			if (parentElement != null) {

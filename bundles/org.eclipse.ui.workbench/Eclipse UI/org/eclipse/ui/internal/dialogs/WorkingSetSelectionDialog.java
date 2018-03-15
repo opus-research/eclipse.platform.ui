@@ -419,7 +419,8 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 
         while (iterator.hasNext()) {
             IWorkingSet editedWorkingSet = (IWorkingSet) iterator.next();
-			IWorkingSet originalWorkingSet = getEditedWorkingSets().get(editedWorkingSet);
+            IWorkingSet originalWorkingSet = (IWorkingSet) getEditedWorkingSets()
+                    .get(editedWorkingSet);
 
             if (editedWorkingSet.getName().equals(originalWorkingSet.getName()) == false) {
                 editedWorkingSet.setName(originalWorkingSet.getName());
