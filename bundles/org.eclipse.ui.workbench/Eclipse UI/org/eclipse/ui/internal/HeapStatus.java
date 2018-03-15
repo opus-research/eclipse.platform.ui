@@ -227,9 +227,9 @@ public class HeapStatus extends Composite {
 	@Override
 	public void setForeground(Color color) {
 		if (color == null) {
-			markCol = textCol = getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+			usedMemCol = getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 		} else {
-			markCol = textCol = color;
+			usedMemCol = color;
 		}
 
 		button.redraw();
