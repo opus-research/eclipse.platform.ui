@@ -13,6 +13,7 @@
 
 package org.eclipse.e4.ui.internal.workbench;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,11 +25,19 @@ import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.internal.expressions.ReferenceExpression;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.InjectionException;
+import org.eclipse.e4.core.di.InjectorFactory;
+import org.eclipse.e4.core.di.annotations.Evaluate;
+import org.eclipse.e4.core.di.suppliers.PrimaryObjectSupplier;
+import org.eclipse.e4.core.internal.contexts.ContextObjectSupplier;
+import org.eclipse.e4.core.internal.di.InjectorImpl;
+import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MExpression;
+import org.eclipse.e4.ui.model.application.ui.MImperativeExpression;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
@@ -47,6 +56,9 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 public final class ContributionsAnalyzer {
+
+	private static final Object missingEvaluate = new Object();
+
 	public static void trace(String msg, Throwable error) {
 		Activator.trace("/trace/menus", msg, error); //$NON-NLS-1$
 	}
@@ -57,9 +69,8 @@ public final class ContributionsAnalyzer {
 		trace(msg + ": " + menu + ": " + menuModel, null); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	public static void gatherTrimContributions(MTrimBar trimModel,
-			List<MTrimContribution> trimContributions, String elementId,
-			ArrayList<MTrimContribution> toContribute, ExpressionContext eContext) {
+	public static void gatherTrimContributions(MTrimBar trimModel, List<MTrimContribution> trimContributions,
+			String elementId, ArrayList<MTrimContribution> toContribute, ExpressionContext eContext) {
 		if (elementId == null || elementId.length() == 0) {
 			return;
 		}
@@ -115,8 +126,7 @@ public final class ContributionsAnalyzer {
 
 	public static void XXXgatherMenuContributions(final MMenu menuModel,
 			final List<MMenuContribution> menuContributionList, final String id,
-			final ArrayList<MMenuContribution> toContribute, final ExpressionContext eContext,
-			boolean includePopups) {
+			final ArrayList<MMenuContribution> toContribute, final ExpressionContext eContext, boolean includePopups) {
 		if (id == null || id.length() == 0) {
 			return;
 		}
@@ -136,19 +146,18 @@ public final class ContributionsAnalyzer {
 		for (MMenuContribution menuContribution : menuContributionList) {
 			String parentID = menuContribution.getParentId();
 			if (parentID == null) {
-				// it doesn't make sense for this to be null, temporary workaround for bug 320790
+				// it doesn't make sense for this to be null, temporary
+				// workaround for bug 320790
 				continue;
 			}
 			boolean popupTarget = includePopups && popupIds.contains(parentID);
-			boolean popupAny = includePopups && menuModel instanceof MPopupMenu
-					&& POPUP_PARENT_ID.equals(parentID);
+			boolean popupAny = includePopups && menuModel instanceof MPopupMenu && POPUP_PARENT_ID.equals(parentID);
 			boolean filtered = isFiltered(menuModel, menuContribution, includePopups);
 			if (!filtered && menuContribution.isToBeRendered() && popupAny) {
 				// process POPUP_ANY first
 				toContribute.add(menuContribution);
 			} else {
-				if (filtered || (!popupTarget && !parentID.equals(id))
-				|| !menuContribution.isToBeRendered()) {
+				if (filtered || (!popupTarget && !parentID.equals(id)) || !menuContribution.isToBeRendered()) {
 					continue;
 				}
 				includedPopups.add(menuContribution);
@@ -159,8 +168,7 @@ public final class ContributionsAnalyzer {
 
 	public static void gatherMenuContributions(final MMenu menuModel,
 			final List<MMenuContribution> menuContributionList, final String id,
-			final ArrayList<MMenuContribution> toContribute, final ExpressionContext eContext,
-			boolean includePopups) {
+			final ArrayList<MMenuContribution> toContribute, final ExpressionContext eContext, boolean includePopups) {
 		if (id == null || id.length() == 0) {
 			return;
 		}
@@ -168,11 +176,11 @@ public final class ContributionsAnalyzer {
 		for (MMenuContribution menuContribution : menuContributionList) {
 			String parentID = menuContribution.getParentId();
 			if (parentID == null) {
-				// it doesn't make sense for this to be null, temporary workaround for bug 320790
+				// it doesn't make sense for this to be null, temporary
+				// workaround for bug 320790
 				continue;
 			}
-			boolean popup = parentID.equals(POPUP_PARENT_ID) && (menuModel instanceof MPopupMenu)
-					&& includePopups;
+			boolean popup = parentID.equals(POPUP_PARENT_ID) && (menuModel instanceof MPopupMenu) && includePopups;
 			boolean filtered = isFiltered(menuModel, menuContribution, includePopups);
 			if (filtered || (!popup && !parentID.equals(id)) || !menuContribution.isToBeRendered()) {
 				continue;
@@ -183,8 +191,7 @@ public final class ContributionsAnalyzer {
 		}
 	}
 
-	static boolean isFiltered(MMenu menuModel, MMenuContribution menuContribution,
-			boolean includePopups) {
+	static boolean isFiltered(MMenu menuModel, MMenuContribution menuContribution, boolean includePopups) {
 		if (includePopups || menuModel.getTags().contains(ContributionsAnalyzer.MC_POPUP)) {
 			return !menuContribution.getTags().contains(ContributionsAnalyzer.MC_POPUP)
 					&& menuContribution.getTags().contains(ContributionsAnalyzer.MC_MENU);
@@ -194,7 +201,8 @@ public final class ContributionsAnalyzer {
 					&& menuContribution.getTags().contains(ContributionsAnalyzer.MC_POPUP);
 		}
 		if (!includePopups) {
-			// not including popups, so filter out popup menu contributions if the menu is a regular
+			// not including popups, so filter out popup menu contributions if
+			// the menu is a regular
 			// menu
 			return menuContribution.getTags().contains(ContributionsAnalyzer.MC_POPUP);
 		}
@@ -220,32 +228,44 @@ public final class ContributionsAnalyzer {
 		if (menuContribution.getVisibleWhen() == null) {
 			return true;
 		}
-		return isVisible((MCoreExpression) menuContribution.getVisibleWhen(), eContext);
+		return isVisible(menuContribution.getVisibleWhen(), eContext);
 	}
 
 	public static boolean isVisible(MToolBarContribution contribution, ExpressionContext eContext) {
 		if (contribution.getVisibleWhen() == null) {
 			return true;
 		}
-		return isVisible((MCoreExpression) contribution.getVisibleWhen(), eContext);
+		return isVisible(contribution.getVisibleWhen(), eContext);
 	}
 
 	public static boolean isVisible(MTrimContribution contribution, ExpressionContext eContext) {
 		if (contribution.getVisibleWhen() == null) {
 			return true;
 		}
-		return isVisible((MCoreExpression) contribution.getVisibleWhen(), eContext);
+		return isVisible(contribution.getVisibleWhen(), eContext);
 	}
 
-	public static boolean isVisible(MCoreExpression exp, final ExpressionContext eContext) {
-		final Expression ref;
-		if (exp.getCoreExpression() instanceof Expression) {
-			ref = (Expression) exp.getCoreExpression();
-		} else {
-			ref = new ReferenceExpression(exp.getCoreExpressionId());
-			exp.setCoreExpression(ref);
+	public static boolean isVisible(MExpression exp, final ExpressionContext eContext) {
+		if (exp instanceof MCoreExpression) {
+			MCoreExpression coreExpression = (MCoreExpression) exp;
+			return isCoreExpressionVisible(coreExpression, eContext);
+		} else if (exp instanceof MImperativeExpression) {
+			return isImperativeExpressionVisible(exp, eContext);
 		}
-		// Creates dependency on a predefined value that can be "poked" by the evaluation
+
+		return true;
+	}
+
+	private static boolean isCoreExpressionVisible(MCoreExpression coreExpression, final ExpressionContext eContext) {
+		final Expression ref;
+		if (coreExpression.getCoreExpression() instanceof Expression) {
+			ref = (Expression) coreExpression.getCoreExpression();
+		} else {
+			ref = new ReferenceExpression(coreExpression.getCoreExpressionId());
+			coreExpression.setCoreExpression(ref);
+		}
+		// Creates dependency on a predefined value that can be "poked" by
+		// the evaluation
 		// service
 		ExpressionInfo info = ref.computeExpressionInfo();
 		String[] names = info.getAccessedPropertyNames();
@@ -261,8 +281,38 @@ public final class ContributionsAnalyzer {
 		return ret;
 	}
 
-	public static void addMenuContributions(final MMenu menuModel,
-			final ArrayList<MMenuContribution> toContribute,
+	private static boolean isImperativeExpressionVisible(MExpression exp, final ExpressionContext eContext) {
+		MImperativeExpression imperativeExpression = (MImperativeExpression) exp;
+		Object imperativeExpressionObject = imperativeExpression.getObject();
+		if (imperativeExpressionObject == null) {
+			IContributionFactory contributionFactory = eContext.eclipseContext.get(IContributionFactory.class);
+			Object newImperativeExpression = contributionFactory.create(imperativeExpression.getContributionURI(),
+					eContext.eclipseContext);
+			imperativeExpression.setObject(newImperativeExpression);
+			imperativeExpressionObject = newImperativeExpression;
+		}
+//		Object result = ContextInjectionFactory.invoke(imperativeExpressionObject, Evaluate.class, eContext.eclipseContext, null,
+//				missingEvaluate);
+
+		Object result = invoke(imperativeExpressionObject, Evaluate.class, eContext.eclipseContext, null,
+				missingEvaluate);
+		if (result == missingEvaluate) {
+			throw new IllegalStateException(
+					"There is no method annotated with @Evaluate in the imperative expression class"); //$NON-NLS-1$
+		}
+		return (boolean) result;
+	}
+
+	final private static InjectorImpl injector = (InjectorImpl) InjectorFactory.getDefault();
+
+	static private Object invoke(Object object, Class<? extends Annotation> qualifier, IEclipseContext context,
+			IEclipseContext localContext, Object defaultValue) throws InjectionException {
+		PrimaryObjectSupplier supplier = ContextObjectSupplier.getObjectSupplier(context, injector);
+		PrimaryObjectSupplier tempSupplier = ContextObjectSupplier.getObjectSupplier(localContext, injector);
+		return injector.invoke(object, qualifier, defaultValue, supplier, tempSupplier, true);
+	}
+
+	public static void addMenuContributions(final MMenu menuModel, final ArrayList<MMenuContribution> toContribute,
 			final ArrayList<MMenuElement> menuContributionsToRemove) {
 
 		HashSet<String> existingMenuIds = new HashSet<>();
@@ -283,8 +333,8 @@ public final class ContributionsAnalyzer {
 			toContribute.clear();
 
 			for (MMenuContribution menuContribution : curList) {
-				if (!processAddition(menuModel, menuContributionsToRemove, menuContribution,
-						existingMenuIds, existingSeparatorNames)) {
+				if (!processAddition(menuModel, menuContributionsToRemove, menuContribution, existingMenuIds,
+						existingSeparatorNames)) {
 					toContribute.add(menuContribution);
 				}
 			}
@@ -295,9 +345,8 @@ public final class ContributionsAnalyzer {
 	}
 
 	public static boolean processAddition(final MMenu menuModel,
-			final ArrayList<MMenuElement> menuContributionsToRemove,
-			MMenuContribution menuContribution, final HashSet<String> existingMenuIds,
-			HashSet<String> existingSeparatorNames) {
+			final ArrayList<MMenuElement> menuContributionsToRemove, MMenuContribution menuContribution,
+			final HashSet<String> existingMenuIds, HashSet<String> existingSeparatorNames) {
 		int idx = getIndex(menuModel, menuContribution.getPositionInParent());
 		if (idx == -1) {
 			return false;
@@ -306,8 +355,7 @@ public final class ContributionsAnalyzer {
 			if (item instanceof MMenu && existingMenuIds.contains(item.getElementId())) {
 				// skip this, it's already there
 				continue;
-			} else if (item instanceof MMenuSeparator
-					&& existingSeparatorNames.contains(item.getElementId())) {
+			} else if (item instanceof MMenuSeparator && existingSeparatorNames.contains(item.getElementId())) {
 				// skip this, it's already there
 				continue;
 			}
@@ -326,16 +374,14 @@ public final class ContributionsAnalyzer {
 		return true;
 	}
 
-	public static boolean processAddition(final MToolBar toolBarModel,
-			MToolBarContribution toolBarContribution, List<MToolBarElement> contributions,
-			HashSet<String> existingSeparatorNames) {
+	public static boolean processAddition(final MToolBar toolBarModel, MToolBarContribution toolBarContribution,
+			List<MToolBarElement> contributions, HashSet<String> existingSeparatorNames) {
 		int idx = getIndex(toolBarModel, toolBarContribution.getPositionInParent());
 		if (idx == -1) {
 			return false;
 		}
 		for (MToolBarElement item : toolBarContribution.getChildren()) {
-			if (item instanceof MToolBarSeparator
-					&& existingSeparatorNames.contains(item.getElementId())) {
+			if (item instanceof MToolBarSeparator && existingSeparatorNames.contains(item.getElementId())) {
 				// skip this, it's already there
 				continue;
 			}
@@ -417,8 +463,7 @@ public final class ContributionsAnalyzer {
 		private MCoreExpression vexp;
 		private Object factory;
 
-		public Key(String parentId, String position, List<String> tags, MCoreExpression vexp,
-				Object factory) {
+		public Key(String parentId, String position, List<String> tags, MCoreExpression vexp, Object factory) {
 			this.parentId = parentId;
 			this.position = position;
 			this.vexp = vexp;
@@ -476,8 +521,8 @@ public final class ContributionsAnalyzer {
 		private MMenuContribution contribution;
 
 		public MenuKey(MMenuContribution mc) {
-			super(mc.getParentId(), mc.getPositionInParent(), mc.getTags(), (MCoreExpression) mc
-					.getVisibleWhen(), mc.getTransientData().get(FACTORY));
+			super(mc.getParentId(), mc.getPositionInParent(), mc.getTags(), (MCoreExpression) mc.getVisibleWhen(),
+					mc.getTransientData().get(FACTORY));
 			this.contribution = mc;
 			mc.setWidget(this);
 		}
@@ -492,8 +537,8 @@ public final class ContributionsAnalyzer {
 		private MToolBarContribution contribution;
 
 		public ToolBarKey(MToolBarContribution mc) {
-			super(mc.getParentId(), mc.getPositionInParent(), mc.getTags(), (MCoreExpression) mc
-					.getVisibleWhen(), mc.getTransientData().get(FACTORY));
+			super(mc.getParentId(), mc.getPositionInParent(), mc.getTags(), (MCoreExpression) mc.getVisibleWhen(),
+					mc.getTransientData().get(FACTORY));
 			this.contribution = mc;
 			mc.setWidget(this);
 		}
@@ -507,8 +552,8 @@ public final class ContributionsAnalyzer {
 		private MTrimContribution contribution;
 
 		public TrimKey(MTrimContribution mc) {
-			super(mc.getParentId(), mc.getPositionInParent(), mc.getTags(), (MCoreExpression) mc
-					.getVisibleWhen(), null);
+			super(mc.getParentId(), mc.getPositionInParent(), mc.getTags(), (MCoreExpression) mc.getVisibleWhen(),
+					null);
 			this.contribution = mc;
 			mc.setWidget(this);
 		}
@@ -658,8 +703,7 @@ public final class ContributionsAnalyzer {
 
 	private static boolean containsMatching(List<MMenuElement> children, MMenuElement me) {
 		for (MMenuElement element : children) {
-			if (Util.equals(me.getElementId(), element.getElementId())
-					&& element.getClass().isInstance(me)
+			if (Util.equals(me.getElementId(), element.getElementId()) && element.getClass().isInstance(me)
 					&& (element instanceof MMenuSeparator || element instanceof MMenu)) {
 				return true;
 			}
@@ -669,8 +713,7 @@ public final class ContributionsAnalyzer {
 
 	private static boolean containsMatching(List<MToolBarElement> children, MToolBarElement me) {
 		for (MToolBarElement element : children) {
-			if (Util.equals(me.getElementId(), element.getElementId())
-					&& element.getClass().isInstance(me)
+			if (Util.equals(me.getElementId(), element.getElementId()) && element.getClass().isInstance(me)
 					&& (element instanceof MToolBarSeparator || element instanceof MToolBar)) {
 				return true;
 			}
@@ -680,8 +723,7 @@ public final class ContributionsAnalyzer {
 
 	private static boolean containsMatching(List<MTrimElement> children, MTrimElement me) {
 		for (MTrimElement element : children) {
-			if (Util.equals(me.getElementId(), element.getElementId())
-					&& element.getClass().isInstance(me)
+			if (Util.equals(me.getElementId(), element.getElementId()) && element.getClass().isInstance(me)
 					&& (element instanceof MToolBarSeparator || element instanceof MToolBar)) {
 				return true;
 			}
@@ -752,8 +794,7 @@ public final class ContributionsAnalyzer {
 		trace("mergeContributions: final size: " + result.size(), null); //$NON-NLS-1$
 	}
 
-	public static void populateModelInterfaces(Object modelObject, IEclipseContext context,
-			Class<?>[] interfaces) {
+	public static void populateModelInterfaces(Object modelObject, IEclipseContext context, Class<?>[] interfaces) {
 		for (Class<?> intf : interfaces) {
 			Activator.trace(Policy.DEBUG_CONTEXTS, "Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
 					+ modelObject.getClass().getName(), null);

@@ -67,16 +67,16 @@ public interface MPerspective extends MElementContainer<MPartSashContainerElemen
 	List<MWindow> getWindows();
 
 	/**
-	 * Returns the value of the '<em><b>Trim Bars</b></em>' containment reference list.
-	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MTrimBar}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
+	 * Returns the value of the '<em><b>Trim Bars</b></em>' containment
+	 * reference list. The list contents are of type
+	 * {@link org.eclipse.e4.ui.model.application.ui.basic.MTrimBar}. <!--
+	 * begin-user-doc --> <!-- end-user-doc --> <!-- begin-model-doc -->
 	 * <p>
 	 * The collection of TrimBars associated with this perspective.
+	 * 
 	 * @since 1.3
-	 * </p>
-	 * <!-- end-model-doc -->
+	 *        </p>
+	 *        <!-- end-model-doc -->
 	 * @return the value of the '<em>Trim Bars</em>' containment reference list.
 	 * @model containment="true"
 	 * @generated
