@@ -109,8 +109,7 @@ public class Tweaklets {
 					return tweaklet;
 				} catch (CoreException e) {
 					StatusManager.getManager().handle(
-							StatusUtil.newStatus(IStatus.ERROR,
-									"Error with extension " + element, e), //$NON-NLS-1$
+							StatusUtil.newStatus(IStatus.ERROR, "Error with extension " + element, e), //$NON-NLS-1$
 							StatusManager.LOG);
 				}
 			}

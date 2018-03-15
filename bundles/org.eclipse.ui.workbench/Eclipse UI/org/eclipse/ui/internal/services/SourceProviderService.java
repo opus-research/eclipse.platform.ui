@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.services.IDisposable;
@@ -84,8 +83,7 @@ public final class SourceProviderService implements ISourceProviderService,
 			throw new NullPointerException("The source provider cannot be null"); //$NON-NLS-1$
 		}
 
-		final String[] sourceNames = sourceProvider.getProvidedSourceNames();
-		for (final String sourceName : sourceNames) {
+		for (final String sourceName : sourceProvider.getProvidedSourceNames()) {
 			sourceProvidersByName.put(sourceName, sourceProvider);
 		}
 		sourceProviders.add(sourceProvider);
@@ -96,18 +94,16 @@ public final class SourceProviderService implements ISourceProviderService,
 			throw new NullPointerException("The source provider cannot be null"); //$NON-NLS-1$
 		}
 
-		final String[] sourceNames = sourceProvider.getProvidedSourceNames();
-		for (String sourceName : sourceNames) {
+		for (String sourceName : sourceProvider.getProvidedSourceNames()) {
 			sourceProvidersByName.remove(sourceName);
 		}
 		sourceProviders.remove(sourceProvider);
 	}
 
 	public final void readRegistry() {
-		AbstractSourceProvider[] sp = WorkbenchServiceRegistry.getRegistry().getSourceProviders();
-		for (AbstractSourceProvider element : sp) {
-			element.initialize(locator);
-			registerProvider(element);
+		for (AbstractSourceProvider sourceProvider : WorkbenchServiceRegistry.getRegistry().getSourceProviders()) {
+			sourceProvider.initialize(locator);
+			registerProvider(sourceProvider);
 		}
 	}
 }

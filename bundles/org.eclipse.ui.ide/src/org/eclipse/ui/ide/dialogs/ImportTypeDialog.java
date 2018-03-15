@@ -190,8 +190,7 @@ public class ImportTypeDialog extends TrayDialog {
 	// the format of the context is operationMask,value:operationMask,value:operationMask,value
 	private String readContextPreference(String key) {
 		String value = IDEWorkbenchPlugin.getDefault().getPreferenceStore().getString(key);
-		String [] keyPairs = value.split(":"); //$NON-NLS-1$
-		for (String keyPair : keyPairs) {
+		for (String keyPair : value.split(":")) { //$NON-NLS-1$
 			String [] element = keyPair.split(","); //$NON-NLS-1$
 			if (element.length == 2) {
 				if (element[0].equals(Integer.toString(operationMask)))

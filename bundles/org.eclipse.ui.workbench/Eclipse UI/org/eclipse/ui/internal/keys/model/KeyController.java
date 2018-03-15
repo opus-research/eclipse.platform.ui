@@ -143,8 +143,7 @@ public class KeyController {
 			Scheme modelActiveScheme = null;
 			for (final Scheme scheme : definedSchemes) {
 				final Scheme copy = bindingManager.getScheme(scheme.getId());
-				copy.define(scheme.getName(), scheme.getDescription(), scheme
-						.getParentId());
+				copy.define(scheme.getName(), scheme.getDescription(), scheme.getParentId());
 				if (scheme.getId().equals(bindingService.getActiveScheme().getId())) {
 					modelActiveScheme = copy;
 				}
@@ -481,8 +480,7 @@ public class KeyController {
 		}
 
 		// Restore any User defined bindings
-		Binding[] bindings = fBindingManager.getBindings();
-		for (Binding binding : bindings) {
+		for (Binding binding : fBindingManager.getBindings()) {
 			if (binding.getType() == Binding.USER) {
 				fBindingManager.removeBinding(binding);
 			}
@@ -511,8 +509,7 @@ public class KeyController {
 				try {
 					fileWriter = new BufferedWriter(new OutputStreamWriter(
 							new FileOutputStream(filePath), StandardCharsets.UTF_8));
-					final Object[] bindingElements = bindingModel.getBindings()
-							.toArray();
+					final Object[] bindingElements = bindingModel.getBindings().toArray();
 					for (Object bindingElement : bindingElements) {
 						final BindingElement be = (BindingElement) bindingElement;
 						if (be.getTrigger() == null

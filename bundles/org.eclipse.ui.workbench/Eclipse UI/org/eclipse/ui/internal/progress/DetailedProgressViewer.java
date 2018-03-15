@@ -135,9 +135,9 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		Set newItems = new HashSet(elements.length);
 
 		Control[] existingChildren = control.getChildren();
-		for (Control element : existingChildren) {
-			if (element.getData() != null)
-				newItems.add(element.getData());
+		for (Control child : existingChildren) {
+			if (child.getData() != null)
+				newItems.add(child.getData());
 		}
 
 		for (Object element : elements) {
@@ -153,8 +153,8 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		}
 
 		// Update with the new elements to prevent flash
-		for (Control element : existingChildren) {
-			((ProgressInfoItem) element).dispose();
+		for (Control child : existingChildren) {
+			((ProgressInfoItem) child).dispose();
 		}
 
 		int totalSize = Math.min(newItems.size(), MAX_DISPLAYED);
@@ -206,9 +206,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 
 			@Override
 			public void select() {
-
-				Control[] children = control.getChildren();
-				for (Control element : children) {
+				for (Control element : control.getChildren()) {
 					ProgressInfoItem child = (ProgressInfoItem) element;
 					if (!item.equals(child)) {
 						child.selectWidgets(false);
@@ -280,8 +278,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 
 	@Override
 	protected Widget doFindItem(Object element) {
-		Control[] existingChildren = control.getChildren();
-		for (Control control : existingChildren) {
+		for (Control control : control.getChildren()) {
 			if (control.isDisposed()
 					|| control.getData() == null) {
 				continue;
@@ -411,10 +408,9 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 	private void refreshAll() {
 
 		Object[] infos = getSortedChildren(getRoot());
-		Control[] existingChildren = control.getChildren();
 
-		for (Control element : existingChildren) {
-			element.dispose();
+		for (Control control : control.getChildren()) {
+			control.dispose();
 
 		}
 
@@ -434,11 +430,10 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 	 * area.
 	 */
 	private void updateVisibleItems() {
-		Control[] children = control.getChildren();
 		int top = scrolled.getOrigin().y;
 		int bottom = top + scrolled.getParent().getBounds().height;
-		for (Control element : children) {
-			ProgressInfoItem item = (ProgressInfoItem) element;
+		for (Control control : control.getChildren()) {
+			ProgressInfoItem item = (ProgressInfoItem) control;
 			item.setDisplayed(top, bottom);
 		}
 	}

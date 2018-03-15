@@ -17,15 +17,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import org.eclipse.osgi.util.NLS;
-
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.ToolBar;
-
 import org.eclipse.core.commands.IHandler;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
@@ -33,7 +25,10 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.commands.ActionHandler;
-
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.ActiveShellExpression;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchCommandConstants;
@@ -140,8 +135,7 @@ class PreferencePageHistory {
 	 */
 	private void updateHistoryControls() {
 		historyToolbar.update(false);
-		IContributionItem[] items = historyToolbar.getItems();
-		for (IContributionItem item : items) {
+		for (IContributionItem item : historyToolbar.getItems()) {
 			item.update(IAction.ENABLED);
 			item.update(IAction.TOOL_TIP_TEXT);
 		}

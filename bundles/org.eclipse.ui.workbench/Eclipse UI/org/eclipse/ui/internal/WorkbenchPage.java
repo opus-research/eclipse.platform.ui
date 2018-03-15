@@ -786,15 +786,15 @@ public class WorkbenchPage implements IWorkbenchPage {
 			if (part != null) {
 				IActionSetDescriptor[] partActionSets = WorkbenchPlugin.getDefault()
 						.getActionSetRegistry().getActionSetsFor(part.getSite().getId());
-				for (IActionSetDescriptor partActionSet : partActionSets) {
-					newActionSets.add(partActionSet);
+				for (int i = 0; i < partActionSets.length; i++) {
+					newActionSets.add(partActionSets[i]);
 				}
 			}
 			if (editor != null && editor != part) {
 				IActionSetDescriptor[] editorActionSets = WorkbenchPlugin.getDefault()
 						.getActionSetRegistry().getActionSetsFor(editor.getSite().getId());
-				for (IActionSetDescriptor editorActionSet : editorActionSets) {
-					newActionSets.add(editorActionSet);
+				for (int i = 0; i < editorActionSets.length; i++) {
+					newActionSets.add(editorActionSets[i]);
 				}
 			}
 			return newActionSets;
@@ -1065,15 +1065,15 @@ public class WorkbenchPage implements IWorkbenchPage {
 			return null;
 		}
 
-		for (ViewReference viewReference : viewReferences) {
-			IViewReference reference = viewReference;
+		for (Iterator<ViewReference> it = viewReferences.iterator(); it.hasNext();) {
+			IViewReference reference = it.next();
 			if (part == reference.getPart(false)) {
 				return ((WorkbenchPartReference) reference).getModel();
 			}
 		}
 
-		for (EditorReference editorReference : editorReferences) {
-			IEditorReference reference = editorReference;
+		for (Iterator<EditorReference> it = editorReferences.iterator(); it.hasNext();) {
+			IEditorReference reference = it.next();
 			if (part == reference.getPart(false)) {
 				return ((WorkbenchPartReference) reference).getModel();
 			}
@@ -1361,8 +1361,8 @@ public class WorkbenchPage implements IWorkbenchPage {
         IEditorReference editors[] = getEditorReferences();
         IEditorReference savedEditors[] = new IEditorReference[editors.length];
         int j = 0;
-        for (IEditorReference editor2 : editors) {
-            IEditorReference editor = editor2;
+        for (int i = 0; i < editors.length; i++) {
+            IEditorReference editor = editors[i];
             if (!editor.isDirty()) {
                 savedEditors[j++] = editor;
             }
@@ -1397,7 +1397,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 		// or cannot
 		// be closed at this time
 		ArrayList<IEditorReference> editorRefs = new ArrayList<>();
-		for (IEditorReference reference : refArray) {
+		for (int i = 0; i < refArray.length; i++) {
+			IEditorReference reference = refArray[i];
+
 			// If we're in the middle of creating this part, this is a
 			// programming error. Abort the entire
 			// close operation. This usually occurs if someone tries to open a
@@ -2763,9 +2765,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 				IMemento[] workingSetChildren = workingSetMem
 						.getChildren(IWorkbenchConstants.TAG_WORKING_SET);
 				List<IWorkingSet> workingSetList = new ArrayList<>(workingSetChildren.length);
-				for (IMemento element : workingSetChildren) {
+				for (int i = 0; i < workingSetChildren.length; i++) {
 					IWorkingSet set = getWorkbenchWindow().getWorkbench().getWorkingSetManager()
-							.getWorkingSet(element.getID());
+							.getWorkingSet(workingSetChildren[i].getID());
 					if (set != null) {
 						workingSetList.add(set);
 					}
@@ -3598,7 +3600,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 	public ISaveablePart[] getDirtyParts() {
 		List<ISaveablePart> result = new ArrayList<>(3);
 		IWorkbenchPartReference[] allParts = getSortedParts(true, true, true);
-		for (IWorkbenchPartReference reference : allParts) {
+		for (int i = 0; i < allParts.length; i++) {
+			IWorkbenchPartReference reference = allParts[i];
+
 			IWorkbenchPart part = reference.getPart(false);
 			ISaveablePart saveable = SaveableHelper.getSaveable(part);
 			if (saveable != null && !result.contains(saveable)) {
@@ -3658,8 +3662,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 		// saveAll below expects a mutable list
 		List<IWorkbenchPart> dirtyParts = new ArrayList<>(parts.length);
-		for (IWorkbenchPart part : parts) {
-			dirtyParts.add(part);
+		for (int i = 0; i < parts.length; i++) {
+			dirtyParts.add(parts[i]);
 		}
 
 		// If confirmation is required ..
@@ -3807,8 +3811,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 		HashSet<Saveable> seen = new HashSet<>();
 		for (IWorkbenchPart part : parts) {
 			Saveable[] saveables = getSaveables(part);
-			for (Saveable saveable2 : saveables) {
-				Saveable saveable = saveable2;
+			for (int j = 0; j < saveables.length; j++) {
+				Saveable saveable = saveables[j];
 				if (saveable.isDirty() && !seen.contains(saveable)) {
 					seen.add(saveable);
 					if (!closing
@@ -3823,10 +3827,10 @@ public class WorkbenchPage implements IWorkbenchPage {
 			SaveablesList saveablesList = (SaveablesList) PlatformUI.getWorkbench().getService(
 					ISaveablesLifecycleListener.class);
 			ISaveablesSource[] nonPartSources = saveablesList.getNonPartSources();
-			for (ISaveablesSource nonPartSource : nonPartSources) {
-				Saveable[] saveables = nonPartSource.getSaveables();
-				for (Saveable saveable2 : saveables) {
-					Saveable saveable = saveable2;
+			for (int i = 0; i < nonPartSources.length; i++) {
+				Saveable[] saveables = nonPartSources[i].getSaveables();
+				for (int j = 0; j < saveables.length; j++) {
+					Saveable saveable = saveables[j];
 					if (saveable.isDirty() && !seen.contains(saveable)) {
 						seen.add(saveable);
 						result.add(saveable);
@@ -3878,7 +3882,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 		IWorkbenchPartReference[] pagePartRefs = ((WorkbenchPage) page).getSortedParts();
 		HashSet<IWorkbenchPart> pagePartsWithSameModels = new HashSet<>();
-		for (IWorkbenchPartReference partRef : pagePartRefs) {
+		for (int i = 0; i < pagePartRefs.length; i++) {
+			IWorkbenchPartReference partRef = pagePartRefs[i];
 			IWorkbenchPart part = partRef.getPart(false);
 			if (part != null) {
 				Saveable[] models = getSaveables(part);
@@ -4228,10 +4233,10 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		IStickyViewDescriptor[] stickyViews = getWorkbenchWindow().getWorkbench().getViewRegistry()
 				.getStickyViews();
-		for (IStickyViewDescriptor stickyView : stickyViews) {
-			if (stickyView.getLocation() == IPageLayout.RIGHT) {
+		for (int i = 0; i < stickyViews.length; i++) {
+			if (stickyViews[i].getLocation() == IPageLayout.RIGHT) {
 				MStackElement viewModel = ModeledPageLayout.createViewModel(application,
-						stickyView.getId(), false, this, partService, true);
+						stickyViews[i].getId(), false, this, partService, true);
 				stickyFolder.getChildren().add(viewModel);
 			}
 		}
@@ -4663,11 +4668,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 		// filter out any duplicates if necessary
 		if (newWorkingSets.length > 1) {
 			Set<IWorkingSet> setOfSets = new HashSet<>();
-			for (IWorkingSet newWorkingSet : newWorkingSets) {
-				if (newWorkingSet == null) {
+			for (int i = 0; i < newWorkingSets.length; i++) {
+				if (newWorkingSets[i] == null) {
 					throw new IllegalArgumentException();
 				}
-				setOfSets.add(newWorkingSet);
+				setOfSets.add(newWorkingSets[i]);
 			}
 			newWorkingSets = setOfSets.toArray(new IWorkingSet[setOfSets.size()]);
 		}
@@ -5583,13 +5588,15 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		List<String> tags = persp.getTags();
 		List<String> existingNewWizards = new ArrayList<>();
-		for (String string : tags) {
+		for (Iterator<String> iterator = tags.iterator(); iterator.hasNext();) {
+			String string = iterator.next();
 			if (string.contains(tagPrefix))
 				existingNewWizards.add(string);
 		}
 
 		List<String> newWizards = new ArrayList<>(wizards.size());
-		for (String wizardName : wizards) {
+		for (Iterator<String> iterator = wizards.iterator(); iterator.hasNext();) {
+			String wizardName = iterator.next();
 			newWizards.add(tagPrefix + wizardName);
 		}
 

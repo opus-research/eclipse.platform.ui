@@ -144,17 +144,17 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 				keyList.add(ks);
 				KeySequence sequence = KeySequence.getInstance(keyList);
 				boolean partialMatch = false;
-				for (TriggerSequence element : ts) {
-					if (element.equals(sequence)) {
+				for (TriggerSequence triggerSequence : ts) {
+					if (triggerSequence.equals(sequence)) {
 						copyToClipboard();
 						keyList.clear();
 						break;
 					}
-					if (element.startsWith(sequence, false)) {
+					if (triggerSequence.startsWith(sequence, false)) {
 						partialMatch = true;
 					}
-					for (int j = 0; j < element.getTriggers().length; j++) {
-						if (element.getTriggers()[j].equals(ks)) {
+					for (int j = 0; j < triggerSequence.getTriggers().length; j++) {
+						if (triggerSequence.getTriggers()[j].equals(ks)) {
 							partialMatch = true;
 						}
 					}
@@ -305,9 +305,8 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 			appendNewLine(text, message, nesting, lineNumber[0]++);
 		}
 
-		IStatus[] children = status.getChildren();
-		for (IStatus element : children) {
-			populateList(text, element, nesting + 1, lineNumber);
+		for (IStatus child : status.getChildren()) {
+			populateList(text, child, nesting + 1, lineNumber);
 		}
 	}
 

@@ -115,8 +115,7 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 	@Override
 	public void refresh(Object[] elements) {
-		Object[] refreshes = getRoots(elements, true);
-		for (Object refresh : refreshes) {
+		for (Object refresh : getRoots(elements, true)) {
 			progressViewer.refresh(refresh, true);
 		}
 	}

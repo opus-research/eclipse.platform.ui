@@ -13,7 +13,6 @@ package org.eclipse.ui.internal.keys.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.jface.bindings.BindingManager;
 import org.eclipse.jface.bindings.Scheme;
 
@@ -38,8 +37,7 @@ public class SchemeModel extends CommonModel {
 	 */
 	public void init(BindingManager bindingManager) {
 		schemes = new ArrayList();
-		Scheme[] definedSchemes = bindingManager.getDefinedSchemes();
-		for (Scheme definedScheme : definedSchemes) {
+		for (Scheme definedScheme : bindingManager.getDefinedSchemes()) {
 			SchemeElement se = new SchemeElement(controller);
 			se.init(definedScheme);
 			se.setParent(this);

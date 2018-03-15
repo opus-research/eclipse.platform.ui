@@ -153,10 +153,9 @@ public class FinishedJobs extends EventManager {
 	}
 
 	private void checkForDuplicates(GroupInfo info) {
-		Object[] objects = info.getChildren();
-		for (Object object : objects) {
-			if (object instanceof JobInfo) {
-				checkForDuplicates((JobInfo) object);
+		for (Object child : info.getChildren()) {
+			if (child instanceof JobInfo) {
+				checkForDuplicates((JobInfo) child);
 			}
 		}
 	}
@@ -192,9 +191,8 @@ public class FinishedJobs extends EventManager {
 		}
 
 		if (fire) {
-			Object l[] = getListeners();
-			for (Object element : l) {
-				KeptJobsListener jv = (KeptJobsListener) element;
+			for (Object listener : getListeners()) {
+				KeptJobsListener jv = (KeptJobsListener) listener;
 				jv.finished(info);
 			}
 		}
@@ -221,21 +219,20 @@ public class FinishedJobs extends EventManager {
 
 			if (myJob != null) {
 
-				Object prop = myJob
-						.getProperty(ProgressManagerUtil.KEEPONE_PROPERTY);
+				Object prop = myJob.getProperty(ProgressManagerUtil.KEEPONE_PROPERTY);
 				if (prop instanceof Boolean && ((Boolean) prop).booleanValue()) {
 					ArrayList found = null;
 					JobTreeElement[] all;
 					all = (JobTreeElement[]) keptjobinfos.toArray(new JobTreeElement[keptjobinfos.size()]);
-					for (JobTreeElement jte : all) {
-						if (jte != info && jte.isJobInfo()) {
-							Job job = ((JobInfo) jte).getJob();
+					for (JobTreeElement jobTreeElement : all) {
+						if (jobTreeElement != info && jobTreeElement.isJobInfo()) {
+							Job job = ((JobInfo) jobTreeElement).getJob();
 							if (job != null && job != myJob
 									&& job.belongsTo(myJob)) {
 								if (found == null) {
 									found = new ArrayList();
 								}
-								found.add(jte);
+								found.add(jobTreeElement);
 							}
 						}
 					}
@@ -311,14 +308,14 @@ public class FinishedJobs extends EventManager {
 			// delete all elements that have jte as their direct or indirect
 			// parent
 			JobTreeElement jtes[] = (JobTreeElement[]) keptjobinfos.toArray(new JobTreeElement[keptjobinfos.size()]);
-			for (JobTreeElement jte2 : jtes) {
-				JobTreeElement parent = (JobTreeElement) jte2.getParent();
+			for (JobTreeElement jobTreeElement : jtes) {
+				JobTreeElement parent = (JobTreeElement) jobTreeElement.getParent();
 				if (parent != null) {
 					if (parent == jte || parent.getParent() == jte) {
-						if (keptjobinfos.remove(jte2)) {
-							disposeAction(jte2);
+						if (keptjobinfos.remove(jobTreeElement)) {
+							disposeAction(jobTreeElement);
 						}
-						finishedTime.remove(jte2);
+						finishedTime.remove(jobTreeElement);
 					}
 				}
 			}
@@ -327,9 +324,8 @@ public class FinishedJobs extends EventManager {
 
 		if (fire) {
 			// notify listeners
-			Object l[] = getListeners();
-			for (Object element : l) {
-				KeptJobsListener jv = (KeptJobsListener) element;
+			for (Object listener : getListeners()) {
+				KeptJobsListener jv = (KeptJobsListener) listener;
 				jv.removed(jte);
 			}
 		}
@@ -384,17 +380,16 @@ public class FinishedJobs extends EventManager {
 		synchronized (keptjobinfos) {
 			JobTreeElement[] all = (JobTreeElement[]) keptjobinfos
 					.toArray(new JobTreeElement[keptjobinfos.size()]);
-			for (JobTreeElement element : all) {
-				disposeAction(element);
+			for (JobTreeElement jobTreeElement : all) {
+				disposeAction(jobTreeElement);
 			}
 			keptjobinfos.clear();
 			finishedTime.clear();
 		}
 
 		// notify listeners
-		Object l[] = getListeners();
-		for (Object element : l) {
-			KeptJobsListener jv = (KeptJobsListener) element;
+		for (Object listener : getListeners()) {
+			KeptJobsListener jv = (KeptJobsListener) listener;
 			jv.removed(null);
 		}
 	}

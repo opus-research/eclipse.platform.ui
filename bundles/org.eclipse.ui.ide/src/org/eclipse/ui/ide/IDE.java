@@ -892,8 +892,7 @@ public final class IDE {
 	 * @since 3.8
 	 */
 	public static IEditorDescriptor overrideDefaultEditorAssociation(IEditorInput editorInput, IContentType contentType, IEditorDescriptor editorDescriptor) {
-		IEditorAssociationOverride[] overrides = getEditorAssociationOverrides();
-		for (IEditorAssociationOverride override : overrides) {
+		for (IEditorAssociationOverride override : getEditorAssociationOverrides()) {
 			editorDescriptor = override.overrideDefaultEditor(editorInput, contentType, editorDescriptor);
 		}
 		return editorDescriptor;
@@ -914,8 +913,7 @@ public final class IDE {
 	 * @since 3.8
 	 */
 	private static IEditorDescriptor overrideDefaultEditorAssociation(String fileName, IContentType contentType, IEditorDescriptor editorDescriptor) {
-		IEditorAssociationOverride[] overrides = getEditorAssociationOverrides();
-		for (IEditorAssociationOverride override : overrides) {
+		for (IEditorAssociationOverride override : getEditorAssociationOverrides()) {
 			editorDescriptor = override.overrideDefaultEditor(fileName, contentType, editorDescriptor);
 		}
 		return editorDescriptor;
@@ -935,8 +933,7 @@ public final class IDE {
 	 * @since 3.8
 	 */
 	public static IEditorDescriptor[] overrideEditorAssociations(IEditorInput editorInput, IContentType contentType, IEditorDescriptor[] editorDescriptors) {
-		IEditorAssociationOverride[] overrides = getEditorAssociationOverrides();
-		for (IEditorAssociationOverride override : overrides) {
+		for (IEditorAssociationOverride override : getEditorAssociationOverrides()) {
 			editorDescriptors = override.overrideEditors(editorInput, contentType, editorDescriptors);
 		}
 		return removeNullEntries(editorDescriptors);
@@ -956,8 +953,7 @@ public final class IDE {
 	 * @since 3.8
 	 */
 	public static IEditorDescriptor[] overrideEditorAssociations(String fileName, IContentType contentType, IEditorDescriptor[] editorDescriptors) {
-		IEditorAssociationOverride[] overrides = getEditorAssociationOverrides();
-		for (IEditorAssociationOverride override : overrides) {
+		for (IEditorAssociationOverride override : getEditorAssociationOverrides()) {
 			editorDescriptors = override.overrideEditors(fileName, contentType, editorDescriptors);
 		}
 		return removeNullEntries(editorDescriptors);
@@ -965,8 +961,8 @@ public final class IDE {
 
 	private static IEditorDescriptor[] removeNullEntries(IEditorDescriptor[] editorDescriptors) {
 		boolean nullDescriptorFound = false;
-		for (IEditorDescriptor d : editorDescriptors) {
-			if (d == null) {
+		for (IEditorDescriptor editorDesc : editorDescriptors) {
+			if (editorDesc == null) {
 				nullDescriptorFound = true;
 				break;
 			}
@@ -975,9 +971,9 @@ public final class IDE {
 			return editorDescriptors;
 		}
 		List<IEditorDescriptor> nonNullDescriptors = new ArrayList<>(editorDescriptors.length);
-		for (IEditorDescriptor d : editorDescriptors) {
-			if (d != null) {
-				nonNullDescriptors.add(d);
+		for (IEditorDescriptor editorDesc : editorDescriptors) {
+			if (editorDesc != null) {
+				nonNullDescriptors.add(editorDesc);
 			}
 		}
 		return nonNullDescriptors.toArray(new IEditorDescriptor[nonNullDescriptors.size()]);
@@ -1730,8 +1726,7 @@ public final class IDE {
 		if (status.isMultiStatus()) {
 			List result = new ArrayList();
 			IStatus[] children = status.getChildren();
-			for (IStatus element : children) {
-				IStatus child = element;
+			for (IStatus child : children) {
 				if (!isIgnoredStatus(child, ignoreModelProviderIds)) {
 					result.add(child);
 				}

@@ -12,7 +12,6 @@ package org.eclipse.ui.internal.registry;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.core.commands.IParameterValues;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.wizards.IWizardCategory;
@@ -62,10 +61,8 @@ public abstract class WizardParameterValues implements IParameterValues {
 
 	private void addParameterValues(Map values, IWizardCategory wizardCategory) {
 
-		final IWizardDescriptor[] wizardDescriptors = wizardCategory
-				.getWizards();
-		for (final IWizardDescriptor wizardDescriptor : wizardDescriptors) {
-			
+		for (final IWizardDescriptor wizardDescriptor : wizardCategory.getWizards()) {
+
 
 			// Note: using description instead of label for the name
 			// to reduce possibilities of key collision in the map
@@ -81,9 +78,7 @@ public abstract class WizardParameterValues implements IParameterValues {
 			values.put(name, id);
 		}
 
-		final IWizardCategory[] childCategories = wizardCategory
-				.getCategories();
-		for (final IWizardCategory childCategory : childCategories) {
+		for (final IWizardCategory childCategory : wizardCategory.getCategories()) {
 			addParameterValues(values, childCategory);
 		}
 	}

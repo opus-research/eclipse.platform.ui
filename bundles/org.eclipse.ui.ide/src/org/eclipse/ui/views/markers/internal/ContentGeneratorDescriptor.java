@@ -86,8 +86,7 @@ public class ContentGeneratorDescriptor {
 	 * @param groupss
 	 */
 	private void addGroupsFrom(IConfigurationElement element, Collection<MarkerGroup> groupss) {
-		IConfigurationElement[] groupings = element.getChildren(MarkerSupportRegistry.MARKER_GROUPING);
-		for (IConfigurationElement grouping : groupings) {
+		for (IConfigurationElement grouping : element.getChildren(MarkerSupportRegistry.MARKER_GROUPING)) {
 			groupss.add(MarkerGroup.createMarkerGroup(grouping));
 		}
 	}
@@ -127,8 +126,7 @@ public class ContentGeneratorDescriptor {
 	 * @return IConfigurationElement[]
 	 */
 	public IConfigurationElement[] getFilterReferences() {
-		IConfigurationElement[] filterGroups = configurationElement
-				.getChildren(ELEMENT_MARKER_FIELD_CONFIGURATION);
+		IConfigurationElement[] filterGroups = configurationElement.getChildren(ELEMENT_MARKER_FIELD_CONFIGURATION);
 		if (generatorExtensions.isEmpty()) {
 			return filterGroups;
 		}
@@ -201,8 +199,8 @@ public class ContentGeneratorDescriptor {
 		if (markerTypes == null) {
 			markerTypes = new HashSet<>();
 			IConfigurationElement[] markerTypeElements = configurationElement.getChildren(MarkerSupportRegistry.MARKER_TYPE_REFERENCE);
-			for (IConfigurationElement configurationElt : markerTypeElements) {
-				String elementName = configurationElt.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_ID);
+			for (IConfigurationElement configElement : markerTypeElements) {
+				String elementName = configElement.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_ID);
 				MarkerType[] types = MarkerTypesModel.getInstance().getType(elementName).getAllSubTypes();
 				for (MarkerType type : types) {
 					markerTypes.add(type);

@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.ui.SubActionBars;
@@ -124,9 +123,7 @@ public class ActionPresentation {
         // Add new actions.
         ArrayList sets = new ArrayList();
 
-        for (IActionSetDescriptor element : newArray) {
-            IActionSetDescriptor desc = element;
-
+		for (IActionSetDescriptor desc : newArray) {
             if (!mapDescToRec.containsKey(desc)) {
                 try {
                     SetRec rec;

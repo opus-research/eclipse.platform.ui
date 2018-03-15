@@ -394,8 +394,7 @@ public class EditorActionBars extends SubActionBars2 {
 		}
 		this.enabledAllowed = enabledAllowed;
 		if (coolItemToolBarMgr != null) {
-			IContributionItem[] items = coolItemToolBarMgr.getItems();
-			for (IContributionItem item : items) {
+			for (IContributionItem item : coolItemToolBarMgr.getItems()) {
 				if (item != null) {
 					item.update(IContributionManagerOverrides.P_ENABLED);
 				}
@@ -463,8 +462,7 @@ public class EditorActionBars extends SubActionBars2 {
 
 		ICoolBarManager coolBarManager = getCastedParent().getCoolBarManager();
 		if ((coolItemToolBarMgr != null) && (coolBarManager != null)) {
-			IContributionItem[] items = coolItemToolBarMgr.getItems();
-			for (IContributionItem item : items) {
+			for (IContributionItem item : coolItemToolBarMgr.getItems()) {
 				item.setVisible(visible || !forceVisibility);
 				coolItemToolBarMgr.markDirty();
 				if (!coolBarManager.isDirty()) {

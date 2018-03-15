@@ -204,8 +204,7 @@ public class MenuAdditionCacheEntry {
 
 	private void addMenuChildren(final MElementContainer<MMenuElement> container,
 			IConfigurationElement parent, String filter) {
-		IConfigurationElement[] items = parent.getChildren();
-		for (final IConfigurationElement child : items) {
+		for (final IConfigurationElement child : parent.getChildren()) {
 			String itemType = child.getName();
 			String id = MenuHelper.getId(child);
 
@@ -412,18 +411,17 @@ public class MenuAdditionCacheEntry {
 		toolBarContribution.setPositionInParent(position);
 		toolBarContribution.getTags().add("scheme:" + location.getScheme()); //$NON-NLS-1$
 
-		IConfigurationElement[] items = toolbar.getChildren();
-		for (final IConfigurationElement item : items) {
-			String itemType = item.getName();
+		for (final IConfigurationElement child : toolbar.getChildren()) {
+			String itemType = child.getName();
 
 			if (IWorkbenchRegistryConstants.TAG_COMMAND.equals(itemType)) {
-				MToolBarElement element = createToolBarCommandAddition(item);
+				MToolBarElement element = createToolBarCommandAddition(child);
 				toolBarContribution.getChildren().add(element);
 			} else if (IWorkbenchRegistryConstants.TAG_SEPARATOR.equals(itemType)) {
-				MToolBarElement element = createToolBarSeparatorAddition(item);
+				MToolBarElement element = createToolBarSeparatorAddition(child);
 				toolBarContribution.getChildren().add(element);
 			} else if (IWorkbenchRegistryConstants.TAG_CONTROL.equals(itemType)) {
-				MToolBarElement element = createToolControlAddition(item);
+				MToolBarElement element = createToolControlAddition(child);
 				toolBarContribution.getChildren().add(element);
 			} else if (IWorkbenchRegistryConstants.TAG_DYNAMIC.equals(itemType)) {
 				ContextFunction generator = new ContextFunction() {
@@ -432,12 +430,12 @@ public class MenuAdditionCacheEntry {
 						ServiceLocator sl = new ServiceLocator();
 						sl.setContext(context);
 						DynamicToolBarContributionItem dynamicItem = new DynamicToolBarContributionItem(
-								MenuHelper.getId(item), sl, item);
+								MenuHelper.getId(child), sl, child);
 						return dynamicItem;
 					}
 				};
 
-				MToolBarElement element = createToolDynamicAddition(item);
+				MToolBarElement element = createToolDynamicAddition(child);
 				RenderedElementUtil.setContributionManager(element, generator);
 				toolBarContribution.getChildren().add(element);
 			}

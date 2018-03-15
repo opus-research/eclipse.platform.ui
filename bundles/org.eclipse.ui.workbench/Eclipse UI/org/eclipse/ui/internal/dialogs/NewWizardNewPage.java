@@ -145,19 +145,17 @@ class NewWizardNewPage implements ISelectionChangedListener {
      * @return whether all of the wizards in the category are enabled via activity filtering
      */
     private boolean allActivityEnabled(IWizardCategory category) {
-        IWizardDescriptor [] wizards = category.getWizards();
-        for (IWizardDescriptor wizard : wizards) {
+		for (IWizardDescriptor wizard : category.getWizards()) {
             if (WorkbenchActivityHelper.filterItem(wizard)) {
 				return false;
 			}
         }
 
-        IWizardCategory [] children = category.getCategories();
-        for (int i = 0; i < children.length; i++) {
-            if (!allActivityEnabled(children[i])) {
+		for (IWizardCategory wizard : category.getCategories()) {
+			if (!allActivityEnabled(wizard)) {
 				return false;
 			}
-        }
+		}
 
         return true;
     }
@@ -187,20 +185,17 @@ class NewWizardNewPage implements ISelectionChangedListener {
      * @return whether all wizards in the category are considered primary
      */
     private boolean allPrimary(IWizardCategory category) {
-        IWizardDescriptor [] wizards = category.getWizards();
-        for (IWizardDescriptor wizard2 : wizards) {
-        	IWizardDescriptor wizard = wizard2;
+		for (IWizardDescriptor wizard : category.getWizards()) {
             if (!isPrimary(wizard)) {
 				return false;
 			}
         }
 
-        IWizardCategory [] children = category.getCategories();
-        for (int i = 0; i < children.length; i++) {
-            if (!allPrimary(children[i])) {
+		for (IWizardCategory wizard : category.getCategories()) {
+			if (!allPrimary(wizard)) {
 				return false;
 			}
-        }
+		}
 
         return true;
     }
@@ -317,9 +312,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
 
         if (wizardCategories != null) {
             if (wizardCategories.getParent() == null) {
-                IWizardCategory [] children = wizardCategories.getCategories();
-                for (IWizardCategory element : children) {
-                    inputArray.add(element);
+				for (IWizardCategory wizardCategory : wizardCategories.getCategories()) {
+					inputArray.add(wizardCategory);
                 }
             } else {
                 expandTop = true;

@@ -69,8 +69,8 @@ public final class ThemeElementHelper {
         }
 
         if (defaults != null) {
-            for (FontDefinition default1 : defaults) {
-                installFont(default1, theme, store, false);
+            for (FontDefinition fontDef : defaults) {
+                installFont(fontDef, theme, store, false);
             }
         }
     }
@@ -123,11 +123,8 @@ public final class ThemeElementHelper {
 
 			//If in high contrast, ignore the defaults in jface and use the default (system) font.
 			//This is a hack to address bug #205474. See bug #228207 for a future fix.
-			FontData[] fontData = JFaceResources.getFontRegistry().getFontData(
-				display.getHighContrast()
-					? JFaceResources.DEFAULT_FONT
-					: id
-			);
+			FontData[] fontData = JFaceResources.getFontRegistry()
+					.getFontData(display.getHighContrast() ? JFaceResources.DEFAULT_FONT : id);
 			defaultFont = registry.bestDataArray(fontData, display);
         }
 
@@ -192,8 +189,8 @@ public final class ThemeElementHelper {
         }
 
         if (defaults != null) {
-            for (ColorDefinition default1 : defaults) {
-                installColor(default1, theme, store, false);
+			for (ColorDefinition colorDef : defaults) {
+				installColor(colorDef, theme, store, false);
             }
         }
     }
