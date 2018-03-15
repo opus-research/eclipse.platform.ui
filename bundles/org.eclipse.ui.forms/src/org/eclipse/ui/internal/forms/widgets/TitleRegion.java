@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *      Ralf Petter <ralf.petter@gmail.com> - Bug 510232
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 
@@ -348,7 +349,7 @@ public class TitleRegion extends Canvas {
 			busyLabel.setImage(theImage);
 		}
 		if (doLayout)
-			layout();
+			requestLayout();
 	}
 
 	public void updateToolTip(String toolTip) {
@@ -378,7 +379,7 @@ public class TitleRegion extends Canvas {
 		if (text != null)
 			titleLabel.setText(text);
 		titleLabel.setVisible(text != null);
-		layout();
+		requestLayout();
 		redraw();
 	}
 
@@ -392,7 +393,7 @@ public class TitleRegion extends Canvas {
 		titleLabel.setFont(font);
 		fontHeight = -1;
 		fontBaselineHeight = -1;
-		layout();
+		requestLayout();
 	}
 
 	private void ensureBusyLabelExists() {
@@ -441,7 +442,7 @@ public class TitleRegion extends Canvas {
 			return false;
 		busyLabel.setBusy(busy);
 		if (busyLabel.getImage() == null) {
-			layout();
+			requestLayout();
 			return true;
 		}
 		return false;
