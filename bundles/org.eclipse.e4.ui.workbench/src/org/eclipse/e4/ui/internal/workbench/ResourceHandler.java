@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -230,13 +230,11 @@ public class ResourceHandler implements IModelResourceHandler {
 		if (restore && saveAndRestore) {
 			resource = loadResource(restoreLocation);
 			// If the saved model does not have any top-level windows, Eclipse will exit
-			// immediately, so we ignore the persisted state and reinitialize
-			// with the default application model.
+			// immediately, so throw out the persisted state and reinitialize with the defaults.
 			if (!hasTopLevelWindows(resource)) {
 				if (logger != null) {
-					// log a stack trace to help debug the corruption
-					logger.error(new Exception(),
-							"The persisted application model has no top-level windows. Reinitializing with the default application model."); //$NON-NLS-1$
+					logger.error(new Exception(), // log a stack trace to help debug the corruption
+							"The persisted workbench has no top-level windows, so reinitializing with defaults."); //$NON-NLS-1$
 				}
 				resource = null;
 			}
@@ -263,7 +261,7 @@ public class ResourceHandler implements IModelResourceHandler {
 		if (!hasTopLevelWindows(resource) && logger != null) {
 			logger.error(new Exception(), // log a stack trace to help debug the
 											// corruption
-					"Loading the application model results in no top-level window " //$NON-NLS-1$
+					"Initializing from the application definition instance yields no top-level windows! " //$NON-NLS-1$
 							+ "Continuing execution, but the missing windows may cause other initialization failures."); //$NON-NLS-1$
 		}
 
