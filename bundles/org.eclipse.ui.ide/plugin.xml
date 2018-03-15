@@ -541,9 +541,6 @@
       <keyword
             id="org.eclipse.ui.ide.settings"
             label="%PreferenceKeywords.Settings"/>
-      <keyword
-            id="org.eclipse.ui.ide.unassociated"
-            label="%PreferenceKeywords.unassociated"/>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -591,7 +588,6 @@
             id="org.eclipse.ui.preferencePages.FileEditors">
          <keywordReference id="org.eclipse.ui.ide.editing"/>
          <keywordReference id="org.eclipse.ui.ide.editors"/>
-         <keywordReference id="org.eclipse.ui.ide.unassociated"/>
       </page>
       <page
             name="%PreferencePages.Views"
@@ -2412,19 +2408,16 @@
       <strategy
             class="org.eclipse.ui.internal.ide.SystemEditorOrTextEditorStrategy"
             id="org.eclipse.ui.ide.systemEditorThenTextEditor"
-            interactive="false"
             label="%systemEditorThenTextEditor">
       </strategy>
       <strategy
             class="org.eclipse.ui.internal.ide.TextEditorStrategy"
             id="org.eclipse.ui.ide.textEditor"
-            interactive="false"
             label="%textEditor">
       </strategy>
       <strategy
             class="org.eclipse.ui.internal.ide.AskUserViaPopupUnassociatedEditorStrategy"
             id="org.eclipse.ui.ide.askUserForUnassociatedEditor"
-            interactive="true"
             label="%askUserViaPopup">
       </strategy>
    </extension>
