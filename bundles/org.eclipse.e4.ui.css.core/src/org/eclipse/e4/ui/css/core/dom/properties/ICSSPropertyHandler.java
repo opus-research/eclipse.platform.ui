@@ -8,7 +8,6 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 490912
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490931
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.dom.properties;
 
@@ -59,7 +58,9 @@ public interface ICSSPropertyHandler {
 	 * @return retrieved CSS properties or null
 	 * @throws Exception
 	 */
-	public String retrieveCSSProperty(Object element, String property, String pseudo, CSSEngine engine)
-			throws Exception;
+	default public String retrieveCSSProperty(Object element, String property, String pseudo, CSSEngine engine)
+			throws Exception {
+		return null;
+	}
 
 }
