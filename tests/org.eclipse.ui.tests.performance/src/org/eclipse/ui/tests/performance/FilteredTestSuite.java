@@ -79,8 +79,7 @@ public class FilteredTestSuite extends TestSuite {
 		}
     }
 
-    @Override
-	public void addTest(Test test) {
+    public void addTest(Test test) {
     	if ((filterTestClassName != null) || (filterTestName != null)) {
     		if (test instanceof TestSuite) {
     			addFilteredTestSuite((TestSuite)test);

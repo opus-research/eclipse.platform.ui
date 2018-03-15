@@ -65,7 +65,6 @@ public class TestColumnWrapLayout extends TestCase {
 			this.height = height;
 		}
 
-		@Override
 		public Point computeSize(int wHint, int hHint, boolean changed) {
 			return new Point( 20, height);
 		}

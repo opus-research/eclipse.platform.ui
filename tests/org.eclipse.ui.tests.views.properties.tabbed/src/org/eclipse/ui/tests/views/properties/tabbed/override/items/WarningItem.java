@@ -24,18 +24,30 @@ import org.eclipse.ui.tests.views.properties.tabbed.model.Warning;
  */
 public class WarningItem extends InformationItem {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.InformationItem#getElement()
+	 */
 	public Class getElement() {
 		return Warning.class;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.InformationItem#getImage()
+	 */
 	public Image getImage() {
 		return PlatformUI.getWorkbench().getSharedImages().getImage(
 				ISharedImages.IMG_OBJS_WARN_TSK);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.InformationItem#getText()
+	 */
 	public String getText() {
 		return "Warning"; //$NON-NLS-1$
 	}

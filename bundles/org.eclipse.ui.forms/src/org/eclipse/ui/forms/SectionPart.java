@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
-import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -63,15 +62,13 @@ public class SectionPart extends AbstractFormPart {
 	 * Adds listeners to the underlying widget.
 	 */
 	protected void hookListeners() {
-		if ((section.getExpansionStyle() & ExpandableComposite.TWISTIE) != 0
-				|| (section.getExpansionStyle() & ExpandableComposite.TREE_NODE) != 0) {
+		if ((section.getExpansionStyle() & Section.TWISTIE) != 0
+				|| (section.getExpansionStyle() & Section.TREE_NODE) != 0) {
 			section.addExpansionListener(new ExpansionAdapter() {
-				@Override
 				public void expansionStateChanging(ExpansionEvent e) {
 					SectionPart.this.expansionStateChanging(e.getState());
 				}
 
-				@Override
 				public void expansionStateChanged(ExpansionEvent e) {
 					SectionPart.this.expansionStateChanged(e.getState());
 				}
@@ -109,7 +106,9 @@ public class SectionPart extends AbstractFormPart {
 		getManagedForm().getForm().reflow(false);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.AbstractFormPart#setFocus()
+	 */
 	public void setFocus() {
 		Control client = section.getClient();
 		if (client != null)
