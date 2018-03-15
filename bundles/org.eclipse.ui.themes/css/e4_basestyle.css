@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 420836
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 497586
  *******************************************************************************/
 
 /* New ColorDefinitions for the E4 default theme */ 
@@ -21,7 +22,8 @@ ThemesExtension { color-definition:
 	'#org-eclipse-ui-workbench-ACTIVE_UNSELECTED_TABS_COLOR_END',
 	'#org-eclipse-ui-workbench-ACTIVE_TAB_OUTER_KEYLINE_COLOR',
 	'#org-eclipse-ui-workbench-ACTIVE_TAB_INNER_KEYLINE_COLOR',
-	'#org-eclipse-ui-workbench-ACTIVE_TAB_OUTLINE_COLOR';
+	'#org-eclipse-ui-workbench-ACTIVE_TAB_OUTLINE_COLOR',
+	'#org-eclipse-ui-workbench-SELECTED-TABS-HIGHLIGHT';
 }
 
 ColorDefinition#org-eclipse-ui-workbench-INACTIVE_UNSELECTED_TABS_COLOR_START {
@@ -114,6 +116,10 @@ ColorDefinition#org-eclipse-ui-workbench-ACTIVE_NOFOCUS_TAB_TEXT_COLOR {
 	color: #101010;
 }
 
+ColorDefinition#org-eclipse-ui-workbench-SELECTED-TABS-HIGHLIGHT {
+	color: #1F98C7;
+}
+
 .MTrimmedWindow.topLevel {
 	margin-top: 0px;
 	margin-bottom: 0px;
@@ -144,6 +150,7 @@ CTabItem:selected {
 	swt-outer-keyline-color: '#org-eclipse-ui-workbench-INACTIVE_TAB_OUTER_KEYLINE_COLOR';
 	swt-inner-keyline-color: '#org-eclipse-ui-workbench-INACTIVE_TAB_INNER_KEYLINE_COLOR';
 	swt-tab-outline: '#org-eclipse-ui-workbench-INACTIVE_TAB_OUTLINE_COLOR';
+	swt-selected-tabs-highlight: '#org-eclipse-ui-workbench-SELECTED-TABS-HIGHLIGHT';
 	padding: 0px 2px 2px;
 	swt-shadow-visible: false;
 	swt-mru-visible: false;

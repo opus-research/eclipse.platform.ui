@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Fabio Zadrozny - Bug 465711
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 497586
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -107,6 +108,7 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 	private CTabFolderWrapper parentWrapper;
 
 	private Color hotUnselectedTabsColorBackground;
+	private Color selectedTabHighlightColor;
 
 	@Inject
 	public CTabRendering(CTabFolder parent) {
@@ -496,6 +498,11 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 			if (!onBottom) {
 				gc.drawLine(startX, 0, endX, 0);
 			}
+		}
+
+		if (selectedTabHighlightColor != null) {
+			gc.setBackground(selectedTabHighlightColor);
+			gc.fillRectangle(bounds.x, bounds.y + bounds.height - 3, bounds.width, 3);
 		}
 
 		if (backgroundPattern != null) {
@@ -915,6 +922,12 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 		if (color != null) {
 			setActive(!(color.getRed() == 255 && color.getGreen() == 255 && color.getBlue() == 255));
 		}
+		parent.redraw();
+	}
+
+	@Override
+	public void setSelectedTabHighlight(Color color) {
+		this.selectedTabHighlightColor = color;
 		parent.redraw();
 	}
 

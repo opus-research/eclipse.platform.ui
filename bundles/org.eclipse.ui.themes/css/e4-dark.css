@@ -8,6 +8,7 @@
  * Contributors:
  *     Andrea Guarinoni <andrea.guarinoni.dev@outlook.com> - initial API and implementation
  *     Lars Vogel - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 497586
  *******************************************************************************/
 
 @import url("platform:/plugin/org.eclipse.ui.themes/css/dark/e4-dark_basestyle.css");
@@ -33,6 +34,7 @@
     swt-outer-keyline-color: '#org-eclipse-ui-workbench-INACTIVE_TAB_OUTER_KEYLINE_COLOR'; /* border color for whole tabs container */
     swt-inner-keyline-color: '#org-eclipse-ui-workbench-INACTIVE_TAB_INNER_KEYLINE_COLOR';
     swt-tab-outline: '#org-eclipse-ui-workbench-INACTIVE_TAB_OUTLINE_COLOR'; /* border color for selected tab */
+    swt-selected-tabs-highlight: '#org-eclipse-ui-workbench-SELECTED-TABS-HIGHLIGHT';
     padding: 0px 2px 2px;
     swt-shadow-visible: false;
     swt-mru-visible: true;
