@@ -244,7 +244,7 @@ public class PluginActivationTests {
 	@Test
 	@Ignore("See Bug 516743")
 	public void pluginsWithoutOSGiServiceOrActivatorShouldNotActive() {
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		for (String element : NOT_ACTIVE_BUNDLES) {
 			Bundle bundle = Platform.getBundle(element);
 			if (bundle == null) {
