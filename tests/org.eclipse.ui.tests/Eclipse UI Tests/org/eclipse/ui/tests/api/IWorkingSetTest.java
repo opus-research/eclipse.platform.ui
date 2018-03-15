@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -211,7 +211,7 @@ public class IWorkingSetTest extends UITestCase {
 		assertTrue(fWorkingSet.isEmpty());
 		fWorkingSet.setElements(new IAdaptable[] { new IAdaptable() {
 			@Override
-			public <T> T getAdapter(Class<T> adapter) {
+			public Object getAdapter(Class adapter) {
 				return null;
 			}
 		} });
@@ -314,7 +314,8 @@ public class IWorkingSetTest extends UITestCase {
     public static class Foo implements IAdaptable {
 
 		@Override
-		public <T> T getAdapter(Class<T> adapter) {
+		public Object getAdapter(Class adapter) {
+			// TODO Auto-generated method stub
 			return null;
 		}
     }
@@ -325,12 +326,10 @@ public class IWorkingSetTest extends UITestCase {
 
     public class ToFoo implements IAdaptable {
 
-		@SuppressWarnings("unchecked")
 		@Override
-		public <T> T getAdapter(Class<T> adapter) {
+		public Object getAdapter(Class adapter) {
 			if (adapter == Foo.class) {
-				return (T) new Foo() {
-				};
+				return new Foo() {};
 			}
 			return null;
 		}
@@ -340,7 +339,8 @@ public class IWorkingSetTest extends UITestCase {
     public static class IAImpl implements IA, IAdaptable {
 
 		@Override
-		public <T> T getAdapter(Class<T> adapter) {
+		public Object getAdapter(Class adapter) {
+			// TODO Auto-generated method stub
 			return null;
 		}
     }
@@ -348,7 +348,7 @@ public class IWorkingSetTest extends UITestCase {
     public static class ModelElement implements IModelElement, IAdaptable {
 
 		@Override
-		public <T> T getAdapter(Class<T> adapter) {
+		public Object getAdapter(Class adapter) {
 			return null;
 		}
 

@@ -12,7 +12,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
@@ -130,7 +129,6 @@ public class PluginActivationTests {
 			"org.eclipse.emf.ecore.xmi",
 			"org.eclipse.equinox.app",
 			"org.eclipse.equinox.common",
-			"org.eclipse.ui.cheatsheets",
 			"org.eclipse.equinox.console",
 			"org.eclipse.equinox.ds",
 			"org.eclipse.equinox.event",
@@ -242,9 +240,8 @@ public class PluginActivationTests {
 	 */
 
 	@Test
-	@Ignore("See Bug 516743")
 	public void pluginsWithoutOSGiServiceOrActivatorShouldNotActive() {
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		for (String element : NOT_ACTIVE_BUNDLES) {
 			Bundle bundle = Platform.getBundle(element);
 			if (bundle == null) {
@@ -282,10 +279,9 @@ public class PluginActivationTests {
 	 */
 
 	@Test
-	@Ignore("See Bug 516743")
 	public void activePluginsShouldNotIncrease() {
 		printPluginStatus(true);
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		for (String element : ACTIVE_BUNDLES) {
 			Bundle bundle = Platform.getBundle(element);
 			if (bundle == null) {

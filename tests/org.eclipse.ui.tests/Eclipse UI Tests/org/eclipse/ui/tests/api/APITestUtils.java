@@ -97,6 +97,7 @@ public class APITestUtils {
 		saveableHelperSetAutomatedResponse(response, context);
 
 		while (workbench.getDisplay().readAndDispatch()) {
+			;
 		}
 
 		for (MWindow window : application.getChildren()) {
@@ -104,6 +105,7 @@ public class APITestUtils {
 		}
 
 		while (workbench.getDisplay().readAndDispatch()) {
+			;
 		}
 	}
 
