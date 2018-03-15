@@ -25,8 +25,6 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Color;
@@ -768,13 +766,10 @@ public class FormHeading extends Canvas {
 			toolbar.setBackground(getBackground());
 			toolbar.setForeground(getForeground());
 			toolbar.setCursor(FormsResources.getHandCursor());
-			addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(DisposeEvent e) {
-					if (toolBarManager != null) {
-						toolBarManager.dispose();
-						toolBarManager = null;
-					}
+			addDisposeListener(e -> {
+				if (toolBarManager != null) {
+					toolBarManager.dispose();
+					toolBarManager = null;
 				}
 			});
 		}
