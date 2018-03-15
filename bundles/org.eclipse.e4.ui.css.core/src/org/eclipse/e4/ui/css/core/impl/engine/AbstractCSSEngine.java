@@ -221,11 +221,8 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 				tempStream.setURI(url.toString());
 				tempStream.setByteStream(stream);
 				parseImport++;
-				try {
-					styleSheet = (CSSStyleSheet) this.parseStyleSheet(tempStream);
-				} finally {
-					parseImport--;
-				}
+				styleSheet = (CSSStyleSheet) this.parseStyleSheet(tempStream);
+				parseImport--;
 				CSSRuleList tempRules = styleSheet.getCssRules();
 				for (int j = 0; j < tempRules.getLength(); j++) {
 					masterList.add(tempRules.item(j));

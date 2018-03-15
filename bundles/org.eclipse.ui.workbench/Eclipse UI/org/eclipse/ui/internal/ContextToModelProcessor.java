@@ -64,7 +64,8 @@ public class ContextToModelProcessor {
 				contextModel.setDescription(ctx.getDescription());
 
 			} catch (NotDefinedException e) {
-				WorkbenchPlugin.log(e);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		for (Context ctx : contextManager.getDefinedContexts()) {
@@ -87,7 +88,8 @@ public class ContextToModelProcessor {
 					}
 				}
 			} catch (NotDefinedException e) {
-				WorkbenchPlugin.log(e);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}

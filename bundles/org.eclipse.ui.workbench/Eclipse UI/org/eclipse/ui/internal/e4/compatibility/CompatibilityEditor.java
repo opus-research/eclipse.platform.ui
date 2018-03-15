@@ -96,9 +96,9 @@ public class CompatibilityEditor extends CompatibilityPart {
 
 	@Override
 	protected boolean createPartControl(final IWorkbenchPart legacyPart, Composite parent) {
-		clearMenuItems();
-
 		super.createPartControl(legacyPart, parent);
+
+		clearMenuItems();
 
 		part.getContext().set(IEditorPart.class, (IEditorPart) legacyPart);
 

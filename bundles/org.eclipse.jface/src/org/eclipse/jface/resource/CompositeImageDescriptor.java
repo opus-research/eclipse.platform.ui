@@ -20,6 +20,7 @@ import org.eclipse.swt.graphics.ImageDataProvider;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * Abstract base class for image descriptors that synthesize an image from other
@@ -40,9 +41,6 @@ public abstract class CompositeImageDescriptor extends ImageDescriptor {
 	 * An {@link ImageDataProvider} that caches the most recently returned
 	 * {@link ImageData} object. I.e. consecutive calls to
 	 * {@link #getImageData(int)} with the same zoom level are cheap.
-	 *
-	 * @see #createCachedImageDataProvider(Image)
-	 * @see #createCachedImageDataProvider(ImageDescriptor)
 	 *
 	 * @since 3.13
 	 * @noextend This class is not intended to be subclassed by clients.
@@ -107,9 +105,33 @@ public abstract class CompositeImageDescriptor extends ImageDescriptor {
 			if (zoom == cachedZoom) {
 				return cached;
 			}
-			cached = baseImage.getImageData(zoom);
+			// Workaround for the missing API Image#getImageData(int zoom) (bug 496409).
+			// Can't use zoom == getZoomLevel() because SWT on Cocoa asks for 100% image even on Retina screen!
+			if (zoom == 100) {
+				cached = baseImage.getImageData();
+			} else if (isAtCurrentZoom(baseImage, zoom)) {
+				cached = baseImage.getImageDataAtCurrentZoom();
+			} else {
+				// strange zoom value, should not happen
+				zoom = 0;
+				cached = null;
+			}
 			cachedZoom = zoom;
 			return cached;
+		}
+
+		private /*static*/ boolean isAtCurrentZoom(Image image, int zoom) {
+			Rectangle bounds= image.getBounds();
+			Rectangle boundsInPixels= image.getBoundsInPixels();
+			//TODO: Probably has off-by-one problems at fractional zoom levels:
+			return bounds.width == scaleDown(boundsInPixels.width, zoom)
+					|| bounds.height == scaleDown(boundsInPixels.height, zoom);
+		}
+
+		private /*static*/ int scaleDown(int value, int zoom) {
+			// @see SWT's internal DPIUtil#autoScaleDown(int)
+			float scaleFactor = zoom / 100f;
+			return Math.round(value / scaleFactor);
 		}
 	}
 
@@ -240,15 +262,6 @@ public abstract class CompositeImageDescriptor extends ImageDescriptor {
 	 * this composite image. This method must only be called within the dynamic
 	 * scope of a call to {@link #drawCompositeImage(int, int)}.
 	 * </p>
-	 * <p>
-	 * Hint: Use {@link #createCachedImageDataProvider(Image)} or
-	 * {@link #createCachedImageDataProvider(ImageDescriptor)} to create an
-	 * {@link ImageDataProvider}. To calculate the width and height of the image
-	 * that is about to be drawn, you can use
-	 * {@link CachedImageDataProvider#getWidth()}/getHeight(). These methods
-	 * already return values in SWT points, so that your code doesn't have to
-	 * deal with device-dependent pixel coordinates.
-	 * </p>
 	 *
 	 * @param srcProvider
 	 *            the source image data provider
@@ -359,16 +372,13 @@ public abstract class CompositeImageDescriptor extends ImageDescriptor {
 		if (!supportsZoomLevel(zoom)) {
 			return null;
 		}
-		/* Assign before calling getSize(), just in case an implementer of
-		 * getSize() already uses a CachedImageDataProvider. */
-		compositeZoom = zoom;
-
 		Point size = getSize();
 
 		/* Create a 24 bit image data with alpha channel */
 		imageData = new ImageData(scaleUp(size.x, zoom), scaleUp(size.y, zoom), 24,
 				new PaletteData(0xFF, 0xFF00, 0xFF0000));
 		imageData.alphaData = new byte[imageData.width * imageData.height];
+		compositeZoom = zoom;
 
 		drawCompositeImage(size.x, size.y);
 
