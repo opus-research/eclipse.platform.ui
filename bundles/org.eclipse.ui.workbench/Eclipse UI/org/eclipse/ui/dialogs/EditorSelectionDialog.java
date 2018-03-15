@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IFileEditorMapping;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
@@ -142,6 +143,8 @@ public class EditorSelectionDialog extends Dialog {
 	protected static final String STORE_ID_INTERNAL_EXTERNAL = "EditorSelectionDialog.STORE_ID_INTERNAL_EXTERNAL";//$NON-NLS-1$
 
 	private static final String STORE_ID_DESCR = "EditorSelectionDialog.STORE_ID_DESCR";//$NON-NLS-1$
+
+	private static final String STORE_ID_FILE_EXTENSION = "EditorSelectionDialog.STORE_ID_FILE_EXTENSION";//$NON-NLS-1$
 
 	private String message = WorkbenchMessages.EditorSelection_chooseAnEditor;
 
@@ -332,6 +335,7 @@ public class EditorSelectionDialog extends Dialog {
 			}
 		}
 
+		initializeSuggestion();
 		restoreWidgetValues(); // Place buttons to the appropriate state
 
 		// Run async to restore selection on *visible* dialog - otherwise three won't scroll
@@ -379,22 +383,15 @@ public class EditorSelectionDialog extends Dialog {
 
 		editorTableViewer.setInput(showInternal ? getInternalEditors() : getExternalEditors());
 
+		if (newSelection == null) {
+			if (!showInternal) {
+				newSelection = findBestExternalEditor();
+			} else {
+				newSelection = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(fileName);
+			}
+		}
 		if (newSelection != null) {
 			editorTableViewer.setSelection(new StructuredSelection(newSelection), true);
-		} else if (!showInternal) {
-			int index = fileName.lastIndexOf('.');
-			if (index != -1) {
-				String extension = fileName.substring(index);
-				Program program = Program.findProgram(extension);
-				if (program != null) {
-					for (IEditorDescriptor descriptor : externalEditors) {
-						if (descriptor instanceof EditorDescriptor
-								&& program.equals(((EditorDescriptor) descriptor).getProgram())) {
-							editorTableViewer.setSelection(new StructuredSelection(descriptor), true);
-						}
-					}
-				}
-			}
 		}
 
 		if (editorTableViewer.getSelection().isEmpty()) {
@@ -407,10 +404,17 @@ public class EditorSelectionDialog extends Dialog {
 		editorTable.setFocus();
 	}
 
+	private static String getFileExtension(String fileName) {
+		int index = fileName.lastIndexOf('.');
+		if (index != -1) {
+			return fileName.substring(index);
+		}
+		return fileName;
+	}
+
 	/**
 	 * Return the dialog store to cache values into
 	 */
-
 	protected IDialogSettings getDialogSettings() {
 		IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault()
 				.getDialogSettings();
@@ -545,12 +549,44 @@ public class EditorSelectionDialog extends Dialog {
 		buttonPressed(IDialogConstants.OK_ID);
 	}
 
+	private void initializeSuggestion() {
+		IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+		IEditorDescriptor suggestion = editorRegistry.getDefaultEditor(fileName);
+		if (suggestion != null && suggestion.isInternal()) {
+			selectedEditor = suggestion;
+		} else {
+			selectedEditor = findBestExternalEditor();
+		}
+		boolean enableInternalList = selectedEditor == null || selectedEditor.isInternal();
+		internalButton.setSelection(enableInternalList);
+		externalButton.setSelection(!enableInternalList);
+	}
+
+	private IEditorDescriptor findBestExternalEditor() {
+		String extension = getFileExtension(fileName);
+		Program program = Program.findProgram(extension);
+		if (program != null) {
+			for (IEditorDescriptor descriptor : getExternalEditors()) {
+				if (descriptor instanceof EditorDescriptor
+						&& program.equals(((EditorDescriptor) descriptor).getProgram())) {
+					return descriptor;
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Use the dialog store to restore widget values to the values that they
-	 * held last time this wizard was used to completion
+	 * held last time this wizard was used to completion, if the previous file
+	 * has same extension.
 	 */
 	protected void restoreWidgetValues() {
 		IDialogSettings settings = getDialogSettings();
+		if (!getFileExtension(fileName).equals(settings.get(STORE_ID_FILE_EXTENSION))) {
+			// last selection most likely not relevant for other file types
+			return;
+		}
 		boolean wasExternal = settings.getBoolean(STORE_ID_INTERNAL_EXTERNAL);
 		internalButton.setSelection(!wasExternal);
 		externalButton.setSelection(wasExternal);
@@ -578,6 +614,7 @@ public class EditorSelectionDialog extends Dialog {
 	protected void saveWidgetValues() {
 		IDialogSettings settings = getDialogSettings();
 		// record whether use was viewing internal or external editors
+		settings.put(STORE_ID_FILE_EXTENSION, getFileExtension(fileName));
 		settings.put(STORE_ID_INTERNAL_EXTERNAL, !internalButton.getSelection());
 		settings.put(STORE_ID_DESCR, selectedEditor.getId());
 		String editorId = selectedEditor.getId();
