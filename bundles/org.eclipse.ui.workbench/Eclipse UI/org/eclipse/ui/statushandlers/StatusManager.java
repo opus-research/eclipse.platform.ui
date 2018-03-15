@@ -135,6 +135,8 @@ public class StatusManager {
 
 	private StatusManager() {
 		Platform.addLogListener(new StatusManagerLogListener());
+		// Init default handler on startup, to avoid initialization on shutdown
+		getStatusHandler();
 	}
 
 	private AbstractStatusHandler getStatusHandler(){
