@@ -23,8 +23,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.tests.internal.util.VerifyDialog;
-
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * A <code>DialogCheck</code> is used test a dialog in
