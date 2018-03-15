@@ -175,7 +175,7 @@ public abstract class ViewerSettingsAndStatusDialog extends ViewSettingsDialog {
 		if (msgParent != null) {
 			setMessageImage(image);
 			setMessageText(messgage);
-			msgParent.layout();
+			msgParent.requestLayout();
 		}
 	}
 
@@ -228,7 +228,7 @@ public abstract class ViewerSettingsAndStatusDialog extends ViewSettingsDialog {
 		if (data.exclude == visible) {
 			data.exclude = !visible;
 			msgParent.setVisible(visible);
-			msgParent.getParent().layout();
+			msgParent.getParent().requestLayout();
 		}
 	}
 

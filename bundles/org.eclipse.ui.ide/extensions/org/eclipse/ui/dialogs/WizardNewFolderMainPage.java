@@ -545,7 +545,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			useVirtualFolder = null;
 			useLinkedResource = null;
 			linkedGroupComposite = null;
-			composite.layout();
+			composite.requestLayout();
 			shell.setSize(shellSize.x, shellSize.y - linkedResourceGroupHeight);
 			advancedButton.setText(IDEWorkbenchMessages.showAdvanced);
 		} else {

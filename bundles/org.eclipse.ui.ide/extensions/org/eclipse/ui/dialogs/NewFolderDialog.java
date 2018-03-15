@@ -309,7 +309,7 @@ public class NewFolderDialog extends SelectionStatusDialog {
 		if (linkedResourceComposite != null) {
 			linkedResourceComposite.dispose();
 			linkedResourceComposite = null;
-			composite.layout();
+			composite.requestLayout();
 			shell.setSize(shellSize.x, basicShellHeight);
 			advancedButton.setText(IDEWorkbenchMessages.showAdvanced);
 		} else {
@@ -321,7 +321,7 @@ public class NewFolderDialog extends SelectionStatusDialog {
 					.createContents(linkedResourceParent);
 			shellSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 			shell.setSize(shellSize);
-			composite.layout();
+			composite.requestLayout();
 			advancedButton.setText(IDEWorkbenchMessages.hideAdvanced);
 		}
 	}

@@ -1769,7 +1769,7 @@ getPreferenceStore(),
         }
 
         stackLayout.topControl = previewControl;
-        previewComposite.layout();
+        previewComposite.requestLayout();
         updateControls();
 	}
 

@@ -608,7 +608,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 		if (linkedResourceComposite != null) {
 			linkedResourceComposite.dispose();
 			linkedResourceComposite = null;
-			composite.layout();
+			composite.requestLayout();
 			shell.setSize(shellSize.x, shellSize.y - linkedResourceGroupHeight);
 			advancedButton.setText(IDEWorkbenchMessages.showAdvanced);
 		} else {
@@ -621,7 +621,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 				linkedResourceGroupHeight = groupSize.y;
 			}
 			shell.setSize(shellSize.x, shellSize.y + linkedResourceGroupHeight);
-			composite.layout();
+			composite.requestLayout();
 			advancedButton.setText(IDEWorkbenchMessages.hideAdvanced);
 		}
 	}

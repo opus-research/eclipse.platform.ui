@@ -2967,7 +2967,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			viewForm.setVisible(visible);
 			GridData gd = (GridData) viewForm.getLayoutData();
 			gd.exclude = !visible;
-			viewForm.getParent().layout();
+			viewForm.getParent().requestLayout();
 		}
 
 		@Override

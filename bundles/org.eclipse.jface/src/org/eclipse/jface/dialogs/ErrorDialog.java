@@ -619,7 +619,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 		} else {
 			list = createDropDownList((Composite) getContents());
 			detailsButton.setText(IDialogConstants.HIDE_DETAILS_LABEL);
-			getContents().getShell().layout();
+			getContents().getShell().requestLayout();
 			opened = true;
 		}
 		Point newSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);

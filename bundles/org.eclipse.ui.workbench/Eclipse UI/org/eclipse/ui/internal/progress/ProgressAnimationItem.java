@@ -267,7 +267,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 		toolButton.setImage(im);
 		toolButton.setToolTipText(tt);
     	toolbar.setVisible(true);
-		toolbar.getParent().layout(); // must layout
+		toolbar.getParent().requestLayout(); // must layout
 
 		if (currentAccessibleListener != null)
 			toolbar.getAccessible().removeAccessibleListener(currentAccessibleListener);

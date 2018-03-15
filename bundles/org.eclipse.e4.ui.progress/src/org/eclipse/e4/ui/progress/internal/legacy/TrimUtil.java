@@ -42,7 +42,7 @@ public class TrimUtil {
     	t.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     	ToolItem ti = new ToolItem(t, SWT.PUSH);
     	ti.setImage(JFaceResources.getImageRegistry().get(Dialog.DLG_IMG_MESSAGE_INFO));
-    	s.layout();
+    	s.requestLayout();
     	int toolItemHeight = t.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
     	GC gc = new GC(s);
     	Point fontSize = gc.textExtent("Wg"); //$NON-NLS-1$

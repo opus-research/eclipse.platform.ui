@@ -551,7 +551,7 @@ public class TaskList extends ViewPart {
             stackLayout.topControl = table;
         }
 
-        parent.layout();
+        parent.requestLayout();
     }
 
     @Override
