@@ -86,10 +86,10 @@ public class VisibilityAssistant implements IExtensionActivationListener {
 		if (theExtensions == null) {
 			return;
 		}
-		for (String theExtension : theExtensions) {
-			programmaticVisibilityBindings.add(theExtension);
+		for (String extension : theExtensions) {
+			programmaticVisibilityBindings.add(extension);
 			if (isRoot) {
-				programmaticRootBindings.add(theExtension);
+				programmaticRootBindings.add(extension);
 			}
 		}
 		notifyClients();

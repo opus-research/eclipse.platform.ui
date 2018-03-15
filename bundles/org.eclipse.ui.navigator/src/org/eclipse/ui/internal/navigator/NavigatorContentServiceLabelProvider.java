@@ -18,6 +18,7 @@ import java.util.Iterator;
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -28,7 +29,6 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.ViewerLabel;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -328,13 +328,12 @@ public class NavigatorContentServiceLabelProvider extends EventManager
      */
     protected void fireLabelProviderChanged(
             final LabelProviderChangedEvent event) {
-        Object[] theListeners = getListeners();
-        for (Object theListener : theListeners) {
-            final ILabelProviderListener l = (ILabelProviderListener) theListener;
+		for (Object listener : getListeners()) {
+			final ILabelProviderListener labelProviderListener = (ILabelProviderListener) listener;
             SafeRunner.run(new SafeRunnable() {
                 @Override
 				public void run() {
-                    l.labelProviderChanged(event);
+					labelProviderListener.labelProviderChanged(event);
                 }
             });
 
