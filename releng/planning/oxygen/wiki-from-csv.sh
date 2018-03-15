@@ -1,7 +1,7 @@
 #!/bin/bash
 
 create_wiki_header() {
-echo "Overview page of the work done for the Eclipse 4.5 service and 4.6 release. For the general themes of this release please see [https://wiki.eclipse.org/Platform_UI/Plan/4.6 Platform UI targets for Eclipse Neon] "
+echo "Overview page of the work done for the Eclipse 4.6 service and 4.7 release. For the general themes of this release please see [https://wiki.eclipse.org/Platform_UI/Plan/4.7 Platform UI targets for Eclipse 4.7] "
 echo ""
 echo "'''This list is generated automatically, please do not update manually'''"
 echo ""
@@ -64,28 +64,15 @@ echo ""
 
 create_wiki_header
 
-echo "= Work targeting Eclipse 4.5.1 and 4.5.2 ="
+echo "= Work targeting Eclipse 4.6.1 and 4.6.2 ="
 
-create_wiki_section "4.5.1" 4.5.1
-create_wiki_section "4.5.2" 4.5.2
+create_wiki_section "4.6.1" 4.6.1
 
 
-echo "= Work targeting Eclipse 4.6 ="
-
+echo "= Work targeting Eclipse 4.7 ="
 echo ""
 
-create_wiki_section "4.6 M1" 4.6%20M1
-create_wiki_section "4.6 M2" 4.6%20M2
-create_wiki_section "4.6 M3" 4.6%20M3
-create_wiki_section "4.6 M4" 4.6%20M4
-create_wiki_section "4.6 M5" 4.6%20M5
-create_wiki_section "4.6 M6" 4.6%20M6
-create_wiki_section "4.6 M7" 4.6%20M7
-create_wiki_section "4.6 RC1" 4.6%20RC1
-create_wiki_section "4.6 RC2" 4.6%20RC2
-create_wiki_section "4.6 RC3" 4.6%20RC3
-create_wiki_section "4.6 RC4" 4.6%20RC4
-create_wiki_section "4.6" 4.6
+create_wiki_section "4.7" 4.7
 
 
 
