@@ -377,7 +377,7 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 			new ToolItem(toolBar, SWT.SEPARATOR).setWidth(0);
 
 			ToolItem importButton = new ToolItem(toolBar, SWT.PUSH);
-			importImage = WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_PREF_IMPORT)
+			importImage = WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_ETOOL_IMPORT_WIZ)
 					.createImage();
 			importButton.setImage(importImage);
 			importButton.setToolTipText(WorkbenchMessages.Preference_importTooltip);
@@ -386,7 +386,7 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 			new ToolItem(toolBar, SWT.SEPARATOR).setWidth(0);
 
 			ToolItem exportButton = new ToolItem(toolBar, SWT.PUSH);
-			exportImage = WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_PREF_EXPORT)
+			exportImage = WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_ETOOL_EXPORT_WIZ)
 					.createImage();
 			exportButton.setImage(exportImage);
 			exportButton.setToolTipText(WorkbenchMessages.Preference_exportTooltip);
