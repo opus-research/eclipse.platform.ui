@@ -35,8 +35,7 @@ import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.bindings.internal.BindingTable;
 import org.eclipse.e4.ui.bindings.internal.BindingTableManager;
 import org.eclipse.e4.ui.internal.workbench.Activator;
-import org.eclipse.e4.ui.internal.workbench.swt.Policy;
-import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
+import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MBindingContext;
 import org.eclipse.e4.ui.model.application.commands.MBindingTable;
@@ -148,9 +147,7 @@ public class BindingProcessingAddon {
 	}
 
 	private void defineBindingTables() {
-		if (Policy.DEBUG_CMDS) {
-			WorkbenchSWTActivator.trace(Policy.DEBUG_CMDS_FLAG, "Initialize binding tables from model", null); //$NON-NLS-1$
-		}
+		Activator.trace(Policy.DEBUG_CMDS, "Initialize binding tables from model", null); //$NON-NLS-1$
 		for (MBindingTable bindingTable : application.getBindingTables()) {
 			defineBindingTable(bindingTable);
 		}
@@ -251,9 +248,7 @@ public class BindingProcessingAddon {
 				keyBinding = bindingService.createBinding(sequence, cmd, bindingContext.getId(), attrs);
 				binding.getTransientData().put(EBindingService.MODEL_TO_BINDING_KEY, keyBinding);
 			} catch (IllegalArgumentException e) {
-				if (Policy.DEBUG_MENUS) {
-					WorkbenchSWTActivator.trace(Policy.DEBUG_MENUS_FLAG, "failed to create: " + binding, e); //$NON-NLS-1$
-				}
+				Activator.trace(Policy.DEBUG_MENUS, "failed to create: " + binding, e); //$NON-NLS-1$
 				return null;
 			}
 
