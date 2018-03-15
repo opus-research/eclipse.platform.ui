@@ -11,33 +11,36 @@
  *     Bryan Hunt - Fix for Bug 245457
  *     Didier Villevalois - Fix for Bug 178534
  *     Robin Stocker - Fix for Bug 193034 (tool tip also on text)
- *     Alena Laskavaia - Bug 481604, Bug 482024
- *     Ralf Petter <ralf.petter@gmail.com> - Bug 183675
- *     Jens Reimann <jreimann@redhat.com> - Bug 520833
+ *     Alena Laskavaia - Bug 481604
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.osgi.service.environment.Constants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
@@ -49,7 +52,7 @@ import org.eclipse.ui.internal.forms.widgets.FormsResources;
  * This composite is capable of expanding or collapsing a single client that is
  * its direct child. The composite renders an expansion toggle affordance
  * (according to the chosen style), and a title that also acts as a hyperlink
- * (can be selected and is traversable). The client is laid out below the title
+ * (can be selected and is traversable). The client is layed out below the title
  * when expanded, or hidden when collapsed.
  * <p>
  * The widget can be instantiated as-is, or subclassed to modify some aspects of
@@ -62,9 +65,9 @@ import org.eclipse.ui.internal.forms.widgets.FormsResources;
  *
  * <p>
  * While expandable composite recognize that different styles can be used to
- * render the title bar, and even defines the constants for these styles
- * (<code>TITLE_BAR</code> and <code>SHORT_TITLE_BAR</code> the actual painting
- * is done in the subclasses.
+ * render the title bar, and even defines the constants for these styles (<code>TITLE_BAR</code>
+ * and <code>SHORT_TITLE_BAR</code> the actual painting is done in the
+ * subclasses.
  *
  * @see Section
  * @since 3.0
@@ -98,7 +101,7 @@ public class ExpandableComposite extends Canvas {
 	/**
 	 * If this style is used, computed size of the composite will take the
 	 * client width into consideration only in the expanded state. Otherwise,
-	 * client width will always be taken into account.
+	 * client width will always be taken into acount.
 	 */
 	public static final int COMPACT = 1 << 5;
 
@@ -117,7 +120,7 @@ public class ExpandableComposite extends Canvas {
 
 	/**
 	 * If this style is used, a short version of the title bar decoration will
-	 * be painted behind the text. This style is useful when a more discrete
+	 * be painted behind the text. This style is useful when a more descrete
 	 * option is needed for the title bar.
 	 *
 	 * @since 3.1
@@ -226,8 +229,6 @@ public class ExpandableComposite extends Canvas {
 
 	private class ExpandableLayout extends Layout implements ILayoutExtension {
 
-		private static final int MIN_WIDTH = -2;
-
 		private SizeCache toggleCache = new SizeCache();
 
 		private SizeCache textClientCache = new SizeCache();
@@ -268,104 +269,88 @@ public class ExpandableComposite extends Canvas {
 			}
 			int x = marginWidth + thmargin;
 			int y = marginHeight + tvmargin;
-			// toggle
-			Point toggleSize = toggleCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-
-			int width = clientArea.width - marginWidth - marginWidth - thmargin - thmargin;
-			if (toggleSize.x > 0)
-				width -= toggleSize.x + IGAP;
-
-			// TODO: This code is common between computeSize and layout
-			int gapBetweenTcAndLabel = (textClient != null && textLabel != null) ? IGAP : 0;
-
-			int widthForTcAndLabel = Math.max(0, width - gapBetweenTcAndLabel);
-
-			Point tcDefault = textClientCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-			Point labelDefault = this.textLabelCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-
-			int tcWidthBeforeSplit = Math.min(width, tcDefault.x);
-			int labelWidthBeforeSplit = Math.min(width, labelDefault.x);
-
-			int tcWidthAfterSplit = tcWidthBeforeSplit;
-			int labelWidthAfterSplit = labelWidthBeforeSplit;
-
-			int expectedWidthForTcAndLabel = tcWidthBeforeSplit + labelWidthBeforeSplit;
-
-			if (expectedWidthForTcAndLabel > widthForTcAndLabel) {
-				// this is heuristic since we don't have a reliable way to find
-				// out if control can wrap. It checks if width of each label or
-				// textClient is less then half
-				// and gives them what they asked in this case
-				if (labelWidthBeforeSplit < widthForTcAndLabel / 2) {
-					labelWidthAfterSplit = labelWidthBeforeSplit;
-				} else {
-					labelWidthAfterSplit = widthForTcAndLabel * labelWidthBeforeSplit
-							/ expectedWidthForTcAndLabel;
+			Point tsize = NULL_SIZE;
+			Point tcsize = NULL_SIZE;
+			if (toggle != null)
+				tsize = toggleCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			int twidth = clientArea.width - marginWidth - marginWidth
+					- thmargin - thmargin;
+			if (tsize.x > 0)
+				twidth -= tsize.x + IGAP;
+			if (textClient != null) {
+				tcsize = textClientCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			}
+			Point size = NULL_SIZE;
+			if (textLabel != null) {
+				if (tcsize.x > 0 && FormUtil.isWrapControl(textClient)) {
+					size = textLabelCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+					if (twidth < size.x + IGAP + tcsize.x) {
+						twidth -= IGAP;
+						if (textLabel instanceof Label) {
+							GC gc = new GC(textLabel);
+							size = FormUtil.computeWrapSize(gc, ((Label)textLabel).getText(), Math.round(twidth*(size.x/(float)(size.x+tcsize.x))));
+							gc.dispose();
+						} else
+							size = textLabelCache.computeSize(Math.round(twidth*(size.x/(float)(size.x+tcsize.x))), SWT.DEFAULT);
+						tcsize = textClientCache.computeSize(twidth-size.x, SWT.DEFAULT);
+					}
 				}
-
-				if (tcWidthBeforeSplit < widthForTcAndLabel / 2) {
-					tcWidthAfterSplit = tcWidthBeforeSplit;
-					labelWidthAfterSplit = widthForTcAndLabel - tcWidthAfterSplit;
-				} else {
-					tcWidthAfterSplit = widthForTcAndLabel - labelWidthAfterSplit;
+				else {
+					if (tcsize.x > 0)
+						twidth -= tcsize.x + IGAP;
+					size = textLabelCache.computeSize(twidth, SWT.DEFAULT);
 				}
 			}
-
-			// TODO: Add support for fill alignment of textControl
-
-			Point tcsize = textClientCache.computeSize(tcWidthAfterSplit, SWT.DEFAULT);
-			Point size = textLabelCache.computeSize(labelWidthAfterSplit, SWT.DEFAULT);
-
-			int height = Math.max(tcsize.y, size.y); // max of label/text client
-			height = Math.max(height, toggleSize.y); // or max of toggle
-
-			boolean leftAlignment = textClient != null && (expansionStyle & LEFT_TEXT_CLIENT_ALIGNMENT) != 0;
+			if (textLabel instanceof Label) {
+				Point defSize = textLabelCache.computeSize(SWT.DEFAULT,
+						SWT.DEFAULT);
+				if (defSize.y == size.y) {
+					// One line - pick the smaller of the two widths
+					size.x = Math.min(defSize.x, size.x);
+				}
+			}
 			if (toggle != null) {
-				// if label control is absent we vertically center the toggle,
-				// because the text client is usually a lot thicker
-				int ty = (height - toggleSize.y + 1) / 2 + 1;
+				GC gc = new GC(ExpandableComposite.this);
+				gc.setFont(getFont());
+				FontMetrics fm = gc.getFontMetrics();
+				int textHeight = fm.getHeight();
+				gc.dispose();
+				if (textClient != null
+						&& (expansionStyle & LEFT_TEXT_CLIENT_ALIGNMENT) != 0) {
+					textHeight = Math.max(textHeight, tcsize.y);
+				}
+				int ty = textHeight / 2 - tsize.y / 2 + 1;
 				ty = Math.max(ty, 0);
 				ty += marginHeight + tvmargin;
 				toggle.setLocation(x, ty);
-				toggle.setSize(toggleSize);
-				x += toggleSize.x + IGAP;
+				toggle.setSize(tsize);
+				x += tsize.x + IGAP;
 			}
 			if (textLabel != null) {
 				int ty = y;
-				if (leftAlignment) {
+				if (textClient != null
+						&& (expansionStyle & LEFT_TEXT_CLIENT_ALIGNMENT) != 0) {
 					if (size.y < tcsize.y)
-						ty = (tcsize.y - size.y) / 2 + marginHeight
+						ty = tcsize.y / 2 - size.y / 2 + marginHeight
 								+ tvmargin;
 				}
-
-				int gap = 0;
-				if (size.y < height) {
-					// bug 520833: the text label is smaller in height
-					// than the composite so we align it to the middle
-					gap = (height - size.y) / 2;
+				String os = System.getProperty("os.name"); //$NON-NLS-1$
+				if (Constants.OS_LINUX.equalsIgnoreCase(os)) {
+					size.x += 1; // See Bug 342610
 				}
-
-				textLabelCache.setBounds(x, ty + gap, size.x, size.y);
+				textLabelCache.setBounds(x, ty, size.x, size.y);
 			}
-
 			if (textClient != null) {
-				int tcwidth = clientArea.width - marginWidth - marginWidth - thmargin - thmargin;
-				if (toggleSize.x > 0)
-					tcwidth -= toggleSize.x + IGAP;
-				if (size.x > 0)
-					tcwidth -= size.x + IGAP;
-				tcwidth = Math.min(tcsize.x, tcwidth);
-				if (tcwidth < 0)
-					tcwidth = 0;
 				int tcx;
 				if ((expansionStyle & LEFT_TEXT_CLIENT_ALIGNMENT) != 0) {
-					tcx = x + ((size.x > 0) ? size.x + IGAP : 0);
+					tcx = x + size.x + GAP;
 				} else {
-					tcx = clientArea.width - tcwidth - marginWidth - thmargin;
+					tcx = clientArea.width - tcsize.x - marginWidth - thmargin;
 				}
-				textClientCache.setBounds(tcx, y, tcwidth, height);
+				textClientCache.setBounds(tcx, y, tcsize.x, tcsize.y);
 			}
-
+			int height = Math.max(tcsize.y, size.y); // max of label/text client
+			height = Math.max(height, tsize.y); // or max of toggle
 			y += height;
 			if (hasTitleBar())
 				y += tvmargin;
@@ -406,11 +391,12 @@ public class ExpandableComposite extends Canvas {
 				boolean changed) {
 			initCache(changed);
 
-			Point toggleSize = NULL_SIZE;
-			int toggleWidthPlusGap = 0;
+			int width = 0;
+			Point tsize = NULL_SIZE;
+			int twidth = 0;
 			if (toggle != null) {
-				toggleSize = toggleCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				toggleWidthPlusGap = toggleSize.x + IGAP;
+				tsize = toggleCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				twidth = tsize.x + IGAP;
 			}
 			int thmargin = 0;
 			int tvmargin = 0;
@@ -419,47 +405,55 @@ public class ExpandableComposite extends Canvas {
 				thmargin = titleBarTextMarginWidth;
 				tvmargin = IVGAP;
 			}
+			int innerwHint = wHint;
+			if (innerwHint != SWT.DEFAULT)
+				innerwHint -= twidth + marginWidth + marginWidth + thmargin
+						+ thmargin;
 
-			// TODO: This code is common between computeSize and layout
-			int gapBetweenTcAndLabel = (textClient != null && textLabel != null) ? IGAP : 0;
+			int innertHint = innerwHint;
 
-			Point tcDefault = textClientCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-			Point labelDefault = this.textLabelCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-
-			int width = 0;
-			if (wHint == SWT.DEFAULT || wHint == MIN_WIDTH) {
-				width += toggleWidthPlusGap;
-				width += labelDefault.x;
-				width += gapBetweenTcAndLabel;
-				width += tcDefault.x;
-			} else {
-				width = wHint - marginWidth - marginWidth - thmargin - thmargin;
+			Point tcsize = NULL_SIZE;
+			if (textClient != null) {
+				tcsize = textClientCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 			}
+			Point size = NULL_SIZE;
 
-			width = Math.max(0, width);
-
-			int widthForTcAndLabel = Math.max(0, width - gapBetweenTcAndLabel - toggleWidthPlusGap);
-
-			int tcWidthBeforeSplit = Math.min(width, tcDefault.x);
-			int labelWidthBeforeSplit = Math.min(width, labelDefault.x);
-
-			int tcWidthAfterSplit = tcWidthBeforeSplit;
-			int labelWidthAfterSplit = labelWidthBeforeSplit;
-
-			int expectedWidthForTcAndLabel = tcWidthBeforeSplit + labelWidthBeforeSplit;
-
-			if (expectedWidthForTcAndLabel > widthForTcAndLabel) {
-				labelWidthAfterSplit = widthForTcAndLabel * labelWidthBeforeSplit / expectedWidthForTcAndLabel;
-				tcWidthAfterSplit = widthForTcAndLabel - labelWidthAfterSplit;
+			if (textLabel != null) {
+				if (tcsize.x > 0 && FormUtil.isWrapControl(textClient)) {
+					size = textLabelCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+					if (innertHint != SWT.DEFAULT && innertHint < size.x + IGAP + tcsize.x) {
+						innertHint -= IGAP;
+						if (textLabel instanceof Label) {
+							GC gc = new GC(textLabel);
+							size = FormUtil.computeWrapSize(gc, ((Label)textLabel).getText(), Math.round(innertHint*(size.x/(float)(size.x+tcsize.x))));
+							gc.dispose();
+						} else
+							size = textLabelCache.computeSize(Math.round(innertHint*(size.x/(float)(size.x+tcsize.x))), SWT.DEFAULT);
+						tcsize = textClientCache.computeSize(innertHint-size.x, SWT.DEFAULT);
+					}
+				} else {
+					if (innertHint != SWT.DEFAULT && tcsize.x > 0)
+						innertHint -= IGAP + tcsize.x;
+					size = textLabelCache.computeSize(innertHint, SWT.DEFAULT);
+				}
 			}
-
-			// TODO: Add support for fill alignment of textControl
-
-			Point tcsize = textClientCache.computeSize(tcWidthAfterSplit, SWT.DEFAULT);
-			Point size = textLabelCache.computeSize(labelWidthAfterSplit, SWT.DEFAULT);
+			if (textLabel instanceof Label) {
+				Point defSize = textLabelCache.computeSize(SWT.DEFAULT,
+						SWT.DEFAULT);
+				if (defSize.y == size.y) {
+					// One line - pick the smaller of the two widths
+					size.x = Math.min(defSize.x, size.x);
+				}
+			}
+			if (size.x > 0)
+				width = size.x;
+			if (tcsize.x > 0)
+				width += IGAP + tcsize.x;
+			if (toggle != null)
+				width += twidth;
 
 			int height = Math.max(tcsize.y, size.y); // max of label/text client
-			height = Math.max(height, toggleSize.y); // or max of toggle
+			height = Math.max(height, tsize.y); // or max of toggle
 
 			if (getSeparatorControl() != null) {
 				height += VSPACE + SEPARATOR_HEIGHT;
@@ -470,28 +464,23 @@ public class ExpandableComposite extends Canvas {
 				int cwHint = wHint;
 				int clientIndent = 0;
 				if ((expansionStyle & CLIENT_INDENT) != 0)
-					clientIndent = toggleWidthPlusGap;
+					clientIndent = twidth;
 
-				if (cwHint != SWT.DEFAULT && cwHint != MIN_WIDTH) {
+				if (cwHint != SWT.DEFAULT) {
 					cwHint -= marginWidth + marginWidth + thmargin + thmargin;
 					if ((expansionStyle & CLIENT_INDENT) != 0)
 						if (tcsize.x > 0)
-							cwHint -= toggleWidthPlusGap;
+							cwHint -= twidth;
 				}
 				Point dsize = null;
-				Point csize;
-				if (cwHint == MIN_WIDTH) {
-					int minWidth = clientCache.computeMinimumWidth();
-					csize = clientCache.computeSize(minWidth, SWT.DEFAULT);
-				} else {
-					csize = clientCache.computeSize(cwHint, SWT.DEFAULT);
-				}
+				Point csize = clientCache.computeSize(FormUtil.getWidthHint(
+						cwHint, client), SWT.DEFAULT);
 				if (getDescriptionControl() != null) {
 					int dwHint = cwHint;
-					if (dwHint == SWT.DEFAULT || dwHint == MIN_WIDTH) {
+					if (dwHint == SWT.DEFAULT) {
 						dwHint = csize.x;
 						if ((expansionStyle & CLIENT_INDENT) != 0)
-							dwHint -= toggleWidthPlusGap;
+							dwHint -= twidth;
 					}
 					dsize = descriptionCache.computeSize(dwHint, SWT.DEFAULT);
 					width = Math.max(width, dsize.x + clientIndent);
@@ -509,25 +498,15 @@ public class ExpandableComposite extends Canvas {
 				}
 			}
 
-			int resultWidth = width + marginWidth + marginWidth + thmargin + thmargin;
-
-			if (wHint != SWT.DEFAULT && wHint != MIN_WIDTH) {
-				resultWidth = wHint;
-			}
-
-			int resultHeight = height + marginHeight + marginHeight + tvmargin + tvmargin;
-
-			if (hHint != SWT.DEFAULT) {
-				resultHeight = hHint;
-			}
-
-			Point result = new Point(resultWidth, resultHeight);
+			Point result = new Point(width + marginWidth + marginWidth
+					+ thmargin + thmargin, height + marginHeight + marginHeight
+					+ tvmargin + tvmargin);
 			return result;
 		}
 
 		@Override
 		public int computeMinimumWidth(Composite parent, boolean changed) {
-			return computeSize(parent, MIN_WIDTH, SWT.DEFAULT, changed).x;
+			return computeSize(parent, 0, SWT.DEFAULT, changed).x;
 		}
 
 		@Override
@@ -567,7 +546,12 @@ public class ExpandableComposite extends Canvas {
 			setBackgroundMode(SWT.INHERIT_DEFAULT);
 		super.setLayout(new ExpandableLayout());
 		if (hasTitleBar()) {
-			this.addPaintListener(e -> onPaint(e));
+			this.addPaintListener(new PaintListener() {
+				@Override
+				public void paintControl(PaintEvent e) {
+					onPaint(e);
+				}
+			});
 		}
 		if ((expansionStyle & TWISTIE) != 0)
 			toggle = new Twistie(this, SWT.NULL);
@@ -585,13 +569,14 @@ public class ExpandableComposite extends Canvas {
 					toggleState();
 				}
 			});
-			toggle.addPaintListener(e -> {
-				if (textLabel instanceof Label && !isFixedStyle())
-					if (toggle.hover) {
-						textLabel.setForeground(toggle.getHoverDecorationColor());
-					} else {
-						textLabel.setForeground(getTitleBarForeground());
-					}
+			toggle.addPaintListener(new PaintListener() {
+				@Override
+				public void paintControl(PaintEvent e) {
+					if (textLabel instanceof Label && !isFixedStyle())
+						textLabel.setForeground(toggle.hover ? toggle
+								.getHoverDecorationColor()
+								: getTitleBarForeground());
+				}
 			});
 			toggle.addKeyListener(new KeyAdapter() {
 				@Override
@@ -637,36 +622,40 @@ public class ExpandableComposite extends Canvas {
 			final Label label = new Label(this, SWT.WRAP);
 			if (!isFixedStyle()) {
 				label.setCursor(FormsResources.getHandCursor());
-				Listener listener = e -> {
-					switch (e.type) {
-					case SWT.MouseDown:
-						if (toggle != null)
-							toggle.setFocus();
-						break;
-					case SWT.MouseUp:
-						label.setCursor(FormsResources.getBusyCursor());
-						programmaticToggleState();
-						label.setCursor(FormsResources.getHandCursor());
-						break;
-					case SWT.MouseEnter:
-						if (toggle != null) {
-							label.setForeground(toggle.getHoverDecorationColor());
-							toggle.hover = true;
-							toggle.redraw();
+				Listener listener = new Listener() {
+					@Override
+					public void handleEvent(Event e) {
+						switch (e.type) {
+						case SWT.MouseDown:
+							if (toggle != null)
+								toggle.setFocus();
+							break;
+						case SWT.MouseUp:
+							label.setCursor(FormsResources.getBusyCursor());
+							programmaticToggleState();
+							label.setCursor(FormsResources.getHandCursor());
+							break;
+						case SWT.MouseEnter:
+							if (toggle != null) {
+								label.setForeground(toggle
+										.getHoverDecorationColor());
+								toggle.hover = true;
+								toggle.redraw();
+							}
+							break;
+						case SWT.MouseExit:
+							if (toggle != null) {
+								label.setForeground(getTitleBarForeground());
+								toggle.hover = false;
+								toggle.redraw();
+							}
+							break;
+						case SWT.Paint:
+							if (toggle != null && (getExpansionStyle() & NO_TITLE_FOCUS_BOX) == 0) {
+								paintTitleFocus(e.gc);
+							}
+							break;
 						}
-						break;
-					case SWT.MouseExit:
-						if (toggle != null) {
-							label.setForeground(getTitleBarForeground());
-							toggle.hover = false;
-							toggle.redraw();
-						}
-						break;
-					case SWT.Paint:
-						if (toggle != null && (getExpansionStyle() & NO_TITLE_FOCUS_BOX) == 0) {
-							paintTitleFocus(e.gc);
-						}
-						break;
 					}
 				};
 				label.addListener(SWT.MouseDown, listener);
@@ -679,17 +668,20 @@ public class ExpandableComposite extends Canvas {
 		}
 		if (textLabel != null) {
 			textLabel.setMenu(getMenu());
-			textLabel.addTraverseListener(e -> {
-				if (e.detail == SWT.TRAVERSE_MNEMONIC) {
-					// steal the mnemonic
-					if (!isVisible() || !isEnabled())
-						return;
-					if (FormUtil.mnemonicMatch(getText(), e.character)) {
-						e.doit = false;
-						if (!isFixedStyle()) {
-							programmaticToggleState();
+			textLabel.addTraverseListener(new TraverseListener() {
+				@Override
+				public void keyTraversed(TraverseEvent e) {
+					if (e.detail == SWT.TRAVERSE_MNEMONIC) {
+						// steal the mnemonic
+						if (!isVisible() || !isEnabled())
+							return;
+						if (FormUtil.mnemonicMatch(getText(), e.character)) {
+							e.doit = false;
+							if (!isFixedStyle()) {
+							    programmaticToggleState();
+							}
+							setFocus();
 						}
-						setFocus();
 					}
 				}
 			});
@@ -903,7 +895,7 @@ public class ExpandableComposite extends Canvas {
 				getDescriptionControl().setVisible(expanded);
 			if (client != null)
 				client.setVisible(expanded);
-			reflow();
+			layout();
 		}
 	}
 
@@ -921,7 +913,7 @@ public class ExpandableComposite extends Canvas {
 	 * Removes the expansion listener.
 	 *
 	 * @param listener
-	 *            the listener to remove
+	 *            the listner to remove
 	 */
 	public void removeExpansionListener(IExpansionListener listener) {
 		listeners.remove(listener);
@@ -1059,7 +1051,8 @@ public class ExpandableComposite extends Canvas {
 	 *            the title bar foreground
 	 */
 	public void setTitleBarForeground(Color color) {
-		titleBarForeground = color;
+		if (hasTitleBar())
+			titleBarForeground = color;
 		if (textLabel != null)
 			textLabel.setForeground(color);
 	}
@@ -1136,33 +1129,5 @@ public class ExpandableComposite extends Canvas {
 		gc.setForeground(textLabel.getForeground());
 		if (toggle.isFocusControl())
 			gc.drawFocus(0, 0, size.x, size.y);
-	}
-
-	void reflow() {
-		Composite c = this;
-		while (c != null) {
-			c.setRedraw(false);
-			c = c.getParent();
-			if (c instanceof SharedScrolledComposite || c instanceof Shell) {
-				break;
-			}
-		}
-		c = this;
-		while (c != null) {
-			c.requestLayout();
-			c = c.getParent();
-			if (c instanceof SharedScrolledComposite) {
-				((SharedScrolledComposite) c).reflow(true);
-				break;
-			}
-		}
-		c = this;
-		while (c != null) {
-			c.setRedraw(true);
-			c = c.getParent();
-			if (c instanceof SharedScrolledComposite || c instanceof Shell) {
-				break;
-			}
-		}
 	}
 }

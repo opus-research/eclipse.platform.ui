@@ -10,19 +10,18 @@
  *     Oakland Software (Francis Upton) <francisu@ieee.org> - bug 219273
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Stefan Xenos <sxenos@google.com> - Bug 466793
- *     Lucas Bullen (Red Hat Inc.) - Bug 500051
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.commands.ActionHandler;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.preference.PreferenceContentProvider;
@@ -32,20 +31,20 @@ import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -53,14 +52,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.ActiveShellExpression;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PlatformUI;
@@ -73,8 +70,6 @@ import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.misc.StatusUtil;
-import org.eclipse.ui.internal.wizards.preferences.PreferencesExportWizard;
-import org.eclipse.ui.internal.wizards.preferences.PreferencesImportWizard;
 import org.eclipse.ui.model.IContributionService;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.eclipse.ui.preferences.IWorkingCopyManager;
@@ -175,7 +170,7 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 
 	IWorkingCopyManager workingCopyManager;
 
-	private Collection<Job> updateJobs = new ArrayList<>();
+	private Collection updateJobs = new ArrayList();
 
 	/**
 	 * The preference page history.
@@ -189,10 +184,6 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 	private IHandlerActivation showViewHandler;
 
 	private boolean locked;
-
-	private Image importImage;
-
-	private Image exportImage;
 
 	/**
 	 * Creates a new preference dialog under the control of the given preference
@@ -243,7 +234,12 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 
 		tree.addFilter(new CapabilityFilter());
 
-		tree.addSelectionChangedListener(event -> handleTreeSelectionChanged(event));
+		tree.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				handleTreeSelectionChanged(event);
+			}
+		});
 
 		super.addListeners(tree);
 		return tree;
@@ -369,71 +365,6 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 	}
 
 	@Override
-	protected Control createHelpControl(Composite parent) {
-		Control control = super.createHelpControl(parent);
-		if (control instanceof ToolBar) {
-			ToolBar toolBar = (ToolBar) control;
-
-			ToolItem importButton = new ToolItem(toolBar, SWT.PUSH);
-			importImage = WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_PREF_IMPORT)
-					.createImage();
-			importButton.setImage(importImage);
-			importButton.setToolTipText(WorkbenchMessages.Preference_importTooltip);
-			importButton.addListener(SWT.Selection, e -> openImportWizard(parent));
-
-			ToolItem exportButton = new ToolItem(toolBar, SWT.PUSH);
-			exportImage = WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_PREF_EXPORT)
-					.createImage();
-			exportButton.setImage(exportImage);
-			exportButton.setToolTipText(WorkbenchMessages.Preference_exportTooltip);
-			exportButton.addListener(SWT.Selection, e -> openExportWizard(parent));
-		} else if (control instanceof Link) {
-			Composite linkParent = ((Link) control).getParent();
-			Link importLink = new Link(linkParent, SWT.WRAP | SWT.NO_FOCUS);
-			((GridLayout) parent.getLayout()).numColumns++;
-			importLink.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
-			importLink.setText(" <a>" + WorkbenchMessages.Preference_import + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
-			importLink.addListener(SWT.Selection, e -> openImportWizard(parent));
-
-			Link exportLink = new Link(linkParent, SWT.WRAP | SWT.NO_FOCUS);
-			((GridLayout) parent.getLayout()).numColumns++;
-			exportLink.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
-			exportLink.setText(" <a>" + WorkbenchMessages.Preference_export + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
-			exportLink.addListener(SWT.Selection, e -> openExportWizard(parent));
-		}
-		return control;
-	}
-
-	private void openImportWizard(Composite parent) {
-		Wizard importWizard = new PreferencesImportWizard();
-		WizardDialog wizardDialog = new WizardDialog(parent.getShell(), importWizard);
-		wizardDialog.open();
-		if (wizardDialog.getReturnCode() == 0) {
-			parent.getShell().close();
-		}
-	}
-
-	private void openExportWizard(Composite parent) {
-		Wizard exportWizard = new PreferencesExportWizard();
-		WizardDialog wizardDialog = new WizardDialog(parent.getShell(), exportWizard);
-
-		int dialogResponse = MessageDialog.open(MessageDialog.CONFIRM, parent.getShell(),
-				WorkbenchMessages.PreferenceExportWarning_title, WorkbenchMessages.PreferenceExportWarning_message,
-				SWT.NONE, WorkbenchMessages.PreferenceExportWarning_applyAndContinue,
-				WorkbenchMessages.PreferenceExportWarning_continue);
-		if (dialogResponse == -1) {
-			return;
-		} else if (dialogResponse == 0) {
-			okPressed();
-		}
-
-		wizardDialog.open();
-		if (dialogResponse == 1) {
-			close();
-		}
-	}
-
-	@Override
 	public IPreferencePage getCurrentPage() {
 		return super.getCurrentPage();
 	}
@@ -498,7 +429,10 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		}
 
 		// Run the update jobs
-		updateJobs.forEach(Job::schedule);
+		Iterator updateIterator = updateJobs.iterator();
+		while (updateIterator.hasNext()) {
+			((Job) updateIterator.next()).schedule();
+		}
 	}
 
 	@Override
@@ -600,51 +534,59 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 				return;
 			}
 			final ScrolledComposite sc = (ScrolledComposite) pageParent;
-			keyScrollingFilter = event -> {
-				if (!keyScrollingEnabled || sc.isDisposed()) {
-					return;
+			keyScrollingFilter = new Listener() {
+				@Override
+				public void handleEvent(Event event) {
+					if (!keyScrollingEnabled || sc.isDisposed()) {
+						return;
+					}
+					switch (event.keyCode) {
+					case SWT.ARROW_DOWN:
+						sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
+								+ INCREMENT);
+						break;
+					case SWT.ARROW_UP:
+						sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
+								- INCREMENT);
+						break;
+					case SWT.ARROW_LEFT:
+						sc.setOrigin(sc.getOrigin().x - INCREMENT, sc
+								.getOrigin().y);
+						break;
+					case SWT.ARROW_RIGHT:
+						sc.setOrigin(sc.getOrigin().x + INCREMENT, sc
+								.getOrigin().y);
+						break;
+					case SWT.PAGE_DOWN:
+						sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
+								+ PAGE_MULTIPLIER * INCREMENT);
+						break;
+					case SWT.PAGE_UP:
+						sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
+								- PAGE_MULTIPLIER * INCREMENT);
+						break;
+					case SWT.HOME:
+						sc.setOrigin(0, 0);
+						break;
+					case SWT.END:
+						sc.setOrigin(0, sc.getSize().y);
+						break;
+					default:
+						keyScrollingEnabled = false;
+					}
+					event.type = SWT.None;
+					event.doit = false;
 				}
-				switch (event.keyCode) {
-				case SWT.ARROW_DOWN:
-					sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
-							+ INCREMENT);
-					break;
-				case SWT.ARROW_UP:
-					sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
-							- INCREMENT);
-					break;
-				case SWT.ARROW_LEFT:
-					sc.setOrigin(sc.getOrigin().x - INCREMENT, sc
-							.getOrigin().y);
-					break;
-				case SWT.ARROW_RIGHT:
-					sc.setOrigin(sc.getOrigin().x + INCREMENT, sc
-							.getOrigin().y);
-					break;
-				case SWT.PAGE_DOWN:
-					sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
-							+ PAGE_MULTIPLIER * INCREMENT);
-					break;
-				case SWT.PAGE_UP:
-					sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
-							- PAGE_MULTIPLIER * INCREMENT);
-					break;
-				case SWT.HOME:
-					sc.setOrigin(0, 0);
-					break;
-				case SWT.END:
-					sc.setOrigin(0, sc.getSize().y);
-					break;
-				default:
-					keyScrollingEnabled = false;
-				}
-				event.type = SWT.None;
-				event.doit = false;
 			};
 			Display display = PlatformUI.getWorkbench().getDisplay();
 			display.addFilter(SWT.KeyDown, keyScrollingFilter);
 			display.addFilter(SWT.Traverse, keyScrollingFilter);
-			sc.addDisposeListener(e -> removeKeyScrolling());
+			sc.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent e) {
+					removeKeyScrolling();
+				}
+			});
 		}
 		keyScrollingEnabled = true;
 	}
@@ -682,10 +624,6 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		}
 		removeKeyScrolling();
 		history.dispose();
-		if (importImage != null)
-			importImage.dispose();
-		if (exportImage != null)
-			exportImage.dispose();
 		return super.close();
 	}
 
@@ -748,8 +686,8 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		control.setFont(dialogFont);
 		if (control instanceof Composite) {
 			Control[] children = ((Composite) control).getChildren();
-			for (Control element : children) {
-				applyDialogFont(element, dialogFont);
+			for (int i = 0; i < children.length; i++) {
+				applyDialogFont(children[i], dialogFont);
 			}
 		}
 	}

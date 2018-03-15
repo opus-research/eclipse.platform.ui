@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2017 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
-import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
@@ -139,10 +138,8 @@ public class ActionSet {
 			for (IConfigurationElement part : children) {
 				String id = MenuHelper.getId(part);
 				if (id != null && id.length() > 0) {
-					if (Policy.DEBUG_MENUS) {
-						MenuHelper.trace(IWorkbenchRegistryConstants.PL_ACTION_SET_PART_ASSOCIATIONS + ':' + actionSetId
-								+ ':' + id, null);
-					}
+					MenuHelper.trace(IWorkbenchRegistryConstants.PL_ACTION_SET_PART_ASSOCIATIONS
+							+ ':' + actionSetId + ':' + id, null);
 					result.add(id);
 				}
 			}
@@ -321,6 +318,9 @@ public class ActionSet {
 
 		MToolBarElement action = MenuHelper
 				.createLegacyToolBarActionAdditions(application, element);
+		if (action == null) {
+			return;
+		}
 
 		action.getTransientData().put("Name", MenuHelper.getLabel(element)); //$NON-NLS-1$
 		action.getTransientData().put("ActionSet", id); //$NON-NLS-1$
@@ -450,8 +450,9 @@ public class ActionSet {
 		if (item.getChildren().size() == 0) {
 			if (segment + 1 == menuPath.segmentCount()) {
 				return menu;
+			} else {
+				return null;
 			}
-			return null;
 		}
 		return findMenuFromPath(item, menuPath, segment + 1);
 	}

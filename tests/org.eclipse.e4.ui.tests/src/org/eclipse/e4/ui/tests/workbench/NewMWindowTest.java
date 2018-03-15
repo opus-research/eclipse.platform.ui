@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.services.IServiceConstants;
-import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -46,6 +45,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+/*
+ *
+ */
 public class NewMWindowTest {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
@@ -54,7 +56,7 @@ public class NewMWindowTest {
 	@Before
 	public void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
-		appContext.set(IWorkbench.PRESENTATION_URI_ARG,
+		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
 		ems = appContext.get(EModelService.class);
 	}
@@ -139,7 +141,7 @@ public class NewMWindowTest {
 		}
 		assertFalse(window.getContext() == child);
 
-		MPart contextPart = child.get(MPart.class);
+		MPart contextPart = (MPart) child.get(MPart.class.getName());
 
 		assertNotNull(contextPart);
 		assertEquals(window, contextPart.getParent().getParent().getParent());

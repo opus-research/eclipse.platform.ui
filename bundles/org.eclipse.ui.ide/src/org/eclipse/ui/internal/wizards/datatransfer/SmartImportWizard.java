@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2017 Red Hat Inc., and others
+ * Copyright (c) 2014-2016 Red Hat Inc., and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,12 +27,12 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IImportWizard;
@@ -209,30 +209,14 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 		if (o instanceof File) {
 			return (File)o;
 		} else if (o instanceof IResource) {
-			IPath location = ((IResource)o).getLocation();
-			return location == null ? null : location.toFile();
+			return ((IResource)o).getLocation().toFile();
 		} else if (o instanceof IAdaptable) {
 			IResource resource = ((IAdaptable)o).getAdapter(IResource.class);
 			if (resource != null) {
-				IPath location = resource.getLocation();
-				return location == null ? null : location.toFile();
+				return resource.getLocation().toFile();
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Tries to infer a file path string from given object, using various
-	 * strategies
-	 *
-	 * @param o
-	 *            an object
-	 * @return a {@link File#getAbsolutePath} associated to this object, or
-	 *         empty string.
-	 */
-	public static String toAbsolutePath(Object o) {
-		File file = toFile(o);
-		return file == null ? "" : file.getAbsolutePath(); //$NON-NLS-1$
 	}
 
 	@Override
@@ -289,12 +273,6 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 			this.easymportJob = new SmartImportJob(this.directoryToImport, projectRootPage.getSelectedWorkingSets(),
 					projectRootPage.isConfigureProjects(), projectRootPage.isDetectNestedProject());
 		}
-		if (this.easymportJob != null) {
-			// always update working set on request as the job isn't updated on
-			// WS change automatically
-			this.easymportJob.setWorkingSets(projectRootPage.getSelectedWorkingSets());
-			this.easymportJob.setCloseProjectsAfterImport(projectRootPage.isCloseProjectsAfterImport());
-		}
 		return this.easymportJob;
 	}
 
@@ -325,13 +303,23 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 				archive.getName() + "_expanded"); //$NON-NLS-1$
 	}
 
-	private static boolean matchesPage(SmartImportJob job, SmartImportRootWizardPage page) {
-		File jobRoot = job.getRoot().getAbsoluteFile();
-		File pageRoot = page.getSelectedRoot().getAbsoluteFile();
-		boolean sameSource = jobRoot.equals(pageRoot)
-				|| (isValidArchive(pageRoot) && getExpandDirectory(pageRoot).getAbsoluteFile().equals(jobRoot));
-		return sameSource && job.isDetectNestedProjects() == page.isDetectNestedProject()
-				&& job.isConfigureProjects() == page.isConfigureProjects();
+	/**
+	 * @param easymportJob2
+	 * @param projectRootPage2
+	 * @return
+	 */
+	private static boolean matchesPage(SmartImportJob easymportJob2, SmartImportRootWizardPage projectRootPage2) {
+		return easymportJob2.getRoot().getAbsoluteFile().equals(projectRootPage2.getSelectedRoot().getAbsoluteFile())
+				&& easymportJob2.isDetectNestedProjects() == projectRootPage2.isDetectNestedProject()
+				&& easymportJob2.isConfigureProjects() == projectRootPage2.isConfigureProjects();
+	}
+
+	@Override
+	public IWizardPage getNextPage(IWizardPage page) {
+		if (page == this.projectRootPage && !this.projectRootPage.isDetectNestedProject()) {
+			return null;
+		}
+		return super.getNextPage(page);
 	}
 
 }

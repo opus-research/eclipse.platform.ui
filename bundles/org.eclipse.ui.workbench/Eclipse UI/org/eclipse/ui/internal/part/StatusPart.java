@@ -10,14 +10,16 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.part;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
@@ -97,7 +99,12 @@ public class StatusPart {
 
 
         detailsButton = new Button(buttonParent, SWT.PUSH);
-        detailsButton.addSelectionListener(widgetSelectedAdapter(e -> showDetails(!showingDetails)));
+        detailsButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                showDetails(!showingDetails);
+            }
+        });
 
         detailsButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
         detailsButton.setVisible(reason.getException() != null);
@@ -186,16 +193,24 @@ public class StatusPart {
 			return;
 		}
 		Button button = new Button(parent, SWT.PUSH);
-		button.addSelectionListener(widgetSelectedAdapter(e -> {
-			try {
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(LOG_VIEW_ID);
-			} catch (CoreException ce) {
-				StatusManager.getManager().handle(ce, WorkbenchPlugin.PI_WORKBENCH);
+		button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(LOG_VIEW_ID);
+				} catch (CoreException ce) {
+					StatusManager.getManager().handle(ce, WorkbenchPlugin.PI_WORKBENCH);
+				}
 			}
-		}));
+		});
 		final Image image = descriptor.getImageDescriptor().createImage();
 		button.setImage(image);
 		button.setToolTipText(WorkbenchMessages.ErrorLogUtil_ShowErrorLogTooltip);
-		button.addDisposeListener(e -> image.dispose());
+		button.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				image.dispose();
+			}
+		});
     }
 }

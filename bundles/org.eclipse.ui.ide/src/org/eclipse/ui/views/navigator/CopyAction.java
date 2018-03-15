@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -103,15 +103,15 @@ import org.eclipse.ui.part.ResourceTransfer;
          * on <code>IAction</code> copies the selected resources to the
          * clipboard.
          */
-		List<? extends IResource> selectedResources = getSelectedResources();
-        IResource[] resources = selectedResources
+        List selectedResources = getSelectedResources();
+        IResource[] resources = (IResource[]) selectedResources
                 .toArray(new IResource[selectedResources.size()]);
 
         // Get the file names and a string representation
         final int length = resources.length;
         int actualLength = 0;
         String[] fileNames = new String[length];
-        StringBuilder buf = new StringBuilder();
+        StringBuffer buf = new StringBuffer();
         for (int i = 0; i < length; i++) {
             IPath location = resources[i].getLocation();
             // location may be null. See bug 29491.
@@ -193,7 +193,7 @@ import org.eclipse.ui.part.ResourceTransfer;
 			return false;
 		}
 
-		List<? extends IResource> selectedResources = getSelectedResources();
+        List selectedResources = getSelectedResources();
         if (selectedResources.size() == 0) {
 			return false;
 		}
@@ -217,9 +217,9 @@ import org.eclipse.ui.part.ResourceTransfer;
 			return false;
 		}
 
-		Iterator<? extends IResource> resourcesEnum = selectedResources.iterator();
+        Iterator resourcesEnum = selectedResources.iterator();
         while (resourcesEnum.hasNext()) {
-            IResource currentResource = resourcesEnum.next();
+            IResource currentResource = (IResource) resourcesEnum.next();
             if (!currentResource.getParent().equals(firstParent)) {
 				return false;
 			}

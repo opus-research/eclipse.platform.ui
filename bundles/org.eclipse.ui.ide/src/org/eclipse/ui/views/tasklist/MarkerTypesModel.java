@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ class MarkerTypesModel {
     /**
      * Maps from marker type id to MarkerType.
      */
-	private HashMap<String, MarkerType> types;
+    private HashMap types;
 
     /**
      * Creates a new marker types model.
@@ -41,7 +41,7 @@ class MarkerTypesModel {
      * Returns the marker type with the given id, or <code>null</code> if there is no such marker type.
      */
     public MarkerType getType(String id) {
-        return types.get(id);
+        return (MarkerType) types.get(id);
     }
 
     /**
@@ -73,22 +73,27 @@ class MarkerTypesModel {
     /**
      * Reads the marker types from the registry.
      */
-	private HashMap<String, MarkerType> readTypes() {
-		HashMap<String, MarkerType> types = new HashMap<>();
+    private HashMap readTypes() {
+        HashMap types = new HashMap();
         IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(
                 ResourcesPlugin.PI_RESOURCES, ResourcesPlugin.PT_MARKERS);
         if (point != null) {
             // Gather all registered marker types.
-			for (IExtension extension : point.getExtensions()) {
-				String id = extension.getUniqueIdentifier();
-				String label = extension.getLabel();
+            IExtension[] extensions = point.getExtensions();
+            for (int i = 0; i < extensions.length; ++i) {
+                IExtension ext = extensions[i];
+                String id = ext.getUniqueIdentifier();
+                String label = ext.getLabel();
                 if (label.equals("")) {//$NON-NLS-1$
                     label = getWellKnownLabel(id);
                 }
-				ArrayList<String> supersList = new ArrayList<>();
-				for (IConfigurationElement configElement : extension.getConfigurationElements()) {
-                    if (configElement.getName().equalsIgnoreCase("super")) {//$NON-NLS-1$
-                        String sup = configElement.getAttribute("type");//$NON-NLS-1$
+                ArrayList supersList = new ArrayList();
+                IConfigurationElement[] configElements = ext
+                        .getConfigurationElements();
+                for (int j = 0; j < configElements.length; ++j) {
+                    IConfigurationElement elt = configElements[j];
+                    if (elt.getName().equalsIgnoreCase("super")) {//$NON-NLS-1$
+                        String sup = elt.getAttribute("type");//$NON-NLS-1$
                         if (sup != null) {
                             supersList.add(sup);
                         }

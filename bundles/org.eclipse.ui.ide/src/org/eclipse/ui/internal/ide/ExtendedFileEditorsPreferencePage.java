@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015-2016 Red Hat Inc and Others.
+ * Copyright (c) 2015 Red Hat Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,10 @@
  *
  * Contributors:
  *     Mickael Istria (Red Hat Inc.) - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 497156
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
 import java.io.IOException;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -33,12 +30,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.dialogs.FileEditorsPreferencePage;
-import org.eclipse.ui.internal.ide.registry.UnassociatedEditorStrategyRegistry;
 
 /**
  * @since 3.12
@@ -55,13 +49,10 @@ public class ExtendedFileEditorsPreferencePage extends FileEditorsPreferencePage
 		final UnassociatedEditorStrategyRegistry registry = IDEWorkbenchPlugin.getDefault()
 				.getUnassociatedEditorStrategyRegistry();
 		Composite defaultStrategyComposite = new Composite(res, SWT.NONE);
-		// Gets the first and only Link in the parent page
-		Optional<Control> cLink = Stream.of(res.getChildren()).filter(c -> c instanceof Link).findFirst();
-		defaultStrategyComposite.moveBelow(cLink.get());
-		GridLayout layout = new GridLayout(2, false);
-		layout.marginWidth = 0;
-		defaultStrategyComposite.setLayout(layout);
-		defaultStrategyComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		defaultStrategyComposite.setLayout(new GridLayout(2, false));
+		GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
+		layoutData.verticalIndent = 20;
+		defaultStrategyComposite.setLayoutData(layoutData);
 		Label unknownTypeStrategyLabel = new Label(defaultStrategyComposite, SWT.NONE);
 		unknownTypeStrategyLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		unknownTypeStrategyLabel

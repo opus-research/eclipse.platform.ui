@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -196,7 +195,8 @@ public class RenameResourceAction extends WorkspaceAction {
 				title = PROJECT_EXISTS_TITLE;
 			}
 			result[0] = MessageDialog.openQuestion(shell,
-					title, MessageFormat.format(message, pathName));
+					title, MessageFormat.format(message,
+							new Object[] { pathName }));
 		};
 
 		shell.getDisplay().syncExec(query);
@@ -221,7 +221,8 @@ public class RenameResourceAction extends WorkspaceAction {
 				.getResourceAttributes();
 		if (attributes != null && attributes.isReadOnly()) {
 			return MessageDialog.openQuestion(getShell(), CHECK_RENAME_TITLE,
-					MessageFormat.format(CHECK_RENAME_MESSAGE, currentResource.getName()));
+					MessageFormat.format(CHECK_RENAME_MESSAGE,
+							new Object[] { currentResource.getName() }));
 		}
 
 		return true;
@@ -333,12 +334,12 @@ public class RenameResourceAction extends WorkspaceAction {
 	 * @return list of resource elements (element type: <code>IResource</code>)
 	 */
 	@Override
-	protected List<? extends IResource> getActionResources() {
+	protected List getActionResources() {
 		if (inlinedResource == null) {
 			return super.getActionResources();
 		}
 
-		List<IResource> actionResources = new ArrayList<>();
+		List actionResources = new ArrayList();
 		actionResources.add(inlinedResource);
 		return actionResources;
 	}
@@ -478,9 +479,9 @@ public class RenameResourceAction extends WorkspaceAction {
 	 *         one resources selected.
 	 */
 	private IResource getCurrentResource() {
-		List<? extends IResource> resources = getSelectedResources();
+		List resources = getSelectedResources();
 		if (resources.size() == 1) {
-			return resources.get(0);
+			return (IResource) resources.get(0);
 		}
 		return null;
 
@@ -617,7 +618,7 @@ public class RenameResourceAction extends WorkspaceAction {
 	@Override
 	protected IRunnableWithProgress createOperation(final IStatus[] errorStatus) {
 		return monitor -> {
-			IResource[] resources = getActionResources()
+			IResource[] resources = (IResource[]) getActionResources()
 					.toArray(new IResource[getActionResources().size()]);
 			// Rename is only valid for a single resource. This has already
 			// been validated.

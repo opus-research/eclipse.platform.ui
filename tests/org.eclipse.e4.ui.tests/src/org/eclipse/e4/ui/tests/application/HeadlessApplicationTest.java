@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -233,8 +233,8 @@ public abstract class HeadlessApplicationTest extends
 
 	protected IPresentationEngine createPresentationEngine(
 			String renderingEngineURI) throws Exception {
-		IContributionFactory contributionFactory = applicationContext
-				.get(IContributionFactory.class);
+		IContributionFactory contributionFactory = (IContributionFactory) applicationContext
+				.get(IContributionFactory.class.getName());
 		Object newEngine = contributionFactory.create(renderingEngineURI,
 				applicationContext);
 		return (IPresentationEngine) newEngine;
@@ -257,7 +257,8 @@ public abstract class HeadlessApplicationTest extends
 		appContext.set(MApplication.class, application); // XXX
 		appContext.set(EModelService.class, new ModelServiceImpl(appContext));
 
-		ECommandService cs = appContext.get(ECommandService.class);
+		ECommandService cs = (ECommandService) appContext
+				.get(ECommandService.class.getName());
 		Category cat = cs.defineCategory(MApplication.class.getName(),
 				"Application Category", null); //$NON-NLS-1$
 		List<MCommand> commands = application.getCommands();
@@ -286,7 +287,8 @@ public abstract class HeadlessApplicationTest extends
 
 	private void processPartContributions(IEclipseContext context,
 			Resource resource) {
-		IExtensionRegistry registry = context.get(IExtensionRegistry.class);
+		IExtensionRegistry registry = (IExtensionRegistry) context
+				.get(IExtensionRegistry.class.getName());
 		String extId = "org.eclipse.e4.workbench.parts"; //$NON-NLS-1$
 		IConfigurationElement[] parts = registry
 				.getConfigurationElementsFor(extId);

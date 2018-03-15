@@ -49,7 +49,7 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
 
     private IResource resource;
 
-	private List<IStatus> errorTable = new ArrayList<>(1);
+    private List errorTable = new ArrayList(1);
 
     //The constants for the overwrite 3 state
     private static final int OVERWRITE_NOT_SET = 0;
@@ -104,8 +104,9 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
 
         int count = 0;
         if (parentResource.isAccessible()) {
-			for (IResource child : ((IContainer) parentResource).members()) {
-				count += countChildrenOf(child);
+            IResource[] children = ((IContainer) parentResource).members();
+            for (int i = 0; i < children.length; i++) {
+				count += countChildrenOf(children[i]);
 			}
         }
 
@@ -170,7 +171,8 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
      */
     protected void exportChildren(IResource[] children, IPath currentPath)
             throws InterruptedException {
-		for (IResource child : children) {
+        for (int i = 0; i < children.length; i++) {
+            IResource child = children[i];
 			if (!child.isAccessible() || (!resolveLinks && child.isLinked())) {
 				continue;
 			}

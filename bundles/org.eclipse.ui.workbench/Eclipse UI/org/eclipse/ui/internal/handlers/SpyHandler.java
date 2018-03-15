@@ -151,7 +151,9 @@ public class SpyHandler extends AbstractHandler {
 		if (optionalElementType != null && result == null && data != null) {
 			Bundle bundle = FrameworkUtil.getBundle(data.getClass());
 			if (bundle != null) {
-				result = new ContributionInfo(bundle.getSymbolicName(), optionalElementType, null);
+				result = new ContributionInfo(bundle.getSymbolicName(),
+						optionalElementType != null ? optionalElementType
+								: ContributionInfoMessages.ContributionInfo_Unknown, null);
 			}
 		}
 		return result;

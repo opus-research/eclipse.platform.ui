@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007,2017 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Ralf M Petter<ralf.petter@gmail.com> - Bug 510241
  *******************************************************************************/
 
 package org.eclipse.ui.tests.forms.performance;
@@ -39,11 +38,9 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
-import org.junit.Test;
 
 public class FormsPerformanceTest extends PerformanceTestCase {
 
-	@Test
 	public void test_createForm() {
 		tagAsSummary("Create Form", Dimension.ELAPSED_PROCESS);
 	    Performance.getDefault();
@@ -172,7 +169,7 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 		button = toolkit.createButton(sectionClient, "Radio 2", SWT.RADIO);
 		section.setClient(sectionClient);
 
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		buf.append("<form>");
 		buf.append("<p>");
 		buf.append("Here is some plain text for the text to render; ");

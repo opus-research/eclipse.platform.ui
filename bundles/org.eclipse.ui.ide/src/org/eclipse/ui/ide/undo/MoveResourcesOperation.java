@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -122,9 +122,9 @@ public class MoveResourcesOperation extends
 		SubMonitor subMonitor = SubMonitor.convert(monitor,
 				resources.length + (resourceDescriptions != null ? resourceDescriptions.length : 0));
 		subMonitor.setTaskName(UndoMessages.AbstractResourcesOperation_MovingResources);
-		List<IResource> resourcesAtDestination = new ArrayList<>();
-		List<IPath> undoDestinationPaths = new ArrayList<>();
-		List<ResourceDescription> overwrittenResources = new ArrayList<>();
+		List resourcesAtDestination = new ArrayList();
+		List undoDestinationPaths = new ArrayList();
+		List overwrittenResources = new ArrayList();
 
 		for (int i = 0; i < resources.length; i++) {
 			// Move the resources and record the overwrites that would
@@ -134,30 +134,30 @@ public class MoveResourcesOperation extends
 					resourcesAtDestination, undoDestinationPaths, subMonitor.split(1), uiInfo, true);
 
 			// Accumulate the overwrites into the full list
-			for (ResourceDescription overwrite : overwrites) {
-				overwrittenResources.add(overwrite);
+			for (int j = 0; j < overwrites.length; j++) {
+				overwrittenResources.add(overwrites[j]);
 			}
 		}
 
 		// Are there any previously overwritten resources to restore now?
 		if (resourceDescriptions != null) {
-			for (ResourceDescription resourceDescription : resourceDescriptions) {
-				if (resourceDescription != null) {
-					resourceDescription.createResource(subMonitor.split(1));
+			for (int i = 0; i < resourceDescriptions.length; i++) {
+				if (resourceDescriptions[i] != null) {
+					resourceDescriptions[i].createResource(subMonitor.split(1));
 				}
 			}
 		}
 
 		// Reset resource descriptions to the just overwritten resources
-		setResourceDescriptions(overwrittenResources
+		setResourceDescriptions((ResourceDescription[]) overwrittenResources
 				.toArray(new ResourceDescription[overwrittenResources.size()]));
 
 		// Reset the target resources to refer to the resources in their new
 		// location.
-		setTargetResources(resourcesAtDestination
+		setTargetResources((IResource[]) resourcesAtDestination
 				.toArray(new IResource[resourcesAtDestination.size()]));
 		// Reset the destination paths that correspond to these resources
-		destinationPaths = undoDestinationPaths
+		destinationPaths = (IPath[]) undoDestinationPaths
 				.toArray(new IPath[undoDestinationPaths.size()]);
 		destination = null;
 	}

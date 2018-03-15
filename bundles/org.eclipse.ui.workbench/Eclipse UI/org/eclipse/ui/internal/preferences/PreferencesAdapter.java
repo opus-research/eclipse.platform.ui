@@ -20,7 +20,12 @@ import org.eclipse.core.runtime.Preferences;
 public final class PreferencesAdapter extends PropertyMapAdapter {
     private Preferences store;
 
-    private Preferences.IPropertyChangeListener listener = event -> firePropertyChange(event.getProperty());
+    private Preferences.IPropertyChangeListener listener = new Preferences.IPropertyChangeListener() {
+        @Override
+		public void propertyChange(Preferences.PropertyChangeEvent event) {
+            firePropertyChange(event.getProperty());
+        }
+    };
 
     public PreferencesAdapter(Preferences toConvert) {
         this.store = toConvert;
@@ -40,8 +45,12 @@ public final class PreferencesAdapter extends PropertyMapAdapter {
 	public Set keySet() {
         Set result = new HashSet();
 
-		for (String name : store.propertyNames()) {
-			result.add(name);
+        String[] names = store.propertyNames();
+
+        for (int i = 0; i < names.length; i++) {
+            String string = names[i];
+
+            result.add(string);
         }
 
         return result;
@@ -58,11 +67,11 @@ public final class PreferencesAdapter extends PropertyMapAdapter {
         }
 
         if (propertyType == Double.class) {
-			return Double.valueOf(store.getDouble(propertyId));
+            return new Double(store.getDouble(propertyId));
         }
 
         if (propertyType == Float.class) {
-			return Float.valueOf(store.getFloat(propertyId));
+            return new Float(store.getFloat(propertyId));
         }
 
         if (propertyType == Integer.class) {
@@ -70,7 +79,7 @@ public final class PreferencesAdapter extends PropertyMapAdapter {
         }
 
         if (propertyType == Long.class) {
-			return Long.valueOf(store.getLong(propertyId));
+            return new Long(store.getLong(propertyId));
         }
 
         return null;

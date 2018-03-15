@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -144,8 +144,8 @@ class FiltersDialog extends TrayDialog {
         void updateEnabledState() {
             boolean enabled = enableButton.isEnabled()
                     && enableButton.getSelection();
-            for (Button valueButton : valueButtons) {
-                valueButton.setEnabled(enabled);
+            for (int i = 0; i < valueButtons.length; ++i) {
+                valueButtons[i].setEnabled(enabled);
             }
         }
 
@@ -373,8 +373,9 @@ class FiltersDialog extends TrayDialog {
     public void checkStateChanged(CheckStateChangedEvent event) {
         MarkerType type = (MarkerType) event.getElement();
         typesViewer.setSubtreeChecked(type, event.getChecked());
-		for (MarkerType markerSupertype : type.getAllSupertypes()) {
-			typesViewer.setChecked(markerSupertype, false);
+        MarkerType[] allSupertypes = type.getAllSupertypes();
+        for (int i = 0; i < allSupertypes.length; ++i) {
+            typesViewer.setChecked(allSupertypes[i], false);
         }
         updateEnabledState();
     }
@@ -637,8 +638,10 @@ class FiltersDialog extends TrayDialog {
      */
     MarkerType[] getMarkerTypes() {
         if (markerTypes == null) {
-			ArrayList<MarkerType> typesList = new ArrayList<>();
-			for (MarkerType type : markerTypesModel.getTypes()) {
+            ArrayList typesList = new ArrayList();
+            MarkerType[] types = markerTypesModel.getTypes();
+            for (int i = 0; i < types.length; ++i) {
+                MarkerType type = types[i];
                 if (type.getLabel().length() > 0) {
                     if (type.isSubtypeOf(markerTypesModel
                             .getType(IMarker.PROBLEM))
@@ -648,12 +651,13 @@ class FiltersDialog extends TrayDialog {
                     }
                 }
             }
-			Collections.sort(typesList, new Comparator<MarkerType>() {
+            Collections.sort(typesList, new Comparator() {
                 Collator collator = Collator.getInstance();
 
                 @Override
-				public int compare(MarkerType o1, MarkerType o2) {
-					return collator.compare(o1.getLabel(), o2.getLabel());
+				public int compare(Object o1, Object o2) {
+                    return collator.compare(((MarkerType) o1).getLabel(),
+                            ((MarkerType) o2).getLabel());
                 }
             });
             markerTypes = new MarkerType[typesList.size()];
@@ -668,9 +672,10 @@ class FiltersDialog extends TrayDialog {
      * @return the ids of the selected marker types
      */
     String[] getSelectedTypes() {
+        Object[] checked = typesViewer.getCheckedElements();
         ArrayList list = new ArrayList();
-		for (Object checkedElement : typesViewer.getCheckedElements()) {
-			MarkerType type = (MarkerType) checkedElement;
+        for (int i = 0; i < checked.length; ++i) {
+            MarkerType type = (MarkerType) checked[i];
             // Skip it if any supertypes have already been included.
             // Relies on getCheckedElements() using a pre-order traversal
             // so parents are earlier in the list.
@@ -808,8 +813,9 @@ class FiltersDialog extends TrayDialog {
         if (superType == null) {
             return false;
         }
-		for (Object checkedElement : typesViewer.getCheckedElements()) {
-			if (((MarkerType) checkedElement).isSubtypeOf(superType)) {
+        Object[] checked = typesViewer.getCheckedElements();
+        for (int i = 0; i < checked.length; ++i) {
+            if (((MarkerType) checked[i]).isSubtypeOf(superType)) {
                 return true;
             }
         }
@@ -832,8 +838,8 @@ class FiltersDialog extends TrayDialog {
      */
     void setSelectedTypes(String[] typeIds) {
         typesViewer.setCheckedElements(new MarkerType[0]);
-        for (String typeId : typeIds) {
-            MarkerType type = markerTypesModel.getType(typeId);
+        for (int i = 0; i < typeIds.length; ++i) {
+            MarkerType type = markerTypesModel.getType(typeIds[i]);
             if (type != null) {
                 typesViewer.setSubtreeChecked(type, true);
             }

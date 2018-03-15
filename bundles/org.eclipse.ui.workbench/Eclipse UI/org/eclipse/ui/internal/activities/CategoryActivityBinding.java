@@ -89,7 +89,7 @@ public final class CategoryActivityBinding implements ICategoryActivityBinding {
     @Override
 	public String toString() {
         if (string == null) {
-            final StringBuilder stringBuffer = new StringBuilder();
+            final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append('[');
             stringBuffer.append(activityId);
             stringBuffer.append(',');

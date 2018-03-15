@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1014,12 +1014,12 @@ public class ContentProposalAdapter {
 			// Check each string for a match. Use the string displayed to the
 			// user, not the proposal content.
 			ArrayList<IContentProposal> list = new ArrayList<>();
-			for (IContentProposal proposal : proposals) {
-				String string = getString(proposal);
+			for (int i = 0; i < proposals.length; i++) {
+				String string = getString(proposals[i]);
 				if (string.length() >= filterString.length()
 						&& string.substring(0, filterString.length())
 								.equalsIgnoreCase(filterString)) {
-					list.add(proposal);
+					list.add(proposals[i]);
 				}
 
 			}
@@ -1184,12 +1184,12 @@ public class ContentProposalAdapter {
 	/*
 	 * The list of IContentProposalListener listeners.
 	 */
-	private ListenerList<IContentProposalListener> proposalListeners = new ListenerList<>();
+	private ListenerList proposalListeners = new ListenerList();
 
 	/*
 	 * The list of IContentProposalListener2 listeners.
 	 */
-	private ListenerList<IContentProposalListener2> proposalListeners2 = new ListenerList<>();
+	private ListenerList proposalListeners2 = new ListenerList();
 
 	/*
 	 * Flag that indicates whether the adapter is enabled. In some cases,
@@ -1664,11 +1664,11 @@ public class ContentProposalAdapter {
 				case SWT.Traverse:
 				case SWT.KeyDown:
 					if (DEBUG) {
-						StringBuilder sb;
+						StringBuffer sb;
 						if (e.type == SWT.Traverse) {
-							sb = new StringBuilder("Traverse"); //$NON-NLS-1$
+							sb = new StringBuffer("Traverse"); //$NON-NLS-1$
 						} else {
-							sb = new StringBuilder("KeyDown"); //$NON-NLS-1$
+							sb = new StringBuffer("KeyDown"); //$NON-NLS-1$
 						}
 						sb.append(" received by adapter"); //$NON-NLS-1$
 						dump(sb.toString(), e);
@@ -1678,11 +1678,11 @@ public class ContentProposalAdapter {
 					if (popup != null) {
 						popup.getTargetControlListener().handleEvent(e);
 						if (DEBUG) {
-							StringBuilder sb;
+							StringBuffer sb;
 							if (e.type == SWT.Traverse) {
-								sb = new StringBuilder("Traverse"); //$NON-NLS-1$
+								sb = new StringBuffer("Traverse"); //$NON-NLS-1$
 							} else {
-								sb = new StringBuilder("KeyDown"); //$NON-NLS-1$
+								sb = new StringBuffer("KeyDown"); //$NON-NLS-1$
 							}
 							sb.append(" after being handled by popup"); //$NON-NLS-1$
 							dump(sb.toString(), e);
@@ -1698,18 +1698,6 @@ public class ContentProposalAdapter {
 
 					// We were only listening to traverse events for the popup
 					if (e.type == SWT.Traverse) {
-						// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=520372
-						// The popup is null so record tab as a means to interrupt
-						// any autoactivation that is pending due to autoactivation
-						// delay.
-						if (popup == null) {
-							switch (e.detail) {
-							case SWT.TRAVERSE_TAB_NEXT:
-							case SWT.TRAVERSE_TAB_PREVIOUS:
-								receivedKeyDown = true;
-								break;
-							}
-						}
 						return;
 					}
 
@@ -1759,20 +1747,6 @@ public class ContentProposalAdapter {
 							// in the modify event.
 							if (triggerKeyStroke == null) {
 								watchModify = true;
-							}
-
-							// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=520372
-							// mimic close cases of popup in TargetControlListener
-							if (popup == null) {
-								switch (e.character) {
-								case SWT.CR:
-								case SWT.LF:
-								case SWT.ESC:
-									// Interrupt any autoactivation that is pending due to
-									// autoactivation delay.
-									receivedKeyDown = true;
-									break;
-								}
 							}
 						}
 					} else {
@@ -1836,7 +1810,7 @@ public class ContentProposalAdapter {
 			 *            the event
 			 */
 			private void dump(String who, Event e) {
-				StringBuilder sb = new StringBuilder(
+				StringBuffer sb = new StringBuffer(
 						"--- [ContentProposalAdapter]\n"); //$NON-NLS-1$
 				sb.append(who);
 				sb.append(" - e: keyCode=" + e.keyCode + hex(e.keyCode)); //$NON-NLS-1$
@@ -2074,8 +2048,10 @@ public class ContentProposalAdapter {
 		if (DEBUG) {
 			System.out.println("Notify listeners - proposal accepted."); //$NON-NLS-1$
 		}
-		for (IContentProposalListener l : proposalListeners) {
-			l.proposalAccepted(proposal);
+		final Object[] listenerArray = proposalListeners.getListeners();
+		for (int i = 0; i < listenerArray.length; i++) {
+			((IContentProposalListener) listenerArray[i])
+					.proposalAccepted(proposal);
 		}
 	}
 
@@ -2086,8 +2062,10 @@ public class ContentProposalAdapter {
 		if (DEBUG) {
 			System.out.println("Notify listeners - popup opened."); //$NON-NLS-1$
 		}
-		for (IContentProposalListener2 l : proposalListeners2) {
-			l.proposalPopupOpened(this);
+		final Object[] listenerArray = proposalListeners2.getListeners();
+		for (int i = 0; i < listenerArray.length; i++) {
+			((IContentProposalListener2) listenerArray[i])
+					.proposalPopupOpened(this);
 		}
 	}
 
@@ -2098,8 +2076,10 @@ public class ContentProposalAdapter {
 		if (DEBUG) {
 			System.out.println("Notify listeners - popup closed."); //$NON-NLS-1$
 		}
-		for (IContentProposalListener2 l : proposalListeners2) {
-			l.proposalPopupClosed(this);
+		final Object[] listenerArray = proposalListeners2.getListeners();
+		for (int i = 0; i < listenerArray.length; i++) {
+			((IContentProposalListener2) listenerArray[i])
+					.proposalPopupClosed(this);
 		}
 	}
 

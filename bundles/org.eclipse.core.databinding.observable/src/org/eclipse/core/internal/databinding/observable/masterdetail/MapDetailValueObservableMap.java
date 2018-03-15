@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2017 Ovidio Mallo and others.
+ * Copyright (c) 2010, 2015 Ovidio Mallo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.Diffs;
+import org.eclipse.core.databinding.observable.DisposeEvent;
+import org.eclipse.core.databinding.observable.IDisposeListener;
 import org.eclipse.core.databinding.observable.IObserving;
 import org.eclipse.core.databinding.observable.IStaleListener;
 import org.eclipse.core.databinding.observable.ObservableTracker;
@@ -27,9 +29,12 @@ import org.eclipse.core.databinding.observable.StaleEvent;
 import org.eclipse.core.databinding.observable.map.AbstractObservableMap;
 import org.eclipse.core.databinding.observable.map.IMapChangeListener;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
+import org.eclipse.core.databinding.observable.map.MapChangeEvent;
 import org.eclipse.core.databinding.observable.map.MapDiff;
 import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.IValueChangeListener;
+import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.internal.databinding.identity.IdentityMap;
 import org.eclipse.core.internal.databinding.identity.IdentitySet;
 import org.eclipse.core.internal.databinding.observable.Util;
@@ -62,9 +67,19 @@ public class MapDetailValueObservableMap<K, M, E> extends
 
 	private IdentitySet<IObservableValue<E>> staleDetailObservables = new IdentitySet<>();
 
-	private IMapChangeListener<K, M> masterMapListener = event -> handleMasterMapChange(event.diff);
+	private IMapChangeListener<K, M> masterMapListener = new IMapChangeListener<K, M>() {
+		@Override
+		public void handleMapChange(MapChangeEvent<? extends K, ? extends M> event) {
+			handleMasterMapChange(event.diff);
+		}
+	};
 
-	private IStaleListener masterStaleListener = staleEvent -> fireStale();
+	private IStaleListener masterStaleListener = new IStaleListener() {
+		@Override
+		public void handleStale(StaleEvent staleEvent) {
+			fireStale();
+		}
+	};
 
 	private IStaleListener detailStaleListener = new IStaleListener() {
 		@SuppressWarnings("unchecked")
@@ -91,7 +106,12 @@ public class MapDetailValueObservableMap<K, M, E> extends
 		// Add change/stale/dispose listeners on the master map.
 		masterMap.addMapChangeListener(masterMapListener);
 		masterMap.addStaleListener(masterStaleListener);
-		masterMap.addDisposeListener(event -> MapDetailValueObservableMap.this.dispose());
+		masterMap.addDisposeListener(new IDisposeListener() {
+			@Override
+			public void handleDispose(DisposeEvent event) {
+				MapDetailValueObservableMap.this.dispose();
+			}
+		});
 
 		// Initialize the map with the current state of the master map.
 		Map<K, M> emptyMap = Collections.emptyMap();
@@ -160,13 +180,16 @@ public class MapDetailValueObservableMap<K, M, E> extends
 
 			keyDetailMap.put(addedKey, detailValue);
 
-			detailValue.addValueChangeListener(event -> {
-				if (!event.getObservableValue().isStale()) {
-					staleDetailObservables.remove(event.getSource());
-				}
+			detailValue.addValueChangeListener(new IValueChangeListener<E>() {
+				@Override
+				public void handleValueChange(ValueChangeEvent<? extends E> event) {
+					if (!event.getObservableValue().isStale()) {
+						staleDetailObservables.remove(event.getSource());
+					}
 
-				fireMapChange(
-						Diffs.createMapDiffSingleChange(addedKey, event.diff.getOldValue(), event.diff.getNewValue()));
+					fireMapChange(Diffs.createMapDiffSingleChange(addedKey,
+							event.diff.getOldValue(), event.diff.getNewValue()));
+				}
 			});
 
 			if (detailValue.isStale()) {

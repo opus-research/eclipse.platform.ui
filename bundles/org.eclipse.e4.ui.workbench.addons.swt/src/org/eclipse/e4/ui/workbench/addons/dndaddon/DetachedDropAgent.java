@@ -37,14 +37,12 @@ public class DetachedDropAgent extends DropAgent {
 
 	@Override
 	public boolean canDrop(MUIElement dragElement, DnDInfo info) {
-		if (info.curElement != null) {
+		if (info.curElement != null)
 			return false;
-		}
 
 		if (dragElement instanceof MPart || dragElement instanceof MPlaceholder
-				|| dragElement instanceof MPartStack) {
+				|| dragElement instanceof MPartStack)
 			return true;
-		}
 
 		return false;
 	}
@@ -56,9 +54,8 @@ public class DetachedDropAgent extends DropAgent {
 			dragElement.getTags().remove(IPresentationEngine.MINIMIZED);
 		}
 
-		if (dragElement.getCurSharedRef() != null) {
+		if (dragElement.getCurSharedRef() != null)
 			dragElement = dragElement.getCurSharedRef();
-		}
 
 		Rectangle rectangle = getRectangle(dragElement, info);
 
@@ -73,9 +70,8 @@ public class DetachedDropAgent extends DropAgent {
 
 	@Override
 	public Rectangle getRectangle(MUIElement dragElement, DnDInfo info) {
-		if (dragElement.getCurSharedRef() != null) {
+		if (dragElement.getCurSharedRef() != null)
 			dragElement = dragElement.getCurSharedRef();
-		}
 
 		if (dragElement instanceof MPartStack) {
 			Control ctrl = (Control) dragElement.getWidget();
@@ -100,9 +96,8 @@ public class DetachedDropAgent extends DropAgent {
 
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
-		if (info.curElement != null) {
+		if (info.curElement != null)
 			return false;
-		}
 
 		manager.frameRect(getRectangle(dragElement, info));
 		return true;

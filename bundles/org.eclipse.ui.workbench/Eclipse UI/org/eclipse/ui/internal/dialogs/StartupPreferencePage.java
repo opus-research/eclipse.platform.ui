@@ -132,7 +132,7 @@ public class StartupPreferencePage extends PreferencePage implements
      */
     @Override
 	public boolean performOk() {
-        StringBuilder preference = new StringBuilder();
+        StringBuffer preference = new StringBuffer();
         TableItem items[] = pluginsList.getItems();
         for (int i = 0; i < items.length; i++) {
             if (!items[i].getChecked()) {

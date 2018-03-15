@@ -72,7 +72,7 @@ public class DynamicTestsElement implements
 		this.dynamicTestsColor = DynamicTestsColor.getColor(path.substring(
 				slash + 1, underscore));
 		this.image = Activator.getImageDescriptor(path).createImage();
-		StringBuilder nameBuffer = new StringBuilder(path);
+		StringBuffer nameBuffer = new StringBuffer(path);
 		nameBuffer.replace(slash + 1, slash + 2, path.substring(slash + 1,
 				slash + 2).toUpperCase());
 		nameBuffer.replace(underscore + 1, underscore + 2, path.substring(

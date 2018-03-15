@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,7 +37,7 @@ public class FrameList extends EventManager {
 
     private IFrameSource source;
 
-	private List<Frame> frames;
+    private List frames;
 
     private int current;
 
@@ -51,7 +51,7 @@ public class FrameList extends EventManager {
         Frame frame = source.getFrame(IFrameSource.CURRENT_FRAME, 0);
         frame.setParent(this);
         frame.setIndex(0);
-		frames = new ArrayList<>();
+        frames = new ArrayList();
         frames.add(frame);
         current = 0;
     }
@@ -86,8 +86,9 @@ public class FrameList extends EventManager {
      * @see IPropertyChangeListener#propertyChange
      */
     protected void firePropertyChange(PropertyChangeEvent event) {
-		for (Object listener : getListeners()) {
-            ((IPropertyChangeListener) listener).propertyChange(event);
+        Object[] listeners = getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            ((IPropertyChangeListener) listeners[i]).propertyChange(event);
         }
     }
 
@@ -132,7 +133,7 @@ public class FrameList extends EventManager {
         if (index < 0 || index >= frames.size()) {
 			return null;
 		}
-        return frames.get(index);
+        return (Frame) frames.get(index);
     }
 
     /**

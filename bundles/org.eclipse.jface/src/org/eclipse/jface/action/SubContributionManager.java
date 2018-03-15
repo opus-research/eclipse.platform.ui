@@ -267,8 +267,8 @@ public abstract class SubContributionManager implements IContributionManager {
     @Override
 	public void removeAll() {
     	Object[] array = mapItemToWrapper.keySet().toArray();
-    	for (Object element : array) {
-			IContributionItem item = (IContributionItem) element;
+    	for (int i = 0; i < array.length; i++) {
+			IContributionItem item = (IContributionItem) array[i];
 			remove(item);
 		}
         mapItemToWrapper.clear();

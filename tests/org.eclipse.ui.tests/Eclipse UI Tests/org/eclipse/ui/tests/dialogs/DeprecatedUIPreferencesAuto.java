@@ -10,17 +10,17 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.dialogs;
 
+import junit.framework.TestCase;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.help.WorkbenchHelp;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.tests.harness.util.DialogCheck;
-
-import junit.framework.TestCase;
 
 public class DeprecatedUIPreferencesAuto extends TestCase {
 
@@ -39,8 +39,8 @@ public class DeprecatedUIPreferencesAuto extends TestCase {
         if (manager != null) {
             dialog = new PreferenceDialogWrapper(getShell(), manager);
             dialog.create();
-			PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),
-					IWorkbenchHelpContextIds.PREFERENCE_DIALOG);
+            WorkbenchHelp.setHelp(dialog.getShell(),
+                    new Object[] { IWorkbenchHelpContextIds.PREFERENCE_DIALOG });
 
             for (Object element : manager.getElements(
                     PreferenceManager.PRE_ORDER)) {
@@ -56,38 +56,38 @@ public class DeprecatedUIPreferencesAuto extends TestCase {
 
     public void testWorkbenchPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.Workbench");
-        DialogCheck.assertDialogTexts(dialog);
+        DialogCheck.assertDialogTexts(dialog, this);
     }
 
     public void testAppearancePref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.Views");
-        DialogCheck.assertDialogTexts(dialog);
+        DialogCheck.assertDialogTexts(dialog, this);
     }
 
     public void testDefaultTextEditorPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.TextEditor");
-        DialogCheck.assertDialogTexts(dialog);
+        DialogCheck.assertDialogTexts(dialog, this);
     }
 
     public void testFileEditorsPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.FileEditors");
-        DialogCheck.assertDialogTexts(dialog);
+        DialogCheck.assertDialogTexts(dialog, this);
     }
 
     public void testLocalHistoryPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.FileStates");
-        DialogCheck.assertDialogTexts(dialog);
+        DialogCheck.assertDialogTexts(dialog, this);
     }
 
     public void testPerspectivesPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.Perspectives");
-        DialogCheck.assertDialogTexts(dialog);
+        DialogCheck.assertDialogTexts(dialog, this);
     }
 
     //Only really checking if this opens without an exception
     public void testFontEditorsPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.tests.dialogs.FontFieldEditorTestPreferencePage");
-        DialogCheck.assertDialogTexts(dialog);
+        DialogCheck.assertDialogTexts(dialog, this);
     }
 
     public void testInfoProp() {
@@ -97,7 +97,7 @@ public class DeprecatedUIPreferencesAuto extends TestCase {
          * is an SWT issue.
          *
          Dialog dialog = getPropertyDialog("org.eclipse.ui.propertypages.info.file");
-         DialogCheck.assertDialogTexts(dialog);
+         DialogCheck.assertDialogTexts(dialog, this);
          */
     }
 
@@ -108,7 +108,7 @@ public class DeprecatedUIPreferencesAuto extends TestCase {
          * is an SWT issue.
          *
          Dialog dialog = getPropertyDialog("org.eclipse.ui.propertypages.project.reference");
-         DialogCheck.assertDialogTexts(dialog);
+         DialogCheck.assertDialogTexts(dialog, this);
          */
     }
 

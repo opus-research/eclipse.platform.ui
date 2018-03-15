@@ -30,7 +30,7 @@ public class DummyJob extends Job {
 
 	public boolean inProgress = false;
 	/** if false, infinite until changed or job is cancelled */
-	public volatile boolean shouldFinish = true;
+	public boolean shouldFinish = true;
 
 	public DummyJob(String name, IStatus status) {
 		super(name);

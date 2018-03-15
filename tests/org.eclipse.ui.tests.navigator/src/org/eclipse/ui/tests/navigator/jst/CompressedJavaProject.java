@@ -15,6 +15,7 @@ package org.eclipse.ui.tests.navigator.jst;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -76,6 +77,7 @@ public class CompressedJavaProject implements ICompressedNode, IAdaptable {
 	}
 
 	public List getNonExternalSourceFolders() {
+		List nonExternalSourceFolders = null;
 		Object[] sourceFolders;
 		try {
 			Object jProject = WebJavaContentProvider
@@ -83,11 +85,13 @@ public class CompressedJavaProject implements ICompressedNode, IAdaptable {
 			Method m = WebJavaContentProvider.IJAVA_PROJECT_CLASS.getMethod(
 					"getPackageFragmentRoots", new Class[] {});
 			sourceFolders = (Object[]) m.invoke(jProject, new Object[] {});
-			return new ArrayList(Arrays
+			nonExternalSourceFolders = new ArrayList(Arrays
 					.asList(sourceFolders));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		return nonExternalSourceFolders != null ? nonExternalSourceFolders
+				: Collections.EMPTY_LIST;
 	}
 
 	public CompressedJavaLibraries getCompressedJavaLibraries() {

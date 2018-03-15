@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -35,7 +36,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 public abstract class WorkbenchPreferenceExtensionNode extends WorkbenchPreferenceExpressionNode
     implements IComparableContribution {
 
-	private Collection<String> keywordReferences;
+	private Collection keywordReferences;
 
 	private IConfigurationElement configurationElement;
 
@@ -43,7 +44,7 @@ public abstract class WorkbenchPreferenceExtensionNode extends WorkbenchPreferen
 
 	private Image image;
 
-	private Collection<String> keywordLabelCache;
+	private Collection keywordLabelCache;
 
 	private int priority;
 
@@ -66,13 +67,14 @@ public abstract class WorkbenchPreferenceExtensionNode extends WorkbenchPreferen
 	 *
 	 * @return Collection of <code>String</code>.  Never <code>null</code>.
 	 */
-	public Collection<String> getKeywordReferences() {
+	public Collection getKeywordReferences() {
 		if (keywordReferences == null) {
 			IConfigurationElement[] references = getConfigurationElement()
 					.getChildren(IWorkbenchRegistryConstants.TAG_KEYWORD_REFERENCE);
-			HashSet<String> list = new HashSet<>(references.length);
-			for (IConfigurationElement configElement : references) {
-				String id = configElement.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
+			HashSet list = new HashSet(references.length);
+			for (int i = 0; i < references.length; i++) {
+				IConfigurationElement page = references[i];
+				String id = page.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
 				if (id != null) {
 					list.add(id);
 				}
@@ -93,21 +95,23 @@ public abstract class WorkbenchPreferenceExtensionNode extends WorkbenchPreferen
 	 *
 	 * @return Collection of <code>String</code>.  Never <code>null</code>.
 	 */
-	public Collection<String> getKeywordLabels() {
+	public Collection getKeywordLabels() {
 		if (keywordLabelCache != null) {
 			return keywordLabelCache;
 		}
 
-		Collection<String> refs = getKeywordReferences();
+		Collection refs = getKeywordReferences();
 
-		if (refs.isEmpty()) {
-			keywordLabelCache = Collections.emptySet();
+		if(refs == Collections.EMPTY_SET) {
+			keywordLabelCache = Collections.EMPTY_SET;
 			return keywordLabelCache;
 		}
 
-		keywordLabelCache = new ArrayList<>(refs.size());
-		for (String reference : refs) {
-			String label = KeywordRegistry.getInstance().getKeywordLabel(reference);
+		keywordLabelCache = new ArrayList(refs.size());
+		Iterator referenceIterator = refs.iterator();
+		while(referenceIterator.hasNext()){
+			Object label = KeywordRegistry.getInstance().getKeywordLabel(
+					(String) referenceIterator.next());
 			if(label != null) {
 				keywordLabelCache.add(label);
 			}
@@ -187,10 +191,11 @@ public abstract class WorkbenchPreferenceExtensionNode extends WorkbenchPreferen
 		return pluginId;
 	}
 
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+    @Override
+	public Object getAdapter(Class adapter)
+    {
         if (adapter == IConfigurationElement.class)
-			return adapter.cast(getConfigurationElement());
+            return getConfigurationElement();
         return null;
     }
 

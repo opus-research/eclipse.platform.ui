@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -112,7 +112,7 @@ public class OpenWorkspaceAction extends Action implements
 
 
 	private IContributionItem[] getContributionItems() {
-		ArrayList<IContributionItem> list = new ArrayList<>();
+		ArrayList list = new ArrayList();
 		final ChooseWorkspaceData data = new ChooseWorkspaceData(Platform
 				.getInstanceLocation().getURL());
 		data.readPersistedData();
@@ -127,12 +127,12 @@ public class OpenWorkspaceAction extends Action implements
 		if (list.size()>0) {
 			list.add(new Separator());
 		}
-		return list
+		return (IContributionItem[]) list
 				.toArray(new IContributionItem[list.size()]);
 	}
 
 	class MenuCreator implements IMenuCreator {
-		ArrayList<Menu> menus = new ArrayList<>();
+		ArrayList menus = new ArrayList();
 
 		private MenuManager dropDownMenuMgr;
 
@@ -150,8 +150,9 @@ public class OpenWorkspaceAction extends Action implements
 		public Menu getMenu(Control parent) {
 			createDropDownMenuMgr();
 			dropDownMenuMgr.addMenuListener(manager -> {
-				for (IContributionItem contributionItem : getContributionItems()) {
-					manager.add(contributionItem);
+				IContributionItem[] items = getContributionItems();
+				for (int i = 0; i < items.length; i++) {
+					manager.add(items[i]);
 				}
 				manager.add(new OpenDialogAction());
 			});
@@ -166,11 +167,13 @@ public class OpenWorkspaceAction extends Action implements
 				if (menu.isDisposed()) {
 					return;
 				}
-				for (MenuItem item : menu.getItems()) {
-					item.dispose();
+				MenuItem[] items = menu.getItems();
+				for (int i1 = 0; i1 < items.length; i1++) {
+					items[i1].dispose();
 				}
-				for (IContributionItem contribution : getContributionItems()) {
-					contribution.fill(menu, -1);
+				IContributionItem[] contributions = getContributionItems();
+				for (int i2 = 0; i2 < contributions.length; i2++) {
+					contributions[i2].fill(menu, -1);
 				}
 				new ActionContributionItem(new OpenDialogAction()).fill(
 						menu, -1);
@@ -185,8 +188,8 @@ public class OpenWorkspaceAction extends Action implements
 				dropDownMenuMgr = null;
 			}
 			if (menus.size()>0) {
-				for (Iterator<Menu> i = menus.iterator(); i.hasNext();) {
-					Menu m = i.next();
+				for (Iterator i = menus.iterator(); i.hasNext();) {
+					Menu m = (Menu) i.next();
 					if (!m.isDisposed()) {
 						m.dispose();
 					}
@@ -294,7 +297,7 @@ public class OpenWorkspaceAction extends Action implements
 			return null;
 		}
 
-		StringBuilder result = new StringBuilder(512);
+		StringBuffer result = new StringBuffer(512);
 		result.append(property);
 		result.append(NEW_LINE);
 

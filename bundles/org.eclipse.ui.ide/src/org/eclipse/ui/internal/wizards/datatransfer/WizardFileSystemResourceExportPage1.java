@@ -432,8 +432,8 @@ public class WizardFileSystemResourceExportPage1 extends
 
             // destination
             setDestinationValue(directoryNames[0]);
-            for (String directoryName : directoryNames) {
-				addDestinationItem(directoryName);
+            for (int i = 0; i < directoryNames.length; i++) {
+				addDestinationItem(directoryNames[i]);
 			}
 
             // options

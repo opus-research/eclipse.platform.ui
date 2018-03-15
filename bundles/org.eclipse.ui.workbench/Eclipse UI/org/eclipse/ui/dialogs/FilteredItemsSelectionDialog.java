@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,11 +14,8 @@
  *  Simon Muschel <smuschel@gmx.de> - bug 258493
  *  Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *  Patrik Suzzi <psuzzi@gmail.com> - Bug 485133
- *  Lucas Bullen <lbullen@redhat.com> - Bug 525974
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -49,24 +46,28 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILazyContentProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
@@ -83,8 +84,14 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.ViewForm;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -455,10 +462,13 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		headerLabel.setText((getMessage() != null && getMessage().trim()
 				.length() > 0) ? getMessage()
 				: WorkbenchMessages.FilteredItemsSelectionDialog_patternLabel);
-		headerLabel.addTraverseListener(e -> {
-			if (e.detail == SWT.TRAVERSE_MNEMONIC && e.doit) {
-				e.detail = SWT.TRAVERSE_NONE;
-				pattern.setFocus();
+		headerLabel.addTraverseListener(new TraverseListener() {
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_MNEMONIC && e.doit) {
+					e.detail = SWT.TRAVERSE_NONE;
+					pattern.setFocus();
+				}
 			}
 		});
 
@@ -489,10 +499,13 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		listLabel
 				.setText(WorkbenchMessages.FilteredItemsSelectionDialog_listLabel);
 
-		listLabel.addTraverseListener(e -> {
-			if (e.detail == SWT.TRAVERSE_MNEMONIC && e.doit) {
-				e.detail = SWT.TRAVERSE_NONE;
-				list.getTable().setFocus();
+		listLabel.addTraverseListener(new TraverseListener() {
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_MNEMONIC && e.doit) {
+					e.detail = SWT.TRAVERSE_NONE;
+					list.getTable().setFocus();
+				}
 			}
 		});
 
@@ -525,7 +538,12 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 				.getImage(IWorkbenchGraphicConstants.IMG_LCL_VIEW_MENU));
 		toolItem
 				.setToolTipText(WorkbenchMessages.FilteredItemsSelectionDialog_menu);
-		toolItem.addSelectionListener(widgetSelectedAdapter(e -> showViewMenu()));
+		toolItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				showViewMenu();
+			}
+		});
 
 		menuManager = new MenuManager();
 
@@ -595,11 +613,17 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 	private void createPopupMenu() {
 		removeHistoryItemAction = new RemoveHistoryItemAction();
-		removeHistoryActionContributionItem = new ActionContributionItem(removeHistoryItemAction);
+		removeHistoryActionContributionItem = new ActionContributionItem(
+				removeHistoryItemAction);
 
 		contextMenuManager = new MenuManager();
 		contextMenuManager.setRemoveAllWhenShown(true);
-		contextMenuManager.addMenuListener(manager -> fillContextMenu(manager));
+		contextMenuManager.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(IMenuManager manager) {
+				fillContextMenu(manager);
+			}
+		});
 
 		final Table table = list.getTable();
 		Menu menu= contextMenuManager.createContextMenu(table);
@@ -667,7 +691,12 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		createPopupMenu();
 
-		pattern.addModifyListener(e -> applyFilter());
+		pattern.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				applyFilter();
+			}
+		});
 
 		pattern.addKeyListener(new KeyAdapter() {
 			@Override
@@ -680,12 +709,21 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			}
 		});
 
-		list.addSelectionChangedListener(event -> {
-			StructuredSelection selection = (StructuredSelection) event.getSelection();
-			handleSelected(selection);
+		list.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				StructuredSelection selection = (StructuredSelection) event
+						.getSelection();
+				handleSelected(selection);
+			}
 		});
 
-		list.addDoubleClickListener(event -> handleDoubleClick());
+		list.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				handleDoubleClick();
+			}
+		});
 
 		list.getTable().addKeyListener(new KeyAdapter() {
 			@Override
@@ -715,7 +753,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 				if (e.keyCode == SWT.ARROW_UP && (e.stateMask & SWT.SHIFT) != 0
 						&& (e.stateMask & SWT.CTRL) != 0) {
-					IStructuredSelection selection = list.getStructuredSelection();
+					StructuredSelection selection = (StructuredSelection) list
+							.getSelection();
 
 					if (selection.size() == 1) {
 						Object element = selection.getFirstElement();
@@ -726,7 +765,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 								.getSelectionIndex() - 1) instanceof ItemsListSeparator)
 							list.getTable().setSelection(
 									list.getTable().getSelectionIndex() - 1);
-						list.getTable().notifyListeners(SWT.Selection, new Event());
+						list.getTable().notifyListeners(SWT.Selection,
+								new Event());
 
 					}
 				}
@@ -988,7 +1028,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 	@Override
 	protected void computeResult() {
 
-		List selectedElements = list.getStructuredSelection().toList();
+		List selectedElements = ((StructuredSelection) list.getSelection())
+				.toList();
 
 		List objectsToReturn = new ArrayList();
 
@@ -1073,7 +1114,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 	 */
 	protected StructuredSelection getSelectedItems() {
 
-		StructuredSelection selection = (StructuredSelection) list.getStructuredSelection();
+		StructuredSelection selection = (StructuredSelection) list
+				.getSelection();
 
 		List selectedItems = selection.toList();
 		Object itemToRemove = null;
@@ -1484,7 +1526,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		@Override
 		public void run() {
-			List selectedElements = ((StructuredSelection) list.getSelection()).toList();
+			List selectedElements = ((StructuredSelection) list.getSelection())
+					.toList();
 			removeSelectedItems(selectedElements);
 		}
 	}
@@ -1493,13 +1536,14 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		return PlatformUI.getPreferenceStore().getBoolean(IWorkbenchPreferenceConstants.USE_COLORED_LABELS);
 	}
 
-	private class ItemsListLabelProvider extends StyledCellLabelProvider implements ILabelProviderListener {
+	private class ItemsListLabelProvider extends StyledCellLabelProvider
+			implements ILabelProviderListener {
 		private ILabelProvider provider;
 
 		private ILabelDecorator selectionDecorator;
 
 		// Need to keep our own list of listeners
-		private ListenerList<ILabelProviderListener> listeners = new ListenerList<>();
+		private ListenerList listeners = new ListenerList();
 
 		/**
 		 * Creates a new instance of the class.
@@ -1584,8 +1628,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		private boolean isSelected(Object element) {
 			if (element != null && currentSelection != null) {
-				for (Object entry : currentSelection) {
-					if (element.equals(entry))
+				for (int i = 0; i < currentSelection.length; i++) {
+					if (element.equals(currentSelection[i]))
 						return true;
 				}
 			}
@@ -1594,7 +1638,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		private String getText(Object element) {
 			if (element instanceof ItemsListSeparator) {
-				return getSeparatorLabel(((ItemsListSeparator) element).getName());
+				return getSeparatorLabel(((ItemsListSeparator) element)
+						.getName());
 			}
 
 			String str = provider.getText(element);
@@ -1605,11 +1650,13 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			return str;
 		}
 
-		private StyledString getStyledText(Object element, IStyledLabelProvider provider) {
+		private StyledString getStyledText(Object element,
+				IStyledLabelProvider provider) {
 			StyledString string = provider.getStyledText(element);
 
 			if (selectionDecorator != null && isSelected(element)) {
-				String decorated = selectionDecorator.decorateText(string.getString(), element);
+				String decorated = selectionDecorator.decorateText(string
+						.getString(), element);
 				return StyledCellLabelProvider.styleDecoratedString(decorated, null, string);
 				// no need to add colors when element is selected
 			}
@@ -1658,13 +1705,13 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 			gc.dispose();
 
-			StringBuilder dashes = new StringBuilder();
+			StringBuffer dashes = new StringBuffer();
 			int chars = (((width - fMessageLength) / fSeparatorWidth) / 2) - 2;
 			for (int i = 0; i < chars; i++) {
 				dashes.append('-');
 			}
 
-			StringBuilder result = new StringBuilder();
+			StringBuffer result = new StringBuffer();
 			result.append(dashes);
 			result.append(" " + separatorLabel + " "); //$NON-NLS-1$//$NON-NLS-2$
 			result.append(dashes);
@@ -1739,8 +1786,9 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		@Override
 		public void labelProviderChanged(LabelProviderChangedEvent event) {
-			for (ILabelProviderListener l : listeners) {
-				l.labelProviderChanged(event);
+			Object[] l = listeners.getListeners();
+			for (int i = 0; i < listeners.size(); i++) {
+				((ILabelProviderListener) l[i]).labelProviderChanged(event);
 			}
 		}
 	}
@@ -2173,7 +2221,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 			IMemento[] mementoElements = historyMemento
 					.getChildren(infoNodeName);
-			for (IMemento mementoElement : mementoElements) {
+			for (int i = 0; i < mementoElements.length; ++i) {
+				IMemento mementoElement = mementoElements[i];
 				Object object = restoreItemFromMemento(mementoElement);
 				if (object != null) {
 					historyList.add(object);
@@ -2192,7 +2241,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			IMemento historyMemento = memento.createChild(rootNodeName);
 
 			Object[] items = getHistoryItems();
-			for (Object item : items) {
+			for (int i = 0; i < items.length; i++) {
+				Object item = items[i];
 				IMemento elementMemento = historyMemento
 						.createChild(infoNodeName);
 				storeItemToMemento(item, elementMemento);
@@ -2561,7 +2611,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		public void addHistoryItems(ItemsFilter itemsFilter) {
 			if (this.selectionHistory != null) {
 				Object[] items = this.selectionHistory.getHistoryItems();
-				for (Object item : items) {
+				for (int i = 0; i < items.length; i++) {
+					Object item = items[i];
 					if (itemsFilter == filter) {
 						if (itemsFilter != null) {
 							if (itemsFilter.matchItem(item)) {
@@ -2856,39 +2907,21 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			}
 
 			ArrayList preparedElements = new ArrayList();
-			int i = 0;
 			boolean hasHistory = false;
-			int reportEvery = filteredElements.length / ticks;
 
-			for (; i < filteredElements.length; i++) {
-				Object item = filteredElements[i];
-				if (filter != null && filter.getPattern().equals(getElementName(item))) {
-					if (isHistoryElement(item)) {
-						preparedElements.add(0, item);
-						hasHistory = true;
-					} else {
-						preparedElements.add(item);
-					}
-				} else {
-					break;
-				}
-
-				if (reportEvery != 0 && ((i + 1) % reportEvery == 0)) {
-					monitor.worked(1);
-				}
-			}
-
-			if (filteredElements.length > i) {
-				if (isHistoryElement(filteredElements[i])) {
+			if (filteredElements.length > 0) {
+				if (isHistoryElement(filteredElements[0])) {
 					hasHistory = true;
 				}
 			}
 
-			// add separators
-			for (; i < filteredElements.length; i++) {
+			int reportEvery = filteredElements.length / ticks;
+
+			// add separator
+			for (int i = 0; i < filteredElements.length; i++) {
 				Object item = filteredElements[i];
+
 				if (hasHistory && !isHistoryElement(item)) {
-					setSeparatorLabel(WorkbenchMessages.FilteredItemsSelectionDialog_separatorLabel);
 					preparedElements.add(itemsListSeparator);
 					hasHistory = false;
 				}
@@ -3052,8 +3085,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 				return;
 			}
 			Object input = getInput();
-			for (Object obj : objs) {
-				if (obj.equals(input)) {
+			for (int i = 0; i < objs.length; i++) {
+				if (objs[i].equals(input)) {
 					refresh();
 					break;
 				}
@@ -3068,20 +3101,6 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		@Override
 		public int compare(Object o1, Object o2) {
-			// find perfect matches
-			if (filter != null) {
-				String filterPattern = filter.getPattern();
-				// See if any are exact matches
-				boolean m1 = filterPattern.equals(getElementName(o1));
-				boolean m2 = filterPattern.equals(getElementName(o2));
-				if (m1 && m2)
-					return 0;
-				if (m1 && !m2)
-					return -1;
-				if (m2 && !m1)
-					return 1;
-			}
-
 			boolean h1 = isHistoryElement(o1);
 			boolean h2 = isHistoryElement(o2);
 			if (h1 == h2)

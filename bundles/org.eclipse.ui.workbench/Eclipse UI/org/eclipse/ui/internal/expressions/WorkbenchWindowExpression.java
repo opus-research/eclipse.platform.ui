@@ -102,7 +102,7 @@ public class WorkbenchWindowExpression extends Expression {
 
 	@Override
 	public String toString() {
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer();
 		buffer.append("WorkbenchWindowExpression("); //$NON-NLS-1$
 		buffer.append(window);
 		buffer.append(')');

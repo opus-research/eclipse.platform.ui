@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -60,7 +59,7 @@ public class FileStatesPage extends PreferencePage implements
 
     private Button applyPolicyButton;
 
-	private ArrayList<Control> dependentControls = new ArrayList<>();
+	private ArrayList dependentControls= new ArrayList();
 
     //Choose a maximum to prevent OutOfMemoryErrors
     private int FILE_STATES_MAXIMUM = 10000;
@@ -122,9 +121,9 @@ public class FileStatesPage extends PreferencePage implements
         }
 
         boolean newState= applyPolicyButton.getSelection();
-		Iterator<Control> iter = dependentControls.iterator();
+        Iterator iter= dependentControls.iterator();
         while (iter.hasNext())
-			iter.next().setEnabled(newState);
+			((Control)iter.next()).setEnabled(newState);
 
         if (validateLongTextEntry(longevityText, DAY_LENGTH) == FAILED_VALUE) {
             setValid(false);
@@ -311,7 +310,7 @@ public class FileStatesPage extends PreferencePage implements
 
         } catch (NumberFormatException exception) {
             setErrorMessage(MessageFormat.format(IDEWorkbenchMessages.FileHistory_invalid,
-					exception.getLocalizedMessage()));
+                    new Object[] { exception.getLocalizedMessage() }));
             return FAILED_VALUE;
         }
 
@@ -342,7 +341,7 @@ public class FileStatesPage extends PreferencePage implements
 
         } catch (NumberFormatException exception) {
             setErrorMessage(MessageFormat.format(IDEWorkbenchMessages.FileHistory_invalid,
-					exception.getLocalizedMessage()));
+                    new Object[] { exception.getLocalizedMessage() }));
             return FAILED_VALUE;
         }
 

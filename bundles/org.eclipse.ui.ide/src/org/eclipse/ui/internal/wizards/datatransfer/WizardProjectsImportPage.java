@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -72,7 +71,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -91,11 +89,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.WizardDataTransferPage;
 import org.eclipse.ui.dialogs.WorkingSetGroup;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.StatusUtil;
-import org.eclipse.ui.internal.registry.WorkingSetDescriptor;
-import org.eclipse.ui.internal.registry.WorkingSetRegistry;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
@@ -290,8 +285,10 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		 * @since 3.4
 		 */
 		public String getProjectLabel() {
-			String path = projectSystemFile == null ? structureProvider.getFullPath(parent)
-					: projectSystemFile.getParent();
+			String path = projectSystemFile == null ? structureProvider
+					.getLabel(parent) : projectSystemFile
+					.getParent();
+
 			return NLS.bind(
 					DataTransferMessages.WizardProjectsImportPage_projectLabel,
 					projectName, path);
@@ -339,8 +336,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	private Button copyCheckbox;
 
 	private boolean copyFiles = false;
-
-	private boolean closeProjectsAfterImport = false;
 
 	private ProjectRecord[] selectedProjects = new ProjectRecord[0];
 
@@ -408,20 +403,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	public WizardProjectsImportPage(String pageName,String initialPath,
 			IStructuredSelection currentSelection) {
  		super(pageName);
-		if (initialPath != null) {
-			this.initialPath = initialPath;
-		} else {
-			if (currentSelection != null) {
-				Object firstElement = currentSelection.getFirstElement();
-				if (firstElement instanceof File) {
-					this.initialPath = ((File) firstElement).getAbsolutePath();
-				} else if (firstElement instanceof IResource) {
-					this.initialPath = ((IResource) firstElement).getLocation().toFile().getAbsolutePath();
-				} else if (firstElement instanceof String && new File((String) firstElement).exists()) {
-					this.initialPath = new File((String) firstElement).getAbsolutePath();
-				}
-			}
-		}
+		this.initialPath = initialPath;
 		this.currentSelection = currentSelection;
 		setPageComplete(false);
 		setTitle(DataTransferMessages.WizardProjectsImportPage_ImportProjectsTitle);
@@ -453,9 +435,8 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	 * @param workArea
 	 */
 	private void createWorkingSetGroup(Composite workArea) {
-		WorkingSetRegistry registry = WorkbenchPlugin.getDefault().getWorkingSetRegistry();
-		String[] workingSetIds = Arrays.stream(registry.getNewPageWorkingSetDescriptors())
-				.map(WorkingSetDescriptor::getId).toArray(String[]::new);
+		String[] workingSetIds = new String[] {"org.eclipse.ui.resourceWorkingSetPage",  //$NON-NLS-1$
+				"org.eclipse.jdt.ui.JavaWorkingSetPage"};  //$NON-NLS-1$
 		workingSetGroup = new WorkingSetGroup(workArea, currentSelection, workingSetIds);
 	}
 
@@ -491,13 +472,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 				projectsList.refresh(true);
 			}
 		});
-
-		Button closeProjectsCheckbox = new Button(optionsGroup, SWT.CHECK);
-		closeProjectsCheckbox.setText(DataTransferMessages.WizardProjectsImportPage_closeProjectsAfterImport);
-		closeProjectsCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		closeProjectsCheckbox.setSelection(closeProjectsAfterImport);
-		closeProjectsCheckbox.addSelectionListener(
-				SelectionListener.widgetSelectedAdapter(e -> closeProjectsAfterImport = closeProjectsCheckbox.getSelection()));
 
 		hideConflictingProjects = new Button(optionsGroup, SWT.CHECK);
 		hideConflictingProjects
@@ -1370,16 +1344,13 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			SubMonitor subTask = subMonitor.split(1).setWorkRemaining(100);
 			subTask.setTaskName(DataTransferMessages.WizardProjectsImportPage_CreateProjectsTask);
 			project.create(record.description, subTask.split(30));
-			if (!closeProjectsAfterImport || copyFiles) {
-				project.open(IResource.BACKGROUND_REFRESH, subTask.split(70));
-			}
+			project.open(IResource.BACKGROUND_REFRESH, subTask.split(70));
 			subTask.setTaskName(""); //$NON-NLS-1$
 		} catch (CoreException e) {
 			return e.getStatus();
 		}
 
 		// import operation to import project files if copy checkbox is selected
-		IStatus result = Status.OK_STATUS;
 		if (copyFiles && importSource != null) {
 			List filesToImport = FileSystemStructureProvider.INSTANCE
 					.getChildren(importSource);
@@ -1400,17 +1371,10 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 				return new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, 2,
 						e.getCause().getLocalizedMessage(), e);
 			}
-
-		}
-		if (closeProjectsAfterImport) {
-			try {
-				project.close(subMonitor.split(1));
-			} catch (CoreException e) {
-				return e.getStatus();
-			}
+			return operation.getStatus();
 		}
 
-		return result;
+		return Status.OK_STATUS;
 	}
 
 	/**

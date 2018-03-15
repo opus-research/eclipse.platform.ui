@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,20 +8,15 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700, 511198
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,6 +39,8 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -77,16 +74,13 @@ import org.eclipse.ui.model.WorkbenchPartLabelProvider;
  */
 public class SaveablesList implements ISaveablesLifecycleListener {
 
-	private ListenerList<ISaveablesLifecycleListener> listeners = new ListenerList<>();
+	private ListenerList listeners = new ListenerList();
 
 	// event source (mostly ISaveablesSource) -> Set of Saveable
-	private Map<Object, Set<Saveable>> modelMap = new LinkedHashMap<>();
+	private Map<Object, Set<Saveable>> modelMap = new HashMap<>();
 
 	// reference counting map
-	private Map<Saveable, Integer> modelRefCounts = new LinkedHashMap<>();
-
-	// lists contain "equal" saveables as many times as we have counted them above
-	private Map<Saveable, List<Saveable>> equalKeys = new IdentityHashMap<>();
+	private Map<Saveable, Integer> modelRefCounts = new HashMap<>();
 
 	private Set<ISaveablesSource> nonPartSources = new HashSet<>();
 
@@ -142,148 +136,29 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 			result = true;
 			refCount = Integer.valueOf(0);
 		}
-
-		// Remember concrete saveable instance to make sure we can find it later
-		if (referenceMap == modelRefCounts) {
-			if (result) {
-				// first time we saw such key
-				rememberRefKey(key);
-			} else {
-				incrementRefKeys(key);
-			}
-		}
-
 		referenceMap.put(key, Integer.valueOf(refCount.intValue() + 1));
 		return result;
-	}
-
-	private void rememberRefKey(Saveable key) {
-		ArrayList<Saveable> equals = new ArrayList<>();
-		equals.add(key);
-		equalKeys.put(key, equals);
-	}
-
-	private void incrementRefKeys(Saveable key) {
-		Saveable keyUsedInCountMap = findExistingRefKey(key);
-		if (keyUsedInCountMap == null) {
-			// Should not happen
-			rememberRefKey(key);
-			return;
-		}
-		List<Saveable> equals = equalKeys.get(keyUsedInCountMap);
-		equals.add(key);
-		equalKeys.put(key, equals);
 	}
 
 	/**
 	 * returns true if the given key has been removed
 	 *
+	 * @param referenceMap
 	 * @param key
 	 * @return true if the ref count of the given key was 1
 	 */
-	private boolean decrementRefCount(Saveable key) {
+	private boolean decrementRefCount(Map<Saveable, Integer> referenceMap, Saveable key) {
 		boolean result = false;
-		Integer refCount = modelRefCounts.get(key);
-		final Saveable keyToDecrement = key;
-		if (refCount == null) {
-			key = fixKeyIfKnown(key);
-			if (keyToDecrement != key) {
-				refCount = modelRefCounts.get(key);
-			}
-		}
-		if (refCount == null) {
-			Assert.isTrue(false, keyToDecrement + ": " + keyToDecrement.getName()); //$NON-NLS-1$
-		}
-		int refCountValue = refCount.intValue();
-		if (refCountValue == 1) {
-			modelRefCounts.remove(key);
+		Integer refCount = referenceMap.get(key);
+		if (refCount == null)
+			Assert.isTrue(false, key + ": " + key.getName()); //$NON-NLS-1$
+		if (refCount.intValue() == 1) {
+			referenceMap.remove(key);
 			result = true;
-			forgetRefKeys(key);
 		} else {
-			Saveable keyUsedInCountMap;
-			Collection<Saveable> equals = equalKeys.get(keyToDecrement);
-			long instanceCount = count(keyToDecrement, equals);
-			if (instanceCount == 1) {
-				forgetRefKeys(keyToDecrement);
-				keyUsedInCountMap = equals.iterator().next();
-			} else {
-				decrementRefKeys(keyToDecrement);
-				keyUsedInCountMap = key;
-			}
-			modelRefCounts.remove(keyToDecrement);
-			modelRefCounts.put(keyUsedInCountMap, Integer.valueOf(refCountValue - 1));
+			referenceMap.put(key, Integer.valueOf(refCount.intValue() - 1));
 		}
 		return result;
-	}
-
-	private long count(final Saveable keyToDecrement, Collection<Saveable> equals) {
-		return equals.stream().filter(x -> x == keyToDecrement).count();
-	}
-
-	/**
-	 * If the given key changed the equals() behavior since we've used it for the
-	 * first time, we should still have its instance in the equalKeys map and could
-	 * use his previously "equal" colleagues to retrieve the expected reference
-	 * count
-	 *
-	 * @key object to find known, previously equal one
-	 * @return fixed key or given key
-	 */
-	private Saveable fixKeyIfKnown(Saveable key) {
-		Collection<Saveable> keys = equalKeys.get(key);
-		if (keys == null) {
-			return key;
-		}
-		Saveable goodKey = null;
-		for (Saveable saveable : keys) {
-			Integer refCount = modelRefCounts.get(saveable);
-			if (refCount != null) {
-				goodKey = saveable;
-				break;
-			}
-		}
-		if (goodKey == null) {
-			return key;
-		}
-		return goodKey;
-	}
-
-	private void forgetRefKeys(Saveable key) {
-		Collection<Saveable> keys = equalKeys.get(key);
-		if (keys != null) {
-			equalKeys.remove(key);
-			keys.removeIf(x -> x == key);
-		}
-	}
-
-	private void decrementRefKeys(Saveable key) {
-		List<Saveable> keys = equalKeys.get(key);
-		if (keys != null) {
-			for (int i = 0; i < keys.size(); i++) {
-				if (keys.get(i) == key) {
-					keys.remove(i);
-					break;
-				}
-			}
-		}
-	}
-
-	/**
-	 *
-	 * @param key
-	 *            current key
-	 * @return probably existing equal key we use in modelRefCounts map
-	 */
-	private Saveable findExistingRefKey(Saveable key) {
-		Saveable existingKey = null;
-		Set<Saveable> keys = modelRefCounts.keySet();
-		for (Saveable s : keys) {
-			if (s.equals(key)) {
-				existingKey = s;
-				break;
-			}
-		}
-		return existingKey;
 	}
 
 	// returns true if this model was removed from getModels();
@@ -295,7 +170,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 					"Ignored attempt to remove a saveable when no saveables were known", source, model); //$NON-NLS-1$
 		} else {
 			if (modelsForSource.remove(model)) {
-				result = decrementRefCount(model);
+				result = decrementRefCount(modelRefCounts, model);
 				if (modelsForSource.isEmpty()) {
 					modelMap.remove(source);
 				}
@@ -353,8 +228,8 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 			Saveable[] models = event.getSaveables();
 			Map<Saveable, Integer> modelsDecrementing = new HashMap<>();
 			Set<Saveable> modelsClosing = new HashSet<>();
-			for (Saveable model : models) {
-				incrementRefCount(modelsDecrementing, model);
+			for (int i = 0; i < models.length; i++) {
+				incrementRefCount(modelsDecrementing, models[i]);
 			}
 
 			fillModelsClosing(modelsClosing, modelsDecrementing);
@@ -394,7 +269,8 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 */
 	private void removeModels(Object source, Saveable[] modelArray) {
 		List<Saveable> removed = new ArrayList<>();
-		for (Saveable model : modelArray) {
+		for (int i = 0; i < modelArray.length; i++) {
+			Saveable model = modelArray[i];
 			if (removeModel(source, model)) {
 				removed.add(model);
 			}
@@ -412,7 +288,8 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 */
 	private void addModels(Object source, Saveable[] modelArray) {
 		List<Saveable> added = new ArrayList<>();
-		for (Saveable model : modelArray) {
+		for (int i = 0; i < modelArray.length; i++) {
+			Saveable model = modelArray[i];
 			if (addModel(source, model)) {
 				added.add(model);
 			}
@@ -428,8 +305,10 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 * @param event
 	 */
 	private void fireModelLifecycleEvent(SaveablesLifecycleEvent event) {
-		for (ISaveablesLifecycleListener listener : listeners) {
-			listener.handleLifecycleEvent(event);
+		Object[] listenerArray = listeners.getListeners();
+		for (int i = 0; i < listenerArray.length; i++) {
+			((ISaveablesLifecycleListener) listenerArray[i])
+					.handleLifecycleEvent(event);
 		}
 	}
 
@@ -505,8 +384,10 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 					continue;
 				}
 			}
-			for (Saveable saveableModel : getSaveables(part)) {
-				incrementRefCount(postCloseInfo.modelsDecrementing, saveableModel);
+			Saveable[] modelsFromSource = getSaveables(part);
+			for (int i = 0; i < modelsFromSource.length; i++) {
+				incrementRefCount(postCloseInfo.modelsDecrementing,
+						modelsFromSource[i]);
 			}
 		}
 		fillModelsClosing(postCloseInfo.modelsClosing,
@@ -613,26 +494,28 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 			} else if (modelsToSave.size() == 1) {
 				Saveable model = modelsToSave.get(0);
 				// Show a dialog.
+				String[] buttons;
+				if(canCancel) {
+					buttons = new String[] { IDialogConstants.YES_LABEL,
+							IDialogConstants.NO_LABEL,
+							IDialogConstants.CANCEL_LABEL };
+				} else {
+					buttons = new String[] { IDialogConstants.YES_LABEL,
+							IDialogConstants.NO_LABEL};
+				}
 
 				// don't save if we don't prompt
 				int choice = ISaveablePart2.NO;
 
 				MessageDialog dialog;
 				if (stillOpenElsewhere) {
-					LinkedHashMap<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
-					buttonLabelToIdMap.put(WorkbenchMessages.SaveableHelper_Save, IDialogConstants.OK_ID);
-					buttonLabelToIdMap.put(WorkbenchMessages.SaveableHelper_Dont_Save, IDialogConstants.NO_ID);
-					if (canCancel) {
-						buttonLabelToIdMap.put(WorkbenchMessages.SaveableHelper_Cancel, IDialogConstants.CANCEL_ID);
-					}
 					String message = NLS
 							.bind(
 									WorkbenchMessages.EditorManager_saveChangesOptionallyQuestion,
 									model.getName());
 					MessageDialogWithToggle dialogWithToggle = new MessageDialogWithToggle(shellProvider.getShell(),
 							WorkbenchMessages.Save_Resource, null, message,
-							MessageDialog.QUESTION, buttonLabelToIdMap, 0,
-							WorkbenchMessages.EditorManager_closeWithoutPromptingOption, false) {
+							MessageDialog.QUESTION, buttons, 0, WorkbenchMessages.EditorManager_closeWithoutPromptingOption, false) {
 						@Override
 						protected int getShellStyle() {
 							return (canCancel ? SWT.CLOSE : SWT.NONE)
@@ -643,15 +526,6 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 					};
 					dialog = dialogWithToggle;
 				} else {
-					String[] buttons;
-					if (canCancel) {
-						buttons = new String[] { WorkbenchMessages.SaveableHelper_Save,
-								WorkbenchMessages.SaveableHelper_Dont_Save, WorkbenchMessages.SaveableHelper_Cancel };
-					} else {
-						buttons = new String[] { WorkbenchMessages.SaveableHelper_Save,
-								WorkbenchMessages.SaveableHelper_Dont_Save };
-					}
-
 					String message = NLS
 							.bind(
 									WorkbenchMessages.EditorManager_saveChangesQuestion,
@@ -777,23 +651,26 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 */
 	public boolean saveModels(final List<Saveable> finalModels, final IShellProvider shellProvider,
 			IRunnableContext runnableContext, final boolean blockUntilSaved) {
-		IRunnableWithProgress progressOp = monitor -> {
-			IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
-			SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Saving_Modifications,
-					finalModels.size());
-			for (Saveable model : finalModels) {
-				// handle case where this model got saved as a result of
-				// saving another
-				if (!model.isDirty()) {
-					subMonitor.worked(1);
-					continue;
+		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
+			@Override
+			public void run(IProgressMonitor monitor) {
+				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
+				SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Saving_Modifications,
+						finalModels.size());
+				for (Saveable model : finalModels) {
+					// handle case where this model got saved as a result of
+					// saving another
+					if (!model.isDirty()) {
+						subMonitor.worked(1);
+						continue;
+					}
+					SaveableHelper.doSaveModel(model, subMonitor.split(1),
+							shellProvider, blockUntilSaved);
+					if (subMonitor.isCanceled())
+						break;
 				}
-				SaveableHelper.doSaveModel(model, subMonitor.split(1),
-						shellProvider, blockUntilSaved);
-				if (subMonitor.isCanceled())
-					break;
+				monitorWrap.done();
 			}
-			monitorWrap.done();
 		};
 
 		// Do the save.
@@ -917,9 +794,11 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 
 		@Override
 		protected void createButtonsForButtonBar(Composite parent) {
-			createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+			createButton(parent, IDialogConstants.OK_ID,
+					IDialogConstants.OK_LABEL, true);
 			if (canCancel) {
-				createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
+				createButton(parent, IDialogConstants.CANCEL_ID,
+						IDialogConstants.CANCEL_LABEL, false);
 			}
 		}
 
@@ -932,7 +811,12 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 				 checkboxComposite.setLayout(new GridLayout(2, false));
 
 				 checkbox = new Button(checkboxComposite, SWT.CHECK);
-				 checkbox.addSelectionListener(widgetSelectedAdapter(e -> dontPromptSelection = checkbox.getSelection()));
+				 checkbox.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						dontPromptSelection = checkbox.getSelection();
+					}
+				 });
 				 GridData gd = new GridData();
 				 gd.horizontalAlignment = SWT.BEGINNING;
 				 checkbox.setLayoutData(gd);
@@ -968,24 +852,4 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		return result.toArray(new IWorkbenchPart[result.size()]);
 	}
 
-	/**
-	 * FOR TESTS ONLY
-	 */
-	protected Map<Saveable, Integer> getModelRefCounts() {
-		return modelRefCounts;
-	}
-
-	/**
-	 * FOR TESTS ONLY
-	 */
-	protected Map<Object, Set<Saveable>> getModelMap() {
-		return modelMap;
-	}
-
-	/**
-	 * FOR TESTS ONLY
-	 */
-	protected Map<Saveable, List<Saveable>> getEqualKeys() {
-		return equalKeys;
-	}
 }

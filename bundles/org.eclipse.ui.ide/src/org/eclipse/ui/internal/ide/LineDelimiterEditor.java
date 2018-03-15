@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -218,7 +218,7 @@ public class LineDelimiterEditor {
 	 * @return the default setting for the object being shown
 	 */
 	private String[] getChoices() {
-		Set<String> keys = Platform.knownPlatformLineSeparators().keySet();
+		Set keys = Platform.knownPlatformLineSeparators().keySet();
 		String[] keyArray = new String[keys.size()];
 		keys.toArray(keyArray);
 		return keyArray;
@@ -264,8 +264,8 @@ public class LineDelimiterEditor {
 		if (defaultButton.getSelection() || choiceCombo.getText().equals("")) { //$NON-NLS-1$
 			val = null;
 		} else {
-			Map<String, String> lineSeparators = Platform.knownPlatformLineSeparators();
-			val = lineSeparators.get(choiceCombo.getText());
+			Map lineSeparators = Platform.knownPlatformLineSeparators();
+			val = (String) lineSeparators.get(choiceCombo.getText());
 		}
 
 		Preferences node = getPreferences(project).node(Platform.PI_RUNTIME);
@@ -289,8 +289,9 @@ public class LineDelimiterEditor {
 	 */
 	public void setEnabled(boolean enabled) {
 		group.setEnabled(enabled);
-		for (Control child : group.getChildren()) {
-			child.setEnabled(enabled);
+		Control[] children = group.getChildren();
+		for (int i = 0; i < children.length; i++) {
+			children[i].setEnabled(enabled);
 		}
 	}
 }

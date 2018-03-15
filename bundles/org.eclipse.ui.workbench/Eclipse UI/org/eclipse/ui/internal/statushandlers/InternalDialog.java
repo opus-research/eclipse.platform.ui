@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 473973
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  ******************************************************************************/
 package org.eclipse.ui.internal.statushandlers;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -29,8 +25,11 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -38,6 +37,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -46,8 +47,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.WorkbenchMessages;
@@ -151,13 +154,16 @@ public class InternalDialog extends TrayDialog {
 	public InternalDialog(final Map dialogState, boolean modal) {
 		super(ProgressManagerUtil.getDefaultParent());
 		this.dialogState = dialogState;
-		supportTray = new SupportTray(dialogState, event -> {
-			dialogState.put(IStatusDialogConstants.TRAY_OPENED,
-					Boolean.FALSE);
-			// close the tray
-			closeTray();
-			// set focus back to shell
-			getShell().setFocus();
+		supportTray = new SupportTray(dialogState, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				dialogState.put(IStatusDialogConstants.TRAY_OPENED,
+						Boolean.FALSE);
+				// close the tray
+				closeTray();
+				// set focus back to shell
+				getShell().setFocus();
+			}
 		});
 		detailsManager = new DetailsAreaManager(dialogState);
 		setShellStyle(SWT.RESIZE | SWT.MAX | SWT.MIN | getShellStyle());
@@ -363,9 +369,6 @@ public class InternalDialog extends TrayDialog {
 	}
 
 	void refreshDialogSize() {
-		if (dialogArea == null || dialogArea.isDisposed()) {
-			return;
-		}
 		Point newSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		getShell().setSize(newSize);
 	}
@@ -461,6 +464,7 @@ public class InternalDialog extends TrayDialog {
 
 	@Override
 	public Point getInitialLocation(Point initialSize) {
+		// TODO Auto-generated method stub
 		return super.getInitialLocation(initialSize);
 	}
 
@@ -505,18 +509,21 @@ public class InternalDialog extends TrayDialog {
 		control.setLayoutData(data);
 		initContentProvider();
 		initLabelProvider();
-		statusListViewer.addPostSelectionChangedListener(event -> {
-			handleSelectionChange();
-			if ((getTray() == null) && getBooleanValue(IStatusDialogConstants.TRAY_OPENED)
-					&& providesSupport()) {
-				silentTrayOpen();
-				return;
+		statusListViewer.addPostSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				handleSelectionChange();
+				if ((getTray() == null) && getBooleanValue(IStatusDialogConstants.TRAY_OPENED)
+						&& providesSupport()) {
+					silentTrayOpen();
+					return;
+				}
+				if ((getTray() != null) && !providesSupport()) {
+					silentTrayClose();
+					return;
+				}
+				supportTray.selectionChanged(event);
 			}
-			if ((getTray() != null) && !providesSupport()) {
-				silentTrayClose();
-				return;
-			}
-			supportTray.selectionChanged(event);
 		});
 		Dialog.applyDialogFont(parent);
 	}
@@ -920,20 +927,30 @@ public class InternalDialog extends TrayDialog {
 				.setText(WorkbenchMessages.WorkbenchStatusDialog_SupportHyperlink);
 		link
 				.setToolTipText(WorkbenchMessages.WorkbenchStatusDialog_SupportTooltip);
-		link.addSelectionListener(widgetSelectedAdapter(e -> openTray()));
+		link.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				openTray();
+			}
+		});
 		Dialog.applyDialogFont(link);
 		return link;
 	}
 
 	private Link createShowErrorLogLink() {
 		Link link = new Link(linkComposite, SWT.NONE);
-		link.addSelectionListener(widgetSelectedAdapter(e -> {
-			try {
-				Workbench.getInstance().getActiveWorkbenchWindow().getActivePage().showView(LOG_VIEW_ID);
-			} catch (CoreException ce) {
-				StatusManager.getManager().handle(ce, WorkbenchPlugin.PI_WORKBENCH);
+		link.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					Workbench.getInstance().getActiveWorkbenchWindow()
+							.getActivePage().showView(LOG_VIEW_ID);
+				} catch (CoreException ce) {
+					StatusManager.getManager().handle(ce,
+							WorkbenchPlugin.PI_WORKBENCH);
+				}
 			}
-		}));
+		});
 		link.setText(WorkbenchMessages.ErrorLogUtil_ShowErrorLogHyperlink);
 		link
 				.setToolTipText(WorkbenchMessages.ErrorLogUtil_ShowErrorLogTooltip);
@@ -975,9 +992,13 @@ public class InternalDialog extends TrayDialog {
 	 * @return StatusAdapter or <code>null</code>.
 	 */
 	private StatusAdapter getSingleSelection() {
-		IStructuredSelection selection = statusListViewer.getStructuredSelection();
-		if (selection.size() == 1) {
-			return (StatusAdapter) selection.getFirstElement();
+		ISelection rawSelection = statusListViewer.getSelection();
+		if (rawSelection != null
+				&& rawSelection instanceof IStructuredSelection) {
+			IStructuredSelection selection = (IStructuredSelection) rawSelection;
+			if (selection.size() == 1) {
+				return (StatusAdapter) selection.getFirstElement();
+			}
 		}
 		return null;
 	}

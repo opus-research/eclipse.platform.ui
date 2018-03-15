@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,12 @@
 
 package org.eclipse.jface.bindings;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.AbstractBitSetEvent;
+import org.eclipse.jface.util.Util;
 
 /**
  * An instance of this class describes changes to an instance of
@@ -185,19 +185,20 @@ public final class BindingManagerEvent extends AbstractBitSetEvent {
 				.getActiveBindingsFor(parameterizedCommand);
 		final TriggerSequence[] previousBindings;
 		if (previousTriggersByParameterizedCommand != null) {
-			final Collection<TriggerSequence> previousBindingCollection = (Collection<TriggerSequence>) previousTriggersByParameterizedCommand
+			final Collection previousBindingCollection = (Collection) previousTriggersByParameterizedCommand
 					.get(parameterizedCommand);
 			if (previousBindingCollection == null) {
 				previousBindings = EMTPY_SEQUENCE;
 			} else {
-				previousBindings = previousBindingCollection
-						.toArray(new TriggerSequence[previousBindingCollection.size()]);
+				previousBindings = (TriggerSequence[]) previousBindingCollection
+						.toArray(new TriggerSequence[previousBindingCollection
+								.size()]);
 			}
 		} else {
 			previousBindings = EMTPY_SEQUENCE;
 		}
 
-		return !Arrays.equals(currentBindings, previousBindings);
+		return !Util.equals(currentBindings, previousBindings);
 	}
 
 	/**

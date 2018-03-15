@@ -190,8 +190,9 @@ public class ImportTypeDialog extends TrayDialog {
 	// the format of the context is operationMask,value:operationMask,value:operationMask,value
 	private String readContextPreference(String key) {
 		String value = IDEWorkbenchPlugin.getDefault().getPreferenceStore().getString(key);
-		for (String keyPair : value.split(":")) { //$NON-NLS-1$
-			String [] element = keyPair.split(","); //$NON-NLS-1$
+		String [] keyPairs = value.split(":"); //$NON-NLS-1$
+		for (int i = 0; i < keyPairs.length; i++) {
+			String [] element = keyPairs[i].split(","); //$NON-NLS-1$
 			if (element.length == 2) {
 				if (element[0].equals(Integer.toString(operationMask)))
 					return element[1];
@@ -216,7 +217,7 @@ public class ImportTypeDialog extends TrayDialog {
 
 	private void writeContextPreference(String key, String value) {
 		String oldValue = IDEWorkbenchPlugin.getDefault().getPreferenceStore().getString(key);
-		StringBuilder buffer = new StringBuilder();
+		StringBuffer buffer = new StringBuffer();
 		String [] keyPairs = oldValue.split(":"); //$NON-NLS-1$
 		boolean found = false;
 		for (int i = 0; i < keyPairs.length; i++) {
@@ -451,8 +452,8 @@ public class ImportTypeDialog extends TrayDialog {
 	 * @return true if a set of paths are files only or a mix of files and folders, false otherwise
 	 */
 	private static boolean areOnlyFiles(IResource[] resources) {
-		for (IResource resource : resources) {
-			if (resource.getType() != IResource.FILE)
+		for (int i = 0; i < resources.length; i++) {
+			if (resources[i].getType() != IResource.FILE)
 				return false;
 		}
 		return true;
@@ -464,8 +465,8 @@ public class ImportTypeDialog extends TrayDialog {
 	 * @return true if a set of paths are files only or a mix of files and folders, false otherwise
 	 */
 	private static boolean areOnlyFiles(String[] names) {
-		for (String name : names) {
-			File file = new File(name);
+		for (int i = 0; i < names.length; i++) {
+			File file = new File(names[i]);
 			if (file.exists() && !file.isFile())
 				return false;
 		}

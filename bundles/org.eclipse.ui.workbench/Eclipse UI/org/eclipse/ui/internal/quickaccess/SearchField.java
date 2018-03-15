@@ -12,7 +12,7 @@
  *     Brian de Alwis - Fix size computation to account for trim
  *     Markus Kuppe <bugs.eclipse.org@lemmster.de> - Bug 449485: [QuickAccess] "Widget is disposed" exception in errorlog during shutdown due to quickaccess.SearchField.storeDialog
  *     Elena Laskavaia <elaskavaia.cdt@gmail.com> - Bug 433746: [QuickAccess] SWTException on closing quick access shell
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278, 491291, 491312, 491293, 436788, 513436
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278, 491291, 491312, 491293
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
@@ -62,6 +62,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -164,8 +166,8 @@ public class SearchField {
 				new EditorProvider(), new ViewProvider(application, window),
 				new PerspectiveProvider(), commandProvider, new ActionProvider(),
 				new WizardProvider(), new PreferenceProvider(), new PropertiesProvider() };
-		for (QuickAccessProvider provider : providers) {
-			providerMap.put(provider.getId(), provider);
+		for (int i = 0; i < providers.length; i++) {
+			providerMap.put(providers[i].getId(), providers[i]);
 		}
 		restoreDialog();
 
@@ -197,11 +199,6 @@ public class SearchField {
 					txtQuickAccess.setText(""); //$NON-NLS-1$
 					element.execute();
 
-					// after execution, the search box might be disposed
-					if (txtQuickAccess.isDisposed()) {
-						return;
-					}
-
 					/*
 					 * By design, attempting to activate a part that is already
 					 * active does not change the focus. However in the case of
@@ -217,11 +214,6 @@ public class SearchField {
 									IPresentationEngine.class);
 							pe.focusGui(activePart);
 						}
-					}
-
-					if (shell.isVisible()) {
-						// after selection, closes the shell
-						quickAccessContents.doClose();
 					}
 				}
 			}
@@ -244,7 +236,12 @@ public class SearchField {
 			@Override
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close the shell
-				table.getDisplay().asyncExec(() -> checkFocusLost(table, txtQuickAccess));
+				table.getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						checkFocusLost(table, txtQuickAccess);
+					}
+				});
 				activated = false;
 			}
 
@@ -263,10 +260,20 @@ public class SearchField {
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close
 				// the shell
-				table.getDisplay().asyncExec(() -> checkFocusLost(table, txtQuickAccess));
+				table.getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						checkFocusLost(table, txtQuickAccess);
+					}
+				});
 			}
 		});
-		txtQuickAccess.addModifyListener(e -> showList());
+		txtQuickAccess.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				showList();
+			}
+		});
 		txtQuickAccess.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -443,17 +450,19 @@ public class SearchField {
 		Monitor[] monitors = toSearch.getMonitors();
 		Monitor result = monitors[0];
 
-		for (Monitor currentMonitor : monitors) {
-			Rectangle clientArea = currentMonitor.getClientArea();
+		for (int idx = 0; idx < monitors.length; idx++) {
+			Monitor current = monitors[idx];
+
+			Rectangle clientArea = current.getClientArea();
 
 			if (clientArea.contains(toFind)) {
-				return currentMonitor;
+				return current;
 			}
 
 			int distance = Geometry.distanceSquared(Geometry.centerPoint(clientArea), toFind);
 			if (distance < closest) {
 				closest = distance;
-				result = currentMonitor;
+				result = current;
 			}
 		}
 
@@ -489,13 +498,13 @@ public class SearchField {
 		Display display = txtQuickAccess.getDisplay();
 		Rectangle tempBounds = txtQuickAccess.getBounds();
 		Rectangle compBounds = display.map(txtQuickAccess, null, tempBounds);
-		Rectangle shellBounds = txtQuickAccess.getShell().getBounds();
-		int preferredWidth = dialogWidth == -1 ? Math.max(300, (int) (shellBounds.width * 0.6)) : dialogWidth;
+		int preferredWidth = dialogWidth == -1 ? 350 : dialogWidth;
 		int width = Math.max(preferredWidth, compBounds.width);
-		int height = dialogHeight == -1 ? Math.max(200, (int) (shellBounds.height * 0.9)) : dialogHeight;
+		int height = dialogHeight == -1 ? 250 : dialogHeight;
 
 		// If size would extend past the right edge of the shell, try to move it
 		// to the left of the text
+		Rectangle shellBounds = txtQuickAccess.getShell().getBounds();
 		if (compBounds.x + width > shellBounds.x + shellBounds.width){
 			compBounds.x = Math.max(shellBounds.x, (compBounds.x + compBounds.width - width));
 		}

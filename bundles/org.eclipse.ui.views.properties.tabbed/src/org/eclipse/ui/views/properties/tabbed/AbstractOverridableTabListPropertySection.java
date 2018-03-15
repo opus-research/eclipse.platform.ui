@@ -25,7 +25,6 @@ public class AbstractOverridableTabListPropertySection
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.tabbed.IOverridableTabList#getTabs()
 	 */
-	@Override
 	public ITabItem[] getTabs() {
 		return new ITabItem[] {};
 	}
@@ -34,7 +33,6 @@ public class AbstractOverridableTabListPropertySection
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.tabbed.IOverridableTabList#selectTab(int)
 	 */
-	@Override
 	public void selectTab(int tab) {
 		/* no default implementation */
 	}

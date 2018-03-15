@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ package org.eclipse.ui.internal.ide.dialogs;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -126,10 +126,10 @@ public class PathVariablesGroup {
     private Listener selectionListener;
 
     // temporary collection for keeping currently defined variables
-	private SortedMap<String, IPath> tempPathVariables;
+    private SortedMap tempPathVariables;
 
     // set of removed variables' names
-	private Set<String> removedVariableNames;
+    private Set removedVariableNames;
 
     // reference to the workspace's path variable manager
     private IPathVariableManager pathVariableManager;
@@ -169,9 +169,9 @@ public class PathVariablesGroup {
         this.variableType = variableType;
         pathVariableManager = ResourcesPlugin.getWorkspace()
                 .getPathVariableManager();
-		removedVariableNames = new HashSet<>();
+        removedVariableNames = new HashSet();
         Collator ignoreCaseComparator = Collator.getInstance();
-		tempPathVariables = new TreeMap<>(ignoreCaseComparator);
+        tempPathVariables = new TreeMap(ignoreCaseComparator);
         // initialize internal model
         initTemporaryState();
     }
@@ -367,7 +367,7 @@ public class PathVariablesGroup {
 		public void update(ViewerCell cell) {
 			String varName = (String) cell.getElement();
 			cell.setText(varName);
-			IPath value = tempPathVariables.get(varName);
+			IPath value = (IPath) tempPathVariables.get(varName);
         	URI resolvedURI = pathVariableManager.resolveURI(URIUtil.toURI(value));
         	IPath resolvedValue = URIUtil.toPath(resolvedURI);
             IFileInfo file = IDEResourceInfoUtils.getFileInfo(resolvedValue);
@@ -383,7 +383,7 @@ public class PathVariablesGroup {
     {
 		@Override
 		public String getToolTipText(Object element) {
-            IPath value = tempPathVariables.get(element);
+            IPath value = (IPath) tempPathVariables.get(element);
         	URI resolvedURI = pathVariableManager.resolveURI(URIUtil.toURI(value));
         	IPath resolvedValue = URIUtil.toPath(resolvedURI);
             return TextProcessor.process(resolvedValue.toOSString());
@@ -406,7 +406,7 @@ public class PathVariablesGroup {
 
 		@Override
 		public void update(ViewerCell cell) {
-            IPath value = tempPathVariables.get(cell.getElement());
+            IPath value = (IPath) tempPathVariables.get(cell.getElement());
 			cell.setText(TextProcessor.process(removeParentVariable(value.toOSString())));
 		}
 
@@ -432,7 +432,7 @@ public class PathVariablesGroup {
         TableItem item = variableTable.getTable().getItem(variableTable.getTable()
                 .getSelectionIndex());
         String variableName = (String) item.getData();
-        IPath variableValue = tempPathVariables.get(variableName);
+        IPath variableValue = (IPath) tempPathVariables.get(variableName);
 
         // constructs a dialog for editing the variable's current name and value
         PathVariableDialog dialog = new PathVariableDialog(shell,
@@ -510,7 +510,7 @@ public class PathVariablesGroup {
             String name = (String) items[i].getData();
             selection[i] = new PathVariableElement();
             selection[i].name = name;
-            selection[i].path = tempPathVariables.get(name);
+            selection[i].path = (IPath) tempPathVariables.get(name);
         }
         return selection;
     }
@@ -590,13 +590,15 @@ public class PathVariablesGroup {
      * (Re-)Initialize collections used to mantain temporary variable state.
      */
     private void initTemporaryState() {
+        String[] varNames = pathVariableManager.getPathVariableNames();
+
         tempPathVariables.clear();
-		for (String varName : pathVariableManager.getPathVariableNames()) {
+        for (int i = 0; i < varNames.length; i++) {
         	// hide the PARENT variable
-        	if (varName.equals(PARENT_VARIABLE_NAME))
+        	if (varNames[i].equals(PARENT_VARIABLE_NAME))
         		continue;
             try {
-				URI uri = pathVariableManager.getURIValue(varName);
+				URI uri = pathVariableManager.getURIValue(varNames[i]);
 				// the value may not exist any more
 				if (uri != null) {
 				    IPath value = URIUtil.toPath(uri);
@@ -605,7 +607,7 @@ public class PathVariablesGroup {
 				        if ((isFile && (variableType & IResource.FILE) != 0)
 				                || (isFile == false && (variableType & IResource.FOLDER) != 0)) {
 
-				            tempPathVariables.put(varName, value);
+				            tempPathVariables.put(varNames[i], value);
 				        }
 				    }
 				}
@@ -652,9 +654,9 @@ public class PathVariablesGroup {
     public boolean performOk() {
         try {
             // first process removed variables
-			for (Iterator<String> removed = removedVariableNames.iterator(); removed
+            for (Iterator removed = removedVariableNames.iterator(); removed
                     .hasNext();) {
-                String removedVariableName = removed.next();
+                String removedVariableName = (String) removed.next();
                 // only removes variables that have not been added again
                 if (!tempPathVariables.containsKey(removedVariableName)) {
 					pathVariableManager.setURIValue(removedVariableName, null);
@@ -662,11 +664,11 @@ public class PathVariablesGroup {
             }
 
             // then process the current collection of variables, adding/updating them
-			for (Iterator<Entry<String, IPath>> current = tempPathVariables.entrySet().iterator(); current
+            for (Iterator current = tempPathVariables.entrySet().iterator(); current
                     .hasNext();) {
-				Entry<String, IPath> entry = current.next();
-                String variableName = entry.getKey();
-                IPath variableValue = entry.getValue();
+                Map.Entry entry = (Map.Entry) current.next();
+                String variableName = (String) entry.getKey();
+                IPath variableValue = (IPath) entry.getValue();
                 if (!isBuiltInVariable(variableName))
                     pathVariableManager.setURIValue(variableName, URIUtil.toURI(variableValue));
             }
@@ -686,8 +688,9 @@ public class PathVariablesGroup {
      */
     private void removeSelectedVariables() {
         // remove each selected element
-		for (int selectedIndex : variableTable.getTable().getSelectionIndices()) {
-			TableItem selectedItem = variableTable.getTable().getItem(selectedIndex);
+        int[] selectedIndices = variableTable.getTable().getSelectionIndices();
+        for (int i = 0; i < selectedIndices.length; i++) {
+            TableItem selectedItem = variableTable.getTable().getItem(selectedIndices[i]);
             String varName = (String) selectedItem.getData();
             removedVariableNames.add(varName);
             tempPathVariables.remove(varName);
@@ -697,8 +700,9 @@ public class PathVariablesGroup {
     }
 
     private boolean canChangeSelection() {
-		for (int selectedIndex : variableTable.getTable().getSelectionIndices()) {
-			TableItem selectedItem = variableTable.getTable().getItem(selectedIndex);
+        int[] selectedIndices = variableTable.getTable().getSelectionIndices();
+        for (int i = 0; i < selectedIndices.length; i++) {
+            TableItem selectedItem = variableTable.getTable().getItem(selectedIndices[i]);
             String varName = (String) selectedItem.getData();
             if (isBuiltInVariable(varName))
                 return false;
@@ -777,8 +781,8 @@ public class PathVariablesGroup {
         	pathVariableManager = resource.getPathVariableManager();
         else
         	pathVariableManager = ResourcesPlugin.getWorkspace().getPathVariableManager();
-		removedVariableNames = new HashSet<>();
-		tempPathVariables = new TreeMap<>();
+        removedVariableNames = new HashSet();
+        tempPathVariables = new TreeMap();
         // initialize internal model
         initTemporaryState();
     }
@@ -787,8 +791,8 @@ public class PathVariablesGroup {
 	 * Reloads the path variables from the project description.
 	 */
 	public void reloadContent() {
-		removedVariableNames = new HashSet<>();
-		tempPathVariables = new TreeMap<>();
+        removedVariableNames = new HashSet();
+        tempPathVariables = new TreeMap();
 		initTemporaryState();
 		if (variableTable != null)
 	        updateWidgetState();

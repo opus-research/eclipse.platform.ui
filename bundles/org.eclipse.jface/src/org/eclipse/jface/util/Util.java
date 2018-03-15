@@ -11,11 +11,9 @@
 
 package org.eclipse.jface.util;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.MissingResourceException;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -243,7 +241,7 @@ public final class Util {
 		}
 
 		for (int i = 0; i < r; i++) {
-			if (!Objects.equals(left[l - i - 1], right[r - i - 1])) {
+			if (!equals(left[l - i - 1], right[r - i - 1])) {
 				return false;
 			}
 		}
@@ -261,31 +259,54 @@ public final class Util {
 	 *            The right object to compare; may be <code>null</code>.
 	 * @return <code>true</code> if the two objects are equivalent;
 	 *         <code>false</code> otherwise.
-	 * @deprecated Use {@link Objects#equals(Object, Object)}
 	 */
-	@Deprecated
 	public static final boolean equals(final Object left, final Object right) {
-		return Objects.equals(left, right);
+		return left == null ? right == null : ((right != null) && left
+				.equals(right));
 	}
 
 	/**
-	 * Tests whether two arrays of objects are equal to each other. The arrays must
-	 * not be <code>null</code>, but their elements may be <code>null</code>.
+	 * Tests whether two arrays of objects are equal to each other. The arrays
+	 * must not be <code>null</code>, but their elements may be
+	 * <code>null</code>.
 	 *
 	 * @param leftArray
-	 *            The left array to compare; may be <code>null</code>, and may be
-	 *            empty and may contain <code>null</code> elements.
+	 *            The left array to compare; may be <code>null</code>, and
+	 *            may be empty and may contain <code>null</code> elements.
 	 * @param rightArray
-	 *            The right array to compare; may be <code>null</code>, and may be
-	 *            empty and may contain <code>null</code> elements.
-	 * @return <code>true</code> if the arrays are equal length and the elements at
-	 *         the same position are equal; <code>false</code> otherwise.
-	 * @deprecated Use {@link Arrays#equals(Object[], Object[])}
+	 *            The right array to compare; may be <code>null</code>, and
+	 *            may be empty and may contain <code>null</code> elements.
+	 * @return <code>true</code> if the arrays are equal length and the
+	 *         elements at the same position are equal; <code>false</code>
+	 *         otherwise.
 	 */
-	@Deprecated
 	public static final boolean equals(final Object[] leftArray,
 			final Object[] rightArray) {
-		return Arrays.equals(leftArray, rightArray);
+		if (leftArray == rightArray) {
+			return true;
+		}
+
+		if (leftArray == null) {
+			return (rightArray == null);
+		} else if (rightArray == null) {
+			return false;
+		}
+
+		if (leftArray.length != rightArray.length) {
+			return false;
+		}
+
+		for (int i = 0; i < leftArray.length; i++) {
+			final Object left = leftArray[i];
+			final Object right = rightArray[i];
+			final boolean equal = (left == null) ? (right == null) : (left
+					.equals(right));
+			if (!equal) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -328,7 +349,8 @@ public final class Util {
 		}
 
 		int hashCode = 89;
-		for (final Object object : objects) {
+		for (int i = 0; i < objects.length; i++) {
+			final Object object = objects[i];
 			if (object != null) {
 				hashCode = hashCode * 31 + object.hashCode();
 			}
@@ -364,7 +386,7 @@ public final class Util {
 		}
 
 		for (int i = 0; i < r; i++) {
-			if (!Objects.equals(left[i], right[i])) {
+			if (!equals(left[i], right[i])) {
 				return false;
 			}
 		}
@@ -385,7 +407,7 @@ public final class Util {
 			return "null"; //$NON-NLS-1$
 		}
 
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer();
 		buffer.append('[');
 
 		final int length = array.length;
@@ -458,7 +480,7 @@ public final class Util {
 			return src;
 		}
 
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		int beginIndex = 0;
 		while (idx != -1 && idx < len) {
 			buf.append(src.substring(beginIndex, idx));

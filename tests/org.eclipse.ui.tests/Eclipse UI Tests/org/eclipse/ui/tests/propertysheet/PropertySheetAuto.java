@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  *     Markus Alexander Kuppe (Versant Corp.) - https://bugs.eclipse.org/248103
  *******************************************************************************/
 package org.eclipse.ui.tests.propertysheet;
-
-import static org.junit.Assert.assertArrayEquals;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -32,8 +30,6 @@ import org.eclipse.ui.views.properties.ColorPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertySheet;
-import org.eclipse.ui.views.properties.PropertySheetEntry;
-import org.eclipse.ui.views.properties.PropertySheetPage;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
@@ -99,7 +95,7 @@ public class PropertySheetAuto extends UITestCase {
          * property descriptors.
          */
         private void createDescriptors() {
-			ArrayList<IPropertyDescriptor> list = new ArrayList<>(5);
+            ArrayList list = new ArrayList(5);
             if (modelYear != 0) {
 				list.add(new TextPropertyDescriptor(MODEL_YEAR, "model year"));
 			}
@@ -115,7 +111,8 @@ public class PropertySheetAuto extends UITestCase {
             if (engineSize != 0.0) {
 				list.add(new TextPropertyDescriptor(ENGINE_SIZE, "engine"));
 			}
-			descriptors = list.toArray(new IPropertyDescriptor[list.size()]);
+            descriptors = (IPropertyDescriptor[]) list
+                    .toArray(new IPropertyDescriptor[list.size()]);
         }
 
         @Override
@@ -179,7 +176,7 @@ public class PropertySheetAuto extends UITestCase {
 
         @Override
 		public String toString() {
-            StringBuilder s = new StringBuilder();
+            StringBuffer s = new StringBuffer();
             s.append("<");
             if (modelYear != 0) {
                 s.append(modelYear);
@@ -304,7 +301,7 @@ public class PropertySheetAuto extends UITestCase {
         for (int i = 0; i < NUMBER_OF_SELECTIONS; i++) {
             // create the selection
             int numberToSelect = random.nextInt(NUMBER_OF_CARS - 2);
-			ArrayList<Car> selection = new ArrayList<>(numberToSelect);
+            ArrayList selection = new ArrayList(numberToSelect);
             while (selection.size() < numberToSelect) {
                 int j = random.nextInt(NUMBER_OF_CARS);
                 if (!selection.contains(cars[j])) {
@@ -340,7 +337,7 @@ public class PropertySheetAuto extends UITestCase {
         for (int i = 0; i < NUMBER_OF_SELECTIONS; i++) {
             // create the selection
             int numberToSelect = random.nextInt(NUMBER_OF_CARS - 2);
-			ArrayList<Car> selection = new ArrayList<>(numberToSelect);
+            ArrayList selection = new ArrayList(numberToSelect);
             while (selection.size() < numberToSelect) {
                 int j = random.nextInt(NUMBER_OF_CARS);
                 if (!selection.contains(cars[j])) {
@@ -356,64 +353,6 @@ public class PropertySheetAuto extends UITestCase {
                     .getSelection());
         }
     }
-
-	/**
-	 * Supply selection events with a random car selection after properties view
-	 * is hidden by maximizing source view. All of these selections should go to
-	 * the properties view even if it is hidden. After properties view became
-	 * visible again, it should show car selection from the (restored) original
-	 * source view.
-	 */
-	public void testInputIfHiddenByMaximizeBug509405() throws Throwable {
-		PropertySheetPerspectiveFactory3.applyPerspective(activePage);
-		IViewPart projectExplorer = activePage.showView(IPageLayout.ID_PROJECT_EXPLORER);
-		PropertySheet propView = (PropertySheet) createTestParts(activePage);
-		// project explorer hides property view, because it is in the same stack
-		createCars();
-		for (int i = 0; i < 10; i++) {
-			// bring project explorer view to front (hides property view from
-			// same stack)
-			assertViewsVisibility2(propView, projectExplorer);
-
-			// activate now selectionProviderView (to became site selection
-			// provider again)
-			activePage.activate(selectionProviderView);
-			processUiEvents();
-			activePage.toggleZoom(activePage.getReference(selectionProviderView));
-			processUiEvents();
-
-			// create the selection
-			int numberToSelect = random.nextInt(NUMBER_OF_CARS - 2);
-			ArrayList<Car> selection = new ArrayList<>(numberToSelect);
-			while (selection.size() < numberToSelect) {
-				int j = random.nextInt(NUMBER_OF_CARS);
-				if (!selection.contains(cars[j])) {
-					selection.add(cars[j]);
-				}
-			}
-			StructuredSelection structuredSelection = new StructuredSelection(selection);
-			// fire the selection
-			selectionProviderView.setSelection(structuredSelection);
-			processUiEvents();
-
-			// props view hidden, but still tracks the selection from original
-			// source part
-			assertEquals(structuredSelection, propView.getShowInContext().getSelection());
-
-			// unhide props view again
-			activePage.toggleZoom(activePage.getReference(selectionProviderView));
-			processUiEvents();
-			assertViewsVisibility2(propView, projectExplorer);
-
-			// props view visible again and shows the last selection from
-			// original source part
-			assertEquals(structuredSelection, propView.getShowInContext().getSelection());
-
-			PropertySheetPage currentPage = (PropertySheetPage) propView.getCurrentPage();
-			PropertySheetEntry propEntry = (PropertySheetEntry) currentPage.getControl().getData();
-			assertArrayEquals(structuredSelection.toArray(), propEntry.getValues());
-		}
-	}
 
     /**
      * Supply selection events with a random car selection after properties view
@@ -439,7 +378,7 @@ public class PropertySheetAuto extends UITestCase {
 
             // create the selection
             int numberToSelect = random.nextInt(NUMBER_OF_CARS - 2);
-			ArrayList<Car> selection = new ArrayList<>(numberToSelect);
+            ArrayList selection = new ArrayList(numberToSelect);
             while (selection.size() < numberToSelect) {
                 int j = random.nextInt(NUMBER_OF_CARS);
                 if (!selection.contains(cars[j])) {
@@ -461,10 +400,6 @@ public class PropertySheetAuto extends UITestCase {
 
             // props view visible again and shows the last selection from original source part
             assertEquals(structuredSelection, propView.getShowInContext().getSelection());
-
-			PropertySheetPage currentPage = (PropertySheetPage) propView.getCurrentPage();
-			PropertySheetEntry propEntry = (PropertySheetEntry) currentPage.getControl().getData();
-			assertArrayEquals(structuredSelection.toArray(), propEntry.getValues());
         }
     }
 
@@ -503,7 +438,7 @@ public class PropertySheetAuto extends UITestCase {
 
 		// create the selection
 		int numberToSelect = random.nextInt(NUMBER_OF_CARS - 2);
-		ArrayList<Car> selection = new ArrayList<>(numberToSelect);
+		ArrayList selection = new ArrayList(numberToSelect);
 		while (selection.size() < numberToSelect) {
 			int j = random.nextInt(NUMBER_OF_CARS);
 			if (!selection.contains(cars[j])) {
@@ -537,14 +472,12 @@ public class PropertySheetAuto extends UITestCase {
 			// props view visible again and shows the last selection from
 			// original source part
 			assertEquals(structuredSelection, propView.getShowInContext().getSelection());
-			PropertySheetPage currentPage = (PropertySheetPage) propView.getCurrentPage();
-			PropertySheetEntry propEntry = (PropertySheetEntry) currentPage.getControl().getData();
-			assertArrayEquals(structuredSelection.toArray(), propEntry.getValues());
 		}
 	}
 
 	private void processUiEvents() {
 		while (Display.getCurrent().readAndDispatch()) {
+			;
 		}
 	}
 
