@@ -20,7 +20,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -30,13 +29,9 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.Spliterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
@@ -147,36 +142,22 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	private final INotificationListener notificationListener;
 
 	/**
-	 * Lock object for synchronizing updates of {@code pendingJobUpdates},
-	 * {@code pendingGroupUpdates}, {@code pendingJobRemoval},
-	 * {@code pendingGroupRemoval} and {@code pendingJobAddition}.
+	 * Lock object for synchronizing updates of {@code pendingJobUpdates} and
+	 * {@code pendingGroupUpdates}
 	 */
 	private final Object pendingUpdatesMutex = new Object();
 
 	/**
 	 * Modification guarded by {@link #pendingUpdatesMutex}.
 	 */
-	private Map<JobInfo, Set<IJobProgressManagerListener>> pendingJobUpdates = new HashMap<>();
+	private Set<JobInfo> pendingJobUpdates = new HashSet<>();
 
 	/**
 	 * Modification guarded by {@link #pendingUpdatesMutex}.
 	 */
 	private Set<GroupInfo> pendingGroupUpdates = new HashSet<>();
 
-	/**
-	 * Modification guarded by {@link #pendingUpdatesMutex}.
-	 */
-	private Map<JobInfo, Set<IJobProgressManagerListener>> pendingJobRemoval = new HashMap<>();
-
-	/**
-	 * Modification guarded by {@link #pendingUpdatesMutex}.
-	 */
-	private Set<GroupInfo> pendingGroupRemoval = new HashSet<>();
-
-	/**
-	 * Modification guarded by {@link #pendingUpdatesMutex}.
-	 */
-	private Map<JobInfo, Set<IJobProgressManagerListener>> pendingJobAddition = new HashMap<>();
+	private final Display display;
 
 	private static final String IMAGE_KEY = "org.eclipse.ui.progress.images"; //$NON-NLS-1$
 
@@ -361,44 +342,42 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		Job.getJobManager().addJobChangeListener(this.changeListener);
 		StatusManager.getManager().addListener(notificationListener);
 
-		uiRefreshThrottler = new Throttler(Display.getDefault(), Duration.ofMillis(100), () -> {
-			Set<GroupInfo> localPendingGroupUpdates, localPendingGroupRemoval;
-			Map<JobInfo, Set<IJobProgressManagerListener>> localPendingJobUpdates, localPendingJobAddition,
-					localPendingJobRemoval;
+		display = Display.getDefault();
+
+		uiRefreshThrottler = new Throttler(display, Duration.ofMillis(100), () -> {
+			Set<JobInfo> localPendingJobUpdates;
+			Set<GroupInfo> localPendingGroupUpdates;
 			synchronized (pendingUpdatesMutex) {
 				localPendingJobUpdates = pendingJobUpdates;
-				pendingJobUpdates = new HashMap<>();
+				pendingJobUpdates = new HashSet<>();
 				localPendingGroupUpdates = pendingGroupUpdates;
 				pendingGroupUpdates = new HashSet<>();
-				localPendingJobRemoval = pendingJobRemoval;
-				pendingJobRemoval = new HashMap<>();
-				localPendingGroupRemoval = pendingGroupRemoval;
-				pendingGroupRemoval = new HashSet<>();
-				localPendingJobAddition = pendingJobAddition;
-				pendingJobAddition = new HashMap<>();
+			}
+			Iterator<JobInfo> jobUpdatesIterator = localPendingJobUpdates.iterator();
+			while (jobUpdatesIterator.hasNext()) {
+				JobInfo info = jobUpdatesIterator.next();
+
+				GroupInfo group = info.getGroupInfo();
+				if (group != null) {
+					localPendingGroupUpdates.remove(group);
+					doRefreshGroup(group);
+				}
+
+				Object[] listenersArray = listeners.getListeners();
+				for (int i = 0; i < listenersArray.length; i++) {
+					IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
+					if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
+						listener.refreshJobInfo(info);
+					}
+				}
 			}
 
-			localPendingJobAddition.entrySet()
-					.forEach(e -> e.getValue().forEach(listener -> listener.addJob(e.getKey())));
-
-			// Adds all non null JobInfo#getGroupInfo to the list of groups to
-			// be refreshed
-			localPendingJobUpdates.entrySet().stream().map(e -> e.getKey().getGroupInfo()).filter(Objects::nonNull)
-					.forEach(localPendingGroupUpdates::add);
-
-			localPendingJobUpdates.entrySet()
-					.forEach(e -> e.getValue().forEach(listener -> listener.refreshJobInfo(e.getKey())));
-
 			// refresh groups
-			localPendingGroupUpdates
-					.forEach(groupInfo -> listeners.forEach(listener -> listener.refreshGroup(groupInfo)));
-
-			localPendingJobRemoval.entrySet()
-					.forEach(e -> e.getValue().forEach(listener -> listener.removeJob(e.getKey())));
-
-			localPendingGroupRemoval.forEach(group -> {
-				listeners.forEach(listener -> listener.removeGroup(group));
-			});
+			Iterator<GroupInfo> groupUpdatesIterator = localPendingGroupUpdates.iterator();
+			while (groupUpdatesIterator.hasNext()) {
+				GroupInfo groupInfo = groupUpdatesIterator.next();
+				doRefreshGroup(groupInfo);
+			}
 		});
 	}
 
@@ -672,12 +651,15 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 */
 	public void refreshJobInfo(JobInfo info) {
 		synchronized (pendingUpdatesMutex) {
-			Set<IJobProgressManagerListener> localListeners = pendingJobUpdates.computeIfAbsent(info,
-					k -> new HashSet<>());
-			listenersStream().filter(listener -> !isCurrentDisplaying(info.getJob(), listener.showsDebug()))
-					.forEach(localListeners::add);
+			pendingJobUpdates.add(info);
 		}
 		uiRefreshThrottler.throttledExec();
+	}
+
+	private void safeAsyncExec(Runnable runnable) {
+		if (!display.isDisposed()) {
+			display.asyncExec(runnable);
+		}
 	}
 
 	/**
@@ -693,6 +675,12 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		uiRefreshThrottler.throttledExec();
 	}
 
+	private void doRefreshGroup(GroupInfo info) {
+		for (IJobProgressManagerListener listener : listeners) {
+			listener.refreshGroup(info);
+		}
+	}
+
 	/**
 	 * Refreshes the content providers as a result of a deletion of info.
 	 *
@@ -703,13 +691,17 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		Job job = info.getJob();
 		jobs.remove(job);
 		synchronized (pendingUpdatesMutex) {
-			Set<IJobProgressManagerListener> localListeners = pendingJobRemoval.computeIfAbsent(info,
-					k -> new HashSet<>());
-			listenersStream().filter(listener -> !isCurrentDisplaying(info.getJob(), listener.showsDebug()))
-					.forEach(localListeners::add);
+			pendingJobUpdates.remove(info);
 		}
 		runnableMonitors.remove(job);
-		uiRefreshThrottler.throttledExec();
+
+		safeAsyncExec(() -> {
+			for (IJobProgressManagerListener listener : listeners) {
+				if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
+					listener.removeJob(info);
+				}
+			}
+		});
 	}
 
 	/**
@@ -720,9 +712,14 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 */
 	public void removeGroup(GroupInfo group) {
 		synchronized (pendingUpdatesMutex) {
-			pendingGroupRemoval.add(group);
+			pendingGroupUpdates.remove(group);
 		}
-		uiRefreshThrottler.throttledExec();
+
+		safeAsyncExec(() -> {
+			for (IJobProgressManagerListener listener : listeners) {
+				listener.removeGroup(group);
+			}
+		});
 	}
 
 	/**
@@ -737,20 +734,13 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		}
 
 		jobs.put(info.getJob(), info);
-		synchronized (pendingUpdatesMutex) {
-			Set<IJobProgressManagerListener> localListeners = pendingJobAddition.computeIfAbsent(info,
-					k -> new HashSet<>());
-			listenersStream().filter(listener -> !isCurrentDisplaying(info.getJob(), listener.showsDebug()))
-					.forEach(localListeners::add);
-		}
-		uiRefreshThrottler.throttledExec();
-	}
-
-	private Stream<IJobProgressManagerListener> listenersStream() {
-		Spliterator<?> untype = Arrays.spliterator(listeners.getListeners());
-		@SuppressWarnings("unchecked") // Safe as ListenerList.add only allow E
-		Spliterator<IJobProgressManagerListener> retype = (Spliterator<IJobProgressManagerListener>) untype;
-		return StreamSupport.stream(retype, false);
+		safeAsyncExec(() -> {
+			for (IJobProgressManagerListener listener : listeners) {
+				if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
+					listener.addJob(info);
+				}
+			}
+		});
 	}
 
 	/**
