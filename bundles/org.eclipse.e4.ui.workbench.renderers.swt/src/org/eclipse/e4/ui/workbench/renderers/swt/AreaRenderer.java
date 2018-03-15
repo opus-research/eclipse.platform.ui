@@ -20,7 +20,6 @@ import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.UIEvents.UIElement;
@@ -152,10 +151,8 @@ public class AreaRenderer extends SWTPartRenderer {
 			ctf.setMinimized(curCTF.getMinimized());
 			ctf.setMaximized(curCTF.getMaximized());
 
-			if (!areaModel.getTags().contains(IPresentationEngine.MIN_MAXIMIZEABLE_CHILDREN_AREA_TAG)) {
-				curCTF.setMinimizeVisible(false);
-				curCTF.setMaximizeVisible(false);
-			}
+			curCTF.setMinimizeVisible(false);
+			curCTF.setMaximizeVisible(false);
 		}
 
 		CTabItem cti = new CTabItem(ctf, SWT.NONE);
