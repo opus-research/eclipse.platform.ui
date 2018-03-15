@@ -44,10 +44,9 @@ public class CSSValueSWTColorConverterImpl extends AbstractCSSValueConverter {
 			throws DOMException {
 		Display display = (Display) context;
 		Color color = CSSSWTColorHelper.getSWTColor(value, display);
-		if (color == null) {
+		if (color == null)
 			throw new DOMExceptionImpl(DOMException.INVALID_ACCESS_ERR,
 					DOMExceptionImpl.RGBCOLOR_ERROR);
-		}
 
 		return color;
 	}

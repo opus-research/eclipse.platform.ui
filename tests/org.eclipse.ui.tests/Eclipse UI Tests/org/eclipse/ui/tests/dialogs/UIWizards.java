@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.dialogs;
 
+import junit.framework.TestCase;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
@@ -21,6 +23,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
+import org.eclipse.ui.help.WorkbenchHelp;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.ExportWizard;
@@ -32,8 +35,6 @@ import org.eclipse.ui.tests.harness.util.DialogCheck;
 import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewFolderResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
-
-import junit.framework.TestCase;
 
 public class UIWizards extends TestCase {
     private static final int SIZING_WIZARD_WIDTH = 470;
@@ -74,7 +75,7 @@ public class UIWizards extends TestCase {
         dialog.getShell().setSize(
                 Math.max(SIZING_WIZARD_WIDTH, dialog.getShell().getSize().x),
                 SIZING_WIZARD_HEIGHT);
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IWorkbenchHelpContextIds.EXPORT_WIZARD);
+        WorkbenchHelp.setHelp(dialog.getShell(), IWorkbenchHelpContextIds.EXPORT_WIZARD);
 
         if (page != null) {
             page.setWizard(wizard);
@@ -102,7 +103,7 @@ public class UIWizards extends TestCase {
         dialog.getShell().setSize(
                 Math.max(SIZING_WIZARD_WIDTH, dialog.getShell().getSize().x),
                 SIZING_WIZARD_HEIGHT);
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IWorkbenchHelpContextIds.IMPORT_WIZARD);
+        WorkbenchHelp.setHelp(dialog.getShell(), IWorkbenchHelpContextIds.IMPORT_WIZARD);
 
         if (page != null) {
             page.setWizard(wizard);
@@ -152,7 +153,7 @@ public class UIWizards extends TestCase {
         WizardDialog dialog = new WizardDialog(getShell(), wizard);
         dialog.create();
         dialog.getShell().setText("CreateFileAction_title");
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),
+        WorkbenchHelp.setHelp(dialog.getShell(),
                 IIDEHelpContextIds.NEW_FILE_WIZARD);
         DialogCheck.assertDialog(dialog, this);
     }
@@ -164,7 +165,7 @@ public class UIWizards extends TestCase {
         WizardDialog dialog = new WizardDialog(getShell(), wizard);
         dialog.create();
         dialog.getShell().setText("CreateFolderAction_title");
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),
+        WorkbenchHelp.setHelp(dialog.getShell(),
         		IIDEHelpContextIds.NEW_FOLDER_WIZARD);
         DialogCheck.assertDialog(dialog, this);
     }
@@ -180,7 +181,7 @@ public class UIWizards extends TestCase {
                 Math.max(SIZING_WIZARD_WIDTH_2, dialog.getShell().getSize().x),
                 SIZING_WIZARD_HEIGHT_2);
         dialog.getShell().setText("CreateFileAction_title");
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),
+        WorkbenchHelp.setHelp(dialog.getShell(),
         		IIDEHelpContextIds.NEW_PROJECT_WIZARD);
         DialogCheck.assertDialog(dialog, this);
     }
@@ -203,7 +204,7 @@ public class UIWizards extends TestCase {
                 SIZING_WIZARD_HEIGHT_2);
         dialog.getShell().setText("CreateFileAction_title");
         dialog.showPage(page);
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),
+        WorkbenchHelp.setHelp(dialog.getShell(),
         		IIDEHelpContextIds.NEW_PROJECT_WIZARD);
         DialogCheck.assertDialog(dialog, this);
     }
@@ -238,7 +239,7 @@ public class UIWizards extends TestCase {
         dialog.getShell().setSize(
                 Math.max(SIZING_WIZARD_WIDTH_2, dialog.getShell().getSize().x),
                 SIZING_WIZARD_HEIGHT_2);
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),
+        WorkbenchHelp.setHelp(dialog.getShell(),
         		IIDEHelpContextIds.NEW_PROJECT_WIZARD);
         DialogCheck.assertDialog(dialog, this);
     }
@@ -270,7 +271,7 @@ public class UIWizards extends TestCase {
         dialog.getShell().setSize(
                 Math.max(SIZING_WIZARD_WIDTH_2, dialog.getShell().getSize().x),
                 SIZING_WIZARD_HEIGHT_2);
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IWorkbenchHelpContextIds.NEW_WIZARD);
+        WorkbenchHelp.setHelp(dialog.getShell(), IWorkbenchHelpContextIds.NEW_WIZARD);
         DialogCheck.assertDialog(dialog, this);
     }
 }

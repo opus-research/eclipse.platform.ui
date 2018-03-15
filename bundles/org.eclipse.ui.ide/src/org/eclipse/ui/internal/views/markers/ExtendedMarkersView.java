@@ -12,7 +12,6 @@
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442440
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 446864, 466927
  *     Mickael Istria (Red Hat Inc.) - Bug 486901
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.views.markers;
 
@@ -32,12 +31,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.help.IContext;
 import org.eclipse.help.IContextProvider;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionManager;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.EditingSupport;
@@ -76,7 +71,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
@@ -156,9 +150,6 @@ public class ExtendedMarkersView extends ViewPart {
 	private UIUpdateJob uiUpdateJob;
 
 	private MarkersTreeViewer viewer;
-
-	private Action filterAction;
-
 
 	/**
 	 * Tells whether the tree has been painted.
@@ -347,27 +338,6 @@ public class ExtendedMarkersView extends ViewPart {
 	}
 
 	/**
-	 * Create the Filter action for the receiver.
-	 */
-	private void createFilterAction() {
-		filterAction = new Action(MarkerMessages.configureFiltersCommand_title) { // $NON-NLS-1$
-			@Override
-			public void run() {
-				openFiltersDialog();
-			}
-		};
-		filterAction.setToolTipText(MarkerMessages.configureFiltersCommand_title);// $NON-NLS-1$
-		ImageDescriptor id = IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/filter_ps.png"); //$NON-NLS-1$
-		if (id != null) {
-			filterAction.setImageDescriptor(id);
-		}
-		id = IDEWorkbenchPlugin.getIDEImageDescriptor("/dlcl16/filter_ps.png"); //$NON-NLS-1$
-		if (id != null) {
-			filterAction.setDisabledImageDescriptor(id);
-		}
-	}
-
-	/**
 	 *
 	 * @param markerField
 	 * @param preferredWidth
@@ -430,8 +400,6 @@ public class ExtendedMarkersView extends ViewPart {
 
 		initDragAndDrop();
 
-		initToolBar();
-
 		getSite().setSelectionProvider(viewer);
 
 		IUndoContext undoContext= getUndoContext();
@@ -441,7 +409,6 @@ public class ExtendedMarkersView extends ViewPart {
 		redoAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_REDO);
 		getViewSite().getActionBars().setGlobalActionHandler(ActionFactory.UNDO.getId(), undoAction);
 		getViewSite().getActionBars().setGlobalActionHandler(ActionFactory.REDO.getId(), redoAction);
-
 
 		startView();
 
@@ -574,21 +541,25 @@ public class ExtendedMarkersView extends ViewPart {
 	 * @since 3.8
 	 */
 	IMarker[] getOpenableMarkers() {
-		IStructuredSelection structured = viewer.getStructuredSelection();
-		Iterator<?> elements = structured.iterator();
-		HashSet<IMarker> result = new HashSet<>();
-		while (elements.hasNext()) {
-			MarkerSupportItem next = (MarkerSupportItem) elements.next();
-			if (next.isConcrete()) {
-				result.add(((MarkerEntry) next).getMarker());
+		ISelection selection = viewer.getSelection();
+		if (selection instanceof IStructuredSelection) {
+			IStructuredSelection structured = (IStructuredSelection) selection;
+			Iterator<?> elements = structured.iterator();
+			HashSet<IMarker> result = new HashSet<>();
+			while (elements.hasNext()) {
+				MarkerSupportItem next = (MarkerSupportItem) elements.next();
+				if (next.isConcrete()) {
+					result.add(((MarkerEntry) next).getMarker());
+				}
 			}
+			if (result.isEmpty()) {
+				return MarkerSupportInternalUtilities.EMPTY_MARKER_ARRAY;
+			}
+			IMarker[] markers = new IMarker[result.size()];
+			result.toArray(markers);
+			return markers;
 		}
-		if (result.isEmpty()) {
-			return MarkerSupportInternalUtilities.EMPTY_MARKER_ARRAY;
-		}
-		IMarker[] markers = new IMarker[result.size()];
-		result.toArray(markers);
-		return markers;
+		return MarkerSupportInternalUtilities.EMPTY_MARKER_ARRAY;
 	}
 
 	/**
@@ -857,26 +828,30 @@ public class ExtendedMarkersView extends ViewPart {
 	 * @return Array of {@link IMarker}
 	 */
 	public IMarker[] getSelectedMarkers() {
-		IStructuredSelection structured = viewer.getStructuredSelection();
-		final List<IMarker> result = new ArrayList<>(structured.size());
-		MarkerCategory lastCategory = null;
-		for (Iterator<?> i = structured.iterator(); i.hasNext();) {
-			final MarkerSupportItem next = (MarkerSupportItem) i.next();
-			if (next.isConcrete()) {
-				if (lastCategory != null && lastCategory == next.getParent()) {
-					continue;
-				}
-				result.add(next.getMarker());
-			} else {
-				lastCategory = (MarkerCategory) next;
-				final MarkerEntry[] children = (MarkerEntry[]) lastCategory.getChildren();
+		ISelection selection = viewer.getSelection();
+		if (selection instanceof IStructuredSelection) {
+			final IStructuredSelection structured = (IStructuredSelection) selection;
+			final List<IMarker> result = new ArrayList<>(structured.size());
+			MarkerCategory lastCategory = null;
+			for (Iterator<?> i = structured.iterator(); i.hasNext();) {
+				final MarkerSupportItem next = (MarkerSupportItem) i.next();
+				if(next.isConcrete()) {
+					if(lastCategory != null && lastCategory == next.getParent()) {
+						continue;
+					}
+					result.add(next.getMarker());
+				} else {
+					lastCategory = (MarkerCategory) next;
+					final MarkerEntry[] children = (MarkerEntry[]) lastCategory.getChildren();
 
-				for (MarkerEntry element : children) {
-					result.add(element.getMarker());
+					for (MarkerEntry element : children) {
+						result.add(element.getMarker());
+					}
 				}
 			}
+			return result.toArray(new IMarker[result.size()]);
 		}
-		return result.toArray(new IMarker[result.size()]);
+		return MarkerSupportInternalUtilities.EMPTY_MARKER_ARRAY;
 	}
 
 	/**
@@ -1380,12 +1355,16 @@ public class ExtendedMarkersView extends ViewPart {
 		if (counts[0].intValue() == 0 && counts[1].intValue() == 0) {
 			// In case of tasks view and bookmarks view, show only selection
 			// count
-			return MessageFormat.format(MarkerMessages.marker_statusSelectedCount, entries.length);
+			return MessageFormat.format(MarkerMessages.marker_statusSelectedCount, new Object[] { entries.length });
 		}
-		return MessageFormat.format(MarkerMessages.marker_statusSummarySelected, entries.length,
-				/* combine infos and others */
-				MessageFormat.format(MarkerMessages.errorsAndWarningsSummaryBreakdown, counts[0], counts[1],
-						counts[2] + counts[3]));
+		return MessageFormat
+				.format(
+						MarkerMessages.marker_statusSummarySelected,
+						new Object[] { entries.length,
+								MessageFormat
+										.format(
+												MarkerMessages.errorsAndWarningsSummaryBreakdown,
+												counts[0], counts[1], /* combine infos and others */ counts[2] + counts[3])});
 	}
 
 	/**
@@ -1435,17 +1414,6 @@ public class ExtendedMarkersView extends ViewPart {
 		};
 
 		viewer.addDragSupport(operations, transferTypes, listener);
-	}
-
-	/**
-	 * Add additional actions to the tool bar.
-	 */
-	private void initToolBar() {
-		IActionBars bars = getViewSite().getActionBars();
-		IToolBarManager tm = bars.getToolBarManager();
-		createFilterAction();
-		tm.add(new Separator("FilterGroup")); //$NON-NLS-1$
-		tm.add(filterAction);
 	}
 
 	/**
