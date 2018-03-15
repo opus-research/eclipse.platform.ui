@@ -65,8 +65,8 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 		statusHandlerDescriptorsMap = new StatusHandlerDescriptorsMap();
 
 		// initial population
-		for (int i = 0; i < extensions.length; i++) {
-			addExtension(tracker, extensions[i]);
+		for (IExtension extension : extensions) {
+			addExtension(tracker, extension);
 		}
 
 		tracker.registerHandler(this, ExtensionTracker
@@ -97,17 +97,17 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		IConfigurationElement[] configElements = extension
 				.getConfigurationElements();
-		for (int j = 0; j < configElements.length; j++) {
-			if (configElements[j].getName().equals(TAG_STATUSHANDLER)) {
+		for (IConfigurationElement configElement : configElements) {
+			if (configElement.getName().equals(TAG_STATUSHANDLER)) {
 				StatusHandlerDescriptor descriptor = new StatusHandlerDescriptor(
-						configElements[j]);
+						configElement);
 				tracker.registerObject(extension, descriptor,
 						IExtensionTracker.REF_STRONG);
 				statusHandlerDescriptors.add(descriptor);
-			} else if (configElements[j].getName().equals(
+			} else if (configElement.getName().equals(
 					TAG_STATUSHANDLER_PRODUCTBINDING)) {
 				StatusHandlerProductBindingDescriptor descriptor = new StatusHandlerProductBindingDescriptor(
-						configElements[j]);
+						configElement);
 				tracker.registerObject(extension, descriptor,
 						IExtensionTracker.REF_STRONG);
 				productBindingDescriptors.add(descriptor);
@@ -118,11 +118,11 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (int i = 0; i < objects.length; i++) {
-			if (objects[i] instanceof StatusHandlerDescriptor) {
-				statusHandlerDescriptors.remove(objects[i]);
-			} else if (objects[i] instanceof StatusHandlerProductBindingDescriptor) {
-				productBindingDescriptors.remove(objects[i]);
+		for (Object object : objects) {
+			if (object instanceof StatusHandlerDescriptor) {
+				statusHandlerDescriptors.remove(object);
+			} else if (object instanceof StatusHandlerProductBindingDescriptor) {
+				productBindingDescriptors.remove(object);
 			}
 		}
 		buildHandlersStructure();
