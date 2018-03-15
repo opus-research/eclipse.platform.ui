@@ -1900,32 +1900,44 @@
       		name="org.eclipse.ui.workbench.ACTIVE_TAB_HIGHLIGHT" value="false">
 		 </data>
       </theme>
+     
       <colorDefinition
+            categoryId="org.eclipse.ui.workbenchMisc"
+            id="org.eclipse.ui.workbench.INFORMATION_BACKGROUND"
+            label="%Color.informationBackground">
+            <description> %Color.informationBackgroundDesc</description>
+            <colorFactory class="org.eclipse.ui.internal.themes.RGBInfoColorFactory" plugin="org.eclipse.ui">
+               <parameter name="color" value="background"> </parameter>
+            </colorFactory>
+      </colorDefinition>
+      <colorDefinition
+            categoryId="org.eclipse.ui.workbenchMisc"
+            id="org.eclipse.ui.workbench.INFORMATION_FOREGROUND"
+            label="%Color.informationForeground">
+            <description> %Color.informationForegroundDesc</description>
+            <colorFactory class="org.eclipse.ui.internal.themes.RGBInfoColorFactory" plugin="org.eclipse.ui">
+               <parameter name="color" value="foreground"></parameter>
+            </colorFactory>
+      </colorDefinition>
+     <colorDefinition
             categoryId="org.eclipse.ui.workbenchMisc"
             id="org.eclipse.ui.workbench.HOVER_BACKGROUND"
-            label="%Color.infoBackground">
-            <colorFactory
-               class="org.eclipse.ui.internal.themes.RGBInfoColorFactory"
-               plugin="org.eclipse.ui">
-               <parameter
-                      name="color"
-                      value="background">
-                </parameter>
+            isEditable="false"
+            label="%Color.hoverBackgroundDeprecated">
+            <colorFactory class="org.eclipse.ui.internal.themes.RGBInfoColorFactory" plugin="org.eclipse.ui">
+               <parameter name="color" value="background"></parameter>
             </colorFactory>
       </colorDefinition>
-      <colorDefinition
+	 <colorDefinition
             categoryId="org.eclipse.ui.workbenchMisc"
             id="org.eclipse.ui.workbench.HOVER_FOREGROUND"
-            label="%Color.infoForeground">
-            <colorFactory
-               class="org.eclipse.ui.internal.themes.RGBInfoColorFactory"
-               plugin="org.eclipse.ui">
-               <parameter
-                      name="color"
-                      value="foreground">
-                </parameter>
+            isEditable="false"
+            label="%Color.hoverBackgroundDeprecated">
+            <colorFactory class="org.eclipse.ui.internal.themes.RGBInfoColorFactory" plugin="org.eclipse.ui">
+               <parameter name="color" value="foreground"></parameter>
             </colorFactory>
       </colorDefinition>
+
       <theme
             id="org.eclipse.ui.r30"
             name="%ThemeName.R30">
