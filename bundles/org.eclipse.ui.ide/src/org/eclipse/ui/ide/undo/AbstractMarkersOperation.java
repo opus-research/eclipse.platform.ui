@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.MultiRule;
 import org.eclipse.ui.internal.ide.undo.MarkerDescription;
@@ -101,18 +102,17 @@ abstract class AbstractMarkersOperation extends AbstractWorkspaceOperation {
 	 *             propagates any CoreExceptions thrown from the resources API
 	 *
 	 */
-	protected void deleteMarkers(int work, IProgressMonitor monitor)
-			throws CoreException {
+	protected void deleteMarkers(int work, IProgressMonitor monitor) throws CoreException {
 		if (markers == null || markers.length == 0) {
-			monitor.worked(work);
 			return;
 		}
 		int markerWork = work / markers.length;
 		markerDescriptions = new MarkerDescription[markers.length];
+		SubMonitor subMonitor = SubMonitor.convert(monitor, markerWork);
 		for (int i = 0; i < markers.length; i++) {
 			markerDescriptions[i] = new MarkerDescription(markers[i]);
 			markers[i].delete();
-			monitor.worked(markerWork);
+			subMonitor.step(markerWork);
 		}
 		markers = new IMarker[0];
 	}
@@ -127,19 +127,17 @@ abstract class AbstractMarkersOperation extends AbstractWorkspaceOperation {
 	 * @throws CoreException
 	 *             propagates any CoreExceptions thrown from the resources API
 	 */
-	protected void createMarkers(int work, IProgressMonitor monitor)
-			throws CoreException {
+	protected void createMarkers(int work, IProgressMonitor monitor) throws CoreException {
 		if (markerDescriptions == null || markerDescriptions.length == 0) {
-			monitor.worked(work);
 			return;
 		}
 		int markerWork = work / markerDescriptions.length;
 		markers = new IMarker[markerDescriptions.length];
-
+		SubMonitor subMonitor = SubMonitor.convert(monitor, markerWork);
 		// Recreate the markers from the descriptions
 		for (int i = 0; i < markerDescriptions.length; i++) {
 			markers[i] = markerDescriptions[i].createMarker();
-			monitor.worked(markerWork);
+			subMonitor.step(markerWork);
 		}
 	}
 
@@ -158,14 +156,13 @@ abstract class AbstractMarkersOperation extends AbstractWorkspaceOperation {
 	 *             propagates any CoreExceptions thrown from the resources API
 	 *
 	 */
-	protected void updateMarkers(int work, IProgressMonitor monitor,
-			boolean mergeAttributes) throws CoreException {
-		if (attributes == null || markers == null
-				|| attributes.length != markers.length || markers.length == 0) {
-			monitor.worked(work);
+	protected void updateMarkers(int work, IProgressMonitor monitor, boolean mergeAttributes) throws CoreException {
+		if (attributes == null || markers == null || attributes.length != markers.length || markers.length == 0) {
 			return;
 		}
 		int markerWork = work / markers.length;
+
+		SubMonitor subMonitor = SubMonitor.convert(monitor, markerWork);
 		for (int i = 0; i < markers.length; i++) {
 			if (mergeAttributes) {
 				Map oldAttributes = markers[i].getAttributes();
@@ -178,7 +175,7 @@ abstract class AbstractMarkersOperation extends AbstractWorkspaceOperation {
 					Object val = attributes[i].get(key);
 					markers[i].setAttribute(key, val);
 					replacedAttributes.put(key, oldAttributes.get(key));
-					monitor.worked(increment);
+					subMonitor.step(increment);
 				}
 				attributes[i] = replacedAttributes;
 			} else {
