@@ -26,6 +26,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -75,11 +77,14 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(job.getName());
-		shell.addTraverseListener(e -> {
-			if (e.detail == SWT.TRAVERSE_ESCAPE) {
-				cancelPressed();
-				e.detail = SWT.TRAVERSE_NONE;
-				e.doit = true;
+		shell.addTraverseListener(new TraverseListener() {
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_ESCAPE) {
+					cancelPressed();
+					e.detail = SWT.TRAVERSE_NONE;
+					e.doit = true;
+				}
 			}
 		});
 	}
@@ -194,16 +199,19 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 		// start with a quick busy indicator. Lock the UI as we
 		// want to preserve modality
 		BusyIndicator.showWhile(PlatformUI.getWorkbench().getDisplay(),
-				() -> {
-					try {
-						synchronized (jobIsDone) {
-							if (job.getState() != Job.NONE) {
-								jobIsDone.wait(ProgressManagerUtil.SHORT_OPERATION_TIME);
+				new Runnable() {
+					@Override
+					public void run() {
+						try {
+							synchronized (jobIsDone) {
+								if (job.getState() != Job.NONE) {
+									jobIsDone.wait(ProgressManagerUtil.SHORT_OPERATION_TIME);
+								}
 							}
+						} catch (InterruptedException e) {
+							// Do not log as this is a common operation from the
+							// lock listener
 						}
-					} catch (InterruptedException e) {
-						// Do not log as this is a common operation from the
-						// lock listener
 					}
 				});
 		job.removeJobChangeListener(jobListener);
