@@ -1764,7 +1764,8 @@
                visible="true">
          </separator>
          <command
-               commandId="org.eclipse.ui.edit.copy">
+               commandId="org.eclipse.ui.edit.copy"
+               mnemonic="%command.edit.copy.mnemonic">
          </command>
          <menu
                id="org.eclipse.ui.ide.markers.copyDetailsMenu"
@@ -1780,16 +1781,14 @@
                   label="%command.copyMarkerResourceQualifiedName.label"
                   style="push">
             </command>
-            <dynamic
-                  class="org.eclipse.ui.ExtensionFactory:copyDetailsContribution"
-                  id="org.eclipse.ui.menus.dynamicCopyDetailsMenu">
-            </dynamic>   
          </menu>
          <command
-               commandId="org.eclipse.ui.edit.delete">
+               commandId="org.eclipse.ui.edit.delete"
+               mnemonic="%command.edit.delete.mnemonic">
          </command>
            <command
-               commandId="org.eclipse.ui.edit.selectAll">
+               commandId="org.eclipse.ui.edit.selectAll"
+               mnemonic="%command.edit.selectAll.mnemonic">
          </command>
          <separator
                name="org.eclipse.ui.ide.markersSeperator1"
@@ -1889,7 +1888,8 @@
                visible="true">
          </separator>
           <command
-               commandId="org.eclipse.ui.file.properties">
+               commandId="org.eclipse.ui.file.properties"
+               mnemonic="%command.file.properties.mnemonic">
              <visibleWhen
                    checkEnabled="false">
                 <and>
