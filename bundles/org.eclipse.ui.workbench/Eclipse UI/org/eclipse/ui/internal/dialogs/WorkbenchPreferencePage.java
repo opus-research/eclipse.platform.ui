@@ -64,6 +64,8 @@ public class WorkbenchPreferencePage extends PreferencePage implements
 
     private Button openAfterDelayButton;
 
+    private Button showUserDialogButton;
+
 	private IntegerFieldEditor saveInterval;
 
     private boolean openOnSingleClick;
@@ -101,10 +103,25 @@ public class WorkbenchPreferencePage extends PreferencePage implements
      * @param composite
      */
 	protected void createSettings(Composite composite) {
+		createShowUserDialogPref(composite);
         createStickyCyclePref(composite);
         createHeapStatusPref(composite);
 		createSaveIntervalGroup(composite);
 	}
+
+    /**
+     * Create the widget for the user dialog preference.
+     *
+     * @param composite
+     */
+    protected void createShowUserDialogPref(Composite composite) {
+        showUserDialogButton = new Button(composite, SWT.CHECK);
+        showUserDialogButton.setText(WorkbenchMessages.WorkbenchPreference_RunInBackgroundButton);
+        showUserDialogButton.setToolTipText(WorkbenchMessages.WorkbenchPreference_RunInBackgroundToolTip);
+        showUserDialogButton.setSelection(WorkbenchPlugin.getDefault()
+                .getPreferenceStore().getBoolean(
+                        IPreferenceConstants.RUN_IN_BACKGROUND));
+    }
 
     /**
      * Create the widget for the heap status preference.
@@ -381,6 +398,8 @@ public class WorkbenchPreferencePage extends PreferencePage implements
         openAfterDelayButton.setEnabled(openOnSingleClick);
         stickyCycleButton.setSelection(store
                 .getDefaultBoolean(IPreferenceConstants.STICKY_CYCLE));
+        showUserDialogButton.setSelection(store.getDefaultBoolean(
+                IPreferenceConstants.RUN_IN_BACKGROUND));
         showHeapStatusButton.setSelection(PrefUtil.getAPIPreferenceStore().getDefaultBoolean(
                 IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR));
 
@@ -401,6 +420,8 @@ public class WorkbenchPreferencePage extends PreferencePage implements
                 openOnSingleClick);
         store.setValue(IPreferenceConstants.SELECT_ON_HOVER, selectOnHover);
         store.setValue(IPreferenceConstants.OPEN_AFTER_DELAY, openAfterDelay);
+        store.setValue(IPreferenceConstants.RUN_IN_BACKGROUND,
+                showUserDialogButton.getSelection());
 		store.setValue(IPreferenceConstants.WORKBENCH_SAVE_INTERVAL, saveInterval.getIntValue());
         PrefUtil.getAPIPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, showHeapStatusButton.getSelection());
         updateHeapStatus(showHeapStatusButton.getSelection());

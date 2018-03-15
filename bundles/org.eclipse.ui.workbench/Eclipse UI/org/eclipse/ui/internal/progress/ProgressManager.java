@@ -59,6 +59,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.IPreferenceConstants;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.EventLoopProgressMonitor;
 import org.eclipse.ui.internal.dialogs.WorkbenchDialogBlockedHandler;
@@ -441,7 +442,7 @@ public class ProgressManager extends ProgressProvider implements
 			public void scheduled(IJobChangeEvent event) {
 				updateFor(event);
 				if (event.getJob().isUser()) {
-					boolean noDialog = true;
+					boolean noDialog = shouldRunInBackground();
 					if (!noDialog) {
 						final IJobChangeEvent finalEvent = event;
 						WorkbenchJob showJob = new WorkbenchJob(
@@ -1051,6 +1052,16 @@ public class ProgressManager extends ProgressProvider implements
 		}
 	}
 
+	@Override
+	public void showInDialog(Shell shell, Job job) {
+		if (shouldRunInBackground()) {
+			return;
+		}
+
+		final ProgressMonitorFocusJobDialog dialog = new ProgressMonitorFocusJobDialog(
+				shell);
+		dialog.show(job, shell);
+	}
 
 	@Override
 	public void run(boolean fork, boolean cancelable,
@@ -1187,6 +1198,15 @@ public class ProgressManager extends ProgressProvider implements
 		return false;
 	}
 
+	/**
+	 * Return whether or not dialogs should be run in the background
+	 *
+	 * @return <code>true</code> if the dialog should not be shown.
+	 */
+	private boolean shouldRunInBackground() {
+		return WorkbenchPlugin.getDefault().getPreferenceStore().getBoolean(
+				IPreferenceConstants.RUN_IN_BACKGROUND);
+	}
 
 	/**
 	 * Set whether or not the ProgressViewUpdater should show system jobs.
