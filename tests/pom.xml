@@ -44,7 +44,6 @@
     <module>org.eclipse.ui.tests.navigator</module>
     <module>org.eclipse.ui.tests.performance</module>
     <module>org.eclipse.ui.tests.rcp</module>
-    <module>org.eclipse.ui.tests.smartimport</module>
     <module>org.eclipse.ui.tests.views.properties.tabbed</module>
     <module>org.eclipse.ui.ide.application.tests</module>
     <module>org.eclipse.e4.ui.bindings.tests</module>
