@@ -13,6 +13,7 @@
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 411639, 372799, 466230
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 473063
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 527069
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -170,6 +171,7 @@ import org.eclipse.ui.internal.misc.UIListenerLogging;
 import org.eclipse.ui.internal.progress.ProgressManagerUtil;
 import org.eclipse.ui.internal.registry.ActionSetRegistry;
 import org.eclipse.ui.internal.registry.EditorDescriptor;
+import org.eclipse.ui.internal.registry.EditorRegistry;
 import org.eclipse.ui.internal.registry.IActionSetDescriptor;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.internal.registry.PerspectiveDescriptor;
@@ -3206,8 +3208,17 @@ public class WorkbenchPage implements IWorkbenchPage {
 			return null;
 		}
 
-		IEditorDescriptor desc = getWorkbenchWindow().getWorkbench()
-				.getEditorRegistry().findEditor(editorId);
+		IEditorRegistry reg = getWorkbenchWindow().getWorkbench().getEditorRegistry();
+		IEditorDescriptor desc = reg.findEditor(editorId);
+		if (desc == null && reg instanceof EditorRegistry) {
+			// check for external editors registered in the OS.
+			for (IEditorDescriptor ied : ((EditorRegistry) reg).getSortedEditorsFromOS()) {
+				if (editorId.equals(ied.getId())) {
+					desc = ied;
+					break;
+				}
+			}
+		}
 		if (desc != null && !desc.isOpenExternal() && isLargeDocument(input)) {
 			desc = getAlternateEditor();
 			if (desc == null) {
