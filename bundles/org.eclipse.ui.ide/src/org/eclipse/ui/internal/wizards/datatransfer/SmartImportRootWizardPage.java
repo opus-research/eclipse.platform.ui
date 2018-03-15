@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2016 Red Hat Inc., and others
+ * Copyright (c) 2014, 2016 Red Hat Inc., and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Mickael Istria (Red Hat Inc.) - initial API and implementation
  *     Snjezana Peco (Red Hat Inc.)
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 490590
  ******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
@@ -57,6 +58,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
@@ -95,6 +97,8 @@ public class SmartImportRootWizardPage extends WizardPage {
 	private Set<File> notAlreadyExistingProjects;
 	private Label selectionSummary;
 	protected Map<File, List<ProjectConfigurator>> potentialProjects;
+
+	private Composite detailsComposite;
 
 	private class FolderForProjectsLabelProvider extends CellLabelProvider implements IColorProvider {
 		public String getText(Object o) {
@@ -281,6 +285,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 				String directory = dialog.open();
 				if (directory != null) {
 					rootDirectoryText.setText(directory);
+					detailsEnabled(detailsComposite, true);
 				}
 			}
 		});
@@ -308,11 +313,17 @@ public class SmartImportRootWizardPage extends WizardPage {
 				String archive = dialog.open();
 				if (archive != null) {
 					rootDirectoryText.setText(archive);
+					detailsEnabled(detailsComposite, true);
 				}
 			}
 		});
+		detailsComposite = new Composite(res, SWT.NONE);
 
-		Link showDetectorsLink = new Link(res, SWT.NONE);
+		detailsComposite.setLayout(new GridLayout(4, false));
+		GridData gridDataDetails = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridDataDetails.horizontalSpan = 4;
+		detailsComposite.setLayoutData(gridDataDetails);
+		Link showDetectorsLink = new Link(detailsComposite, SWT.NONE);
 		showDetectorsLink.setText(DataTransferMessages.SmartImportWizardPage_showAvailableDetectors);
 		showDetectorsLink.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
 		showDetectorsLink.addSelectionListener(new SelectionAdapter() {
@@ -334,7 +345,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 						DataTransferMessages.SmartImportWizardPage_availableDetectors_title, message.toString());
 			}
 		});
-		final Button detectNestedProjectsCheckbox = new Button(res, SWT.CHECK);
+		final Button detectNestedProjectsCheckbox = new Button(detailsComposite, SWT.CHECK);
 		detectNestedProjectsCheckbox.setText(DataTransferMessages.SmartImportWizardPage_detectNestedProjects);
 		detectNestedProjectsCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
 		detectNestedProjectsCheckbox.setSelection(this.detectNestedProjects);
@@ -345,7 +356,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 				refreshProposals();
 			}
 		});
-		final Button configureProjectsCheckbox = new Button(res, SWT.CHECK);
+		final Button configureProjectsCheckbox = new Button(detailsComposite, SWT.CHECK);
 		configureProjectsCheckbox.setText(DataTransferMessages.SmartImportWizardPage_configureProjects);
 		configureProjectsCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
 		configureProjectsCheckbox.setSelection(this.configureProjects);
@@ -357,12 +368,12 @@ public class SmartImportRootWizardPage extends WizardPage {
 			}
 		});
 
-		Composite proposalParent = new Composite(res, SWT.NONE);
+		Composite proposalParent = new Composite(detailsComposite, SWT.NONE);
 		proposalParent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
 		proposalParent.setLayout(new FillLayout());
 		createProposalsGroup(proposalParent);
 
-		Group workingSetsGroup = new Group(res, SWT.NONE);
+		Group workingSetsGroup = new Group(detailsComposite, SWT.NONE);
 		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1);
 		layoutData.verticalIndent = 20;
 		workingSetsGroup.setLayoutData(layoutData);
@@ -380,7 +391,20 @@ public class SmartImportRootWizardPage extends WizardPage {
 			validatePage();
 		}
 
+		// disable detailed widgets until an input has been selected
+		detailsEnabled(detailsComposite, false);
 		setControl(res);
+	}
+
+
+	private void detailsEnabled(Control ctrl, boolean value) {
+		if (ctrl instanceof Composite) {
+			Composite comp = (Composite) ctrl;
+			for (Control c : comp.getChildren())
+				detailsEnabled(c, value);
+		} else {
+			ctrl.setEnabled(value);
+		}
 	}
 
 	/**
