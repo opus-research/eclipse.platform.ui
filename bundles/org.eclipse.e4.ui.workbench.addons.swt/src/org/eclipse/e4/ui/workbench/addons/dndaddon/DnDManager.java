@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -51,6 +52,27 @@ import org.osgi.service.event.EventHandler;
 
 class DnDManager {
 	private static final Rectangle offScreenRect = new Rectangle(10000, -10000, 1, 1);
+
+	private static final boolean isGTK2;
+
+	static {
+		boolean gtk2Value = false;
+		try {
+			@SuppressWarnings("rawtypes")
+			Class osClass = Class.forName("org.eclipse.swt.internal.gtk.OS"); //$NON-NLS-1$
+			Field gtk3Field = osClass.getField("GTK3"); //$NON-NLS-1$
+			Object value = gtk3Field.get(null);
+			gtk2Value = (Boolean.FALSE.equals(value));
+			// If an exception is thrown, that means this isn't GTK2.
+		} catch (ClassNotFoundException e) {
+		} catch (NoSuchFieldException e) {
+		} catch (SecurityException e) {
+		} catch (IllegalArgumentException e) {
+		} catch (IllegalAccessException e) {
+		}
+
+		isGTK2 = gtk2Value;
+	}
 
 	public static final int HOSTED = 1;
 	public static final int GHOSTED = 2;
@@ -209,7 +231,18 @@ class DnDManager {
 
 	protected void startDrag() {
 		// Create a new tracker for this drag instance
-		tracker = new Tracker(Display.getCurrent().getActiveShell(), SWT.NULL);
+		// Workaround for bug 493478: GTK2 has a bug in Tracker's Shell
+		// constructor and GTK3 as a bug in the Display constructor...
+		// so we work around the bugs by invoking a different constructor based
+		// on the GTK version. Of other platforms, we go with
+		// the Shell constructor since that's what is recommended by all of
+		// SWT's Tracker code samples.
+		if (isGTK2) {
+			tracker = new Tracker(Display.getCurrent(), SWT.NULL);
+		} else {
+			tracker = new Tracker(Display.getCurrent().getActiveShell(), SWT.NULL);
+		}
+
 		tracker.setStippled(true);
 		setRectangle(offScreenRect);
 
