@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IBundleGroup;
 import org.eclipse.core.runtime.IBundleGroupProvider;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -205,10 +204,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		// show Help button in JFace dialogs
 		TrayDialog.setDialogHelpAvailable(true);
-
-		// Set the default value of the preference controlling the workspace
-		// name displayed in the window title.
-		setWorkspaceNameDefault();
 
 		Policy.setComparator(Collator.getInstance());
 	}
@@ -575,27 +570,8 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	}
 
 	/**
-	 * Sets the default value of the preference controlling the workspace name
-	 * displayed in the window title to the name of the workspace directory.
-	 * This preference cannot be set in the preference initializer because the
-	 * workspace directory may not be known when the preference initializer is
-	 * called.
-	 */
-	private static void setWorkspaceNameDefault() {
-		IPath workspaceDir = Platform.getLocation();
-		if (workspaceDir == null)
-			return;
-		String workspaceName = workspaceDir.lastSegment();
-		if (workspaceName == null)
-			return;
-		IPreferenceStore preferences = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
-		preferences.setDefault(IDEInternalPreferences.WORKSPACE_NAME, workspaceName);
-	}
-
-	/**
 	 * Declares all IDE-specific workbench images. This includes both "shared"
-	 * images (named in {@link org.eclipse.ui.ide.IDE.SharedImages}) and
-	 * internal images (named in
+	 * images (named in {@link org.eclipse.ui.ide.IDE.SharedImages}) and internal images (named in
 	 * {@link org.eclipse.ui.internal.ide.IDEInternalWorkbenchImages}).
 	 *
 	 * @see IWorkbenchConfigurer#declareImage
