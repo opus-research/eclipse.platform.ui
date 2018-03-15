@@ -70,7 +70,7 @@ public class HeightPropertySection
 	 * @see org.eclipse.ui.examples.views.properties.tabbed.hockeyleague.ui.properties.sections.AbstractIntegerPropertySection#getFeatureInteger()
 	 */
 	protected Integer getFeatureInteger() {
-		return Integer.valueOf(((Player) eObject).getHeightValue());
+		return new Integer(((Player) eObject).getHeightValue());
 	}
 
 	/**
