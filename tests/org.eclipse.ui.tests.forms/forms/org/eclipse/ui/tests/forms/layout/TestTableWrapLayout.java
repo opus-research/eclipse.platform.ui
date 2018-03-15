@@ -114,17 +114,6 @@ public class TestTableWrapLayout {
 		shell.dispose();
 	}
 
-	private void runEventLoop(Shell shell) {
-		// Use the display provided by the shell if possible
-		Display display = shell.getDisplay();
-
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-	}
-
 	/**
 	 * Test a 2x2 grid with unequal sizes
 	 */
@@ -147,10 +136,6 @@ public class TestTableWrapLayout {
 		Label l4 = new Label(inner, SWT.WRAP);
 		l4.setText(A80);
 		shell.layout();
-
-		shell.setVisible(true);
-		runEventLoop(shell);
-
 		assertTrue(l1.getSize().x < l2.getSize().x);
 		assertTrue(l1.getSize().y < l3.getSize().y);
 		assertTrue(l1.getSize().x < l4.getSize().x);
