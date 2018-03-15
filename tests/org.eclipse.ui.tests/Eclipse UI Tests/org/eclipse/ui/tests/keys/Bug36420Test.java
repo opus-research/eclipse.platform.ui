@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -86,9 +86,10 @@ public class Bug36420Test extends UITestCase {
         // Export the preferences.
         File file = File.createTempFile("preferences", ".txt"); //$NON-NLS-1$//$NON-NLS-2$
         file.deleteOnExit();
-		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {
-			preferences.store(bos, null);
-		}
+        BufferedOutputStream bos = new BufferedOutputStream(
+                new FileOutputStream(file));
+        preferences.store(bos, null);
+        bos.close();
 
         // Attempt to import the key binding.
         Preferences.importPreferences(new Path(file.getAbsolutePath()));
@@ -99,12 +100,12 @@ public class Bug36420Test extends UITestCase {
         // Check to see that the key binding for the given command matches.
         ICommandManager manager = fWorkbench.getCommandSupport()
                 .getCommandManager();
-		List<KeySequence> keyBindings = manager.getCommand(commandId)
+        List keyBindings = manager.getCommand(commandId)
                 .getKeySequenceBindings();
-		Iterator<KeySequence> keyBindingItr = keyBindings.iterator();
+        Iterator keyBindingItr = keyBindings.iterator();
         boolean found = false;
         while (keyBindingItr.hasNext()) {
-            KeySequence keyBinding = keyBindingItr.next();
+            KeySequence keyBinding = (KeySequence) keyBindingItr.next();
             String currentText = keyBinding.toString();
             if (keySequenceText.equals(currentText)) {
                 found = true;

@@ -10,7 +10,6 @@
  *     Eugene Ostroukhov <eugeneo@symbian.org> -  Bug 287887 [Wizards] [api] Cancel button has two distinct roles
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440270
  *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
- *     Karsten Thoms <karsten.thoms@itemis.de> - Bug 520720 Asynchronous, throttled label update
  *******************************************************************************/
 package org.eclipse.jface.wizard;
 
@@ -161,7 +160,7 @@ public class ProgressMonitorPart extends Composite implements
 	public void beginTask(String name, int totalWork) {
         fTaskName = name;
         fSubTaskName = ""; //$NON-NLS-1$
-		queueUpdateLabel();
+        updateLabel();
 		if (!fProgressIndicator.isDisposed()) {
 			if (totalWork == IProgressMonitor.UNKNOWN || totalWork == 0) {
 				fProgressIndicator.beginAnimatedTask();
@@ -280,7 +279,7 @@ public class ProgressMonitorPart extends Composite implements
 			fStopButton.setToolTipText(JFaceResources.getString("ProgressMonitorPart.cancelToolTip")); //$NON-NLS-1$
         }
 
-		throttledUpdate = new Throttler(fLabel.getDisplay(), Duration.ofMillis(100), this::updateLabel);
+		throttledUpdate = new Throttler(fLabel.getDisplay(), Duration.ofMillis(100), this::internalUpdateLabel);
     }
 
     @Override
@@ -328,29 +327,23 @@ public class ProgressMonitorPart extends Composite implements
     @Override
 	public void setTaskName(String name) {
         fTaskName = name;
-		queueUpdateLabel();
+        updateLabel();
     }
 
     @Override
 	public void subTask(String name) {
         fSubTaskName = name;
-		queueUpdateLabel();
+        updateLabel();
     }
 
 	/**
-	 * Enqueues a label update for asynchronous execution. The update is performed
-	 * throttled to 100ms, i.e. updates within the throttle range are not displayed.
-	 *
-	 * @since 3.14
+	 * Updates the label with the current task and subtask names.
 	 */
-	protected void queueUpdateLabel() {
+	protected void updateLabel() {
 		throttledUpdate.throttledExec();
 	}
 
-    /**
-     * Updates the label with the current task and subtask names.
-     */
-    protected void updateLabel() {
+	private void internalUpdateLabel() {
 		if (fLabel.isDisposed() || fLabel.isAutoDirection()) {
 			return;
 		}
@@ -394,13 +387,15 @@ public class ProgressMonitorPart extends Composite implements
     @Override
 	public void clearBlocked() {
         blockedStatus = null;
-		queueUpdateLabel();
+        updateLabel();
+
     }
 
     @Override
 	public void setBlocked(IStatus reason) {
         blockedStatus = reason;
-		queueUpdateLabel();
+        updateLabel();
+
     }
 
    private void setCancelEnabled(boolean enabled) {
