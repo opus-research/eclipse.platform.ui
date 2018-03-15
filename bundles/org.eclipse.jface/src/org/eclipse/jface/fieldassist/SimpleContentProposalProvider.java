@@ -40,13 +40,14 @@ public class SimpleContentProposalProvider implements IContentProposalProvider {
 	private boolean filterProposals = false;
 
 	/**
-	 * Construct a SimpleContentProposalProvider whose content proposals are always
-	 * the specified array of Objects.
+	 * Construct a SimpleContentProposalProvider whose content proposals are
+	 * always the specified array of Objects.
 	 *
 	 * @param proposals
-	 *            the Strings to be returned whenever proposals are requested.
+	 *            the array of Strings to be returned whenever proposals are
+	 *            requested.
 	 */
-	public SimpleContentProposalProvider(String... proposals) {
+	public SimpleContentProposalProvider(String[] proposals) {
 		super();
 		this.proposals = proposals;
 	}
@@ -90,9 +91,9 @@ public class SimpleContentProposalProvider implements IContentProposalProvider {
 	 * Set the Strings to be used as content proposals.
 	 *
 	 * @param items
-	 *            the Strings to be used as proposals.
+	 *            the array of Strings to be used as proposals.
 	 */
-	public void setProposals(String... items) {
+	public void setProposals(String[] items) {
 		this.proposals = items;
 		contentProposals = null;
 	}
