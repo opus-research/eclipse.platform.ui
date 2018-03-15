@@ -132,8 +132,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 		}
 	};
 
-	private IWorkbenchPart legacyPart;
-
 	CompatibilityPart(MPart part) {
 		this.part = part;
 	}
@@ -146,13 +144,9 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	public abstract WorkbenchPartReference getReference();
 
 	protected boolean createPartControl(final IWorkbenchPart legacyPart, Composite parent) {
-		this.legacyPart = legacyPart;
 		IWorkbenchPartSite site = null;
 		try {
 			site = legacyPart.getSite();
-			part.getContext().set(Composite.class, parent);
-			ContextInjectionFactory.inject(legacyPart, part.getContext());
-			// call createPartControl after dependency injection
 			legacyPart.createPartControl(parent);
 		} catch (RuntimeException e) {
 			logger.error(e);
@@ -426,7 +420,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	 */
 	void disposeSite(PartSite site) {
 		site.dispose();
-		ContextInjectionFactory.uninject(legacyPart, part.getContext());
 	}
 
 	@Persist
