@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 Angelo Zerr and others.
+ * Copyright (c) 2008, 2015 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *     Lars Sadau <lars@sadau-online.de> - view implementation of CSSPropertyList
  *     IBM Corporation - ongoing development
  *******************************************************************************/
 
@@ -28,7 +27,6 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 	private boolean readOnly;
 	private CSSRule parentRule;
 	private List<CSSProperty> properties = new ArrayList<CSSProperty>();
-	private CSSPropertyList cssPropertyListView;
 
 	public CSSStyleDeclarationImpl(CSSRule parentRule) {
 		this.parentRule = parentRule;
@@ -130,22 +128,11 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 	}
 
 	public CSSPropertyList getCSSPropertyList() {
-		if (cssPropertyListView == null) {
-			cssPropertyListView = new CSSPropertyList() {
-
-				@Override
-				public int getLength() {
-					return properties.size();
-				}
-
-				@Override
-				public CSSProperty item(int i) {
-					return properties.get(i);
-				}
-
-			};
+		CSSPropertyListImpl propertyList = new CSSPropertyListImpl();
+		for (CSSProperty property: properties) {
+			propertyList.add(property);
 		}
-		return cssPropertyListView;
+		return propertyList;
 	}
 
 	protected void setReadOnly(boolean readOnly) {
