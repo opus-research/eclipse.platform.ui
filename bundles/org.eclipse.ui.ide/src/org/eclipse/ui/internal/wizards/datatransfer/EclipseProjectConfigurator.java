@@ -12,6 +12,7 @@ package org.eclipse.ui.internal.wizards.datatransfer;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,22 +40,15 @@ public class EclipseProjectConfigurator implements ProjectConfigurator {
 
 	@Override
 	public Set<File> findConfigurableLocations(File root, IProgressMonitor monitor) {
-		HashSet<File> res = new HashSet<>();
-		collectProjectDirectories(res, root, monitor);
+		Set<File> projectFiles = new LinkedHashSet<>();
+		Set<String> visitedDirectories = new HashSet<>();
+		WizardProjectsImportPage.collectProjectFilesFromDirectory(projectFiles, root, visitedDirectories, true,
+				monitor);
+		Set<File> res = new LinkedHashSet<>();
+		for (File projectFile : projectFiles) {
+			res.add(projectFile.getParentFile());
+		}
 		return res;
-	}
-
-	private void collectProjectDirectories(HashSet<File> res, File root, IProgressMonitor monitor) {
-		if (new File(root, IProjectDescription.DESCRIPTION_FILE_NAME).isFile()) {
-			res.add(root);
-		}
-		if (!monitor.isCanceled()) {
-			for (File child : root.listFiles()) {
-				if (child.isDirectory()) {
-					collectProjectDirectories(res, child, monitor);
-				}
-			}
-		}
 	}
 
 	@Override
