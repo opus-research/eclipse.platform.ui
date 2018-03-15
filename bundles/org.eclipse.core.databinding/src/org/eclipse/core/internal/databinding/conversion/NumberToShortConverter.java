@@ -35,7 +35,7 @@ public class NumberToShortConverter extends NumberToNumberConverter {
 	@Override
 	protected Number doConvert(Number number) {
 		if (StringToNumberParser.inShortRange(number)) {
-			return Short.valueOf(number.shortValue());
+			return new Short(number.shortValue());
 		}
 
 		return null;
