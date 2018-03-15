@@ -80,13 +80,8 @@ public class IntegerFieldEditor extends StringFieldEditor {
 
         Text text = getTextControl();
 
-		if (text == null) {
+        if (text == null) {
 			return false;
-		}
-
-		if (!text.isEnabled()) {
-			clearErrorMessage();
-			return true;
 		}
 
         String numberString = text.getText();
