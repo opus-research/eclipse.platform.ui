@@ -144,7 +144,7 @@ public final class IDE {
 	 *
 	 * @since 3.12
 	 */
-	public static final String UNKNOWN_EDITOR_STRATEGY_PREFERENCE_KEY = "unknownEditorStrategy";//$NON-NLS-1$
+	public static final String UNKNOWN_EDITOR_STRATEGY_PREFERENCE_KEY = "unassociatedEditorStrategy";//$NON-NLS-1$
 
 	/**
 	 * Marker help registry mapping markers to help context ids and resolutions;
@@ -1049,9 +1049,9 @@ public final class IDE {
 	}
 
 	/**
-	 * @return The strategy to use in order to open unknown file. Either as set
-	 *         by preference, or a {@link SystemEditorOrTextEditorStrategy} if none is
-	 *         explicitly configured.
+	 * @return The strategy to use in order to open unassociated file. Either as
+	 *         set by preference, or a {@link SystemEditorOrTextEditorStrategy}
+	 *         if none is explicitly configured.
 	 */
 	private static IUnknownEditorStrategy getUnknowEditorStrategy() {
 		String preferedStrategy = IDEWorkbenchPlugin.getDefault().getPreferenceStore()
