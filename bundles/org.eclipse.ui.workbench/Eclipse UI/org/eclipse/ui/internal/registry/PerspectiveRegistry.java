@@ -332,11 +332,11 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 		} else if (id.endsWith(trimE4)) {
 			index = id.lastIndexOf(trimE4) - 1;
 		} else if (id.endsWith(trimE3)) {
-			index = id.lastIndexOf(trimE4) - 1;
+			index = id.lastIndexOf(trimE3) - 1;
 		}
-		if (index == -1) {
-			return id;
+		if (index >= 0 && index < id.length()) {
+			return id.substring(0, index);
 		}
-		return id.substring(0, index);
+		return id;
 	}
 }
