@@ -42,10 +42,8 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.impl.ApplicationFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MAdvancedFactory;
-import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.fragment.MFragmentFactory;
@@ -65,9 +63,9 @@ import org.junit.Test;
 
 @SuppressWarnings("nls")
 public class ModelAssemblerTests {
-	final private static String extensionPointID = "org.eclipse.e4.workbench.model";
-	final private static String bundleSymbolicName = "org.eclipse.e4.ui.tests";
-	final private static String appId = "org.eclipse.e4.ui.tests.modelassembler.app";
+	final private static String EXTENSION_POINT_ID = "org.eclipse.e4.workbench.model";
+	final private static String BUNDLE_SYMBOLIC_NAME = "org.eclipse.e4.ui.tests";
+	final private static String APPLICATION_ID = "org.eclipse.e4.ui.tests.modelassembler.app";
 	private IEclipseContext appContext;
 	private MApplication application;
 	private E4XMIResourceFactory factory;
@@ -78,10 +76,9 @@ public class ModelAssemblerTests {
 
 	@Before
 	public void setup() {
-
 		appContext = E4Application.createDefaultContext();
 		application = ApplicationFactoryImpl.eINSTANCE.createApplication();
-		application.setElementId(appId);
+		application.setElementId(APPLICATION_ID);
 		application.setContext(appContext);
 
 		logger = mock(Logger.class);
@@ -98,10 +95,12 @@ public class ModelAssemblerTests {
 		ContextInjectionFactory.inject(assembler, appContext);
 	}
 
-	@Test
 	/**
 	 * Test the handling of a fragment contribution with no elements to merge.
+	 *
+	 * @throws Exception
 	 */
+	@Test
 	public void testFragments_emptyFragment() throws Exception {
 		MModelFragment fragment = MFragmentFactory.INSTANCE.createStringModelFragment();
 		final String contributorURI = "testFragments_emptyFragment_contribURI";
@@ -123,10 +122,12 @@ public class ModelAssemblerTests {
 		verifyZeroInteractions(logger);
 	}
 
-	@Test
 	/**
 	 * Tests that fragments are correctly contributed to the application model.
+	 * 
+	 * @throws Exception
 	 */
+	@Test
 	public void testFragments_workingFragment() throws Exception {
 		// the contributed element
 		MWindow window = MBasicFactory.INSTANCE.createWindow();
@@ -205,12 +206,14 @@ public class ModelAssemblerTests {
 		verifyZeroInteractions(logger);
 	}
 
-	@Test
 	/**
 	 * Tests that fragments configured to be always merged are correctly
 	 * contributed to the application model, even if the model already contains
 	 * the contributed element.
+	 * 
+	 * @throws Exception
 	 */
+	@Test
 	public void testFragments_existingXMIID_ignoreExists() throws Exception {
 		// create fragment
 		MStringModelFragment fragment = MFragmentFactory.INSTANCE.createStringModelFragment();
@@ -248,8 +251,8 @@ public class ModelAssemblerTests {
 		verifyZeroInteractions(logger);
 	}
 
-	@Test
 	/** Tests that correctly configured imports are correctly handled. */
+	@Test
 	public void testImports() {
 		List<MApplicationElement> imports = new ArrayList<MApplicationElement>();
 		List<MApplicationElement> addedElements = new ArrayList<MApplicationElement>();
@@ -301,56 +304,12 @@ public class ModelAssemblerTests {
 	}
 
 	/**
-	 * Make sure that all fragments and imports are resolved before the
-	 * post-processors are run. For reference, see
-	 * <a href="https://bugs.eclipse.org/475934">bug 475934</a>.
-	 *
-	 * @throws Exception
-	 *             if anything went wrong during the test
-	 *
-	 */
-	@Test
-	public void testModelProcessingOrder() throws Exception {
-
-		/* setup application model */
-		/* this creates a window, containing a part and an area */
-		MTrimmedWindow trimmedWindow = MBasicFactory.INSTANCE.createTrimmedWindow();
-		trimmedWindow.setElementId("testModelProcessingOrder-trimmedWindow");
-		application.getChildren().add(trimmedWindow);
-		MPart part = MBasicFactory.INSTANCE.createPart();
-		part.setElementId("testModelProcessingOrder-part");
-		trimmedWindow.getChildren().add(part);
-		MArea area = MAdvancedFactory.INSTANCE.createArea();
-		area.setElementId("testModelProcessingOrder-area");
-		trimmedWindow.getChildren().add(area);
-
-		/* contribute fragment with imports and post-processor */
-		IContributor contributor = ContributorFactorySimple.createContributor(bundleSymbolicName);
-		IExtensionRegistry registry = createTestExtensionRegistry();
-		assertEquals(0, registry.getConfigurationElementsFor(extensionPointID).length);
-		// The fragment contributes a Placeholder to the application's Area. The
-		// Placeholder references the Part that we created above.
-		// Besides the Placeholder, the xml also contributes a
-		// post-processor(org.eclipse.e4.ui.tests.workbench.ModelAssemblerProcessingOrderPostProcessor).
-		// It will iterate over the elements of the application model and will
-		// make sure that no imports are left unresolved. The post-processor
-		// will throw an error if such elements are found and this test will
-		// fail.
-		String dataFilePath = "org.eclipse.e4.ui.tests/data/ModelAssembler/modelProcessingOrder.xml";// FIXME
-		registry.addContribution(getContentsAsInputStream(dataFilePath), contributor, false, null, null, null);
-
-		assembler.processModel(true);
-
-		// the testing was done in the post-processor; if we didn't fail there,
-		// everything went fine.
-		verifyZeroInteractions(logger);
-	}
-
-	@Test
-	/**
 	 * Tests that pre-processors running from a non-persisted state that are
 	 * marked as "always" are executed.
+	 * 
+	 * @throws Exception
 	 */
+	@Test
 	public void testPreProcessor_nonPersistedState_always() throws Exception {
 		testProcessor("org.eclipse.e4.ui.tests/data/ModelAssembler/processors_always.xml", true, false);
 		assertEquals(1, application.getDescriptors().size());
@@ -358,11 +317,13 @@ public class ModelAssemblerTests {
 		verifyZeroInteractions(logger);
 	}
 
-	@Test
 	/**
 	 * Tests that pre-processors running from a persisted state that are marked
 	 * as "always" are executed.
+	 * 
+	 * @throws Exception
 	 */
+	@Test
 	public void testPreProcessor_persistedState_always() throws Exception {
 		testProcessor("org.eclipse.e4.ui.tests/data/ModelAssembler/processors_always.xml", false, false);
 		assertEquals(1, application.getDescriptors().size());
@@ -370,11 +331,13 @@ public class ModelAssemblerTests {
 		verifyZeroInteractions(logger);
 	}
 
-	@Test
 	/**
 	 * Tests that pre-processors running from a non-persisted state and marked
 	 * as "initial" are executed.
+	 * 
+	 * @throws Exception
 	 */
+	@Test
 	public void testPreProcessor_nonPersistedState_initial() throws Exception {
 		testProcessor("org.eclipse.e4.ui.tests/data/ModelAssembler/processors_initial.xml", true, false);
 		assertEquals(1, application.getDescriptors().size());
@@ -382,22 +345,26 @@ public class ModelAssemblerTests {
 		verifyZeroInteractions(logger);
 	}
 
-	@Test
 	/**
 	 * Tests that pre-processors running from a persisted state and marked as
 	 * "initial" are not executed.
+	 * 
+	 * @throws Exception
 	 */
+	@Test
 	public void testPreProcessor_persistedState_initial() throws Exception {
 		testProcessor("org.eclipse.e4.ui.tests/data/ModelAssembler/processors_initial.xml", false, false);
 		assertEquals(0, application.getDescriptors().size());
 		verifyZeroInteractions(logger);
 	}
 
-	@Test
 	/**
 	 * Tests the execution of post-processors that should always be applied,
 	 * running from a persisted state.
+	 * 
+	 * @throws Exception
 	 */
+	@Test
 	public void testPostProcessor_persistedState_always() throws Exception {
 		testProcessor("org.eclipse.e4.ui.tests/data/ModelAssembler/processors_always.xml", false, true);
 		assertEquals(1, application.getDescriptors().size());
@@ -405,11 +372,13 @@ public class ModelAssemblerTests {
 		verifyZeroInteractions(logger);
 	}
 
-	@Test
 	/**
 	 * Tests the execution of post-processors that should always be applied,
 	 * running from a non-persisted state.
+	 * 
+	 * @throws Exception
 	 */
+	@Test
 	public void testPostProcessor_nonPersistedState_always() throws Exception {
 		testProcessor("org.eclipse.e4.ui.tests/data/ModelAssembler/processors_always.xml", true, true);
 		assertEquals(1, application.getDescriptors().size());
@@ -417,11 +386,13 @@ public class ModelAssemblerTests {
 		verifyZeroInteractions(logger);
 	}
 
-	@Test
 	/**
 	 * Tests the execution of post-processors running from a non-persisted state
 	 * declared to be applied as "initial".
+	 * 
+	 * @throws Exception
 	 */
+	@Test
 	public void testPostProcessor_NonPersistedState_initial() throws Exception {
 		testProcessor("org.eclipse.e4.ui.tests/data/ModelAssembler/processors_initial.xml", true, true);
 		assertEquals(1, application.getDescriptors().size());
@@ -429,22 +400,26 @@ public class ModelAssemblerTests {
 		verifyZeroInteractions(logger);
 	}
 
-	@Test
 	/**
 	 * Processors running from a persisted state declared to be applied as
 	 * "initial" should not be run.
+	 * 
+	 * @throws Exception
 	 */
+	@Test
 	public void testPostProcessor_persistedState_initial() throws Exception {
 		testProcessor("org.eclipse.e4.ui.tests/data/ModelAssembler/processors_initial.xml", false, true);
 		assertEquals(0, application.getDescriptors().size());
 		verifyZeroInteractions(logger);
 	}
 
-	@Test
 	/**
 	 * Test handling of processor contribution without any processor class. A
 	 * warning should be logged in such cases.
+	 * 
+	 * @throws Exception
 	 */
+	@Test
 	public void testProcessor_noProcessor() throws Exception {
 		testProcessor("org.eclipse.e4.ui.tests/data/ModelAssembler/processor_null.xml", true, false);
 		verify(logger).warn("Unable to create processor null from org.eclipse.e4.ui.tests");
@@ -452,11 +427,13 @@ public class ModelAssemblerTests {
 		verifyZeroInteractions(logger);
 	}
 
-	@Test
 	/**
 	 * Tests a contribution containing an nonexistent processor class. A warning
 	 * should be logged in such cases.
+	 * 
+	 * @throws Exception
 	 */
+	@Test
 	public void testProcessor_processorNotFound() throws Exception {
 		testProcessor("org.eclipse.e4.ui.tests/data/ModelAssembler/processor_wrongProcessorClass.xml", true, false);
 		verify(logger).warn(
@@ -466,12 +443,14 @@ public class ModelAssemblerTests {
 	}
 
 
-	@Test
 	/**
 	 * Tests a processor contribution that adds to the context an element with
 	 * an id that does not exist in the application model. A warning should be
 	 * logged, but the processors should still be executed.
+	 * 
+	 * @throws Exception
 	 */
+	@Test
 	public void testProcessor_wrongAppId() throws Exception {
 		application.setElementId("newID");
 		testProcessor("org.eclipse.e4.ui.tests/data/ModelAssembler/processors_initial.xml", true, true);
@@ -482,11 +461,11 @@ public class ModelAssemblerTests {
 	}
 
 	private void testProcessor(String filePath, boolean initial, boolean afterFragments) throws Exception {
-		IContributor contributor = ContributorFactorySimple.createContributor(bundleSymbolicName);
+		IContributor contributor = ContributorFactorySimple.createContributor(BUNDLE_SYMBOLIC_NAME);
 		IExtensionRegistry registry = createTestExtensionRegistry();
-		assertEquals(0, registry.getConfigurationElementsFor(extensionPointID).length);
+		assertEquals(0, registry.getConfigurationElementsFor(EXTENSION_POINT_ID).length);
 		registry.addContribution(getContentsAsInputStream(filePath), contributor, false, null, null, null);
-		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
+		IExtensionPoint extPoint = registry.getExtensionPoint(EXTENSION_POINT_ID);
 		IExtension[] extensions = new ExtensionsSort().sort(extPoint.getExtensions());
 		assertEquals(0, application.getDescriptors().size());
 		assembler.runProcessors(extensions, initial, afterFragments);
@@ -494,7 +473,7 @@ public class ModelAssemblerTests {
 
 	private IExtensionRegistry createTestExtensionRegistry() {
 		IExtensionRegistry defaultRegistry = RegistryFactory.getRegistry();
-		IExtensionPoint extensionPoint = defaultRegistry.getExtensionPoint(extensionPointID);
+		IExtensionPoint extensionPoint = defaultRegistry.getExtensionPoint(EXTENSION_POINT_ID);
 		ExtensionRegistry registry = (ExtensionRegistry) RegistryFactory.createRegistry(null, null, null);
 		registry.addExtensionPoint(extensionPoint.getUniqueIdentifier(), extensionPoint.getContributor(), false,
 				extensionPoint.getLabel(), extensionPoint.getSchemaReference(), null);
