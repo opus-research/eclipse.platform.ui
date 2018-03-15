@@ -140,7 +140,6 @@ import org.eclipse.ui.IShowEditorInput;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -3952,7 +3951,24 @@ public class WorkbenchPage implements IWorkbenchPage {
 		visiblePerspective.setLabel(perspective.getLabel());
 		visiblePerspective.setTooltip(perspective.getLabel());
 		visiblePerspective.setElementId(perspective.getId());
-		modelService.cloneElement(visiblePerspective, application);
+		MUIElement clone = modelService.cloneElement(visiblePerspective, application);
+		MWindow window = WorkbenchWindow.class.cast(getActivePart().getSite().getWorkbenchWindow()).getModel();
+		ModelServiceImpl.class.cast(modelService).getNullRefPlaceHolders(clone, window);
+		List<MPlaceholder> elementsToHide = modelService.findElements(clone, null, MPlaceholder.class, null);
+		for (MPlaceholder elementToHide : elementsToHide) {
+			if (elementToHide.getRef().getTags().contains(IPresentationEngine.NO_RESTORE)) {
+				elementToHide.setToBeRendered(false);
+				MElementContainer<MUIElement> phParent = elementToHide.getParent();
+				if (phParent.getSelectedElement() == elementToHide) {
+					phParent.setSelectedElement(null);
+				}
+				int vc = modelService.countRenderableChildren(phParent);
+				if (vc == 0) {
+					if (!modelService.isLastEditorStack(phParent))
+						phParent.setToBeRendered(false);
+				}
+			}
+		}
 		if (perspective instanceof PerspectiveDescriptor) {
 			((PerspectiveDescriptor) perspective).setHasCustomDefinition(true);
 		}
@@ -4513,14 +4529,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	@Override
 	public IViewPart[] getViewStack(IViewPart part) {
-		IViewSite viewSite = part.getViewSite();
-		if (viewSite == null)
-			return null;
-		String compoundId = viewSite.getId();
-		String secondaryId = viewSite.getSecondaryId();
-		if (secondaryId != null && !secondaryId.isEmpty())
-			compoundId += ":" + secondaryId; //$NON-NLS-1$
-		MPart mpart = partService.findPart(compoundId);
+		MPart mpart = partService.findPart(part.getSite().getId());
 		if (mpart != null) {
 			MElementContainer<?> parent = mpart.getParent();
 			if (parent == null) {
