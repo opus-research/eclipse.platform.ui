@@ -100,7 +100,7 @@ public class PersonWizardPage extends WizardPage implements Listener {
 		if (service.getPerson(getId()) != null) {
 			setErrorMessage(NLS.bind(
 					ContributionMessages.PersonWizardPage_error_alreadyExists,
-					Integer.valueOf(getId())));
+					new Integer(getId())));
 			return false;
 		}
 		if (getSurname() == null || getSurname().length() == 0) {
