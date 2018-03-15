@@ -20,7 +20,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -70,8 +69,8 @@ public class TabbedPropertyTitle
 					label.setVisible(false);
 				} else {
 					label.setVisible(true);
+					drawTitleBackground(e);
 				}
-				drawTitleBackground(e);
 			}
 		});
 
@@ -159,13 +158,5 @@ public class TabbedPropertyTitle
 		}
 		label.setImage(image);
 		redraw();
-	}
-
-	public void setBackgroundColorInFacatory(RGBA bg) {
-		// TODO: Should we make this configurable in CSS independently?
-		this.factory.getColors().createColor(IFormColors.H_GRADIENT_START, bg.rgb);
-		this.factory.getColors().createColor(IFormColors.H_GRADIENT_END, bg.rgb);
-		this.factory.getColors().createColor(IFormColors.H_BOTTOM_KEYLINE1, bg.rgb);
-		this.factory.getColors().createColor(IFormColors.H_BOTTOM_KEYLINE2, bg.rgb);
 	}
 }
