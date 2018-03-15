@@ -1077,7 +1077,7 @@ public class StatusDialogManagerTest extends TestCase {
 			try {
 				semaphore.acquire();
 			} catch (InterruptedException e) {
-				// continue
+				//
 			}
 			lock.get().unlock();
 		});

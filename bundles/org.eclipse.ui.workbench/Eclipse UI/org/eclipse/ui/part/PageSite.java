@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,7 +39,6 @@ import org.eclipse.ui.internal.services.IServiceLocatorCreator;
 import org.eclipse.ui.internal.services.IWorkbenchLocationService;
 import org.eclipse.ui.internal.services.ServiceLocator;
 import org.eclipse.ui.internal.services.WorkbenchLocationService;
-import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.services.IServiceScopes;
 
 /**
@@ -98,16 +97,13 @@ public class PageSite implements IPageSite, INestable {
 				.getService(IServiceLocatorCreator.class);
 		e4Context = ((PartSite) parentViewSite).getContext().createChild("PageSite"); //$NON-NLS-1$
 		this.serviceLocator = (ServiceLocator) slc.createServiceLocator(parentViewSite, null,
-				new IDisposable() {
-					@Override
-					public void dispose() {
-						// final Control control =
-						// ((PartSite)parentViewSite).getPane().getControl();
-						// if (control != null && !control.isDisposed()) {
-						// ((PartSite)parentViewSite).getPane().doHide();
-						// }
-						// TODO compat: not tsure what this should do
-					}
+				() -> {
+					// final Control control =
+					// ((PartSite)parentViewSite).getPane().getControl();
+					// if (control != null && !control.isDisposed()) {
+					// ((PartSite)parentViewSite).getPane().doHide();
+					// }
+					// TODO compat: not tsure what this should do
 				}, e4Context);
 		initializeDefaultServices();
 	}
@@ -121,12 +117,7 @@ public class PageSite implements IPageSite, INestable {
 						getWorkbenchWindow().getWorkbench(),
 						getWorkbenchWindow(), parentSite, null, this, 3));
 		serviceLocator.registerService(IPageSiteHolder.class,
-				new IPageSiteHolder() {
-					@Override
-					public IPageSite getSite() {
-						return PageSite.this;
-					}
-				});
+				(IPageSiteHolder) () -> PageSite.this);
 
 		// create a local handler service so that when this page
 		// activates/deactivates, its handlers will also be taken into/out of
@@ -188,7 +179,7 @@ public class PageSite implements IPageSite, INestable {
 	}
 
 	@Override
-	public Object getAdapter(Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
@@ -203,8 +194,8 @@ public class PageSite implements IPageSite, INestable {
 	}
 
 	@Override
-	public final Object getService(final Class key) {
-		Object service = serviceLocator.getService(key);
+	public final <T> T getService(final Class<T> key) {
+		T service = serviceLocator.getService(key);
 		if (active && service instanceof INestable) {
 			((INestable) service).activate();
 		}
@@ -222,7 +213,7 @@ public class PageSite implements IPageSite, INestable {
 	}
 
 	@Override
-	public final boolean hasService(final Class key) {
+	public final boolean hasService(final Class<?> key) {
 		return serviceLocator.hasService(key);
 	}
 

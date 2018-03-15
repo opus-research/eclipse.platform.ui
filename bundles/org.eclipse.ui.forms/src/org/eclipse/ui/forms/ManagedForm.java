@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -169,12 +169,7 @@ public class ManagedForm implements IManagedForm {
 		if (t.equals(dt))
 			doRefresh();
 		else {
-			toolkit.getColors().getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					doRefresh();
-				}
-			});
+			toolkit.getColors().getDisplay().asyncExec(() -> doRefresh());
 		}
 	}
 
@@ -226,6 +221,9 @@ public class ManagedForm implements IManagedForm {
 		if (parts.size() > 0) {
 			IFormPart part = parts.get(0);
 			part.setFocus();
+		}
+		if (!form.setFocus()) {
+			form.getContent().forceFocus();
 		}
 	}
 
