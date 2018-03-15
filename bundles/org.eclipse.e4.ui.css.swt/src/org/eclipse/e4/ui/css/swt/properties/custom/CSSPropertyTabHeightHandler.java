@@ -19,6 +19,8 @@ import org.w3c.dom.css.CSSValue;
 public class CSSPropertyTabHeightHandler extends
 		AbstractCSSPropertySWTHandler {
 
+	public static final ICSSPropertyHandler INSTANCE = new CSSPropertyTabHeightHandler();
+
 	@Override
 	protected void applyCSSProperty(Control control, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
