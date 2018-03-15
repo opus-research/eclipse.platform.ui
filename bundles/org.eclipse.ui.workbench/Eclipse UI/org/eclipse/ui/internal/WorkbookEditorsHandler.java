@@ -19,13 +19,9 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.e4.ui.css.swt.theme.ITheme;
-import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.e4.ui.workbench.swt.internal.copy.SearchPattern;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -35,12 +31,13 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.themes.ITheme;
 
 /**
  * Shows a list of open editor and parts in the current or last active workbook.
@@ -60,14 +57,10 @@ public class WorkbookEditorsHandler extends FilteredTableBaseHandler {
 	 */
 	private static final String ORG_ECLIPSE_UI_WINDOW_OPEN_EDITOR_DROP_DOWN = "org.eclipse.ui.window.openEditorDropDown"; //$NON-NLS-1$
 
-	private static final String DEFAULT_THEME = "org.eclipse.e4.ui.css.theme.e4_default"; //$NON-NLS-1$
-
 	/**
 	 * E4 Tag used to identify the active part
 	 */
 	private static final String TAG_ACTIVE = "active"; //$NON-NLS-1$
-
-	private Font boldFont;
 
 	private SearchPattern searchPattern;
 
@@ -81,17 +74,6 @@ public class WorkbookEditorsHandler extends FilteredTableBaseHandler {
 		boolean initialMRUValue = preferences.getBoolean(StackRenderer.MRU_KEY_DEFAULT, StackRenderer.MRU_DEFAULT);
 		boolean enableMRU = preferences.getBoolean(StackRenderer.MRU_KEY, initialMRUValue);
 		return enableMRU;
-	}
-
-	private static boolean isCustomThemeUsed() {
-		IThemeEngine engine = PlatformUI.getWorkbench().getService(IThemeEngine.class);
-		if (engine != null) {
-			ITheme activeTheme = engine.getActiveTheme();
-			if (activeTheme != null) {
-				return !DEFAULT_THEME.equals(activeTheme.getId());
-			}
-		}
-		return false;
 	}
 
 	@Override
@@ -155,33 +137,17 @@ public class WorkbookEditorsHandler extends FilteredTableBaseHandler {
 					style.start = 0;
 					style.length = cell.getText().length();
 					// if active use the bold font
-					if (isActiveEditor(model)) {
-						style.font = getBoldFont(cell);
-					}
+					style.font = getFont(isActiveEditor(model));
 					// if hidden use a light gray background
 					if (isHiddenEditor(model)) {
-						// but only if we are in the default theme
-						// (TODO: we should support theme colors here)
-						if (!isCustomThemeUsed()) {
-							cell.setBackground(
-									Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
-						}
+						cell.setBackground(getBackgroundColorForHiddenTabs());
 					}
 					cell.setStyleRanges(new StyleRange[] { style });
 				}
 			}
 
-			@Override
-			public String getToolTipText(Object element) {
-				if (element instanceof WorkbenchPartReference) {
-					WorkbenchPartReference ref = (WorkbenchPartReference) element;
-					return ref.getTitleToolTip();
-				}
-				return super.getToolTipText(element);
-			}
 		});
 
-		ColumnViewerToolTipSupport.enableFor(tableViewerColumn.getViewer());
 	}
 
 	/** True if the given model represents the active editor */
@@ -202,16 +168,21 @@ public class WorkbookEditorsHandler extends FilteredTableBaseHandler {
 		return (item != null && !item.isShowing());
 	}
 
-	/**
-	 * @param cell
-	 * @return Returns the boldFont.
-	 */
-	private Font getBoldFont(ViewerCell cell) {
-		if (boldFont == null) {
-			FontData data = cell.getFont().getFontData()[0];
-			boldFont = JFaceResources.getFontRegistry().getBold(data.getName());
+	private Font getFont(boolean bold) {
+		ITheme theme = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme();
+		if (bold) {
+			return theme.getFontRegistry().getBold(IWorkbenchThemeConstants.TAB_TEXT_FONT);
 		}
-		return boldFont;
+		return theme.getFontRegistry().get(IWorkbenchThemeConstants.TAB_TEXT_FONT);
+	}
+
+	private Color getBackgroundColorForHiddenTabs() {
+		ITheme theme = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme();
+		Color color = theme.getColorRegistry().get(IWorkbenchThemeConstants.INACTIVE_TAB_BG_END);
+		if (color != null) {
+			return color;
+		}
+		return Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
 	}
 
 	@Override
