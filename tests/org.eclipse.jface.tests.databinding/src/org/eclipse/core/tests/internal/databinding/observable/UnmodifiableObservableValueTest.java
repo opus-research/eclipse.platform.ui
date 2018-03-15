@@ -13,8 +13,9 @@
 
 package org.eclipse.core.tests.internal.databinding.observable;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.IObservable;
@@ -27,6 +28,13 @@ import org.eclipse.jface.databinding.conformance.ObservableValueContractTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValueContractDelegate;
 import org.eclipse.jface.databinding.conformance.util.StaleEventTracker;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
+
+import junit.framework.TestSuite;
 
 /**
  * @since 3.2
@@ -37,15 +45,23 @@ public class UnmodifiableObservableValueTest extends
 
 	private UnmodifiableObservableValueStub unmodifiable;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite(UnmodifiableObservableValueTest.class.getName());
-		suite.addTestSuite(UnmodifiableObservableValueTest.class);
-		suite.addTest(ObservableValueContractTest.suite(new Delegate()));
-		return suite;
+	@Test
+	public void testSuite() throws Exception {
+		JUnitCore.runClasses(Suite.class);
+	}
+
+	@RunWith(AllTests.class)
+	public static class Suite {
+		public static junit.framework.Test suite() {
+			TestSuite suite = new TestSuite(UnmodifiableObservableValueTest.class.getName());
+			suite.addTest(ObservableValueContractTest.suite(new Delegate()));
+			return suite;
+		}
 	}
 
 	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		super.setUp();
 
 		WrappedObservableValue wrapped = new WrappedObservableValue(Realm
@@ -53,6 +69,7 @@ public class UnmodifiableObservableValueTest extends
 		unmodifiable = new UnmodifiableObservableValueStub(wrapped);
 	}
 
+	@Test
 	public void testFiresStaleEvents() {
 		StaleEventTracker wrappedListener = new StaleEventTracker();
 		StaleEventTracker unmodifiableListener = new StaleEventTracker();
@@ -72,6 +89,7 @@ public class UnmodifiableObservableValueTest extends
 		assertTrue(unmodifiable.isStale());
 	}
 
+	@Test
 	public void testIsStale() {
 		assertFalse(unmodifiable.wrappedValue.isStale());
 		assertFalse(unmodifiable.isStale());

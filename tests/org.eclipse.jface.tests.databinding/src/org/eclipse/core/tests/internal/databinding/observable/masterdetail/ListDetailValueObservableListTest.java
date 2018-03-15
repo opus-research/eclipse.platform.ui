@@ -11,12 +11,16 @@
 
 package org.eclipse.core.tests.internal.databinding.observable.masterdetail;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.IObservable;
@@ -34,6 +38,12 @@ import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableColl
 import org.eclipse.jface.databinding.conformance.util.ListChangeEventTracker;
 import org.eclipse.jface.examples.databinding.model.SimplePerson;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
+
+import junit.framework.TestSuite;
 
 /**
  * @since 1.3
@@ -41,14 +51,21 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 public class ListDetailValueObservableListTest extends
 		AbstractDefaultRealmTestCase {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite(
-				ListDetailValueObservableListTest.class.getName());
-		suite.addTestSuite(ListDetailValueObservableListTest.class);
-		suite.addTest(ObservableListContractTest.suite(new Delegate()));
-		return suite;
+	@Test
+	public void testSuite() throws Exception {
+		JUnitCore.runClasses(Suite.class);
 	}
 
+	@RunWith(AllTests.class)
+	public static class Suite {
+		public static junit.framework.Test suite() {
+			TestSuite suite = new TestSuite(ListDetailValueObservableListTest.class.getName());
+			suite.addTest(ObservableListContractTest.suite(new Delegate()));
+			return suite;
+		}
+	}
+
+	@Test
 	public void testUnmodifiability() {
 		WritableList masterObservableList = new WritableList();
 		masterObservableList.add(new SimplePerson());
@@ -93,6 +110,7 @@ public class ListDetailValueObservableListTest extends
 		}
 	}
 
+	@Test
 	public void testGetElementType() {
 		ListDetailValueObservableList ldol = new ListDetailValueObservableList(
 				new WritableList(), BeansObservables.valueFactory("name"),
@@ -101,6 +119,7 @@ public class ListDetailValueObservableListTest extends
 		assertSame(String.class, ldol.getElementType());
 	}
 
+	@Test
 	public void testGetObserved() {
 		WritableList masterList = new WritableList();
 		ListDetailValueObservableList ldol = new ListDetailValueObservableList(
@@ -110,6 +129,7 @@ public class ListDetailValueObservableListTest extends
 		assertSame(masterList, ldol.getObserved());
 	}
 
+	@Test
 	public void testMasterListInitiallyNotEmpty() {
 		WritableList masterList = new WritableList();
 		SimplePerson person = new SimplePerson();
@@ -123,6 +143,7 @@ public class ListDetailValueObservableListTest extends
 		assertEquals(person.getName(), ldol.get(0));
 	}
 
+	@Test
 	public void testAddRemove() {
 		WritableList masterList = new WritableList();
 		ListDetailValueObservableList ldol = new ListDetailValueObservableList(
@@ -156,6 +177,7 @@ public class ListDetailValueObservableListTest extends
 		assertTrue(ldol.isEmpty());
 	}
 
+	@Test
 	public void testChangeDetail() {
 		WritableList masterList = new WritableList();
 		ListDetailValueObservableList ldol = new ListDetailValueObservableList(
@@ -176,6 +198,7 @@ public class ListDetailValueObservableListTest extends
 		assertEquals(p2.getName(), ldol.get(0));
 	}
 
+	@Test
 	public void testSet() {
 		WritableList masterList = new WritableList();
 		ListDetailValueObservableList ldol = new ListDetailValueObservableList(
@@ -194,6 +217,7 @@ public class ListDetailValueObservableListTest extends
 		assertEquals(person.getName(), ldol.get(0));
 	}
 
+	@Test
 	public void testDuplicateMasterElements() {
 		WritableList masterList = new WritableList();
 		ListDetailValueObservableList ldol = new ListDetailValueObservableList(
@@ -228,6 +252,7 @@ public class ListDetailValueObservableListTest extends
 		assertEquals("name3", master.getName());
 	}
 
+	@Test
 	public void testDetailObservableChangeEvent() {
 		WritableList masterList = new WritableList();
 		ListDetailValueObservableList ldol = new ListDetailValueObservableList(
@@ -291,6 +316,7 @@ public class ListDetailValueObservableListTest extends
 		}
 	}
 
+	@Test
 	public void testMasterNull() {
 		WritableList masterObservableList = new WritableList();
 		ListDetailValueObservableList ldol = new ListDetailValueObservableList(
@@ -303,6 +329,7 @@ public class ListDetailValueObservableListTest extends
 		assertNull(ldol.get(0));
 	}
 
+	@Test
 	public void testDetailObservableValuesAreDisposed() {
 		final List detailObservables = new ArrayList();
 		IObservableFactory detailValueFactory = new IObservableFactory() {
@@ -340,6 +367,7 @@ public class ListDetailValueObservableListTest extends
 		assertTrue(((WritableValue) detailObservables.get(1)).isDisposed());
 	}
 
+	@Test
 	public void testDisposeOnMasterDisposed() {
 		WritableList masterList = new WritableList();
 		ListDetailValueObservableList ldol = new ListDetailValueObservableList(

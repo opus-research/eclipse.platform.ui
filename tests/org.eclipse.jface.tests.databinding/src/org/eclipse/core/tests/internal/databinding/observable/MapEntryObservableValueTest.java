@@ -12,8 +12,9 @@
 
 package org.eclipse.core.tests.internal.databinding.observable;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Observables;
@@ -29,6 +30,13 @@ import org.eclipse.jface.databinding.conformance.MutableObservableValueContractT
 import org.eclipse.jface.databinding.conformance.ObservableStaleContractTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValueContractDelegate;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
+
+import junit.framework.TestSuite;
 
 /**
  * @since 1.2
@@ -44,7 +52,8 @@ public class MapEntryObservableValueTest extends AbstractDefaultRealmTestCase
 	private MapEntryObservableValue observedValue;
 
 	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		super.setUp();
 		this.map = new WritableMap();
 		this.observedValue = (MapEntryObservableValue) Observables
@@ -57,6 +66,7 @@ public class MapEntryObservableValueTest extends AbstractDefaultRealmTestCase
 		this.diff = p_event.diff;
 	}
 
+	@Test
 	public void testNullValue() {
 		// test entry added with value null
 		this.map.put(this.key, null);
@@ -72,6 +82,7 @@ public class MapEntryObservableValueTest extends AbstractDefaultRealmTestCase
 		assertNull(this.observedValue.getValue());
 	}
 
+	@Test
 	public void testNonNullValue() {
 		// test add non-null value
 		this.map.put(this.key, VALUE1);
@@ -89,6 +100,7 @@ public class MapEntryObservableValueTest extends AbstractDefaultRealmTestCase
 		assertSame(VALUE2, this.observedValue.getValue());
 	}
 
+	@Test
 	public void testTransitionBetweenNullAndNonNull() {
 		this.map.put(this.key, null);
 
@@ -107,6 +119,7 @@ public class MapEntryObservableValueTest extends AbstractDefaultRealmTestCase
 		assertNull(this.diff.getNewValue());
 	}
 
+	@Test
 	public void testRemoveKey() {
 		this.map.put(this.key, VALUE1);
 
@@ -117,6 +130,7 @@ public class MapEntryObservableValueTest extends AbstractDefaultRealmTestCase
 		assertNull(this.diff.getNewValue());
 	}
 
+	@Test
 	public void testGetAndSetValue() {
 		// test set null value
 		this.observedValue.setValue(null);
@@ -139,12 +153,19 @@ public class MapEntryObservableValueTest extends AbstractDefaultRealmTestCase
 		assertSame(VALUE2, this.diff.getNewValue());
 	}
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite(MapEntryObservableValueTest.class.getName());
-		suite.addTestSuite(MapEntryObservableValueTest.class);
-		suite.addTest(MutableObservableValueContractTest.suite(new Delegate()));
-		suite.addTest(ObservableStaleContractTest.suite(new Delegate()));
-		return suite;
+	@Test
+	public void testSuite() throws Exception {
+		JUnitCore.runClasses(Suite.class);
+	}
+
+	@RunWith(AllTests.class)
+	public static class Suite {
+		public static junit.framework.Test suite() {
+			TestSuite suite = new TestSuite(MapEntryObservableValueTest.class.getName());
+			suite.addTest(MutableObservableValueContractTest.suite(new Delegate()));
+			suite.addTest(ObservableStaleContractTest.suite(new Delegate()));
+			return suite;
+		}
 	}
 
 	private static class Delegate extends
