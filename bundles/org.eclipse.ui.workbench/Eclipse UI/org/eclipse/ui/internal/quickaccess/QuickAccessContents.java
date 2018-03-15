@@ -20,7 +20,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.Adapters;
+import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -31,6 +35,8 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -62,8 +68,10 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.themes.ColorUtil;
@@ -137,7 +145,8 @@ public abstract class QuickAccessContents {
 			// (extensible)
 			List<QuickAccessEntry> extraEntries = new ArrayList<>();
 			if (filter.length() > MIN_SEARCH_LENGTH) {
-				extraEntries.add(makeHelpSearchEntry(filter));
+				extraEntries.add(makeSearchHelpEntry(filter));
+				extraEntries.add(makeSearchWorkspaceEntry(filter));
 			}
 
 			// perfect match, to be selected in the table if not null
@@ -162,9 +171,21 @@ public abstract class QuickAccessContents {
 		}
 	}
 
+	QuickAccessProvider searchProvider = null;
 	QuickAccessEntry searchHelpEntry = null;
-	QuickAccessProvider searchHelpProvider = null;
-	QuickAccessSearchElement searchHelpElement = null;
+	QuickAccessEntry searchWorkspaceEntry = null;
+	QuickAccessSearchHelpElement searchHelpElement = null;
+	QuickAccessSearchWorkspeceElement searchWorkspaceElement = null;
+
+	/**
+	 * @return Returns the searchProvider.
+	 */
+	public QuickAccessProvider getSearchProvider() {
+		if (searchProvider == null) {
+			searchProvider = Stream.of(providers).filter(p -> p instanceof ActionProvider).findFirst().get();
+		}
+		return searchProvider;
+	}
 
 	/**
 	 * Instantiate a new {@link QuickAccessEntry} to search the given text in
@@ -175,18 +196,42 @@ public abstract class QuickAccessContents {
 	 *
 	 * @return the {@link QuickAccessEntry} to perform the action
 	 */
-	private QuickAccessEntry makeHelpSearchEntry(String text) {
+	private QuickAccessEntry makeSearchHelpEntry(String text) {
 		if (searchHelpEntry == null) {
-			searchHelpProvider = Stream.of(providers).filter(p -> p instanceof ActionProvider).findFirst().get();
-			searchHelpElement = new QuickAccessSearchElement(searchHelpProvider);
-			searchHelpEntry = new QuickAccessEntry(searchHelpElement, searchHelpProvider, new int[][] {},
+			searchHelpElement = new QuickAccessSearchHelpElement(getSearchProvider());
+			searchHelpEntry = new QuickAccessEntry(searchHelpElement, getSearchProvider(), new int[][] {},
 					new int[][] {}, QuickAccessEntry.MATCH_PERFECT);
 		}
 		searchHelpElement.searchText = text;
 		return searchHelpEntry;
 	}
 
-	static class QuickAccessSearchElement extends QuickAccessElement {
+	/**
+	 * Instantiate a new {@link QuickAccessEntry} to search the given text in
+	 * the eclipse workspace
+	 *
+	 * @param text
+	 *            String to search in the Eclipse Help
+	 *
+	 * @return the {@link QuickAccessEntry} to perform the action
+	 */
+	private QuickAccessEntry makeSearchWorkspaceEntry(String text) {
+		if (searchWorkspaceEntry == null) {
+			searchWorkspaceElement = new QuickAccessSearchWorkspeceElement(getSearchProvider());
+			searchWorkspaceEntry = new QuickAccessEntry(searchWorkspaceElement, getSearchProvider(), new int[][] {},
+					new int[][] {}, QuickAccessEntry.MATCH_PERFECT);
+		}
+		searchWorkspaceElement.searchText = text;
+		return searchWorkspaceEntry;
+	}
+
+	/**
+	 * Quick Access Element responsible to trigger a search in Help
+	 *
+	 * @since 3.5
+	 *
+	 */
+	static class QuickAccessSearchHelpElement extends QuickAccessElement {
 
 		/** identifier */
 		private static final String SEARCH_IN_HELP_ID = "search.in.help"; //$NON-NLS-1$
@@ -196,7 +241,7 @@ public abstract class QuickAccessContents {
 		/**
 		 * @param provider
 		 */
-		public QuickAccessSearchElement(QuickAccessProvider provider) {
+		public QuickAccessSearchHelpElement(QuickAccessProvider provider) {
 			super(provider);
 		}
 
@@ -213,6 +258,68 @@ public abstract class QuickAccessContents {
 		@Override
 		public void execute() {
 			PlatformUI.getWorkbench().getHelpSystem().search(searchText);
+		}
+
+		@Override
+		public ImageDescriptor getImageDescriptor() {
+			return null;
+		}
+
+	}
+
+	/**
+	 * Quick Access Element responsible to search in workspace
+	 *
+	 * @since 3.5
+	 *
+	 */
+	static class QuickAccessSearchWorkspeceElement extends QuickAccessElement {
+
+		/** identifier */
+		private static final String SEARCH_IN_WORKSPACE_ID = "search.in.workspace"; //$NON-NLS-1$
+
+		private static final String SEARCH_TEXT_IN_WORKSPACE_ACTION_ID = "org.eclipse.search.ui.performTextSearchWorkingSet"; //$NON-NLS-1$
+
+		String searchText;
+
+		/**
+		 * @param provider
+		 */
+		public QuickAccessSearchWorkspeceElement(QuickAccessProvider provider) {
+			super(provider);
+		}
+
+		@Override
+		public String getLabel() {
+			return NLS.bind(QuickAccessMessages.QuickAccessContents_SearchInWorkspaceLabel, searchText);
+		}
+
+		@Override
+		public String getId() {
+			return SEARCH_IN_WORKSPACE_ID;
+		}
+
+		@Override
+		public void execute() {
+			try {
+				// Retrieve the Services
+				ECommandService cs = PlatformUI.getWorkbench().getService(ECommandService.class);
+				IHandlerService hs = PlatformUI.getWorkbench().getService(IHandlerService.class);
+
+				// Retrieve the command
+				Command cmd = cs.getCommand(SEARCH_TEXT_IN_WORKSPACE_ACTION_ID);
+
+				// specify the selection
+				IEvaluationContext c = hs.createContextSnapshot(false);
+				IStructuredSelection iss = new StructuredSelection(new String[]{searchText, null});
+				c.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, iss);
+
+				// execute
+				hs.executeCommandInContext(new ParameterizedCommand(cmd, null), null, c);
+
+			} catch (Exception e) {
+				throw new RuntimeException(String.format("% not found", SEARCH_TEXT_IN_WORKSPACE_ACTION_ID)); //$NON-NLS-1$
+			}
 		}
 
 		@Override
