@@ -18,6 +18,8 @@
 package org.eclipse.ui.dialogs;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -231,24 +233,27 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 			return projectName;
 		}
 
-		int counter = 1;
+		String newName = computeNewName(projectName);
 		while (true) {
-			String nameSegment;
-			if (counter > 1) {
-				nameSegment = NLS.bind(IDEWorkbenchMessages.CopyProjectAction_copyNameTwoArgs, counter, projectName);
-			} else {
-				nameSegment = NLS.bind(
-						IDEWorkbenchMessages.CopyProjectAction_copyNameOneArg,
-						projectName);
+			if (!workspace.getRoot().getProject(newName).exists()) {
+				return newName;
 			}
-
-			if (!workspace.getRoot().getProject(nameSegment).exists()) {
-				return nameSegment;
-			}
-
-			counter++;
+			newName = computeNewName(newName);
 		}
+	}
 
+	private static String computeNewName(String str) {
+		String fileExtension = ""; //$NON-NLS-1$
+		String fileNameNoExtension = str;
+		Pattern p = Pattern.compile("[0-9]+$"); //$NON-NLS-1$
+		Matcher m = p.matcher(fileNameNoExtension);
+		if (m.find()) {
+			// String ends with a number: increment it by 1
+			int newNumber = Integer.parseInt(m.group()) + 1;
+			String numberStr = m.replaceFirst(Integer.toString(newNumber));
+			return numberStr + fileExtension;
+		}
+		return fileNameNoExtension + "2" + fileExtension; //$NON-NLS-1$
 	}
 
 	/**
