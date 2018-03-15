@@ -33,6 +33,8 @@ import org.eclipse.ui.internal.registry.PerspectiveRegistry;
  */
 public class ResetPerspectiveHandler extends AbstractHandler {
 
+	private static int RETURNCODE_RESET_PERSPECTIVE = 0;
+
 	@Override
 	public Object execute(ExecutionEvent event) {
 
@@ -68,10 +70,13 @@ public class ResetPerspectiveHandler extends AbstractHandler {
 					} else {
 						String message = NLS.bind(WorkbenchMessages.ResetPerspective_message,
 								descriptor.getLabel());
-						boolean result = MessageDialog.open(MessageDialog.QUESTION,
-								activeWorkbenchWindow.getShell(),
-								WorkbenchMessages.ResetPerspective_title, message, SWT.SHEET);
-						if (result) {
+						final String[] options = { WorkbenchMessages.ResetPerspective_buttonLabel,
+								IDialogConstants.NO_LABEL };
+
+						int result = MessageDialog.open(MessageDialog.CONFIRM, activeWorkbenchWindow.getShell(),
+								WorkbenchMessages.ResetPerspective_title, message, SWT.SHEET, options);
+
+						if (result == RETURNCODE_RESET_PERSPECTIVE) {
 							page.resetPerspective();
 						}
 					}
