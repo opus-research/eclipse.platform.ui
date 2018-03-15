@@ -72,7 +72,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -278,7 +277,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		setDescription(DataTransferMessages.SmartImportWizardPage_importProjectsInFolderDescription);
 		initializeDialogUnits(parent);
 		Composite res = new Composite(parent, SWT.NONE);
-		res.setLayout(new GridLayout(4, false));
+		GridLayoutFactory.swtDefaults().margins(10, 10).numColumns(4).equalWidth(false).applyTo(res);
 
 		createInputSelectionOptions(res);
 
@@ -304,12 +303,18 @@ public class SmartImportRootWizardPage extends WizardPage {
 		Link showOtherImportWizards = new Link(res, SWT.NONE);
 		showOtherImportWizards
 				.setText("<A>" + DataTransferMessages.SmartImportWizardPage_showOtherSpecializedImportWizard + "</A>"); //$NON-NLS-1$ //$NON-NLS-2$
-		showOtherImportWizards.setLayoutData(new GridData(SWT.END, SWT.END, true, true, 4, 1));
+		showOtherImportWizards.setLayoutData(new GridData(SWT.END, SWT.END, true, false, 4, 1));
 		showOtherImportWizards.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ImportExportWizard importWizard = new ImportExportWizard(ImportExportWizard.IMPORT);
-				importWizard.init(PlatformUI.getWorkbench(), new StructuredSelection(selection));
+				IStructuredSelection sel = null;
+				if (selection != null) {
+					sel = new StructuredSelection(selection);
+				} else {
+					sel = new StructuredSelection();
+				}
+				importWizard.init(PlatformUI.getWorkbench(), sel);
 				IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault().getDialogSettings();
 				IDialogSettings wizardSettings = workbenchSettings.getSection("ImportExportAction"); //$NON-NLS-1$
 				if (wizardSettings == null) {
@@ -324,10 +329,10 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 	private void createWorkingSetsGroup(Composite parent) {
 		Composite workingSetComposite = new Composite(parent, SWT.NONE);
-		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1);
-		layoutData.verticalIndent = 20;
+		GridData layoutData = new GridData(SWT.FILL, SWT.TOP, true, false, 4, 1);
+		layoutData.verticalIndent = 10;
 		workingSetComposite.setLayoutData(layoutData);
-		workingSetComposite.setLayout(new GridLayout(1, false));
+		GridLayoutFactory.fillDefaults().applyTo(workingSetComposite);
 		WorkingSetRegistry registry = WorkbenchPlugin.getDefault().getWorkingSetRegistry();
 		String[] workingSetIds = Arrays.stream(registry.getNewPageWorkingSetDescriptors())
 				.map(WorkingSetDescriptor::getId).toArray(String[]::new);
@@ -404,7 +409,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		directoryButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				DirectoryDialog dialog = new DirectoryDialog(getShell());
+				DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.SHEET);
 				dialog.setText(DataTransferMessages.SmartImportWizardPage_browseForFolder);
 				dialog.setMessage(DataTransferMessages.SmartImportWizardPage_selectFolderOrArchiveToImport);
 				if (rootDirectoryText.getText() != null) {
@@ -430,7 +435,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		browseArchiveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				FileDialog dialog = new FileDialog(getShell());
+				FileDialog dialog = new FileDialog(getShell(), SWT.SHEET);
 				dialog.setText(DataTransferMessages.SmartImportWizardPage_selectArchiveTitle);
 				dialog.setFilterExtensions(new String[] { "*.zip;*.tar;*.tar.gz" }); //$NON-NLS-1$
 				dialog.setFilterNames(new String[] { DataTransferMessages.SmartImportWizardPage_allSupportedArchives });
@@ -460,7 +465,8 @@ public class SmartImportRootWizardPage extends WizardPage {
 	private void createConfigurationOptions(Composite parent) {
 		Link showDetectorsLink = new Link(parent, SWT.NONE);
 		showDetectorsLink.setText(DataTransferMessages.SmartImportWizardPage_showAvailableDetectors);
-		showDetectorsLink.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+		GridData layoutData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1);
+		showDetectorsLink.setLayoutData(layoutData);
 		showDetectorsLink.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -482,7 +488,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		});
 		final Button detectNestedProjectsCheckbox = new Button(parent, SWT.CHECK);
 		detectNestedProjectsCheckbox.setText(DataTransferMessages.SmartImportWizardPage_detectNestedProjects);
-		detectNestedProjectsCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+		detectNestedProjectsCheckbox.setLayoutData(layoutData);
 		detectNestedProjectsCheckbox.setSelection(this.detectNestedProjects);
 		detectNestedProjectsCheckbox.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -493,7 +499,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		});
 		final Button configureProjectsCheckbox = new Button(parent, SWT.CHECK);
 		configureProjectsCheckbox.setText(DataTransferMessages.SmartImportWizardPage_configureProjects);
-		configureProjectsCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+		configureProjectsCheckbox.setLayoutData(layoutData);
 		configureProjectsCheckbox.setSelection(this.configureProjects);
 		configureProjectsCheckbox.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -592,7 +598,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 		this.proposalSelectionDecorator = new ControlDecoration(tree.getTree(), SWT.TOP | SWT.LEFT);
 		Image errorImage = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
 				.getImage();
-		treeGridData.horizontalIndent += errorImage.getBounds().width;
 		this.proposalSelectionDecorator.setImage(errorImage);
 		this.proposalSelectionDecorator
 				.setDescriptionText(DataTransferMessages.SmartImportWizardPage_selectAtLeastOneFolderToOpenAsProject);
@@ -743,7 +748,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 	 * @return The user selected working sets to assign to imported projects.
 	 */
 	public Set<IWorkingSet> getSelectedWorkingSets() {
-		this.workingSets.clear();
+		this.workingSets = new HashSet<>();
 		// workingSetsGroup doesn't support listeners...
 		Runnable workingSetsRetriever = new Runnable() {
 			@Override

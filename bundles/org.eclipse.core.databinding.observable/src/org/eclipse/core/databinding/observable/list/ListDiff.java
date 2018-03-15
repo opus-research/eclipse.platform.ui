@@ -294,13 +294,10 @@ public abstract class ListDiff<E> implements IDiff {
 		}
 	}
 
-	/**
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		ListDiffEntry<E>[] differences = getDifferences();
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append(getClass().getName());
 
 		if (differences == null || differences.length == 0) {

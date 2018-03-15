@@ -769,6 +769,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ProjectLocationSelectionDialog_locationIsSelf;
 	public static String ProjectLocationSelectionDialog_selectionTitle;
 	public static String ProjectLocationSelectionDialog_useDefaultLabel;
+	public static String ProjectLocationSelectionDialog_copyButtonLabel;
 
 	public static String ResourceSelectionDialog_title;
 	public static String ResourceSelectionDialog_message;
@@ -970,6 +971,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ChooseWorkspaceWithSettingsDialog_TransferFailedMessage;
 	public static String ChooseWorkspaceWithSettingsDialog_SaveSettingsFailed;
 	public static String ChooseWorkspaceWithSettingsDialog_ClassCreationFailed;
+	public static String ChooseWorkspaceWithSettingsDialog_copySettingsDecoLabel;
 
 	public static String IDEApplication_workspaceMandatoryTitle;
 	public static String IDEApplication_workspaceMandatoryMessage;
@@ -1004,7 +1006,9 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String CleanDialog_cleanSelectedTaskName;
 	public static String CleanDialog_cleanAllTaskName;
 	public static String CleanDialog_alwaysCleanAllButton;
-	public static String CleanDialog_copySettingsDecoLabel;
+	public static String CleanDialog_typeFilterText;
+	public static String CleanDialog_clearToolTip;
+	public static String CleanDialog_AccessibleListenerClearButton;
 	public static String IDEEncoding_EncodingJob;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_viewsRelatedLink;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_FileEditorsRelatedLink;

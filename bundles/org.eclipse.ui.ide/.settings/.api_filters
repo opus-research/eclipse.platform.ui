@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <component id="org.eclipse.ui.ide" version="2">
+    <resource path="META-INF/MANIFEST.MF" type="org.eclipse.ui.views.tasklist.TaskList">
+        <filter comment="Planned removal of TaskList, for details see bug 436506" id="305324134">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.views.tasklist.TaskList"/>
+                <message_argument value="org.eclipse.ui.ide_3.14.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="extensions/org/eclipse/ui/dialogs/WizardResourceImportPage.java" type="org.eclipse.ui.dialogs.WizardResourceImportPage">
         <filter comment="The type IElementFilter was moved to API" id="338792546">
             <message_arguments>
