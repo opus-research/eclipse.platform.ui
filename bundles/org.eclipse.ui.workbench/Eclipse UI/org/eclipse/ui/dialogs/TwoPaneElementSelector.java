@@ -222,11 +222,11 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
         fLowerList.removeAll();
 		int elementCount = 0;
 		List elements= new ArrayList(indices.length * 5);
-        for (int indice : indices) {
-        	Object[] foldedElements= getFoldedElements(indice);
+        for (int i= 0; i < indices.length; i++) {
+        	Object[] foldedElements= getFoldedElements(indices[i]);
 			if (foldedElements != null) {
 				elementCount = elementCount + foldedElements.length;
-				elements.add(getFoldedElements(indice));
+				elements.add(getFoldedElements(indices[i]));
 			}
 		}
 		if (elementCount > 0) {
