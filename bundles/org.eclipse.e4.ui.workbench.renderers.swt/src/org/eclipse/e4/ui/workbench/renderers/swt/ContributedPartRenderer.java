@@ -80,7 +80,7 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 		// does the part already have a composite in its contexts?
 		if (partComposite == null) {
 
-			final Composite newComposite = new Composite((Composite) parentWidget, SWT.NONE) {
+			final Composite newComposite = new Composite((Composite) parentWidget, SWT.NO_BACKGROUND) {
 
 				/**
 				 * Field to determine whether we are currently in the midst of
