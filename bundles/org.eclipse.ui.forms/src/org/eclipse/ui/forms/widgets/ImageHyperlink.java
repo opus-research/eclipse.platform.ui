@@ -261,7 +261,10 @@ public class ImageHyperlink extends Hyperlink {
 	}
 
 	private void createDisabledImage() {
-		if (this.image != null && !this.image.isDisposed())
+		// Only create a new disabledImage when the disabledImage==null or
+		// disposed to avoid a GDI Handler leak See Bug 486531
+		if (this.disabledImage == null || this.disabledImage.isDisposed())
+			if (this.image != null && !this.image.isDisposed())
 			disabledImage = new Image(this.image.getDevice(), this.image, SWT.IMAGE_DISABLE);
 	}
 
@@ -320,9 +323,9 @@ public class ImageHyperlink extends Hyperlink {
 
 	@Override
 	public void setEnabled(boolean enabled) {
-		if (!enabled && (disabledImage == null || disabledImage.isDisposed()) && image != null && !image.isDisposed()) {
-			disabledImage = new Image(image.getDevice(), image, SWT.IMAGE_DISABLE);
-		}
+		if (!enabled)
+			createDisabledImage();
+
 		super.setEnabled(enabled);
 		if (enabled && disabledImage != null) {
 			disabledImage.dispose();
