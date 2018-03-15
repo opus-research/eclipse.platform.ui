@@ -35,7 +35,7 @@ public class NumberToByteConverter extends NumberToNumberConverter {
 	@Override
 	protected Number doConvert(Number number) {
 		if (StringToNumberParser.inByteRange(number)) {
-			return Byte.valueOf(number.byteValue());
+			return new Byte(number.byteValue());
 		}
 
 		return null;

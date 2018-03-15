@@ -30,7 +30,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.services.IServiceConstants;
-import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -54,7 +53,7 @@ public class NewMWindowTest {
 	@Before
 	public void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
-		appContext.set(IWorkbench.PRESENTATION_URI_ARG,
+		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
 		ems = appContext.get(EModelService.class);
 	}
