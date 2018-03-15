@@ -13,8 +13,6 @@ package org.eclipse.e4.ui.workbench.renderers.swt.cocoa;
 
 import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.swt.widgets.Shell;
 
@@ -23,11 +21,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class FullscreenWindowHandler extends AbstractWindowHandler {
 	@Execute
-	public void execute(@Named(IServiceConstants.ACTIVE_SHELL) Shell shell, @Optional Logger logger) {
-		if (logger != null) {
-			logger.warn(
-					"Command 'org.eclipse.ui.cocoa.fullscreenWindow' is deprecated in favor of 'org.eclipse.ui.window.fullscreenmode'"); //$NON-NLS-1$
-		}
+	public void execute(@Named(IServiceConstants.ACTIVE_SHELL) Shell shell) {
 		if (!shell.isDisposed()) {
 			shell.setFullScreen(!shell.getFullScreen());
 		}

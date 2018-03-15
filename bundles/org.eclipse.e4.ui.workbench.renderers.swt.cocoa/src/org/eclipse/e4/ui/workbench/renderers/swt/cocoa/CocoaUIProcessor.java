@@ -108,17 +108,14 @@ public class CocoaUIProcessor {
 						"%command.minimize.name", "%command.minimize.desc", CONTRIBUTOR_URI), //$NON-NLS-1$ //$NON-NLS-2$
 				MinimizeWindowHandler.class, CONTRIBUTOR_URI);
 
-		// Cocoa-specific org.eclipse.ui.cocoa.fullscreenWindow command is
-		// deprecated in 4.6, replaced by org.eclipse.ui.window.fullscreenmode
-		MCommand deprecatedToggleFullscreenCommand = defineCommand(
+		MCommand toggleFullscreenCommand = defineCommand(
 				"org.eclipse.ui.category.window", "org.eclipse.ui.cocoa.fullscreenWindow", //$NON-NLS-1$ //$NON-NLS-2$
 				"%command.fullscreen.name", "%command.fullscreen.desc", CONTRIBUTOR_URI); //$NON-NLS-1$//$NON-NLS-2$
-		deprecatedToggleFullscreenCommand.getTags().add("DEPRECATED"); //$NON-NLS-1$
-		installHandler(deprecatedToggleFullscreenCommand, FullscreenWindowHandler.class,
+		installHandler(toggleFullscreenCommand, FullscreenWindowHandler.class,
 				CONTRIBUTOR_URI);
 		// COMMAND+ALT+F is taken by Force Return
 		installKeybinding(
-				"org.eclipse.ui.contexts.window", "COMMAND+CTRL+F", deprecatedToggleFullscreenCommand); //$NON-NLS-1$ //$NON-NLS-2$
+				"org.eclipse.ui.contexts.window", "COMMAND+CTRL+F", toggleFullscreenCommand); //$NON-NLS-1$ //$NON-NLS-2$
 
 		installHandler(
 				defineCommand(

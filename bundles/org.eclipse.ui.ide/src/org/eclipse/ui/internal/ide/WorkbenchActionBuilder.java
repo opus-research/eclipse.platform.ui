@@ -204,6 +204,8 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 
 	private CommandContributionItem zoomItem;
 
+	private CommandContributionItem fullscreenItem;
+
 	private CommandContributionItem arrangeWindowsItem;
 
     // contribution items
@@ -667,6 +669,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 
 		windowMenu.add(minimizeItem);
 		windowMenu.add(zoomItem);
+		windowMenu.add(fullscreenItem);
 		windowMenu.add(new Separator());
 	}
 
@@ -912,6 +915,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         introAction = null;
         minimizeItem = null;
         zoomItem = null;
+		fullscreenItem = null;
         arrangeWindowsItem = null;
 		super.dispose();
     }
@@ -1192,6 +1196,9 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 			CommandContributionItemParameter zoomParam = new CommandContributionItemParameter(window, null,
 					"org.eclipse.ui.cocoa.zoomWindow", CommandContributionItem.STYLE_PUSH); //$NON-NLS-1$
 			zoomItem = new CommandContributionItem(zoomParam);
+			CommandContributionItemParameter fullscreenParam = new CommandContributionItemParameter(
+					window, null, "org.eclipse.ui.cocoa.fullscreenWindow", CommandContributionItem.STYLE_PUSH); //$NON-NLS-1$
+			fullscreenItem = new CommandContributionItem(fullscreenParam);
 			CommandContributionItemParameter arrangeWindowsParam = new CommandContributionItemParameter(window, null,
 					"org.eclipse.ui.cocoa.arrangeWindowsInFront", CommandContributionItem.STYLE_PUSH); //$NON-NLS-1$
 			arrangeWindowsItem = new CommandContributionItem(arrangeWindowsParam);
