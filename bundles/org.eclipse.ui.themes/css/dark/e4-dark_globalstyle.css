@@ -503,3 +503,14 @@ Link {
 ExpandableComposite {
     titlebar-color: #cccccc;
 }
+
+TabbedPropertyTitle {
+	h-gradient-start-color: #505F70;
+	h-gradient-end-color: #505F70;
+	h-bottom-keyline-1-color: #505F70;
+	h-bottom-keyline-2-color: #505F70;
+}
+
+TabbedPropertyTitle > CLabel{
+	color: #9AC9D8;
+}
