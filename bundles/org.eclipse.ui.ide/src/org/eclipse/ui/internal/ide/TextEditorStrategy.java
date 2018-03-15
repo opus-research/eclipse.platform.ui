@@ -12,13 +12,13 @@ package org.eclipse.ui.internal.ide;
 
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorRegistry;
-import org.eclipse.ui.ide.IUnassociatedEditorStrategy;
+import org.eclipse.ui.ide.IUnknownEditorStrategy;
 
 /**
  * @since 3.12
  *
  */
-public final class TextEditorStrategy implements IUnassociatedEditorStrategy {
+public final class TextEditorStrategy implements IUnknownEditorStrategy {
 
 	@Override
 	public IEditorDescriptor getEditorDescriptor(String name, IEditorRegistry editorReg) {
