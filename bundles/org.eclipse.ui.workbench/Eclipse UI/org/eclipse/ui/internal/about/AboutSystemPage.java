@@ -19,14 +19,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobFunction;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -35,7 +32,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.ConfigurationInfo;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
-import org.eclipse.ui.internal.misc.StringMatcher;
 
 /**
  * Displays system information about the eclipse application. The content of
@@ -52,7 +48,6 @@ public final class AboutSystemPage extends ProductInfoPage {
 	private final static int COPY_TO_CLIPBOARD_BUTTON = IDialogConstants.CLIENT_ID + 1;
 
 	private Text text;
-	private String info = ""; //$NON-NLS-1$
 
 	@Override
 	public void createControl(Composite parent) {
@@ -60,12 +55,6 @@ public final class AboutSystemPage extends ProductInfoPage {
 				IWorkbenchHelpContextIds.SYSTEM_SUMMARY_DIALOG);
 
 		Composite outer = createOuterComposite(parent);
-
-		final Text filterText = new Text(outer, SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
-		filterText.setLayoutData(GridDataFactory.fillDefaults().create());
-		filterText.setFont(JFaceResources.getDialogFont());
-		filterText.setMessage(WorkbenchMessages.AboutPluginsDialog_filterTextMessage);
-		filterText.setFocus();
 
 		text = new Text(outer, SWT.MULTI | SWT.BORDER | SWT.READ_ONLY
 				| SWT.V_SCROLL | SWT.NO_FOCUS | SWT.H_SCROLL);
@@ -80,34 +69,6 @@ public final class AboutSystemPage extends ProductInfoPage {
 		text.setLayoutData(gridData);
 		text.setFont(JFaceResources.getTextFont());
 		fetchConfigurationInfo(text);
-		filterText.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				String filter = filterText.getText();
-				if (filter.isEmpty()) {
-					text.setText(info);
-				} else {
-					StringMatcher matcher = new StringMatcher('*' + filter + '*', true, false);
-
-					StringBuilder filteredInfo = new StringBuilder();
-					boolean previousLineEmpty = false;
-					String delim = System.getProperty("line.separator"); //$NON-NLS-1$
-					String[] infoLines = info.split(delim);
-					for (String line : infoLines) {
-						boolean lineEmpty = line.isEmpty();
-						if (lineEmpty && previousLineEmpty) {
-							continue;
-						}
-						if (lineEmpty || line.startsWith("***") || matcher.match(line)) { //$NON-NLS-1$
-							previousLineEmpty = lineEmpty;
-							filteredInfo.append(line).append(delim);
-						}
-					}
-					text.setText(filteredInfo.toString());
-				}
-			}
-		});
-
 		setControl(outer);
 	}
 
@@ -186,7 +147,7 @@ public final class AboutSystemPage extends ProductInfoPage {
 		Job job = Job.create(WorkbenchMessages.AboutSystemPage_FetchJobTitle, new IJobFunction() {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
-				info = ConfigurationInfo.getSystemSummary();
+				final String info = ConfigurationInfo.getSystemSummary();
 				if (!text.isDisposed()) {
 					text.getDisplay().asyncExec(new Runnable() {
 						@Override
