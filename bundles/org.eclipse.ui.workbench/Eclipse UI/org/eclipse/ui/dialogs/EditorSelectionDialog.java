@@ -382,10 +382,7 @@ public class EditorSelectionDialog extends Dialog {
 			editorTableViewer.setSelection(new StructuredSelection(newSelection), true);
 		} else {
 			// set focus to first element, but don't select it:
-			Tree tree = editorTableViewer.getTree();
-			if (tree.getItemCount() > 0) {
-				tree.showItem(tree.getItem(0));
-			}
+			editorTableViewer.getTree().showItem(editorTableViewer.getTree().getItem(0));
 		}
 		editorTable.setFocus();
 	}
