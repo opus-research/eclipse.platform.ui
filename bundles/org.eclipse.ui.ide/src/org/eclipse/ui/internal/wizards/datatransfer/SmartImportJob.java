@@ -630,23 +630,18 @@ public class SmartImportJob extends Job {
 			if (this.configurationManager == null) {
 				this.configurationManager = new ProjectConfiguratorExtensionManager();
 			}
-			List<ProjectConfigurator> activeConfigurators = configurationManager
-					.getAllActiveProjectConfigurators(this.rootDirectory);
-			for (ProjectConfigurator configurator : activeConfigurators) {
-				Set<File> supportedDirectories = configurator.findConfigurableLocations(
-						SmartImportJob.this.rootDirectory,
+			for (ProjectConfigurator configurator : configurationManager
+					.getAllActiveProjectConfigurators(this.rootDirectory)) {
+				Set<File> supportedFiles = configurator.findConfigurableLocations(SmartImportJob.this.rootDirectory,
 						monitor);
-				if (supportedDirectories != null) {
-					for (File supportedFile : supportedDirectories) {
+				if (supportedFiles != null) {
+					for (File supportedFile : supportedFiles) {
 						if (!res.containsKey(supportedFile)) {
 							res.put(supportedFile, new ArrayList<ProjectConfigurator>());
 						}
 						res.get(supportedFile).add(configurator);
 					}
 				}
-			}
-			for (ProjectConfigurator configurator : activeConfigurators) {
-				configurator.removeDirtyDirectories(res);
 			}
 			this.importProposals = res;
 		}
