@@ -20,7 +20,12 @@ import org.eclipse.core.runtime.Preferences;
 public final class PreferencesAdapter extends PropertyMapAdapter {
     private Preferences store;
 
-    private Preferences.IPropertyChangeListener listener = event -> firePropertyChange(event.getProperty());
+    private Preferences.IPropertyChangeListener listener = new Preferences.IPropertyChangeListener() {
+        @Override
+		public void propertyChange(Preferences.PropertyChangeEvent event) {
+            firePropertyChange(event.getProperty());
+        }
+    };
 
     public PreferencesAdapter(Preferences toConvert) {
         this.store = toConvert;
@@ -40,8 +45,12 @@ public final class PreferencesAdapter extends PropertyMapAdapter {
 	public Set keySet() {
         Set result = new HashSet();
 
-		for (String name : store.propertyNames()) {
-			result.add(name);
+        String[] names = store.propertyNames();
+
+        for (int i = 0; i < names.length; i++) {
+            String string = names[i];
+
+            result.add(string);
         }
 
         return result;

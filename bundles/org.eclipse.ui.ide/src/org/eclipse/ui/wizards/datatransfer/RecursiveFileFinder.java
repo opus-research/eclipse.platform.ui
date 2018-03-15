@@ -48,12 +48,8 @@ public class RecursiveFileFinder implements IResourceVisitor {
 	@Override
 	public boolean visit(IResource res) {
 		if (ignoredDirectories != null) {
-			IPath location = res.getLocation();
-			if (location == null) {
-				return false;
-			}
 			for (IPath ignoedDirectory : this.ignoredDirectories) {
-				if (ignoedDirectory.isPrefixOf(location)) {
+				if (ignoedDirectory.isPrefixOf(res.getLocation())) {
 					return false;
 				}
 			}

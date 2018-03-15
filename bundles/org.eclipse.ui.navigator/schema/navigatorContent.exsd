@@ -541,9 +541,7 @@ Clients may use either &lt;b&gt;filterExpression&lt;/b&gt; or the &quot;class&qu
    <element name="commonSorter">
       <annotation>
          <documentation>
-            A &lt;b&gt;commonSorter&lt;/b&gt; declares an subclass of &lt;code&gt;org.eclipse.jface.viewers.ViewerComparator&lt;/code&gt; which is used to sort children in the tree. The nested &lt;b&gt;parentExpression&lt;/b&gt; describes when the &lt;b&gt;commonSorter&lt;/b&gt; should be used. If an element matches the &lt;b&gt;parentExpression&lt;/b&gt;, then its children will be sorted by this &lt;b&gt;commonSorter&lt;/b&gt;.
-&lt;br&gt;&lt;br&gt;
-Since Eclipse 4.7.0 &lt;code&gt;org.eclipse.jface.viewers.ViewerComparator&lt;/code&gt; is allowed to be used as &lt;b&gt;commonSorter&lt;/b&gt; contributions. Before 4.7.0, only instances of  &lt;code&gt;org.eclipse.jface.viewers.ViewerSorter&lt;/code&gt; were allowed as &lt;b&gt;commonSorter&lt;/b&gt;.
+            A &lt;b&gt;commonSorter&lt;/b&gt; declares an subclass of &lt;code&gt;org.eclipse.jface.viewers.ViewerSorter&lt;/code&gt; which is used to sort children in the tree. The nested &lt;b&gt;parentExpression&lt;/b&gt; describes when the &lt;b&gt;commonSorter&lt;/b&gt; should be used. If an element matches the &lt;b&gt;parentExpression&lt;/b&gt;, then its children will be sorted by this &lt;b&gt;commonSorter&lt;/b&gt;.
          </documentation>
       </annotation>
       <complexType>
@@ -560,10 +558,10 @@ Since Eclipse 4.7.0 &lt;code&gt;org.eclipse.jface.viewers.ViewerComparator&lt;/c
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  A subclass of &lt;code&gt;org.eclipse.jface.viewers.ViewerComparator&lt;/code&gt;.
+                  A subclass of &lt;code&gt;org.eclipse.jface.viewers.ViewerSorter&lt;/code&gt;.
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.jface.viewers.ViewerComparator:"/>
+                  <meta.attribute kind="java" basedOn="org.eclipse.jface.viewers.ViewerSorter:"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -808,7 +806,7 @@ their containing content extension is also bound to the viewer
 The following example demonstrates both approaches. The &quot;TestNestedActionProvider&quot; will be 
 given an opporunity to contribute to the menu and &lt;code&gt;org.eclipse.ui.IActionBars&lt;/code&gt; only
 when the &quot;org.eclipse.ui.tests.navigator.testContent&quot; extension is &lt;i&gt;visible&lt;/i&gt; and &lt;i&gt;active&lt;/i&gt;.
-If the user deactivates the test extension from the &quot;Filters and Customization&quot; dialog, then the
+If the user deactivates the test extension from the &quot;Available customizations&quot; dialog, then the
 nested action provider will no longer be given the opportunity to contribute. 
 &lt;pre&gt;
 &lt;extension  
@@ -881,7 +879,7 @@ strings in real environments.
 
 &lt;p&gt;
 A common sorter is determined for a set of children based on their parent. The sorter class
-must subclass the &lt;code&gt;org.eclipse.jface.viewers.ViewerComparator&lt;/code&gt;. 
+must subclass the &lt;code&gt;org.eclipse.jface.viewers.ViewerSorter&lt;/code&gt;. 
 &lt;p&gt;
 &lt;pre&gt;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -111,13 +111,14 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      *            the id of the property that changed
      */
     protected void firePropertyChange(final int propertyId) {
-		for (Object listener : getListeners()) {
-			final IPropertyListener propertyListener = (IPropertyListener) listener;
+        Object[] array = getListeners();
+        for (int nX = 0; nX < array.length; nX++) {
+            final IPropertyListener l = (IPropertyListener) array[nX];
             SafeRunner.run(new SafeRunnable() {
 
                 @Override
 				public void run() {
-					propertyListener.propertyChanged(this, propertyId);
+                    l.propertyChanged(this, propertyId);
                 }
             });
         }
@@ -132,7 +133,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * adapter manager is consulted).
      */
     @Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
         return Platform.getAdapterManager().getAdapter(this, adapter);
     }
 

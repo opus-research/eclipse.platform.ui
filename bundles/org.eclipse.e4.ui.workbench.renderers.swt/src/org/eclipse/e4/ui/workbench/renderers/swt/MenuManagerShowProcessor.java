@@ -14,7 +14,6 @@
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -34,11 +33,11 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
-import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuListener2;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * <code>MenuManagerShowProcessor</code> provides hooks for renderer processing
@@ -48,9 +47,8 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class MenuManagerShowProcessor implements IMenuListener2 {
 
-	private static void trace(String msg, MenuManager menuManager, MMenu menuModel) {
-		WorkbenchSWTActivator.trace(Policy.DEBUG_MENUS_FLAG,
-				msg + ": " + menuManager + ": " + menuManager.getMenu() + ": " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private static void trace(String msg, Widget menu, MMenu menuModel) {
+		WorkbenchSWTActivator.trace(Policy.MENUS, msg + ": " + menu + ": " //$NON-NLS-1$ //$NON-NLS-2$
 				+ menuModel, null);
 	}
 
@@ -81,6 +79,12 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 
 		if (menuModel != null && menuManager != null) {
 			cleanUp(menuModel, menuManager);
+			if (menuManager.getRemoveAllWhenShown()) {
+				// This needs to be done or else menu items get added multiple
+				// times to MenuModel which results in incorrect behavior and
+				// memory leak - bug 486474
+				menuModel.getChildren().removeAll(menuModel.getChildren());
+			}
 		}
 		if (menuModel instanceof MPopupMenu) {
 			showPopup(menu, (MPopupMenu) menuModel, menuManager);
@@ -88,9 +92,7 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		AbstractPartRenderer obj = rendererFactory.getRenderer(menuModel,
 				menu.getParent());
 		if (!(obj instanceof MenuManagerRenderer)) {
-			if (Policy.DEBUG_MENUS) {
-				trace("Not the correct renderer: " + obj, menuManager, menuModel); //$NON-NLS-1$
-			}
+			trace("Not the correct renderer: " + obj, menu, menuModel); //$NON-NLS-1$
 			return;
 		}
 		MenuManagerRenderer renderer = (MenuManagerRenderer) obj;
@@ -129,24 +131,30 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	 *
 	 */
 	private void processDynamicElements(MMenu menuModel, MenuManager menuManager) {
-		MMenuElement[] menuElements = menuModel.getChildren().toArray(
+		MMenuElement[] ml = menuModel.getChildren().toArray(
 				new MMenuElement[menuModel.getChildren().size()]);
-		for (MMenuElement currentMenuElement : menuElements) {
+		for (int i = 0; i < ml.length; i++) {
 
+			MMenuElement currentMenuElement = ml[i];
 			if (currentMenuElement instanceof MDynamicMenuContribution) {
-				MDynamicMenuContribution dmc = (MDynamicMenuContribution) currentMenuElement;
-				Object contribution = dmc.getObject();
+				Object contribution = ((MDynamicMenuContribution) currentMenuElement)
+						.getObject();
 				if (contribution == null) {
-					IEclipseContext context = modelService.getContainingContext(menuModel);
-					contribution = contributionFactory.create(dmc.getContributionURI(), context);
-					dmc.setObject(contribution);
+					IEclipseContext context = modelService
+							.getContainingContext(menuModel);
+					contribution = contributionFactory.create(
+							((MDynamicMenuContribution) currentMenuElement)
+									.getContributionURI(), context);
+					((MDynamicMenuContribution) currentMenuElement)
+							.setObject(contribution);
 				}
 
-				IEclipseContext dynamicMenuContext = EclipseContextFactory.create();
+				IEclipseContext dynamicMenuContext = EclipseContextFactory
+						.create();
 				ArrayList<MMenuElement> mel = new ArrayList<>();
 				dynamicMenuContext.set(List.class, mel);
-				dynamicMenuContext.set(MDynamicMenuContribution.class, dmc);
-				IEclipseContext parentContext = modelService.getContainingContext(currentMenuElement);
+				IEclipseContext parentContext = modelService
+						.getContainingContext(currentMenuElement);
 				Object rc = ContextInjectionFactory.invoke(contribution,
 						AboutToShow.class, parentContext, dynamicMenuContext,
 						this);
@@ -191,44 +199,13 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 
 	/**
 	 * Remove all of the items created by any dynamic contributions on the
-	 * menuModel. In addition removes all of the items of menuModel in the case
-	 * all items of menuManager need removal when the menu is about to show.
-	 * This needs to be done or else menu items get added multiple times to
-	 * MenuModel which results in incorrect behavior and memory leak - bug
-	 * 486474
+	 * menuModel.
 	 *
 	 * @param menuModel
 	 * @param menuManager
 	 */
 	private void cleanUp(MMenu menuModel, MenuManager menuManager) {
-		if (Policy.DEBUG_MENUS) {
-			trace("\nCleaning up the dynamic menu contributions", menuManager, menuModel); //$NON-NLS-1$
-		}
 		renderer.removeDynamicMenuContributions(menuManager, menuModel);
-
-		if (menuManager.getRemoveAllWhenShown()) {
-			// remove the items from the model related to contributions defined
-			// with location URIs
-			if (Policy.DEBUG_MENUS) {
-				trace("\nCleaning up all of the menu model items", menuManager, menuModel); //$NON-NLS-1$
-			}
-			renderer.cleanUp(menuModel);
-
-			// cleanup any leftovers - opaque items etc
-			for (Iterator<MMenuElement> it = menuModel.getChildren().iterator(); it.hasNext();) {
-				MMenuElement mMenuElement = it.next();
-				// remove item from the menu model
-				it.remove();
-				// cleanup the renderer
-				IContributionItem ici = renderer.getContribution(mMenuElement);
-				if (ici == null && mMenuElement instanceof MMenu) {
-					MMenu menuElement = (MMenu) mMenuElement;
-					ici = renderer.getManager(menuElement);
-					renderer.clearModelToManager(menuElement, (MenuManager) ici);
-				}
-				renderer.clearModelToContribution(mMenuElement, ici);
-			}
-		}
 	}
 
 	private void showPopup(final Menu menu, final MPopupMenu menuModel,

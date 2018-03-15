@@ -95,11 +95,12 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				IStructuredSelection selection = viewer.getStructuredSelection();
+				ISelection selection = viewer.getSelection();
 				if (selection.isEmpty()) {
 					selectedValue = null;
 				} else {
-					selectedValue = selection.getFirstElement();
+					selectedValue = ((IStructuredSelection) selection)
+							.getFirstElement();
 				}
 			}
 		});
@@ -230,11 +231,12 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 */
 	void applyEditorValueAndDeactivate() {
 		// must set the selection before getting value
-		IStructuredSelection selection = viewer.getStructuredSelection();
+		ISelection selection = viewer.getSelection();
 		if (selection.isEmpty()) {
 			selectedValue = null;
 		} else {
-			selectedValue = selection.getFirstElement();
+			selectedValue = ((IStructuredSelection) selection)
+					.getFirstElement();
 		}
 
 		Object newValue = doGetValue();
@@ -243,7 +245,8 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 		setValueValid(isValid);
 
 		if (!isValid) {
-			MessageFormat.format(getErrorMessage(), selectedValue);
+			MessageFormat.format(getErrorMessage(),
+					new Object[] { selectedValue });
 		}
 
 		fireApplyEditorValue();

@@ -149,7 +149,8 @@ public final class SourcePriorityNameMapping implements ISources {
 
 		// Add all of the reference variables.
 		final String[] sourceNames = info.getAccessedVariableNames();
-		for (final String sourceName : sourceNames) {
+		for (int i = 0; i < sourceNames.length; i++) {
+			final String sourceName = sourceNames[i];
 			sourcePriority |= getMapping(sourceName);
 		}
 

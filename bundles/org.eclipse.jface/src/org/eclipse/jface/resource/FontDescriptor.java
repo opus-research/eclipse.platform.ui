@@ -157,7 +157,9 @@ public abstract class FontDescriptor extends DeviceResourceDescriptor {
     public final FontDescriptor setStyle(int style) {
     	FontData[] data = getFontData();
 
-    	for (FontData next : data) {
+    	for (int i = 0; i < data.length; i++) {
+			FontData next = data[i];
+
 			next.setStyle(style);
 		}
 
@@ -184,7 +186,9 @@ public abstract class FontDescriptor extends DeviceResourceDescriptor {
     public final FontDescriptor withStyle(int style) {
     	FontData[] data = getFontData();
 
-    	for (FontData next : data) {
+    	for (int i = 0; i < data.length; i++) {
+			FontData next = data[i];
+
 			next.setStyle(next.getStyle() | style);
 		}
 
@@ -211,7 +215,9 @@ public abstract class FontDescriptor extends DeviceResourceDescriptor {
     public final FontDescriptor setHeight(int height) {
     	FontData[] data = getFontData();
 
-    	for (FontData next : data) {
+    	for (int i = 0; i < data.length; i++) {
+			FontData next = data[i];
+
 			next.setHeight(height);
 		}
 
@@ -243,7 +249,9 @@ public abstract class FontDescriptor extends DeviceResourceDescriptor {
     	}
     	FontData[] data = getFontData();
 
-    	for (FontData next : data) {
+    	for (int i = 0; i < data.length; i++) {
+			FontData next = data[i];
+
 			next.setHeight(next.getHeight() + heightDelta);
 		}
 

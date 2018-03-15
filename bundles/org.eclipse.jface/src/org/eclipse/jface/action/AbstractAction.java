@@ -45,8 +45,8 @@ public abstract class AbstractAction extends EventManager implements IAction {
 	 */
 	protected final void firePropertyChange(final PropertyChangeEvent event) {
 		final Object[] list = getListeners();
-		for (Object element : list) {
-			((IPropertyChangeListener) element).propertyChange(event);
+		for (int i = 0; i < list.length; ++i) {
+			((IPropertyChangeListener) list[i]).propertyChange(event);
 		}
 	}
 

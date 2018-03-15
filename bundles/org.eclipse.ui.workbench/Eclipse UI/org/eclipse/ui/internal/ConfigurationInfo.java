@@ -84,7 +84,9 @@ public final class ConfigurationInfo {
 				.getExtensionRegistry().getConfigurationElementsFor(
 						PlatformUI.PLUGIN_ID,
 						IWorkbenchRegistryConstants.PL_SYSTEM_SUMMARY_SECTIONS));
-		for (IConfigurationElement element : configElements) {
+		for (int i = 0; i < configElements.length; ++i) {
+			IConfigurationElement element = configElements[i];
+
 			Object obj = null;
 			try {
 				obj = WorkbenchPlugin.createExtension(element,

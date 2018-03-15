@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,15 +10,22 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.preferences;
 
-import org.junit.runner.JUnitCore;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({ BooleanFieldEditorTest.class, StringFieldEditorTest.class, IntegerFieldEditorTest.class })
-public class AllTests {
+public class AllTests extends TestSuite {
 
 	public static void main(String[] args) {
-		JUnitCore.main(AllTests.class.getName());
+		junit.textui.TestRunner.run(suite());
+	}
+
+	public static Test suite() {
+		return new AllTests();
+	}
+
+	public AllTests() {
+		addTestSuite(BooleanFieldEditorTest.class);
+		addTestSuite(StringFieldEditorTest.class);
+		addTestSuite(IntegerFieldEditorTest.class);
 	}
 }
