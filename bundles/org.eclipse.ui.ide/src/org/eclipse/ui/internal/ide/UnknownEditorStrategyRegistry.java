@@ -19,15 +19,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.ui.ide.IUnassociatedEditorStrategy;
+import org.eclipse.ui.ide.IUnknownEditorStrategy;
 
 /**
  * @since 3.12
  *
  */
-public class UnassociatedEditorStrategyRegistry {
+public class UnknownEditorStrategyRegistry {
 
-	private static final String EXTENSION_POINT_ID = IDEWorkbenchPlugin.IDE_WORKBENCH + ".unassociatedEditorStrategy"; //$NON-NLS-1$
+	private static final String EXTENSION_POINT_ID = IDEWorkbenchPlugin.IDE_WORKBENCH + ".unknownEditorStrategy"; //$NON-NLS-1$
 
 	private static Map<String, String> idsToLabel;
 
@@ -37,7 +37,7 @@ public class UnassociatedEditorStrategyRegistry {
 	 * @return an instance of the strategy, or {@code null} if no strategy is
 	 *         found for this id
 	 */
-	public static IUnassociatedEditorStrategy getStrategy(String strategyId) {
+	public static IUnknownEditorStrategy getStrategy(String strategyId) {
 		if (strategyId == null) {
 			return null;
 		}
@@ -47,7 +47,7 @@ public class UnassociatedEditorStrategyRegistry {
 			for (IConfigurationElement extension : extensions) {
 				if (strategyId.equals(readAttribute(extension, "id"))) { //$NON-NLS-1$
 					try {
-						return (IUnassociatedEditorStrategy) extension.createExecutableExtension("class"); //$NON-NLS-1$
+						return (IUnknownEditorStrategy) extension.createExecutableExtension("class"); //$NON-NLS-1$
 					} catch (CoreException ex) {
 						IDEWorkbenchPlugin.log(ex.getMessage(), ex);
 						return null;
@@ -81,8 +81,7 @@ public class UnassociatedEditorStrategyRegistry {
 	/**
 	 * @param id
 	 *            the id of the strategy to use
-	 * @return the label for the supplied strategy id, or {@code null} for
-	 *         unknown id.
+	 * @return the label for the supplied strategy id, or {@code null} for unknown id.
 	 */
 	public static String getLabel(String id) {
 		if (idsToLabel == null || !idsToLabel.containsKey(id)) {
@@ -105,28 +104,6 @@ public class UnassociatedEditorStrategyRegistry {
 			}
 		}
 		idsToLabel = res;
-	}
-
-	/**
-	 * @param strategyId
-	 * @return Whether the specified strategy is interactive, or false is
-	 *         strategy is unknown
-	 */
-	public static boolean isInteractive(String strategyId) {
-		if (strategyId == null) {
-			return false;
-		}
-		IExtensionRegistry extRegistry = Platform.getExtensionRegistry();
-		IConfigurationElement[] extensions = extRegistry.getConfigurationElementsFor(EXTENSION_POINT_ID);
-		if (extensions != null) {
-			for (IConfigurationElement extension : extensions) {
-				if (strategyId.equals(readAttribute(extension, "id"))) { //$NON-NLS-1$
-					return Boolean.parseBoolean(readAttribute(extension, "interactive")); //$NON-NLS-1$
-				}
-			}
-		}
-		IDEWorkbenchPlugin.log("No editor strategy found for " + strategyId); //$NON-NLS-1$
-		return false;
 	}
 
 }
