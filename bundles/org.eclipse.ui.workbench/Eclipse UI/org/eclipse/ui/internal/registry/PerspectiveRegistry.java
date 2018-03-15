@@ -10,7 +10,6 @@
  *     Jan-Hendrik Diederich, Bredex GmbH - bug 201052
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 473063
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 500420
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -322,12 +321,6 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 
 	private String getOriginalId(String id) {
 		int index = id.lastIndexOf('.');
-		// custom ids might contain a '.' in the name. So we try find the index
-		// based on common perspective names
-		String suffix = "Perspective."; //$NON-NLS-1$
-		if (id.contains(suffix)) {
-			index = id.lastIndexOf(suffix) + suffix.length() - 1;
-		}
 		if (index == -1)
 			return id;
 		return id.substring(0, index);
