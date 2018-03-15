@@ -221,6 +221,7 @@ import org.eclipse.ui.internal.model.ContributionService;
 import org.eclipse.ui.internal.progress.ProgressManager;
 import org.eclipse.ui.internal.progress.ProgressManagerUtil;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
+import org.eclipse.ui.internal.registry.ImportExportPespectiveHandler;
 import org.eclipse.ui.internal.registry.UIExtensionTracker;
 import org.eclipse.ui.internal.registry.ViewDescriptor;
 import org.eclipse.ui.internal.services.EvaluationService;
@@ -323,18 +324,14 @@ public final class Workbench extends EventManager implements IWorkbench,
 		public void bundleChanged(BundleEvent event) {
 			int eventType = event.getType();
 			String bundleName;
-			boolean worked = false;
-			// Note: no calls to any non-trivial Eclipse code outside this class
-			// should be made inside the synchronized block below. Such calls
-			// can cause deadlocks on startup, see bug 502095.
-			// Progress monitor calls *are* non-trivial.
+
 			synchronized (this) {
 				if (eventType == BundleEvent.STARTING) {
 					starting.add(bundleName = event.getBundle().getSymbolicName());
 				} else if (eventType == BundleEvent.STARTED) {
 					progressCount++;
 					if (progressCount <= maximumProgressCount) {
-						worked = true;
+						progressMonitor.worked(1);
 					}
 					int index = starting.lastIndexOf(event.getBundle().getSymbolicName());
 					if (index >= 0) {
@@ -348,9 +345,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 					return; // uninteresting event
 				}
 			}
-			if (worked) {
-				progressMonitor.worked(1);
-			}
+
 			if (bundleName != null) {
 				String taskName = NLS.bind(WorkbenchMessages.Startup_Loading, bundleName);
 				progressMonitor.subTask(taskName);
@@ -466,7 +461,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/**
 	 * Listener list for registered IWorkbenchListeners .
 	 */
-	private ListenerList<IWorkbenchListener> workbenchListeners = new ListenerList<>(ListenerList.IDENTITY);
+	private ListenerList workbenchListeners = new ListenerList(ListenerList.IDENTITY);
 
 	private ServiceRegistration workbenchService;
 
@@ -635,10 +630,14 @@ public final class Workbench extends EventManager implements IWorkbench,
 					IEclipseContext context = e4Workbench.getContext();
 
 					WorkbenchMigrationProcessor migrationProcessor = null;
-					try {
-						migrationProcessor = ContextInjectionFactory.make(WorkbenchMigrationProcessor.class, context);
-					} catch (@SuppressWarnings("restriction") InjectionException e) {
-						WorkbenchPlugin.log(e);
+					// migration is enabled by default
+					if (ImportExportPespectiveHandler.isImpExpEnabled()) {
+						try {
+							migrationProcessor = ContextInjectionFactory.make(WorkbenchMigrationProcessor.class,
+									context);
+						} catch (@SuppressWarnings("restriction") InjectionException e) {
+							WorkbenchPlugin.log(e);
+						}
 					}
 
 					if (migrationProcessor != null && isFirstE4WorkbenchRun(appModel)
@@ -667,7 +666,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
 
 					IProgressMonitor progressMonitor = null;
-					SynchronousBundleListener bundleListener = null;
 					if (handler != null && showProgress) {
 						progressMonitor = handler.getBundleProgressMonitor();
 						if (progressMonitor != null) {
@@ -675,7 +673,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 							int expectedProgressCount = Math.max(1, WorkbenchPlugin.getDefault()
 									.getBundleCount() / 10);
 							progressMonitor.beginTask("", expectedProgressCount); //$NON-NLS-1$
-							bundleListener = workbench.new StartupProgressBundleListener(
+							SynchronousBundleListener bundleListener = workbench.new StartupProgressBundleListener(
 									progressMonitor, (int) (expectedProgressCount * cutoff));
 							WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
 						}
@@ -689,12 +687,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 								WorkbenchPlugin.getDefault().getViewRegistry());
 						WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.INFO, "Workbench migration finished", null)); //$NON-NLS-1$
 					}
-
 					if (returnCode[0] == PlatformUI.RETURN_OK) {
 						// run the e4 event loop and instantiate ... well, stuff
-						if (bundleListener != null) {
-							WorkbenchPlugin.getDefault().removeBundleListener(bundleListener);
-						}
 						e4Workbench.createAndRunUI(e4Workbench.getApplication());
 						IMenuService wms = e4Workbench.getContext().get(IMenuService.class);
 						wms.dispose();
@@ -989,7 +983,9 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * @since 3.2
 	 */
 	boolean firePreShutdown(final boolean forced) {
-		for (final IWorkbenchListener l : workbenchListeners) {
+		Object list[] = workbenchListeners.getListeners();
+		for (Object element : list) {
+			final IWorkbenchListener l = (IWorkbenchListener) element;
 			final boolean[] result = new boolean[] { false };
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
@@ -1010,7 +1006,9 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * @since 3.2
 	 */
 	void firePostShutdown() {
-		for (final IWorkbenchListener l : workbenchListeners) {
+		Object list[] = workbenchListeners.getListeners();
+		for (Object element : list) {
+			final IWorkbenchListener l = (IWorkbenchListener) element;
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -2324,7 +2322,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 		// TODO Correctly order service initialization
 		// there needs to be some serious consideration given to
 		// the services, and hooking them up in the correct order
-		final IEvaluationService evaluationService = serviceLocator
+		final IEvaluationService evaluationService = (IEvaluationService) serviceLocator
 				.getService(IEvaluationService.class);
 
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
@@ -2525,7 +2523,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 					return;
 				}
 
-				final IHandlerService handlerService = getService(IHandlerService.class);
+				final IHandlerService handlerService = (IHandlerService) getService(IHandlerService.class);
 
 				try {
 					handlerService.executeCommand(commandId, event);
@@ -3533,18 +3531,18 @@ UIEvents.Context.TOPIC_CONTEXT,
 	}
 
 	@Override
-	public final <T> T getAdapter(final Class<T> key) {
-		return key.cast(serviceLocator.getService(key));
+	public final Object getAdapter(final Class key) {
+		return serviceLocator.getService(key);
 	}
 
 
 	@Override
-	public final <T> T getService(final Class<T> key) {
+	public final Object getService(final Class key) {
 		return serviceLocator.getService(key);
 	}
 
 	@Override
-	public final boolean hasService(final Class<?> key) {
+	public final boolean hasService(final Class key) {
 		return serviceLocator.hasService(key);
 	}
 

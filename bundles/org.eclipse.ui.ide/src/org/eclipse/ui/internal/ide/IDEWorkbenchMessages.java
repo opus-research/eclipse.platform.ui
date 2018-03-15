@@ -698,14 +698,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String LinkedResourceEditor_removeMessage;
 	public static String LinkedResourceEditor_removingMessage;
 
-	// --- Auto-save ---
-	public static String AutoSavePreferencPage_autoSaveButton;
-	public static String AutoSavePreferencPage_intervalMessage;
-	public static String AutoSavePreferencPage_errorMessage;
-	public static String AutoSavePreferencPage_resetMessage;
-	public static String AutoSavePreferencPage_noteLabel;
-	public static String AutoSavePreferencPage_noteMessage;
-
 	// ==============================================================================
 	// Editors
 	// ==============================================================================
@@ -778,7 +770,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ResourceSelectionDialog_showDerived;
 
 	public static String OpenResourceDialog_title;
-	public static String OpenResourceDialog_message;
 	public static String OpenResourceDialog_openWithButton_text;
 
 	public static String OpenResourceDialog_openWithMenu_label;

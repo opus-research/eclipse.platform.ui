@@ -33,11 +33,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.annotation.PostConstruct;
@@ -335,7 +333,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private void updateActionSets(Perspective oldPersp, Perspective newPersp) {
 		// Update action sets
 
-		IContextService service = legacyWindow.getService(IContextService.class);
+		IContextService service = (IContextService) legacyWindow.getService(IContextService.class);
 		try {
 			service.deferUpdates(true);
 			if (newPersp != null) {
@@ -508,8 +506,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	private List<IPerspectiveDescriptor> sortedPerspectives = new ArrayList<>();
 
-	private ListenerList<IPartListener> partListenerList = new ListenerList<>();
-	private ListenerList<IPartListener2> partListener2List = new ListenerList<>();
+	private ListenerList partListenerList = new ListenerList();
+	private ListenerList partListener2List = new ListenerList();
 
 	/**
 	 * A listener that forwards page change events to our part listeners.
@@ -517,7 +515,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private IPageChangedListener pageChangedListener = new IPageChangedListener() {
 		@Override
 		public void pageChanged(final PageChangedEvent event) {
-			for (final IPartListener2 listener : partListener2List) {
+			Object[] listeners = partListener2List.getListeners();
+			for (final Object listener : listeners) {
 				if (listener instanceof IPageChangedListener) {
 					SafeRunner.run(new SafeRunnable() {
 						@Override
@@ -542,7 +541,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
     private Composite composite;
 
-	private ListenerList<IPropertyChangeListener> propertyChangeListeners = new ListenerList<>();
+    private ListenerList propertyChangeListeners = new ListenerList();
 
     private IActionBars actionBars;
 
@@ -813,7 +812,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 				return false;
 			}
 
-			IContextService service = legacyWindow
+			IContextService service = (IContextService) legacyWindow
 					.getService(IContextService.class);
 			try {
 				service.deferUpdates(true);
@@ -2022,11 +2021,12 @@ public class WorkbenchPage implements IWorkbenchPage {
 
         UIListenerLogging.logPagePropertyChanged(this, changeId, oldValue, newValue);
 
+        Object[] listeners = propertyChangeListeners.getListeners();
         PropertyChangeEvent event = new PropertyChangeEvent(this, changeId,
                 oldValue, newValue);
 
-		for (IPropertyChangeListener listener : propertyChangeListeners) {
-			listener.propertyChange(event);
+        for (int i = 0; i < listeners.length; i++) {
+            ((IPropertyChangeListener) listeners[i]).propertyChange(event);
         }
     }
 
@@ -3605,7 +3605,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 			IWorkbenchPart part = reference.getPart(false);
 			ISaveablePart saveable = SaveableHelper.getSaveable(part);
-			if (saveable != null && !result.contains(saveable)) {
+			if (saveable != null) {
 				if (saveable.isDirty()) {
 					result.add(saveable);
 				}
@@ -3616,41 +3616,21 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	/**
 	 * @return workbench parts which are dirty (implement or adapt to
-	 *         {@link ISaveablePart}). Only parts matching different saveables
-	 *         are returned.
+	 *         {@link ISaveablePart})
 	 */
 	public IWorkbenchPart[] getDirtyWorkbenchParts() {
 		List<IWorkbenchPart> result = new ArrayList<>(3);
-		Map<ISaveablePart, IWorkbenchPart> saveables = new LinkedHashMap<>(3);
 		IWorkbenchPartReference[] allParts = getSortedParts(true, true, true);
-		for (IWorkbenchPartReference reference : allParts) {
+		for (int i = 0; i < allParts.length; i++) {
+			IWorkbenchPartReference reference = allParts[i];
+
 			IWorkbenchPart part = reference.getPart(false);
 			ISaveablePart saveable = SaveableHelper.getSaveable(part);
-			if (saveable == null || !saveable.isDirty()) {
-				continue;
-			}
-			IWorkbenchPart previousPart = saveables.get(saveable);
-			if (previousPart != null) {
-				// We have already a part claiming to handle this saveable.
-				// See bug 470076 where a property view might return
-				// saveable which is in turn just editor part
-				if (previousPart == saveable) {
-					// if the previous part matches saveable, we have a
-					// perfect match already
-					continue;
+			if (saveable != null) {
+				if (saveable.isDirty()) {
+					result.add(part);
 				}
-				// if parts provide adapters to same saveable but
-				// saveable itself is not a part, we can try to keep
-				// editors and skip views
-				if (part != saveable && previousPart instanceof IEditorPart) {
-					continue;
-				}
-				// last part wins, since we don't want to return multiple parts
-				// representing same saveables
-				result.remove(previousPart);
 			}
-			result.add(part);
-			saveables.put(saveable, part);
 		}
 		return result.toArray(new IWorkbenchPart[result.size()]);
 	}
@@ -4694,10 +4674,14 @@ public class WorkbenchPage implements IWorkbenchPage {
 					.getWorkingSetManager();
 
 			if (aggregateWorkingSetId == null) {
-				aggregateWorkingSetId = generateAggregateWorkingSetId();
+				aggregateWorkingSet = findAggregateWorkingSet(workingSetManager);
+				aggregateWorkingSetId = aggregateWorkingSet == null ? getDefaultAggregateWorkingSetId()
+						: aggregateWorkingSet.getName();
 			} else {
-				aggregateWorkingSet = (AggregateWorkingSet) workingSetManager.getWorkingSet(aggregateWorkingSetId);
+				aggregateWorkingSet = (AggregateWorkingSet) workingSetManager
+						.getWorkingSet(aggregateWorkingSetId);
 			}
+
 			if (aggregateWorkingSet == null) {
 				aggregateWorkingSet = (AggregateWorkingSet) workingSetManager
 						.createAggregateWorkingSet(aggregateWorkingSetId,
@@ -4709,8 +4693,17 @@ public class WorkbenchPage implements IWorkbenchPage {
 		return aggregateWorkingSet;
 	}
 
-	private String generateAggregateWorkingSetId() {
+	private String getDefaultAggregateWorkingSetId() {
 		return "Aggregate for window " + System.currentTimeMillis(); //$NON-NLS-1$
+	}
+
+	private AggregateWorkingSet findAggregateWorkingSet(IWorkingSetManager workingSetManager) {
+		for (IWorkingSet workingSet : workingSetManager.getAllWorkingSets()) {
+			if (workingSet instanceof AggregateWorkingSet) {
+				return (AggregateWorkingSet) workingSet;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -4990,20 +4983,20 @@ public class WorkbenchPage implements IWorkbenchPage {
 				return;
 			}
 
-			for (final IPartListener listener : partListenerList) {
+			for (final Object listener : partListenerList.getListeners()) {
 				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() throws Exception {
-						listener.partActivated(workbenchPart);
+						((IPartListener) listener).partActivated(workbenchPart);
 					}
 				});
 			}
 
-			for (final IPartListener2 listener : partListener2List) {
+			for (final Object listener : partListener2List.getListeners()) {
 				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() throws Exception {
-						listener.partActivated(partReference);
+						((IPartListener2) listener).partActivated(partReference);
 					}
 				});
 			}
@@ -5015,20 +5008,20 @@ public class WorkbenchPage implements IWorkbenchPage {
 				final IWorkbenchPartReference partReference = getReference(workbenchPart);
 
 				if (partReference != null) {
-					for (final IPartListener listener : partListenerList) {
+					for (final Object listener : partListenerList.getListeners()) {
 						SafeRunner.run(new SafeRunnable() {
 							@Override
 							public void run() throws Exception {
-								listener.partActivated(workbenchPart);
+								((IPartListener) listener).partActivated(workbenchPart);
 							}
 						});
 					}
 
-					for (final IPartListener2 listener : partListener2List) {
+					for (final Object listener : partListener2List.getListeners()) {
 						SafeRunner.run(new SafeRunnable() {
 							@Override
 							public void run() throws Exception {
-								listener.partActivated(partReference);
+								((IPartListener2) listener).partActivated(partReference);
 							}
 						});
 					}
@@ -5043,20 +5036,20 @@ public class WorkbenchPage implements IWorkbenchPage {
 			final IWorkbenchPart workbenchPart = ((CompatibilityPart) client).getPart();
 			final IWorkbenchPartReference partReference = getReference(workbenchPart);
 
-			for (final IPartListener listener : partListenerList) {
+			for (final Object listener : partListenerList.getListeners()) {
 				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() throws Exception {
-						listener.partDeactivated(workbenchPart);
+						((IPartListener) listener).partDeactivated(workbenchPart);
 					}
 				});
 			}
 
-			for (final IPartListener2 listener : partListener2List) {
+			for (final Object listener : partListener2List.getListeners()) {
 				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() throws Exception {
-						listener.partDeactivated(partReference);
+						((IPartListener2) listener).partDeactivated(partReference);
 					}
 				});
 			}
@@ -5067,20 +5060,20 @@ public class WorkbenchPage implements IWorkbenchPage {
 				final IWorkbenchPartReference partReference = getReference(workbenchPart);
 
 				if (partReference != null) {
-					for (final IPartListener listener : partListenerList) {
+					for (final Object listener : partListenerList.getListeners()) {
 						SafeRunner.run(new SafeRunnable() {
 							@Override
 							public void run() throws Exception {
-								listener.partDeactivated(workbenchPart);
+								((IPartListener) listener).partDeactivated(workbenchPart);
 							}
 						});
 					}
 
-					for (final IPartListener2 listener : partListener2List) {
+					for (final Object listener : partListener2List.getListeners()) {
 						SafeRunner.run(new SafeRunnable() {
 							@Override
 							public void run() throws Exception {
-								listener.partDeactivated(partReference);
+								((IPartListener2) listener).partDeactivated(partReference);
 							}
 						});
 					}
@@ -5097,20 +5090,20 @@ public class WorkbenchPage implements IWorkbenchPage {
 				ISaveablesLifecycleListener.class);
 		saveablesList.postOpen(part);
 
-		for (final IPartListener listener : partListenerList) {
+		for (final Object listener : partListenerList.getListeners()) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partOpened(part);
+					((IPartListener) listener).partOpened(part);
 				}
 			});
 		}
 
-		for (final IPartListener2 listener : partListener2List) {
+		for (final Object listener : partListener2List.getListeners()) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partOpened(partReference);
+					((IPartListener2) listener).partOpened(partReference);
 				}
 			});
 		}
@@ -5139,20 +5132,20 @@ public class WorkbenchPage implements IWorkbenchPage {
 			modelManager.postClose(postCloseInfo);
 		}
 
-		for (final IPartListener listener : partListenerList) {
+		for (final Object listener : partListenerList.getListeners()) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partClosed(part);
+					((IPartListener) listener).partClosed(part);
 				}
 			});
 		}
 
-		for (final IPartListener2 listener : partListener2List) {
+		for (final Object listener : partListener2List.getListeners()) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partClosed(partReference);
+					((IPartListener2) listener).partClosed(partReference);
 				}
 			});
 		}
@@ -5202,20 +5195,20 @@ public class WorkbenchPage implements IWorkbenchPage {
 			final IWorkbenchPart workbenchPart = ((CompatibilityPart) client).getPart();
 			final IWorkbenchPartReference partReference = getReference(workbenchPart);
 
-			for (final IPartListener listener : partListenerList) {
+			for (final Object listener : partListenerList.getListeners()) {
 				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() throws Exception {
-						listener.partBroughtToTop(workbenchPart);
+						((IPartListener) listener).partBroughtToTop(workbenchPart);
 					}
 				});
 			}
 
-			for (final IPartListener2 listener : partListener2List) {
+			for (final Object listener : partListener2List.getListeners()) {
 				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() throws Exception {
-						listener.partBroughtToTop(partReference);
+						((IPartListener2) listener).partBroughtToTop(partReference);
 					}
 				});
 			}
@@ -5296,11 +5289,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 			IWorkbenchPart workbenchPart = ((CompatibilityPart) client).getPart();
 			final IWorkbenchPartReference partReference = getReference(workbenchPart);
 
-			for (final IPartListener2 listener : partListener2List) {
+			for (final Object listener : partListener2List.getListeners()) {
 				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() throws Exception {
-						listener.partVisible(partReference);
+						((IPartListener2) listener).partVisible(partReference);
 					}
 				});
 			}
@@ -5321,11 +5314,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 			IWorkbenchPart workbenchPart = ((CompatibilityPart) client).getPart();
 			final IWorkbenchPartReference partReference = getReference(workbenchPart);
 
-			for (final IPartListener2 listener : partListener2List) {
+			for (final Object listener : partListener2List.getListeners()) {
 				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() throws Exception {
-						listener.partHidden(partReference);
+						((IPartListener2) listener).partHidden(partReference);
 					}
 				});
 			}
@@ -5333,11 +5326,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 	}
 
 	public void firePartInputChanged(final IWorkbenchPartReference partReference) {
-		for (final IPartListener2 listener : partListener2List) {
+		for (final Object listener : partListener2List.getListeners()) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partInputChanged(partReference);
+					((IPartListener2) listener).partInputChanged(partReference);
 				}
 			});
 		}
