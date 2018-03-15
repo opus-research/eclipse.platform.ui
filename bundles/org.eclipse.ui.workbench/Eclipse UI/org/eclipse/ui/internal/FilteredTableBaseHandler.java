@@ -218,17 +218,14 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 			break;
 		default:
 			int i;
-			int currentItemIndex = getCurrentItemIndex();
 			if (gotoDirection) {
-				i= currentItemIndex + 1;
-				if (i >= tableItemCount) {
-					i = 0;
-				}
+				i= getCurrentItemIndex() + 1;
+				if (i >= tableItemCount)
+					i= 0;
 			} else {
-				i= currentItemIndex - 1;
-				if (i < 0) {
-					i = tableItemCount - 1;
-				}
+				i= getCurrentItemIndex() - 1;
+				if (i < 0)
+					i= tableItemCount - 1;
 			}
 			table.setSelection(i);
 		}
