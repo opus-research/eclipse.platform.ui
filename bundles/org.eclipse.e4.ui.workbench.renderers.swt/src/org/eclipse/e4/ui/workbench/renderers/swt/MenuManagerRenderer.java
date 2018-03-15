@@ -48,6 +48,7 @@ import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
 import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
@@ -642,7 +643,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		List<MUIElement> parts = container.getChildren();
 		if (parts != null) {
 			MUIElement[] plist = parts.toArray(new MUIElement[parts.size()]);
-			for (MUIElement childME : plist) {
+			for (int i = 0; i < plist.length; i++) {
+				MUIElement childME = plist[i];
 				modelProcessSwitch(parentManager, (MMenuElement) childME);
 			}
 		}
@@ -684,7 +686,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		List<MMenuElement> parts = menuModel.getChildren();
 		if (parts != null) {
 			MMenuElement[] plist = parts.toArray(new MMenuElement[parts.size()]);
-			for (MMenuElement childME : plist) {
+			for (int i = 0; i < plist.length; i++) {
+				MMenuElement childME = plist[i];
 				modelProcessSwitch(menuManager, childME);
 			}
 		}
@@ -1119,9 +1122,9 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 				visible = ((Boolean) rc).booleanValue();
 			}
 		}
-		if (visible && element.getVisibleWhen() != null) {
+		if (visible && (element.getVisibleWhen() instanceof MCoreExpression)) {
 			evaluated = true;
-			visible = ContributionsAnalyzer.isVisible(element.getVisibleWhen(), evalContext);
+			visible = ContributionsAnalyzer.isVisible((MCoreExpression) element.getVisibleWhen(), evalContext);
 		}
 		if (evaluated && visible != current) {
 			element.setVisible(visible);

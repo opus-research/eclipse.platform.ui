@@ -91,7 +91,8 @@ public class SwitchToWindowMenu extends ContributionItem {
 
         // Add one item for each window.
         int count = 1;
-		for (IWorkbenchWindow window : array) {
+        for (int i = 0; i < array.length; i++) {
+            final IWorkbenchWindow window = array[i];
             // can encounter disposed shells if this update is in response to a shell closing
             if (!window.getShell().isDisposed()) {
                 String name = calcText(count, window);

@@ -141,10 +141,12 @@ public class KeyController {
 		final Scheme[] definedSchemes = bindingService.getDefinedSchemes();
 		try {
 			Scheme modelActiveScheme = null;
-			for (final Scheme scheme : definedSchemes) {
+			for (int i = 0; i < definedSchemes.length; i++) {
+				final Scheme scheme = definedSchemes[i];
 				final Scheme copy = bindingManager.getScheme(scheme.getId());
-				copy.define(scheme.getName(), scheme.getDescription(), scheme.getParentId());
-				if (scheme.getId().equals(bindingService.getActiveScheme().getId())) {
+				copy.define(scheme.getName(), scheme.getDescription(), scheme
+						.getParentId());
+				if (definedSchemes[i].getId().equals(bindingService.getActiveScheme().getId())) {
 					modelActiveScheme = copy;
 				}
 			}
@@ -480,9 +482,10 @@ public class KeyController {
 		}
 
 		// Restore any User defined bindings
-		for (Binding binding : fBindingManager.getBindings()) {
-			if (binding.getType() == Binding.USER) {
-				fBindingManager.removeBinding(binding);
+		Binding[] bindings = fBindingManager.getBindings();
+		for (int i = 0; i < bindings.length; i++) {
+			if (bindings[i].getType() == Binding.USER) {
+				fBindingManager.removeBinding(bindings[i]);
 			}
 		}
 
@@ -509,9 +512,10 @@ public class KeyController {
 				try {
 					fileWriter = new BufferedWriter(new OutputStreamWriter(
 							new FileOutputStream(filePath), StandardCharsets.UTF_8));
-					final Object[] bindingElements = bindingModel.getBindings().toArray();
-					for (Object bindingElement : bindingElements) {
-						final BindingElement be = (BindingElement) bindingElement;
+					final Object[] bindingElements = bindingModel.getBindings()
+							.toArray();
+					for (int i = 0; i < bindingElements.length; i++) {
+						final BindingElement be = (BindingElement) bindingElements[i];
 						if (be.getTrigger() == null
 								|| be.getTrigger().isEmpty()) {
 							continue;

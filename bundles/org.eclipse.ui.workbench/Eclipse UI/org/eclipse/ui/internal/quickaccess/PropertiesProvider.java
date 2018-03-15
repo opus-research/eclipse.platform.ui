@@ -44,19 +44,24 @@ public class PropertiesProvider extends QuickAccessProvider {
 	public QuickAccessElement[] getElements() {
 		if (idToElement == null) {
 			idToElement = new HashMap();
-			IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			IWorkbenchPage activePage = PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow().getActivePage();
 			if (activePage != null) {
 				PropertyPageManager pageManager = new PropertyPageManager();
 				ISelection selection = activePage.getSelection();
 				if (selection instanceof IStructuredSelection
 						&& !selection.isEmpty()) {
-					Object element = ((IStructuredSelection) selection).getFirstElement();
-					PropertyPageContributorManager.getManager().contribute(pageManager, element);
-					List list = pageManager.getElements(PreferenceManager.PRE_ORDER);
-					IPreferenceNode[] properties = (IPreferenceNode[]) list.toArray(new IPreferenceNode[list.size()]);
-					for (IPreferenceNode property : properties) {
+					Object element = ((IStructuredSelection) selection)
+							.getFirstElement();
+					PropertyPageContributorManager.getManager().contribute(
+							pageManager, element);
+					List list = pageManager
+							.getElements(PreferenceManager.PRE_ORDER);
+					IPreferenceNode[] properties = (IPreferenceNode[]) list
+							.toArray(new IPreferenceNode[list.size()]);
+					for (int i = 0; i < properties.length; i++) {
 						PropertiesElement propertiesElement = new PropertiesElement(
-								element, property, this);
+								element, properties[i], this);
 						idToElement.put(propertiesElement.getId(),
 								propertiesElement);
 					}
