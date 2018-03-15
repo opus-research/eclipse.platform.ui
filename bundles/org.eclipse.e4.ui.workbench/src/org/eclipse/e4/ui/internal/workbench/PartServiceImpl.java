@@ -1352,9 +1352,8 @@ public class PartServiceImpl implements EPartService {
 
 		if (toBeRemoved != null) {
 			toBeRemoved.setToBeRendered(false);
-		} else {
-			part.setToBeRendered(false);
 		}
+		part.setToBeRendered(false);
 
 		if (parent.getSelectedElement() == toBeRemoved) {
 			parent.setSelectedElement(null);
