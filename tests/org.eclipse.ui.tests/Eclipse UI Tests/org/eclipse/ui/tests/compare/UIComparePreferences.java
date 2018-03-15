@@ -57,7 +57,7 @@ public class UIComparePreferences extends TestCase {
 
     public void testCompareViewersPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.compare.internal.ComparePreferencePage");
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 
 }
