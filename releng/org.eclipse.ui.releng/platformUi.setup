@@ -26,17 +26,23 @@
         source="http://www.eclipse.org/oomph/setup/InducedChoices">
       <detail
           key="inherit">
-        <value>eclipse.git.gerrit.remoteURIs</value>
+        <value>eclipse.gerrit.remoteURIs</value>
       </detail>
       <detail
           key="label">
-        <value>Platform UI Git or Gerrit Repository</value>
+        <value>Platform UI Gerrit Repository</value>
       </detail>
       <detail
           key="target">
         <value>remoteURI</value>
       </detail>
     </annotation>
+    <configSections
+        name="gerrit">
+      <properties
+          key="createchangeid"
+          value="true"/>
+    </configSections>
     <description>Platform UI</description>
   </setupTask>
   <setupTask
@@ -139,7 +145,7 @@
     <setupTask
         xsi:type="setup:VariableTask"
         name="eclipse.target.platform"
-        value="Neon"
+        value="Oxygen"
         storageURI="scope://Workspace"/>
   </stream>
   <logicalProjectContainer

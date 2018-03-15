@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,9 @@
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com>
  * 			- Fix for Bug 214443 Problem view filter created even if I hit Cancel
+ *     Robert Roth <robert.roth.off@gmail.com>
+ *          - Fix for Bug 364736 Setting limit to 0 has no effect
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 498056
  ******************************************************************************/
 
 package org.eclipse.ui.internal.views.markers;
@@ -57,6 +60,7 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 /**
  * FiltersConfigurationDialog is the dialog for configuring the filters for the
+ * problems view
  *
  * @since 3.3
  *
@@ -298,9 +302,16 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		});
 
 		limitText.addModifyListener(e -> {
+			boolean isInvalid = false;
 			try {
-				Integer.parseInt(limitText.getText());
+				int value = Integer.parseInt(limitText.getText());
+				if (value <= 0) {
+					isInvalid = true;
+				}
 			} catch (NumberFormatException ex) {
+				isInvalid = true;
+			}
+			if (isInvalid) {
 				limitText.setText(Integer.toString(generator.getMarkerLimits()));
 			}
 		});
@@ -698,21 +709,24 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		orButton.setSelection(!andFilters);
 
 		filterGroups.clear();
-		filterGroups.addAll(generator.getDeclaredFilters());
+		List<MarkerFieldFilterGroup> declaredFilters = new ArrayList<>(generator.getDeclaredFilters());
+		filterGroups.addAll(declaredFilters);
 		configsTable.refresh();
-		configsTable.setSelection(new StructuredSelection(
-				filterGroups.size() > 1 ? filterGroups.iterator().next()
-						: new Object[0]));
+
+		for (MarkerFieldFilterGroup marker : declaredFilters) {
+			if (marker.isEnabled()) {
+				configsTable.setChecked(marker, true);
+			}
+		}
 
 		IPreferenceStore preferenceStore = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
 		boolean useMarkerLimits = preferenceStore.getBoolean(IDEInternalPreferences.USE_MARKER_LIMITS);
-		int markerLimits = useMarkerLimits ? preferenceStore.getInt(IDEInternalPreferences.MARKER_LIMITS_VALUE) : 100;
+		int markerLimits = useMarkerLimits ? preferenceStore.getInt(IDEInternalPreferences.MARKER_LIMITS_VALUE) : 1000;
 
 		limitButton.setSelection(useMarkerLimits);
 		limitsLabel.setEnabled(useMarkerLimits);
 		limitText.setEnabled(useMarkerLimits);
 		limitText.setText(Integer.toString(markerLimits));
-
 		updateRadioButtonsFromTable();
 	}
 
