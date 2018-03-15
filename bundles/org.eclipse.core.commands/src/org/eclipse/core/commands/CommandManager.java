@@ -171,8 +171,8 @@ public final class CommandManager extends HandleObjectManager implements
 	private static final String unescape(final String escapedText)
 			throws SerializationException {
 
-		// defer initialization of a StringBuffer until we know we need one
-		StringBuffer buffer = null;
+		// defer initialization of a StringBuilder until we know we need one
+		StringBuilder buffer = null;
 
 		for (int i = 0; i < escapedText.length(); i++) {
 
@@ -184,7 +184,7 @@ public final class CommandManager extends HandleObjectManager implements
 				}
 			} else {
 				if (buffer == null) {
-					buffer = new StringBuffer(escapedText.substring(0, i));
+					buffer = new StringBuilder(escapedText.substring(0, i));
 				}
 
 				if (++i < escapedText.length()) {
@@ -458,10 +458,9 @@ public final class CommandManager extends HandleObjectManager implements
 			throw new NullPointerException();
 		}
 
-		final Object[] listeners = getListeners();
-		for (int i = 0; i < listeners.length; i++) {
-			final ICommandManagerListener listener = (ICommandManagerListener) listeners[i];
-			listener.commandManagerChanged(event);
+		for (Object listener : getListeners()) {
+			final ICommandManagerListener commandManagerListener = (ICommandManagerListener) listener;
+			commandManagerListener.commandManagerChanged(event);
 		}
 	}
 
@@ -711,8 +710,7 @@ public final class CommandManager extends HandleObjectManager implements
 				parameterValue = unescape(idEqualsValue.substring(equalsPosition + 1));
 			}
 
-			for (int i = 0; i < parameters.length; i++) {
-				final IParameter parameter = parameters[i];
+			for (final IParameter parameter : parameters) {
 				if (parameter.getId().equals(parameterId)) {
 					paramList.add(new Parameterization(parameter, parameterValue));
 					break;

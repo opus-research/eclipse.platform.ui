@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ package org.eclipse.e4.ui.tests.workbench;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -46,6 +47,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Control;
@@ -81,6 +83,15 @@ public class PartRenderingEngineTests {
 			System.out.println("skipping " + PartRenderingEngineTests.class.getName() + "#"
 					+ this.getClass().getSimpleName()
 					+ " on Mac for now, see bug 466636");
+			return true;
+		}
+		return false;
+	}
+
+	private boolean checkMacBug517231() {
+		if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+			System.out.println("skipping " + PartRenderingEngineTests.class.getName() + "#"
+					+ this.getClass().getSimpleName() + " on Mac for now, see bug 517231");
 			return true;
 		}
 		return false;
@@ -737,17 +748,33 @@ public class PartRenderingEngineTests {
 		// the selected element doesn't change its value
 		container.setSelectedElement(partA);
 		partB.setToBeRendered(false);
-		assertTrue(
+		assertEquals(
 				"Changing the TBR of a non-selected element should not change the value of the container's seletedElement",
-				container.getSelectedElement() == partA);
+				partA, container.getSelectedElement());
 
-		// Ensure that changing the TBR state of the selected element results in
-		// it going null
+
+		// Ensure that changing the TBR state of the selected element to false
+		// results in selecting moving to a TBR=true element
 		container.setSelectedElement(partA);
 		partA.setToBeRendered(false);
-		assertTrue(
-				"Changing the TBR of the selected element should have set the field to null",
-				container.getSelectedElement() == null);
+		assertNotEquals("Changing the TBR of the selected element should have moved selection to a TBR item", partA,
+				container.getSelectedElement());
+
+		if ("gtk".equals(SWT.getPlatform())) {
+			assertTrue(
+					"Changing the TBR of the selected element should have moved selection to a TBR item",
+					container.getSelectedElement().isToBeRendered());
+
+			// Ensure that when all elements are TBR=false, selection is null
+			partC.setToBeRendered(false);
+			// Then there should be TBR item
+			assertNull("Changing the TBR of all elements to false should have set the field to null",
+					container.getSelectedElement());
+		} else {
+			assertTrue(
+					"Changing the TBR of the selected element should have set the field to null",
+					container.getSelectedElement() == null);
+		}
 	}
 
 	@Test
@@ -3321,6 +3348,9 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void test_persistState_371087_1() {
+		if (checkMacBug517231())
+			return;
+
 		MApplication application = ems.createModelElement(MApplication.class);
 		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);

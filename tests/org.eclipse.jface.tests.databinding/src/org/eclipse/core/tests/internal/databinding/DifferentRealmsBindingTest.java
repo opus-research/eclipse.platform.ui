@@ -11,18 +11,13 @@
 package org.eclipse.core.tests.internal.databinding;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.observable.list.ComputedList;
-import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.ObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.set.ObservableSet;
 import org.eclipse.core.databinding.observable.set.WritableSet;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.util.ILogger;
 import org.eclipse.core.databinding.util.Policy;
 import org.eclipse.core.runtime.IStatus;
@@ -84,25 +79,6 @@ public class DifferentRealmsBindingTest extends TestCase {
 		final ObservableSet target = new WritableSet(targetAndModelRealm);
 
 		dbc.bindSet(target, model);
-		targetAndModelRealm.waitUntilBlocking();
-		targetAndModelRealm.processQueue();
-		targetAndModelRealm.unblock();
-		assertTrue(errorStatusses.toString(), errorStatusses.isEmpty());
-	}
-
-	public void testBindComputedListToWritableListInDifferentRealm() {
-		// The validationRealm is the current realm.
-		final IObservableValue modelValue = new WritableValue(validationRealm);
-		final IObservableList model = new ComputedList(validationRealm) {
-			@Override
-			protected List calculate() {
-				return Collections.singletonList(modelValue.getValue());
-			}
-		};
-		final ObservableList target = new WritableList(targetAndModelRealm);
-
-		dbc.bindList(target, model);
-		modelValue.setValue("Test");
 		targetAndModelRealm.waitUntilBlocking();
 		targetAndModelRealm.processQueue();
 		targetAndModelRealm.unblock();

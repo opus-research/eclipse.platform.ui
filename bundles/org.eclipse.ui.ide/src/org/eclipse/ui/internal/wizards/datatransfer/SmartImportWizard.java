@@ -33,7 +33,6 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IImportWizard;
@@ -290,6 +289,11 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 			this.easymportJob = new SmartImportJob(this.directoryToImport, projectRootPage.getSelectedWorkingSets(),
 					projectRootPage.isConfigureProjects(), projectRootPage.isDetectNestedProject());
 		}
+		if (this.easymportJob != null) {
+			// always update working set on request as the job isn't updated on
+			// WS change automatically
+			this.easymportJob.setWorkingSets(projectRootPage.getSelectedWorkingSets());
+		}
 		return this.easymportJob;
 	}
 
@@ -327,14 +331,6 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 				|| (isValidArchive(pageRoot) && getExpandDirectory(pageRoot).getAbsoluteFile().equals(jobRoot));
 		return sameSource && job.isDetectNestedProjects() == page.isDetectNestedProject()
 				&& job.isConfigureProjects() == page.isConfigureProjects();
-	}
-
-	@Override
-	public IWizardPage getNextPage(IWizardPage page) {
-		if (page == this.projectRootPage && !this.projectRootPage.isDetectNestedProject()) {
-			return null;
-		}
-		return super.getNextPage(page);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 IBM Corporation and others.
+ * Copyright (c) 2013, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Timo Kinnunen <timo.kinnunen@gmail.com> - bug 450727
+ *     Timo Kinnunen <timo.kinnunen@gmail.com> - Bug 450727
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 466075
+ *     Dawid Pakuła <zulus@w3des.net> - Bug 466075
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom.preference;
 
@@ -27,29 +29,25 @@ public class EclipsePreferencesElement extends ElementAdapter {
 
 	private String id;
 
-	public EclipsePreferencesElement(IEclipsePreferences preferences,
-			CSSEngine engine) {
+	public EclipsePreferencesElement(IEclipsePreferences preferences, CSSEngine engine) {
 		super(preferences, engine);
 	}
 
 	@Override
 	public NodeList getChildNodes() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getNamespaceURI() {
 		if (namespaceURI == null) {
-			namespaceURI = ClassUtils.getPackageName(getNativeWidget()
-					.getClass());
+			namespaceURI = ClassUtils.getPackageName(getNativeWidget().getClass());
 		}
 		return namespaceURI;
 	}
 
 	@Override
 	public Node getParentNode() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -63,13 +61,11 @@ public class EclipsePreferencesElement extends ElementAdapter {
 
 	@Override
 	public String getCSSClass() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getCSSStyle() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -86,4 +82,11 @@ public class EclipsePreferencesElement extends ElementAdapter {
 		return "";
 	}
 
+	@Override
+	public boolean isPseudoInstanceOf(String s) {
+		if (!super.isStaticPseudoInstance(s)) {
+			this.addStaticPseudoInstance(s);
+		}
+		return true;
+	}
 }

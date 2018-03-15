@@ -18,10 +18,6 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
@@ -130,12 +126,7 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 		viewer.setInput(workingSets);
 		viewer.setFilters(new Filter());
 
-		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				handleSelectionChanged();
-			}
-		});
+		viewer.addSelectionChangedListener(event -> handleSelectionChanged());
 		viewer.setCheckedElements(initialSelection);
 
 		GridData viewerData = new GridData(GridData.FILL_BOTH);
@@ -167,11 +158,7 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 
 	@Override
 	protected List getSelectedWorkingSets() {
-		ISelection selection = viewer.getSelection();
-		if (selection instanceof IStructuredSelection) {
-			return ((IStructuredSelection) selection).toList();
-		}
-		return null;
+		return viewer.getStructuredSelection().toList();
 	}
 
 	@Override
