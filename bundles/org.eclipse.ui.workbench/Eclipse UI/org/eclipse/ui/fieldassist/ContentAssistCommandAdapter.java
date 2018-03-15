@@ -23,6 +23,8 @@ import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Control;
@@ -212,7 +214,12 @@ public class ContentAssistCommandAdapter extends ContentProposalAdapter {
 				}
 			}
 		});
-		control.addDisposeListener(e -> deactivateHandler());
+		control.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				deactivateHandler();
+			}
+		});
 	}
 
 	/**

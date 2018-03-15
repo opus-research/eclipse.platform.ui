@@ -61,7 +61,6 @@ public class ProgressAnimationItemTest {
 	public void testSingleJobRefreshOnce() throws Exception {
 		createAndScheduleJob();
 
-		ProgressManager.getInstance().notifyListeners();
 		refresh();
 
 		assertSingleAccessibleListener();
@@ -72,7 +71,6 @@ public class ProgressAnimationItemTest {
 		createAndScheduleJob();
 		createAndScheduleJob();
 
-		ProgressManager.getInstance().notifyListeners();
 		refresh();
 
 		assertSingleAccessibleListener();
@@ -82,7 +80,6 @@ public class ProgressAnimationItemTest {
 	public void testSingleJobRefreshTwice() throws Exception {
 		createAndScheduleJob();
 
-		ProgressManager.getInstance().notifyListeners();
 		refresh();
 		refresh();
 
@@ -98,6 +95,8 @@ public class ProgressAnimationItemTest {
 	private static void createAndScheduleJob() throws InterruptedException {
 		DummyJob job = new DummyJob("Keep me", Status.OK_STATUS);
 		job.setProperty(IProgressConstants.KEEP_PROPERTY, true);
+		ExtendedJobInfo info = new ExtendedJobInfo(job);
+		ProgressManager.getInstance().addJobInfo(info);
 		job.schedule();
 		job.join();
 	}

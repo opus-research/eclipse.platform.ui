@@ -1103,6 +1103,7 @@
             id="org.eclipse.ui.window.newEditor" />
       <command
             categoryId="org.eclipse.ui.category.window"
+            defaultHandler="org.eclipse.ui.internal.SplitHandler"
             description="%command.splitEditor.description"
             id="org.eclipse.ui.window.splitEditor"
             name="%command.splitEditor.name">
@@ -1167,17 +1168,6 @@
             description="%command.windowsHideTrimbars.description"
             id="org.eclipse.ui.window.hidetrimbars"
             name="%command.windowsHideTrimbars.name"/>
-      <command
-            categoryId="org.eclipse.ui.category.window"
-            defaultHandler="org.eclipse.ui.internal.handlers.FullScreenHandler"
-            description="%command.fullscreenmode.description"
-            id="org.eclipse.ui.window.fullscreenmode"
-            name="%command.fullscreenmode.name"/>
-      <command
-            categoryId="org.eclipse.ui.category.window"
-            description="%command.togglestatusbar.description"
-            id="org.eclipse.ui.window.togglestatusbar"
-            name="%command.togglestatusbar.name"/>
       <command
             categoryId="org.eclipse.ui.category.window"
             defaultHandler="org.eclipse.ui.internal.handlers.MinimizePartHandler"
@@ -1900,32 +1890,6 @@
       		name="org.eclipse.ui.workbench.ACTIVE_TAB_HIGHLIGHT" value="false">
 		 </data>
       </theme>
-      <colorDefinition
-            categoryId="org.eclipse.ui.workbenchMisc"
-            id="org.eclipse.ui.workbench.HOVER_BACKGROUND"
-            label="%Color.infoBackground">
-            <colorFactory
-               class="org.eclipse.ui.internal.themes.RGBInfoColorFactory"
-               plugin="org.eclipse.ui">
-               <parameter
-                      name="color"
-                      value="background">
-                </parameter>
-            </colorFactory>
-      </colorDefinition>
-      <colorDefinition
-            categoryId="org.eclipse.ui.workbenchMisc"
-            id="org.eclipse.ui.workbench.HOVER_FOREGROUND"
-            label="%Color.infoForeground">
-            <colorFactory
-               class="org.eclipse.ui.internal.themes.RGBInfoColorFactory"
-               plugin="org.eclipse.ui">
-               <parameter
-                      name="color"
-                      value="foreground">
-                </parameter>
-            </colorFactory>
-      </colorDefinition>
       <theme
             id="org.eclipse.ui.r30"
             name="%ThemeName.R30">
@@ -2031,12 +1995,6 @@
             id="org.eclipse.ui.workingSets"
             name="%SettingsTransfer.WorkingSets">
       </settingsTransfer>
-      <settingsTransfer
-            class="org.eclipse.ui.internal.preferences.PreferencesSettingsTransfer"
-            helpContext="org.eclipse.ui.switch_workspace_dialog_context"
-            id="org.eclipse.ui.preferences"
-            name="%SettingsTransfer.Preferences">
-      </settingsTransfer>
    </extension>
    
    <extension
@@ -2137,18 +2095,6 @@
       <handler
       		class="org.eclipse.ui.internal.handlers.ToggleCoolbarHandler"
       		commandId="org.eclipse.ui.ToggleCoolbarAction">
-      	 <enabledWhen>
-            <with
-                  variable="activeWorkbenchWindow">
-               <instanceof
-                     value="org.eclipse.ui.IWorkbenchWindow">
-               </instanceof>
-            </with>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="org.eclipse.ui.internal.handlers.ToggleStatusBarHandler"
-            commandId="org.eclipse.ui.window.togglestatusbar">
       	 <enabledWhen>
             <with
                   variable="activeWorkbenchWindow">
@@ -2295,18 +2241,6 @@
       <handler
             class="org.eclipse.ui.internal.WorkbookEditorsHandler"
             commandId="org.eclipse.ui.window.openEditorDropDown">
-         <enabledWhen>
-            <with
-                  variable="activePart">
-               <instanceof
-                     value="org.eclipse.ui.IWorkbenchPart">
-               </instanceof>
-            </with>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="org.eclipse.ui.internal.SplitHandler"
-            commandId="org.eclipse.ui.window.splitEditor">
          <enabledWhen>
             <with
                   variable="activeEditor">

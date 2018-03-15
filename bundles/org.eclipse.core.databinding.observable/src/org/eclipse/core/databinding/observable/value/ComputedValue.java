@@ -42,9 +42,9 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
  *
  * <pre>
  * final IObservableList addends = WritableValue.withValueType(Integer.TYPE);
- * addends.add(Integer.valueOf(0));
- * addends.add(Integer.valueOf(1));
- * addends.add(Integer.valueOf(2));
+ * addends.add(new Integer(0));
+ * addends.add(new Integer(1));
+ * addends.add(new Integer(2));
  *
  * IObservableValue sum = new ComputedValue() {
  * 	protected Object calculate() {
@@ -59,7 +59,7 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
  *
  * System.out.println(sum.getValue()); // =&gt; 3
  *
- * addends.add(Integer.valueOf(10));
+ * addends.add(new Integer(10));
  * System.out.println(sum.getValue()); // =&gt; 13
  * </pre>
  *
@@ -199,7 +199,8 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 					privateInterface, privateInterface, null);
 
 			stale = false;
-			for (IObservable observable : newDependencies) {
+			for (int i = 0; i < newDependencies.length; i++) {
+				IObservable observable = newDependencies[i];
 				// Add a change listener to the new dependency.
 				if (observable.isStale()) {
 					stale = true;
@@ -257,7 +258,9 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	private void stopListening() {
 		// Stop listening for dependency changes.
 		if (dependencies != null) {
-			for (IObservable observable : dependencies) {
+			for (int i = 0; i < dependencies.length; i++) {
+				IObservable observable = dependencies[i];
+
 				observable.removeChangeListener(privateInterface);
 				observable.removeStaleListener(privateInterface);
 			}

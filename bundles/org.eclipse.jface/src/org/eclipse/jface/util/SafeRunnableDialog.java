@@ -19,6 +19,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -254,9 +255,13 @@ class SafeRunnableDialog extends ErrorDialog {
 	 * @return IStatus or <code>null</code>.
 	 */
 	private IStatus getSingleSelection() {
-		IStructuredSelection selection = statusListViewer.getStructuredSelection();
-		if (selection != null && selection.size() == 1) {
-			return (IStatus) selection.getFirstElement();
+		ISelection rawSelection = statusListViewer.getSelection();
+		if (rawSelection != null
+				&& rawSelection instanceof IStructuredSelection) {
+			IStructuredSelection selection = (IStructuredSelection) rawSelection;
+			if (selection.size() == 1) {
+				return (IStatus) selection.getFirstElement();
+			}
 		}
 		return null;
 	}

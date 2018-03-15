@@ -299,14 +299,14 @@ public class MarkerGroup {
 				.getChildren(MarkerSupportRegistry.MARKER_ATTRIBUTE_GROUPING);
 
 		Map<String, MarkerGroupingEntry> idsToEntries = new HashMap<>();
-		for (IConfigurationElement markerEntryElement : markerEntryElements) {
-			MarkerGroupingEntry entry = new MarkerGroupingEntry(markerEntryElement);
+		for (int i = 0; i < markerEntryElements.length; i++) {
+			MarkerGroupingEntry entry = new MarkerGroupingEntry(markerEntryElements[i]);
 			entry.setGroup(this);
 			idsToEntries.put(entry.getId(), entry);
 		}
 
-		for (IConfigurationElement attributeGroupingElement : attributeGroupingElements) {
-			AttributeMarkerGrouping attributeGrouping = new AttributeMarkerGrouping(attributeGroupingElement);
+		for (int i = 0; i < attributeGroupingElements.length; i++) {
+			AttributeMarkerGrouping attributeGrouping = new AttributeMarkerGrouping(attributeGroupingElements[i]);
 
 			String defaultEntryId = attributeGrouping.getDefaultGroupingEntry();
 			if (defaultEntryId != null) {
@@ -322,15 +322,16 @@ public class MarkerGroup {
 			IConfigurationElement[] mappings = attributeGrouping.getElement()
 					.getChildren(MarkerSupportRegistry.ATTRIBUTE_MAPPING);
 
-			for (IConfigurationElement mapping : mappings) {
-				String entryId = mapping.getAttribute(MarkerSupportRegistry.MARKER_GROUPING_ENTRY);
+			for (int mappingIndex = 0; mappingIndex < mappings.length; mappingIndex++) {
+				String entryId = mappings[mappingIndex].getAttribute(MarkerSupportRegistry.MARKER_GROUPING_ENTRY);
 
 				if (idsToEntries.containsKey(entryId)) {
 					MarkerGroupingEntry entry = idsToEntries.get(entryId);
 					entry.getMarkerGroup().mapAttribute(
 							attributeGrouping,
 							entry,
-							mapping.getAttribute(MarkerSupportRegistry.VALUE));
+							mappings[mappingIndex]
+									.getAttribute(MarkerSupportRegistry.VALUE));
 				} else {
 					IDEWorkbenchPlugin.log(NLS.bind(
 							"Reference to invaild markerGroupingEntry {0}", //$NON-NLS-1$
@@ -355,8 +356,10 @@ public class MarkerGroup {
 	 * @param entry
 	 */
 	private void addEntry(String markerType, EntryMapping entry) {
-		for (MarkerType type : getMarkerTypes(markerType)) {
+		MarkerType[] allDerived = getMarkerTypes(markerType);
+		for (int i = 0; i < allDerived.length; i++) {
 			Collection<EntryMapping> entries = new HashSet<>();
+			MarkerType type = allDerived[i];
 			if (typesToMappings.containsKey(type.getId())) {
 				entries = typesToMappings.get(markerType);
 			} else {
@@ -463,8 +466,9 @@ public class MarkerGroup {
 		MarkerType type = model.getType(markerType);
 		if (type != null) {
 			types.add(type);
-			for (MarkerType sub : type.getAllSubTypes()) {
-				types.add(sub);
+			MarkerType[] subs = type.getAllSubTypes();
+			for (int j = 0; j < subs.length; j++) {
+				types.add(subs[j]);
 			}
 		}
 

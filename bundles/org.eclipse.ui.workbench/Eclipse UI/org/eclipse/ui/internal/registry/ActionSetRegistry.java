@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.eclipse.core.commands.contexts.Context;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -212,12 +213,17 @@ public class ActionSetRegistry implements IExtensionChangeHandler {
      * Reads the registry.
      */
     private void readFromRegistry() {
-		for (IExtension extension : getActionSetExtensionPoint().getExtensions()) {
-			addActionSets(PlatformUI.getWorkbench().getExtensionTracker(), extension);
+        IExtension[] extensions = getActionSetExtensionPoint().getExtensions();
+        for (int i = 0; i < extensions.length; i++) {
+            addActionSets(PlatformUI.getWorkbench().getExtensionTracker(),
+                    extensions[i]);
         }
 
-		for (IExtension extension : getActionSetPartAssociationExtensionPoint().getExtensions()) {
-			addActionSetPartAssociations(PlatformUI.getWorkbench().getExtensionTracker(), extension);
+        extensions = getActionSetPartAssociationExtensionPoint()
+                .getExtensions();
+        for (int i = 0; i < extensions.length; i++) {
+            addActionSetPartAssociations(PlatformUI.getWorkbench()
+                    .getExtensionTracker(), extensions[i]);
         }
     }
 
@@ -237,10 +243,14 @@ public class ActionSetRegistry implements IExtensionChangeHandler {
      * @param extension
      */
     private void addActionSetPartAssociations(IExtensionTracker tracker, IExtension extension) {
-		for (IConfigurationElement element : extension.getConfigurationElements()) {
+        IConfigurationElement [] elements = extension.getConfigurationElements();
+        for (int i = 0; i < elements.length; i++) {
+            IConfigurationElement element = elements[i];
             if (element.getName().equals(IWorkbenchRegistryConstants.TAG_ACTION_SET_PART_ASSOCIATION)) {
                 String actionSetId = element.getAttribute(IWorkbenchRegistryConstants.ATT_TARGET_ID);
-				for (IConfigurationElement child : element.getChildren()) {
+                IConfigurationElement[] children = element.getChildren();
+                for (int j = 0; j < children.length; j++) {
+                    IConfigurationElement child = children[j];
                     if (child.getName().equals(IWorkbenchRegistryConstants.TAG_PART)) {
                         String partId = child.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
                         if (partId != null) {
@@ -271,7 +281,9 @@ public class ActionSetRegistry implements IExtensionChangeHandler {
      * @param extension
      */
     private void addActionSets(IExtensionTracker tracker, IExtension extension) {
-		for (IConfigurationElement element : extension.getConfigurationElements()) {
+        IConfigurationElement [] elements = extension.getConfigurationElements();
+        for (int i = 0; i < elements.length; i++) {
+            IConfigurationElement element = elements[i];
             if (element.getName().equals(IWorkbenchRegistryConstants.TAG_ACTION_SET)) {
                 try {
                     ActionSetDescriptor desc = new ActionSetDescriptor(element);
@@ -306,7 +318,8 @@ public class ActionSetRegistry implements IExtensionChangeHandler {
      * @param objects
      */
     private void removeActionSetPartAssociations(Object[] objects) {
-        for (Object object : objects) {
+        for (int i = 0; i < objects.length; i++) {
+            Object object = objects[i];
             if (object instanceof ActionSetPartAssociation) {
                 ActionSetPartAssociation association = (ActionSetPartAssociation) object;
                 String actionSetId = association.actionSetId;
@@ -329,7 +342,8 @@ public class ActionSetRegistry implements IExtensionChangeHandler {
      * @param objects
      */
     private void removeActionSets(Object[] objects) {
-        for (Object object : objects) {
+        for (int i = 0; i < objects.length; i++) {
+            Object object = objects[i];
             if (object instanceof IActionSetDescriptor) {
                 IActionSetDescriptor desc = (IActionSetDescriptor) object;
                 removeActionSet(desc);

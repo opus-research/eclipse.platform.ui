@@ -65,8 +65,8 @@ public abstract class TriggerSequence {
 			throw new NullPointerException("The triggers cannot be null"); //$NON-NLS-1$
 		}
 
-		for (Trigger trigger : triggers) {
-			if (trigger == null) {
+		for (int i = 0; i < triggers.length; i++) {
+			if (triggers[i] == null) {
 				throw new IllegalArgumentException(
 						"All triggers in a trigger sequence must be an instance of Trigger"); //$NON-NLS-1$
 			}
