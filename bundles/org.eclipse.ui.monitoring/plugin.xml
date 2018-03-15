@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="4.4"?>
 <!--
-  Copyright (C) 2014, 2015 Google Inc and others.
+  Copyright (C) 2014, 2016 Google Inc and others.
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@
             class="org.eclipse.ui.internal.monitoring.preferences.MonitoringPreferenceInitializer">
       </initializer>
       <initializer
-            class="org.eclipse.ui.internal.monitoring.preferences.JobMonitoringPreferenceInitializer">
+            class="org.eclipse.ui.internal.monitoring.preferences.JobCancelabilityMonitorPreferenceInitializer">
       </initializer>
    </extension>
    <extension
@@ -39,7 +39,7 @@
       </page>
       <page
             category="org.eclipse.ui.preferencePages.Workbench"
-            class="org.eclipse.ui.internal.monitoring.preferences.JobMonitoringPreferencePage"
+            class="org.eclipse.ui.internal.monitoring.preferences.JobCancelabilityPreferencePage"
             id="org.eclipse.ui.monitoring.job.page"
             name="%JobMonitoringPreferencePage.name">
       </page>

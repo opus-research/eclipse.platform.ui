@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Google, Inc and others.
+ * Copyright (c) 2014, 2016 Google, Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,12 +38,12 @@ public final class Messages extends NLS {
 	public static String MonitoringPreferencePage_ui_thread_filter_label;
 	public static String MonitoringPreferencePage_warning_threshold_label;
 
-	public static String JobMonitoringPreferencePage_enable_monitoring_label;
-	public static String JobMonitoringPreferencePage_warning_threshold_label;
-	public static String JobMonitoringPreferencePage_error_threshold_label;
-	public static String JobMonitoringPreferencePage_max_stack_samples_label;
-	public static String JobMonitoringPreferencePage_log_non_cancellable_user_job_label;
-	public static String JobMonitoringPreferencePage_not_log_fast_system_job_label;
+	public static String JobCancelabilityMonitorPreferencePage_enable_monitoring_label;
+	public static String JobCancelabilityMonitorPreferencePage_warning_threshold_label;
+	public static String JobCancelabilityMonitorPreferencePage_error_threshold_label;
+	public static String JobCancelabilityMonitorPreferencePage_max_stack_samples_label;
+	public static String JobCancelabilityMonitorPreferencePage_log_non_cancelable_user_job_label;
+	public static String JobCancelabilityMonitorPreferencePage_not_log_fast_system_job_label;
 
 	private Messages() {
 		// Do not instantiate.

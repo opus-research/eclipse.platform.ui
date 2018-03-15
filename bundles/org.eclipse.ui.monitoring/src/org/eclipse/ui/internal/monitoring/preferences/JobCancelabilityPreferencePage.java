@@ -31,7 +31,7 @@ import org.eclipse.ui.monitoring.PreferenceConstants;
 /**
  * Preference page that allows user to toggle plug in settings from Eclipse preferences.
  */
-public class JobMonitoringPreferencePage extends FieldEditorPreferencePage
+public class JobCancelabilityPreferencePage extends FieldEditorPreferencePage
 		implements IWorkbenchPreferencePage {
 	private static final int HOUR_IN_MS = 3600000;
 	private static final IPreferenceStore preferences =
@@ -84,7 +84,7 @@ public class JobMonitoringPreferencePage extends FieldEditorPreferencePage
 	    }
 	}
 
-	public JobMonitoringPreferencePage() {
+	public JobCancelabilityPreferencePage() {
 		super(GRID);
 		editors = new HashMap<>();
 	}
@@ -112,25 +112,25 @@ public class JobMonitoringPreferencePage extends FieldEditorPreferencePage
 		Composite block = new Composite(container, SWT.NONE);
 
 		monitoringEnabled = createBooleanEditor(PreferenceConstants.JOB_MONITORING_ENABLED,
-				Messages.JobMonitoringPreferencePage_enable_monitoring_label, block);
+				Messages.JobCancelabilityMonitorPreferencePage_enable_monitoring_label, block);
 
 		maxTimeWarningThreshold = createIntegerEditor(
 				PreferenceConstants.JOB_MONITORING_WARNING_THRESHOLD_MILLIS,
-				Messages.JobMonitoringPreferencePage_warning_threshold_label, block,
+				Messages.JobCancelabilityMonitorPreferencePage_warning_threshold_label, block,
 				3, HOUR_IN_MS);
 		maxTimeErrorThreshold = createIntegerEditor(
 				PreferenceConstants.JOB_MONITORING_ERROR_THRESHOLD_MILLIS,
-				Messages.JobMonitoringPreferencePage_error_threshold_label, block,
+				Messages.JobCancelabilityMonitorPreferencePage_error_threshold_label, block,
 				3, HOUR_IN_MS);
 		createIntegerEditor(
 				PreferenceConstants.JOB_MONITORING_MAX_STACK_SAMPLES,
-				Messages.JobMonitoringPreferencePage_max_stack_samples_label, block, 0, 100);
+				Messages.JobCancelabilityMonitorPreferencePage_max_stack_samples_label, block, 0, 100);
 
 		createBooleanEditor(PreferenceConstants.JOB_MONITORING_LOG_NON_CANCELLABLE_USER_JOB,
-				Messages.JobMonitoringPreferencePage_log_non_cancellable_user_job_label, block);
+				Messages.JobCancelabilityMonitorPreferencePage_log_non_cancelable_user_job_label, block);
 
 		createBooleanEditor(PreferenceConstants.JOB_MONITORING_DO_NOT_LOG_FAST_SYSTEM_JOB,
-				Messages.JobMonitoringPreferencePage_not_log_fast_system_job_label, block);
+				Messages.JobCancelabilityMonitorPreferencePage_not_log_fast_system_job_label, block);
 
 		GridLayoutFactory.fillDefaults()
 				.numColumns(2)
