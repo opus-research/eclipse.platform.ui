@@ -203,7 +203,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
                 addError(NLS.bind(DataTransferMessages.DataTransfer_errorExporting, exportResource.getFullPath().makeRelative(), e.getMessage()), e);
             }
 
-			monitor.worked(1);
+            monitor.worked(1);
             ModalContext.checkCanceled(monitor);
         } else {
             IResource[] children = null;
