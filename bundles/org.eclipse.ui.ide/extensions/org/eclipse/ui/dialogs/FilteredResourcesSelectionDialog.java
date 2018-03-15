@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     James Blackburn (Broadcom Corp.) Bug 86973 Allow path pattern matching
  *     Anton Leherbauer (Wind River Systems, Inc.) - Bug 415099 Terminating with "<" or " " (space) does not work for extensions
  *     Mickael Istria (Red Hat Inc.) - Bug 460749: filter resources with same location
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491025
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -254,13 +255,19 @@ public class FilteredResourcesSelectionDialog extends
 	protected void restoreDialog(IDialogSettings settings) {
 		super.restoreDialog(settings);
 
-		boolean showDerived = settings.getBoolean(SHOW_DERIVED);
+		boolean showDerived = false;
+		if (settings.get(SHOW_DERIVED) != null) {
+			showDerived = settings.getBoolean(SHOW_DERIVED);
+		}
 		showDerivedResourcesAction.setChecked(showDerived);
 		this.isDerived = showDerived;
 
-		boolean groupByLoation = settings.getBoolean(FILTER_BY_LOCATION);
-		this.groupResourcesByLocationAction.setChecked(groupByLoation);
-		this.filterResourceByLocation.setEnabled(groupByLoation);
+		boolean groupByLocation = true;
+		if (settings.get(FILTER_BY_LOCATION) != null) {
+			groupByLocation = settings.getBoolean(FILTER_BY_LOCATION);
+		}
+		this.groupResourcesByLocationAction.setChecked(groupByLocation);
+		this.filterResourceByLocation.setEnabled(groupByLocation);
 		addListFilter(this.filterResourceByLocation);
 
 		String setting = settings.get(WORKINGS_SET_SETTINGS);
