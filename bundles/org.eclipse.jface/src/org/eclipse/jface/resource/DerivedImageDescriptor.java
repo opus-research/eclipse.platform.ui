@@ -15,7 +15,6 @@ import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -88,32 +87,12 @@ final class DerivedImageDescriptor extends ImageDescriptor {
         return result;
     }
 
-	@Override
-	public ImageData getImageData(int zoom) {
-		Image image = internalCreateImage(Display.getCurrent());
-		ImageData result = null;
-		if (zoom == 100) {
-			result = image.getImageData();
-		}
-		if (isAtCurrentZoom(image, zoom)) {
-			result = image.getImageDataAtCurrentZoom();
-		}
-		image.dispose();
-		return result;
-	}
+    @Override
+	public ImageData getImageData() {
+        Image image = internalCreateImage(Display.getCurrent());
+        ImageData result = image.getImageData();
+        image.dispose();
+        return result;
+    }
 
-	private static boolean isAtCurrentZoom(Image image, int zoom) {
-		// Implementation is a workaround for missing Image#getCurrentZoom().
-		Rectangle bounds= image.getBounds();
-		Rectangle boundsInPixels= image.getBoundsInPixels();
-		//TODO: Probably has off-by-one problems at fractional zoom levels:
-		return bounds.width == scaleDown(boundsInPixels.width, zoom)
-				|| bounds.height == scaleDown(boundsInPixels.height, zoom);
-	}
-
-	private static int scaleDown(int value, int zoom) {
-		// @see SWT's internal DPIUtil#autoScaleDown(int)
-		float scaleFactor = zoom / 100f;
-		return Math.round(value / scaleFactor);
-	}
 }

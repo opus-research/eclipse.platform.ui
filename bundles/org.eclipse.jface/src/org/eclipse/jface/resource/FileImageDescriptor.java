@@ -85,9 +85,7 @@ class FileImageDescriptor extends ImageDescriptor {
 	 *      FileImageDescriptor implementation of this method is not used by
 	 *      {@link ImageDescriptor#createImage(boolean, Device)} as of version
 	 *      3.4 so that the SWT OS optimised loading can be used.
-	 * @deprecated
 	 */
-	@Deprecated
 	@Override
 	public ImageData getImageData() {
 		InputStream in = getStream();
