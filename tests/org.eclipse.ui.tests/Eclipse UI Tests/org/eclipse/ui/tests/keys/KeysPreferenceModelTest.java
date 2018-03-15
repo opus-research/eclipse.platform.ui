@@ -580,7 +580,7 @@ public class KeysPreferenceModelTest extends UITestCase {
 
 		sm.setSelectedElement(emacsScheme);
 
-		i2 = bm.getBindings().iterator();
+		i = bm.getBindings().iterator();
 		ArrayList<BindingElement> quick2 = new ArrayList<>();
 		boolean foundOriginal = false;
 		while (i2.hasNext()) {
@@ -632,7 +632,7 @@ public class KeysPreferenceModelTest extends UITestCase {
 
 		sm.setSelectedElement(emacsScheme);
 
-		i2 = bm.getBindings().iterator();
+		i = bm.getBindings().iterator();
 		ArrayList<BindingElement> quick2 = new ArrayList<>();
 		boolean foundOriginal = false;
 		while (i2.hasNext()) {
@@ -649,7 +649,7 @@ public class KeysPreferenceModelTest extends UITestCase {
 
 		sm.setSelectedElement(defaultScheme);
 
-		i2 = bm.getBindings().iterator();
+		i = bm.getBindings().iterator();
 		quick2.clear();
 		foundOriginal = false;
 		while (i2.hasNext()) {
