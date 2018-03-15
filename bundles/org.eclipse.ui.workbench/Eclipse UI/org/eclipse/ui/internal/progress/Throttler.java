@@ -8,16 +8,13 @@
  * Contributors:
  *     Mikael Barbero (Eclipse Foundation) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.jface.util;
+package org.eclipse.ui.internal.progress;
 
 import java.time.Duration;
-
 import org.eclipse.swt.widgets.Display;
 
 /**
  * A utility class that throttles the execution of a runnable in the UI thread.
- * 
- * @since 3.14
  */
 public class Throttler {
 	private final Runnable timerExec;

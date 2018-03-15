@@ -51,10 +51,19 @@ public class MarkerCopyHandler extends MarkerViewHandler {
 		String markerReport = createMarkerReport(view, markers);
 
 		// Place the markers on the clipboard
-		Object[] data = new Object[] { markers, markerReport };
-		Transfer[] transferTypes = new Transfer[] { MarkerTransfer.getInstance(), TextTransfer.getInstance() };
+		Object[] data;
+		Transfer[] transferTypes;
+		if (markerReport == null) {
+			data = new Object[] { markers };
+			transferTypes = new Transfer[] { MarkerTransfer.getInstance() };
+		} else {
+			data = new Object[] { markers, markerReport };
+			transferTypes = new Transfer[] { MarkerTransfer.getInstance(),
+					TextTransfer.getInstance() };
+		}
 
 		view.getClipboard().setContents(data, transferTypes);
+
 	}
 
 	/**
