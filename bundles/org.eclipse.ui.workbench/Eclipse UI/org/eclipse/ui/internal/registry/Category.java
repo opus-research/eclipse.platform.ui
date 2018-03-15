@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.ui.internal.registry;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -107,12 +108,12 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
         elements.add(element);
     }
 
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+    @Override
+	public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class) {
-			return adapter.cast(this);
+			return this;
 		} else if (adapter == IConfigurationElement.class) {
-			return adapter.cast(configurationElement);
+			return configurationElement;
 		} else {
 			return null;
 		}
@@ -248,7 +249,7 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
     @Override
 	public String getPluginId() {
         return configurationElement == null ? pluginId : configurationElement
-				.getNamespaceIdentifier();
+				.getNamespace();
     }
 
 	/**

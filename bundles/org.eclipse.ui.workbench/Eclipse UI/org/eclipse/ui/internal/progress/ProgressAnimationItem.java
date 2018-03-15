@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
-import java.time.Duration;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
@@ -48,6 +47,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.WorkbenchImages;
+import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.eclipse.ui.progress.IProgressConstants2;
 import org.eclipse.ui.statushandlers.StatusAdapter;
@@ -80,9 +80,6 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	private AccessibleListener currentAccessibleListener;
 
-	private Throttler throttledRefresh = new Throttler(PlatformUI.getWorkbench().getDisplay(), Duration.ofMillis(100),
-			this::refresh);
-
 	/**
 	 * Create an instance of the receiver in the supplied region.
 	 *
@@ -92,7 +89,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 	 *            flags to use for creation of the progress bar
 	 */
 	ProgressAnimationItem(ProgressRegion region, int flags) {
-		super(region.workbenchWindow);
+		super((WorkbenchWindow) region.workbenchWindow);
 		this.flags = flags;
 		FinishedJobs.getInstance().addListener(this);
 
@@ -400,12 +397,24 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	@Override
 	public void removed(JobTreeElement info) {
-		throttledRefresh.throttledExec();
+		final Display display = Display.getDefault();
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				refresh();
+			}
+		});
 	}
 
 	@Override
 	public void finished(final JobTreeElement jte) {
-		throttledRefresh.throttledExec();
+		final Display display = Display.getDefault();
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				refresh();
+			}
+		});
 	}
 
 }
