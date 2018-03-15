@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -167,9 +167,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	private boolean lockedUI = false;
 
-	private ListenerList<IPageChangedListener> pageChangedListeners = new ListenerList<>();
+	private ListenerList pageChangedListeners = new ListenerList();
 
-	private ListenerList<IPageChangingListener> pageChangingListeners = new ListenerList<>();
+	private ListenerList pageChangingListeners = new ListenerList();
 
 	/**
 	 * A layout for a container which includes several pages, like a notebook,
@@ -1482,7 +1482,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * @since 3.1
 	 */
 	protected void firePageChanged(final PageChangedEvent event) {
-		for (IPageChangedListener l : pageChangedListeners) {
+		Object[] listeners = pageChangedListeners.getListeners();
+		for (int i = 0; i < listeners.length; ++i) {
+			final IPageChangedListener l = (IPageChangedListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1529,7 +1531,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * @since 3.3
 	 */
 	protected void firePageChanging(final PageChangingEvent event) {
-		for (IPageChangingListener l : pageChangingListeners) {
+		Object[] listeners = pageChangingListeners.getListeners();
+		for (int i = 0; i < listeners.length; ++i) {
+			final IPageChangingListener l = (IPageChangingListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -85,28 +85,8 @@ public class MarkerViewUtil {
 	 */
 	public static boolean showMarker(IWorkbenchPage page, IMarker marker,
 			boolean showView) {
-		return showMarkers(page, new IMarker[] { marker }, showView);
-	}
 
-	/**
-	 * Shows the given markers in the appropriate view in the given page. This
-	 * must be called from the UI thread.
-	 *
-	 * @param page
-	 *            the workbench page in which to show the markers
-	 * @param markers
-	 *            the markers to show
-	 * @param showView
-	 *            <code>true</code> if the view should be shown first
-	 *            <code>false</code> to only show the markers if the view is
-	 *            already showing
-	 * @return <code>true</code> if the markers were successfully shown,
-	 *         <code>false</code> if not
-	 * @since 3.12
-	 */
-	public static boolean showMarkers(IWorkbenchPage page, IMarker[] markers, boolean showView) {
 		boolean returnValue = false;
-		IMarker marker = markers[0];
 		try {
 			String viewId = getViewId(marker);
 			if (viewId == null) // Use the problem view by default
@@ -115,7 +95,8 @@ public class MarkerViewUtil {
 			IViewPart view = showView ? page.showView(viewId) : page
 					.findView(viewId);
 			if (view != null)
-				returnValue = MarkerSupportInternalUtilities.showMarkers(view, markers);
+				returnValue = MarkerSupportInternalUtilities.showMarker(view,
+						marker);
 
 			// If we have already shown the new one do not open another one
 			viewId = getLegacyViewId(marker);
