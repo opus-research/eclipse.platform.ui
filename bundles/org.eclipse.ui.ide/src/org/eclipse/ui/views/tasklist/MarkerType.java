@@ -50,8 +50,8 @@ class MarkerType {
      */
     private void getAllSupertypes(ArrayList result) {
         MarkerType[] supers = getSupertypes();
-        for (int i = 0; i < supers.length; ++i) {
-            MarkerType sup = supers[i];
+        for (MarkerType super1 : supers) {
+            MarkerType sup = super1;
             if (!result.contains(sup)) {
                 result.add(sup);
                 sup.getAllSupertypes(result);
@@ -81,11 +81,10 @@ class MarkerType {
     public MarkerType[] getSubtypes() {
         MarkerType[] types = model.getTypes();
         ArrayList result = new ArrayList();
-        for (int i = 0; i < types.length; ++i) {
-            MarkerType type = types[i];
+        for (MarkerType type : types) {
             String[] supers = type.getSupertypeIds();
-            for (int j = 0; j < supers.length; ++j) {
-                if (supers[j].equals(id)) {
+            for (String super1 : supers) {
+                if (super1.equals(id)) {
                     result.add(type);
                 }
             }
@@ -105,8 +104,8 @@ class MarkerType {
      */
     public MarkerType[] getSupertypes() {
         ArrayList result = new ArrayList();
-        for (int i = 0; i < supertypeIds.length; ++i) {
-            MarkerType sup = model.getType(supertypeIds[i]);
+        for (String supertypeId : supertypeIds) {
+            MarkerType sup = model.getType(supertypeId);
             if (sup != null) {
                 result.add(sup);
             }
@@ -124,8 +123,8 @@ class MarkerType {
         if (id.equals(superType.getId())) {
             return true;
         }
-        for (int i = 0; i < supertypeIds.length; ++i) {
-            MarkerType sup = model.getType(supertypeIds[i]);
+        for (String supertypeId : supertypeIds) {
+            MarkerType sup = model.getType(supertypeId);
             if (sup != null && sup.isSubtypeOf(superType)) {
                 return true;
             }
