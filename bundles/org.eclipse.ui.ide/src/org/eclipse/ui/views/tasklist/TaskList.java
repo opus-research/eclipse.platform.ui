@@ -429,13 +429,10 @@ public class TaskList extends ViewPart {
                 }
                 updateSortingState();
                 viewer.refresh();
-                IDialogSettings workbenchSettings = getPlugin()
-                        .getDialogSettings();
-                IDialogSettings settings = workbenchSettings
-                        .getSection(TAG_SORT_SECTION);
+				IDialogSettings workbenchSettings = getPlugin().getDialogSettings();
+				IDialogSettings settings = workbenchSettings.getSection(TAG_SORT_SECTION);
                 if (settings == null) {
-					settings = workbenchSettings
-                            .addNewSection(TAG_SORT_SECTION);
+					settings = workbenchSettings.addNewSection(TAG_SORT_SECTION);
 				}
                 comparator.saveState(settings);
             }
@@ -445,14 +442,13 @@ public class TaskList extends ViewPart {
             //restore columns width
             IMemento children[] = memento.getChildren(TAG_COLUMN);
             if (children != null) {
-                for (int i = 0; i < children.length; i++) {
-                    Integer val = children[i].getInteger(TAG_NUMBER);
+                for (IMemento child : children) {
+                    Integer val = child.getInteger(TAG_NUMBER);
                     if (val != null) {
                         int index = val.intValue();
-                        val = children[i].getInteger(TAG_WIDTH);
+                        val = child.getInteger(TAG_WIDTH);
                         if (val != null) {
-                            columnLayouts[index] = new ColumnPixelData(val
-                                    .intValue(), true);
+							columnLayouts[index] = new ColumnPixelData(val.intValue(), true);
                         }
                     }
                 }
@@ -510,8 +506,8 @@ public class TaskList extends ViewPart {
         buf.append(System.getProperty("line.separator")); //$NON-NLS-1$
 
         // Create the report for the markers
-        for (int i = 0; i < markers.length; i++) {
-            writeMarker(buf, markers[i]);
+        for (IMarker marker : markers) {
+            writeMarker(buf, marker);
         }
         return buf.toString();
     }
@@ -926,7 +922,7 @@ public class TaskList extends ViewPart {
      * @return the current selection (element type: <code>IMarker</code>)
      */
     public ISelection getSelection() {
-        return viewer.getSelection();
+		return viewer.getStructuredSelection();
     }
 
     /**
@@ -990,18 +986,16 @@ public class TaskList extends ViewPart {
         }
 
         IResource[] resources = getResources();
-        IResource resource2;
 
         if (showOwnerProject()) {
             IProject project;
 
-            for (int i = 0, l = resources.length; i < l; i++) {
-                resource2 = resources[i];
+			for (IResource currentResource : resources) {
 
-                if (resource2 == null) {
+				if (currentResource == null) {
                     return true;
                 }
-                project = resource2.getProject();
+				project = currentResource.getProject();
 
                 if (project == null
                         || project.equals(resource.getProject())) {
@@ -1011,20 +1005,16 @@ public class TaskList extends ViewPart {
         }
 
         if (showChildrenHierarchy()) {
-            for (int i = 0, l = resources.length; i < l; i++) {
-                resource2 = resources[i];
+			for (IResource currentResource : resources) {
 
-                if (resource2 != null
-                        && resource2.getFullPath().isPrefixOf(
-                                resource.getFullPath())) {
+				if (currentResource != null && currentResource.getFullPath().isPrefixOf(resource.getFullPath())) {
 					return true;
 				}
             }
         } else {
-			for (int i = 0, l = resources.length; i < l; i++) {
-                resource2 = resources[i];
+			for (IResource currentResource : resources) {
 
-                if (resource.equals(resource2)) {
+				if (resource.equals(currentResource)) {
 					return true;
 				}
             }
@@ -1244,13 +1234,11 @@ public class TaskList extends ViewPart {
      */
     void performDragSetData(DragSourceEvent event) {
         if (MarkerTransfer.getInstance().isSupportedType(event.dataType)) {
-            event.data = ((IStructuredSelection) viewer.getSelection())
-                    .toArray();
+			event.data = viewer.getStructuredSelection().toArray();
             return;
         }
         if (TextTransfer.getInstance().isSupportedType(event.dataType)) {
-            Object[] data = ((IStructuredSelection) viewer.getSelection())
-                    .toArray();
+			Object[] data = viewer.getStructuredSelection().toArray();
             if (data != null) {
                 IMarker[] markers = new IMarker[data.length];
                 for (int i = 0; i < markers.length; i++) {
@@ -1268,12 +1256,10 @@ public class TaskList extends ViewPart {
         IMemento selectionMem = memento.getChild(TAG_SELECTION);
         if (selectionMem != null) {
             ArrayList selectionList = new ArrayList();
-            IMemento markerMems[] = selectionMem.getChildren(TAG_MARKER);
-            for (int i = 0; i < markerMems.length; i++) {
+			for (IMemento markerMemento : selectionMem.getChildren(TAG_MARKER)) {
                 try {
-                    long id = Long.parseLong(markerMems[i].getString(TAG_ID));
-                    IResource resource = root.findMember(markerMems[i]
-                            .getString(TAG_RESOURCE));
+					long id = Long.parseLong(markerMemento.getString(TAG_ID));
+					IResource resource = root.findMember(markerMemento.getString(TAG_RESOURCE));
                     if (resource != null) {
                         IMarker marker = resource.findMarker(id);
                         if (marker != null) {
@@ -1332,13 +1318,12 @@ public class TaskList extends ViewPart {
         }
 
         //save selection
-        Object markers[] = ((IStructuredSelection) viewer.getSelection())
-                .toArray();
+		Object markers[] = viewer.getStructuredSelection().toArray();
         if (markers.length > 0) {
             IMemento selectionMem = memento.createChild(TAG_SELECTION);
-            for (int i = 0; i < markers.length; i++) {
+            for (Object selection : markers) {
                 IMemento elementMem = selectionMem.createChild(TAG_MARKER);
-                IMarker marker = (IMarker) markers[i];
+                IMarker marker = (IMarker) selection;
                 elementMem.putString(TAG_RESOURCE, marker.getResource()
                         .getFullPath().toString());
                 elementMem.putString(TAG_ID, String.valueOf(marker.getId()));
@@ -1635,8 +1620,8 @@ public class TaskList extends ViewPart {
         IMarker[] markerData = (IMarker[]) getClipboard().getContents(transfer);
         boolean canPaste = false;
         if (markerData != null) {
-            for (int i = 0; i < markerData.length; i++) {
-                if (MarkerUtil.isMarkerType(markerData[i], IMarker.TASK)) {
+            for (IMarker marker : markerData) {
+                if (MarkerUtil.isMarkerType(marker, IMarker.TASK)) {
                     canPaste = true;
                     break;
                 }
@@ -1649,13 +1634,7 @@ public class TaskList extends ViewPart {
      * Updates that message displayed in the status line.
      */
     void updateStatusMessage() {
-        ISelection selection = viewer.getSelection();
-
-        if (selection instanceof IStructuredSelection) {
-			updateStatusMessage((IStructuredSelection) selection);
-		} else {
-			updateStatusMessage(null);
-		}
+		updateStatusMessage(viewer.getStructuredSelection());
     }
 
     /**
