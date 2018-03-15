@@ -879,7 +879,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (memento != null) {
                 String sortStr = memento.getString(TAG_SORTER);
                 if (sortStr != null) {
-					sortInt = new Integer(sortStr).intValue();
+					sortInt = Integer.parseInt(sortStr);
 				}
             } else {
                 sortInt = settings.getInt(STORE_SORT_TYPE);
@@ -904,7 +904,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (memento != null) {
                 String sortStr = memento.getString(TAG_SORTER);
                 if (sortStr != null) {
-					sortInt = new Integer(sortStr).intValue();
+					sortInt = Integer.parseInt(sortStr);
 				}
             } else {
                 sortInt = settings.getInt(STORE_SORT_TYPE);

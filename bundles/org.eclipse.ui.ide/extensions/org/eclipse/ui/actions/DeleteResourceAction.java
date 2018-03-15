@@ -397,14 +397,9 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		} else {
 			title = IDEWorkbenchMessages.DeleteResourceAction_titleN;
 			if (containsLinkedResource(resources)) {
-				msg = NLS
-						.bind(
-								IDEWorkbenchMessages.DeleteResourceAction_confirmLinkedResourceN,
-						Integer.valueOf(resources.size()));
+				msg = NLS.bind(IDEWorkbenchMessages.DeleteResourceAction_confirmLinkedResourceN, resources.size());
 			} else {
-				msg = NLS.bind(
-						IDEWorkbenchMessages.DeleteResourceAction_confirmN,
-						new Integer(resources.size()));
+				msg = NLS.bind(IDEWorkbenchMessages.DeleteResourceAction_confirmN, resources.size());
 			}
 		}
 		return MessageDialog.openQuestion(shellProvider.getShell(), title, msg);
