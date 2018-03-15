@@ -926,7 +926,7 @@ public class TaskList extends ViewPart {
      * @return the current selection (element type: <code>IMarker</code>)
      */
     public ISelection getSelection() {
-        return viewer.getSelection();
+		return viewer.getStructuredSelection();
     }
 
     /**
@@ -1244,12 +1244,12 @@ public class TaskList extends ViewPart {
      */
     void performDragSetData(DragSourceEvent event) {
         if (MarkerTransfer.getInstance().isSupportedType(event.dataType)) {
-            event.data = ((IStructuredSelection) viewer.getSelection())
+			event.data = viewer.getStructuredSelection()
                     .toArray();
             return;
         }
         if (TextTransfer.getInstance().isSupportedType(event.dataType)) {
-            Object[] data = ((IStructuredSelection) viewer.getSelection())
+			Object[] data = viewer.getStructuredSelection()
                     .toArray();
             if (data != null) {
                 IMarker[] markers = new IMarker[data.length];
@@ -1332,7 +1332,7 @@ public class TaskList extends ViewPart {
         }
 
         //save selection
-        Object markers[] = ((IStructuredSelection) viewer.getSelection())
+		Object markers[] = viewer.getStructuredSelection()
                 .toArray();
         if (markers.length > 0) {
             IMemento selectionMem = memento.createChild(TAG_SELECTION);
@@ -1649,13 +1649,7 @@ public class TaskList extends ViewPart {
      * Updates that message displayed in the status line.
      */
     void updateStatusMessage() {
-        ISelection selection = viewer.getSelection();
-
-        if (selection instanceof IStructuredSelection) {
-			updateStatusMessage((IStructuredSelection) selection);
-		} else {
-			updateStatusMessage(null);
-		}
+		updateStatusMessage(viewer.getStructuredSelection());
     }
 
     /**
