@@ -163,9 +163,9 @@ public class ActionExpression {
 			}
 
 			list = new ArrayList(children.length);
-			for (IConfigurationElement element2 : children) {
-				String tag = element2.getName();
-				AbstractExpression expr = createExpression(element2);
+			for (IConfigurationElement configElement : children) {
+				String tag = configElement.getName();
+				AbstractExpression expr = createExpression(configElement);
 				if (EXP_TYPE_OBJECT_CLASS.equals(tag)) {
 					list.add(0, expr);
 				} else {
@@ -389,8 +389,8 @@ public class ActionExpression {
 
 				// test all the interfaces the class implements
 				Class[] interfaces = clazz.getInterfaces();
-				for (Class interface1 : interfaces) {
-					if (checkInterfaceHierarchy(interface1)) {
+				for (Class currentInterface : interfaces) {
+					if (checkInterfaceHierarchy(currentInterface)) {
 						return true;
 					}
 				}

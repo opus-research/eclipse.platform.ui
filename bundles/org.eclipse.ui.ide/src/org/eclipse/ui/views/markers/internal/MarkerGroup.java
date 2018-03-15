@@ -299,14 +299,14 @@ public class MarkerGroup {
 				.getChildren(MarkerSupportRegistry.MARKER_ATTRIBUTE_GROUPING);
 
 		Map<String, MarkerGroupingEntry> idsToEntries = new HashMap<>();
-		for (IConfigurationElement markerEntryElement : markerEntryElements) {
-			MarkerGroupingEntry entry = new MarkerGroupingEntry(markerEntryElement);
+		for (int i = 0; i < markerEntryElements.length; i++) {
+			MarkerGroupingEntry entry = new MarkerGroupingEntry(markerEntryElements[i]);
 			entry.setGroup(this);
 			idsToEntries.put(entry.getId(), entry);
 		}
 
-		for (IConfigurationElement attributeGroupingElement : attributeGroupingElements) {
-			AttributeMarkerGrouping attributeGrouping = new AttributeMarkerGrouping(attributeGroupingElement);
+		for (int i = 0; i < attributeGroupingElements.length; i++) {
+			AttributeMarkerGrouping attributeGrouping = new AttributeMarkerGrouping(attributeGroupingElements[i]);
 
 			String defaultEntryId = attributeGrouping.getDefaultGroupingEntry();
 			if (defaultEntryId != null) {
@@ -322,15 +322,15 @@ public class MarkerGroup {
 			IConfigurationElement[] mappings = attributeGrouping.getElement()
 					.getChildren(MarkerSupportRegistry.ATTRIBUTE_MAPPING);
 
-			for (IConfigurationElement mapping : mappings) {
-				String entryId = mapping.getAttribute(MarkerSupportRegistry.MARKER_GROUPING_ENTRY);
+			for (int mappingIndex = 0; mappingIndex < mappings.length; mappingIndex++) {
+				String entryId = mappings[mappingIndex].getAttribute(MarkerSupportRegistry.MARKER_GROUPING_ENTRY);
 
 				if (idsToEntries.containsKey(entryId)) {
 					MarkerGroupingEntry entry = idsToEntries.get(entryId);
 					entry.getMarkerGroup().mapAttribute(
 							attributeGrouping,
 							entry,
-							mapping
+							mappings[mappingIndex]
 									.getAttribute(MarkerSupportRegistry.VALUE));
 				} else {
 					IDEWorkbenchPlugin.log(NLS.bind(
@@ -357,8 +357,9 @@ public class MarkerGroup {
 	 */
 	private void addEntry(String markerType, EntryMapping entry) {
 		MarkerType[] allDerived = getMarkerTypes(markerType);
-		for (MarkerType type : allDerived) {
+		for (int i = 0; i < allDerived.length; i++) {
 			Collection<EntryMapping> entries = new HashSet<>();
+			MarkerType type = allDerived[i];
 			if (typesToMappings.containsKey(type.getId())) {
 				entries = typesToMappings.get(markerType);
 			} else {
@@ -466,8 +467,8 @@ public class MarkerGroup {
 		if (type != null) {
 			types.add(type);
 			MarkerType[] subs = type.getAllSubTypes();
-			for (MarkerType sub : subs) {
-				types.add(sub);
+			for (int j = 0; j < subs.length; j++) {
+				types.add(subs[j]);
 			}
 		}
 

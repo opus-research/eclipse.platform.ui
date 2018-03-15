@@ -124,7 +124,8 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
         }
         IResourceDelta[] projDeltas = delta
                 .getAffectedChildren(IResourceDelta.CHANGED);
-        for (IResourceDelta projDelta : projDeltas) {
+        for (int i = 0; i < projDeltas.length; ++i) {
+            IResourceDelta projDelta = projDeltas[i];
             //changing the project open state or description will affect open/close/build action enablement
             if ((projDelta.getFlags() & (IResourceDelta.OPEN | IResourceDelta.DESCRIPTION)) != 0) {
                 if (sel.contains(projDelta.getResource())) {

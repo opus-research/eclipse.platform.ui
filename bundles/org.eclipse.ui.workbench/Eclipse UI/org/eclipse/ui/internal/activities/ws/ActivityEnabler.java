@@ -160,8 +160,8 @@ public class ActivityEnabler {
 			Object[] children = provider.getChildren(proxy.getCategory());
 			int state = NONE;
 			int count = 0;
-			for (Object element2 : children) {
-				if (checked.contains(element2)) {
+			for (Object child : children) {
+				if (checked.contains(child)) {
 					count++;
 				}
 			}

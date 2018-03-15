@@ -103,9 +103,9 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		IConfigurationElement[] elements = extension.getConfigurationElements();
-		for (IConfigurationElement element2 : elements) {
+		for (IConfigurationElement configElement : elements) {
 			WorkbenchPreferenceNode node = PreferencePageRegistryReader
-					.createNode(element2);
+					.createNode(configElement);
 			if (node == null) {
 				continue;
 			}

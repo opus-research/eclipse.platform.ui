@@ -91,7 +91,8 @@ class BookmarkContentProvider implements IStructuredContentProvider,
     void getMarkerDeltas(IResourceDelta delta, List additions, List removals,
             List changes) {
         IMarkerDelta[] markerDeltas = delta.getMarkerDeltas();
-        for (IMarkerDelta markerDelta : markerDeltas) {
+        for (int i = 0; i < markerDeltas.length; i++) {
+            IMarkerDelta markerDelta = markerDeltas[i];
             IMarker marker = markerDelta.getMarker();
             switch (markerDelta.getKind()) {
             case IResourceDelta.ADDED:
@@ -114,8 +115,8 @@ class BookmarkContentProvider implements IStructuredContentProvider,
 
         //recurse on child deltas
         IResourceDelta[] children = delta.getAffectedChildren();
-        for (IResourceDelta element : children) {
-            getMarkerDeltas(element, additions, removals, changes);
+        for (int i = 0; i < children.length; i++) {
+            getMarkerDeltas(children[i], additions, removals, changes);
         }
     }
 

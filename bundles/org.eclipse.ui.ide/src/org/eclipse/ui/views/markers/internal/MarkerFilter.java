@@ -124,8 +124,8 @@ public class MarkerFilter implements Cloneable {
 	MarkerFilter(String filterName, String[] rootTypes) {
 		name = filterName;
 
-		for (String rootType : rootTypes) {
-			MarkerType type = MarkerTypesModel.getInstance().getType(rootType);
+		for (int i = 0; i < rootTypes.length; i++) {
+			MarkerType type = MarkerTypesModel.getInstance().getType(rootTypes[i]);
 
 			if (!this.rootTypes.contains(type)) {
 				this.rootTypes.add(type);
@@ -158,8 +158,8 @@ public class MarkerFilter implements Cloneable {
 
 		MarkerType[] subTypes = type.getSubtypes();
 
-		for (MarkerType subType : subTypes) {
-			addAllSubTypes(types, subType);
+		for (int i = 0; i < subTypes.length; i++) {
+			addAllSubTypes(types, subTypes[i]);
 		}
 	}
 
@@ -193,8 +193,8 @@ public class MarkerFilter implements Cloneable {
 		IAdaptable[] elements = workingSet.getElements();
 		List<IResource> result = new ArrayList<>(elements.length);
 
-		for (IAdaptable element : elements) {
-			IResource next = Adapters.adapt(element, IResource.class);
+		for (int idx = 0; idx < elements.length; idx++) {
+			IResource next = Adapters.adapt(elements[idx], IResource.class);
 			if (next != null) {
 				result.add(next);
 			}
@@ -222,7 +222,8 @@ public class MarkerFilter implements Cloneable {
 	 * Adds the paths of all resources in the given array to the given set.
 	 */
 	private void addResourcesAndChildren(HashSet<String> result, IResource[] resources) {
-		for (IResource currentResource : resources) {
+		for (int idx = 0; idx < resources.length; idx++) {
+			IResource currentResource = resources[idx];
 			result.add(currentResource.getFullPath().toString());
 			if (currentResource instanceof IContainer) {
 				IContainer cont = (IContainer) currentResource;
@@ -259,14 +260,14 @@ public class MarkerFilter implements Cloneable {
 	static Collection<IProject> getProjectsAsCollection(Object[] elements) {
 		HashSet<IProject> projects = new HashSet<>();
 
-		for (Object element : elements) {
-			if (element instanceof IResource) {
-				projects.add(((IResource) element).getProject());
+		for (int idx = 0; idx < elements.length; idx++) {
+			if (elements[idx] instanceof IResource) {
+				projects.add(((IResource) elements[idx]).getProject());
 			} else {
-				IProject[] mappingProjects = (((ResourceMapping) element)
+				IProject[] mappingProjects = (((ResourceMapping) elements[idx])
 						.getProjects());
-				for (IProject mappingProject : mappingProjects) {
-					projects.add(mappingProject);
+				for (int i = 0; i < mappingProjects.length; i++) {
+					projects.add(mappingProjects[i]);
 				}
 			}
 		}
@@ -319,8 +320,8 @@ public class MarkerFilter implements Cloneable {
 				return false;
 			}
 
-			for (IResource element : focusResource) {
-				IProject selectedProject = element.getProject();
+			for (int i = 0; i < focusResource.length; i++) {
+				IProject selectedProject = focusResource[i].getProject();
 				if (selectedProject == null) {
 					continue;
 				}
@@ -330,16 +331,16 @@ public class MarkerFilter implements Cloneable {
 				}
 			}
 		} else if (onResource == ON_SELECTED_ONLY) {
-			for (IResource element : focusResource) {
-				if (resource.equals(element)) {
+			for (int i = 0; i < focusResource.length; i++) {
+				if (resource.equals(focusResource[i])) {
 					return true;
 				}
 			}
 		} else if (onResource == ON_SELECTED_AND_CHILDREN) {
-			for (IResource element : focusResource) {
+			for (int i = 0; i < focusResource.length; i++) {
 				IResource parentResource = resource;
 				while (parentResource != null) {
-					if (parentResource.equals(element)) {
+					if (parentResource.equals(focusResource[i])) {
 						return true;
 					}
 					parentResource = parentResource.getParent();
