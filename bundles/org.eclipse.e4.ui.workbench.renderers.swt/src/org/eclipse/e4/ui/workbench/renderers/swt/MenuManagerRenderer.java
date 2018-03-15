@@ -643,7 +643,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		List<MUIElement> parts = container.getChildren();
 		if (parts != null) {
 			MUIElement[] plist = parts.toArray(new MUIElement[parts.size()]);
-			for (MUIElement childME : plist) {
+			for (int i = 0; i < plist.length; i++) {
+				MUIElement childME = plist[i];
 				modelProcessSwitch(parentManager, (MMenuElement) childME);
 			}
 		}
@@ -685,7 +686,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		List<MMenuElement> parts = menuModel.getChildren();
 		if (parts != null) {
 			MMenuElement[] plist = parts.toArray(new MMenuElement[parts.size()]);
-			for (MMenuElement childME : plist) {
+			for (int i = 0; i < plist.length; i++) {
+				MMenuElement childME = plist[i];
 				modelProcessSwitch(menuManager, childME);
 			}
 		}

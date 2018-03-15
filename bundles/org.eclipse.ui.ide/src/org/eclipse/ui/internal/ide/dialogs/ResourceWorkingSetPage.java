@@ -104,15 +104,16 @@ public class ResourceWorkingSetPage extends WizardPage implements
      */
     private void addWorkingSetElements(List collectedResources,
             IContainer container) {
+        IAdaptable[] elements = workingSet.getElements();
         IPath containerPath = container.getFullPath();
 
-		for (IAdaptable adaptable : workingSet.getElements()) {
-			IResource resource = Adapters.adapt(adaptable, IResource.class);
+        for (int i = 0; i < elements.length; i++) {
+			IResource resource = Adapters.adapt(elements[i], IResource.class);
 
             if (resource != null) {
                 IPath resourcePath = resource.getFullPath();
                 if (containerPath.isPrefixOf(resourcePath)) {
-					collectedResources.add(adaptable);
+					collectedResources.add(elements[i]);
 				}
             }
         }
@@ -257,17 +258,17 @@ public class ResourceWorkingSetPage extends WizardPage implements
                     IDEWorkbenchMessages.ResourceWorkingSetPage_error,
                     IDEWorkbenchMessages.ResourceWorkingSetPage_error_updateCheckedState);
         }
-        for (IResource resource : resources) {
-            if (tree.getGrayed(resource)) {
-                if (resource.isAccessible()) {
+        for (int i = 0; i < resources.length; i++) {
+            if (tree.getGrayed(resources[i])) {
+                if (resources[i].isAccessible()) {
 					findCheckedResources(checkedResources,
-                            (IContainer) resource);
+                            (IContainer) resources[i]);
 				} else {
 					addWorkingSetElements(checkedResources,
-                            (IContainer) resource);
+                            (IContainer) resources[i]);
 				}
-            } else if (tree.getChecked(resource)) {
-                checkedResources.add(resource);
+            } else if (tree.getChecked(resources[i])) {
+                checkedResources.add(resources[i]);
             }
         }
     }
@@ -523,8 +524,10 @@ public class ResourceWorkingSetPage extends WizardPage implements
         }
         if (errorMessage == null
                 && (workingSet == null || newText.equals(workingSet.getName()) == false)) {
-			for (IWorkingSet workingSet : PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSets()) {
-                if (newText.equals(workingSet.getName())) {
+            IWorkingSet[] workingSets = PlatformUI.getWorkbench()
+                    .getWorkingSetManager().getWorkingSets();
+            for (int i = 0; i < workingSets.length; i++) {
+                if (newText.equals(workingSets[i].getName())) {
                     errorMessage = IDEWorkbenchMessages.ResourceWorkingSetPage_warning_workingSetExists;
                 }
             }

@@ -380,8 +380,8 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
     private void updateButtons() {
         TableItem selectedItems[] = editorsTable.getSelection();
         boolean hasDirty = false;
-        for (TableItem selectedItem : selectedItems) {
-            Adapter editor = (Adapter) selectedItem.getData();
+        for (int i = 0; i < selectedItems.length; i++) {
+            Adapter editor = (Adapter) selectedItems[i].getData();
             if (editor.isDirty()) {
                 hasDirty = true;
                 break;
@@ -391,8 +391,8 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
 
         TableItem allItems[] = editorsTable.getItems();
         boolean hasClean = false;
-        for (TableItem tableItem : allItems) {
-            Adapter editor = (Adapter) tableItem.getData();
+        for (int i = 0; i < allItems.length; i++) {
+            Adapter editor = (Adapter) allItems[i].getData();
             if (!editor.isDirty()) {
                 hasClean = true;
                 break;
@@ -418,8 +418,8 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
 
         // collect all instantiated editors that have been selected
 		List selectedEditors = new ArrayList();
-        for (TableItem item : items) {
-            Adapter e = (Adapter) item.getData();
+        for (int i = 0; i < items.length; i++) {
+            Adapter e = (Adapter) items[i].getData();
 			if (e.editorRef != null) {
 				IWorkbenchPart part = e.editorRef.getPart(false);
 				if (part != null) {
@@ -433,8 +433,8 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
 		// prompt for save
 		if (saveablesList.preCloseParts(selectedEditors, true, this, window) != null) {
 			// close all editors
-			for (TableItem item : items) {
-				Adapter e = (Adapter) item.getData();
+			for (int i = 0; i < items.length; i++) {
+				Adapter e = (Adapter) items[i].getData();
 				e.close();
 			}
 			// update the list
@@ -451,10 +451,10 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
 		}
         ProgressMonitorDialog pmd = new ProgressMonitorJobsDialog(getShell());
         pmd.open();
-        for (TableItem item : items) {
-            Adapter editor = (Adapter) item.getData();
+        for (int i = 0; i < items.length; i++) {
+            Adapter editor = (Adapter) items[i].getData();
             editor.save(pmd.getProgressMonitor());
-            updateItem(item, editor);
+            updateItem(items[i], editor);
         }
         pmd.close();
         updateItems();
@@ -468,10 +468,10 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
 			return new TableItem[0];
 		}
         ArrayList cleanItems = new ArrayList(items.length);
-        for (TableItem item : items) {
-            Adapter editor = (Adapter) item.getData();
+        for (int i = 0; i < items.length; i++) {
+            Adapter editor = (Adapter) items[i].getData();
             if (!editor.isDirty()) {
-				cleanItems.add(item);
+				cleanItems.add(items[i]);
 			}
         }
         TableItem result[] = new TableItem[cleanItems.size()];
@@ -517,9 +517,10 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
      * Adds all editors to elements
      */
     private void updateEditors(IWorkbenchPage[] pages) {
-        for (IWorkbenchPage page : pages) {
-			for (IEditorReference editor : page.getEditorReferences()) {
-                elements.add(new Adapter(editor));
+        for (int j = 0; j < pages.length; j++) {
+            IEditorReference editors[] = pages[j].getEditorReferences();
+            for (int k = 0; k < editors.length; k++) {
+                elements.add(new Adapter(editors[k]));
             }
         }
     }
@@ -539,8 +540,10 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
         editorsTable.removeAll();
         elements = new ArrayList();
         if (showAllPersp) {
-			for (IWorkbenchWindow workbenchWindow : window.getWorkbench().getWorkbenchWindows()) {
-				updateEditors(workbenchWindow.getPages());
+            IWorkbenchWindow windows[] = window.getWorkbench()
+                    .getWorkbenchWindows();
+            for (int i = 0; i < windows.length; i++) {
+				updateEditors(windows[i].getPages());
 			}
         } else {
             IWorkbenchPage page = window.getActivePage();
@@ -559,8 +562,8 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
             updateItem(item, e);
 
             // try to match this item's editor to one that was previously selected
-			for (Adapter selectedAdapter : selectedAdapters) {
-				if (selectedAdapter.editorRef == e.editorRef) {
+			for (int i = 0; i < selectedAdapters.length; i++) {
+				if (selectedAdapters[i].editorRef == e.editorRef) {
 					selection.add(item);
 				}
 			}

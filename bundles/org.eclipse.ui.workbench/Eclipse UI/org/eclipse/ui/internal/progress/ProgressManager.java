@@ -96,7 +96,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 	private static ProgressManager singleton;
 
-	final private Set<Job> managedJobs = ConcurrentHashMap.newKeySet();
+	final private ConcurrentMap<Job, JobInfo> jobs = new ConcurrentHashMap<>();
 
 	final private Map<Object, Collection<IJobBusyListener>> familyListeners = Collections
 			.synchronizedMap(new LinkedHashMap<>());
@@ -207,7 +207,6 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 */
 	public class JobMonitor implements IProgressMonitorWithBlocking {
 		Job job;
-		JobInfo info;
 		String currentTaskName;
 		Set<IProgressMonitorWithBlocking> monitors = Collections.emptySet();
 
@@ -216,13 +215,8 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		 *
 		 * @param newJob
 		 */
-		JobMonitor(Job newJob, JobInfo jobInfo) {
+		JobMonitor(Job newJob) {
 			job = newJob;
-			info = jobInfo;
-		}
-
-		public JobInfo getJobInfo() {
-			return info;
 		}
 
 		/**
@@ -235,6 +229,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 			Set<IProgressMonitorWithBlocking> newSet = new LinkedHashSet<>(monitors);
 			newSet.add(monitor);
 			this.monitors = Collections.unmodifiableSet(newSet);
+			JobInfo info = getJobInfo(job);
 			TaskInfo currentTask = info.getTaskInfo();
 			if (currentTask != null) {
 				monitor.beginTask(currentTaskName, currentTask.totalWork);
@@ -250,6 +245,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 		@Override
 		public void beginTask(String taskName, int totalWork) {
+			JobInfo info = getJobInfo(job);
 			info.beginTask(taskName, totalWork);
 			refreshJobInfo(info);
 			currentTaskName = taskName;
@@ -258,13 +254,16 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 		@Override
 		public void done() {
+			JobInfo info = getJobInfo(job);
 			info.clearTaskInfo();
 			info.clearChildren();
+			runnableMonitors.remove(job);
 			monitors.stream().forEach(IProgressMonitorWithBlocking::done);
 		}
 
 		@Override
 		public void internalWorked(double work) {
+			JobInfo info = getJobInfo(job);
 			if (info.hasTaskInfo()) {
 				info.addWork(work);
 				refreshJobInfo(info);
@@ -274,11 +273,17 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 		@Override
 		public boolean isCanceled() {
+			// Use the internal get so we don't create a Job Info for
+			// a job that is not running (see bug 149857).
+			JobInfo info = internalGetJobInfo(job);
+			if (info == null)
+				return false;
 			return info.isCanceled();
 		}
 
 		@Override
 		public void setCanceled(boolean value) {
+			JobInfo info = getJobInfo(job);
 			// Don't bother canceling twice.
 			if (value && !info.isCanceled()) {
 				info.cancel();
@@ -289,6 +294,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 		@Override
 		public void setTaskName(String taskName) {
+			JobInfo info = getJobInfo(job);
 			if (info.hasTaskInfo()) {
 				info.setTaskName(taskName);
 			} else {
@@ -306,6 +312,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 			if (name == null) {
 				return;
 			}
+			JobInfo info = getJobInfo(job);
 			info.clearChildren();
 			info.addSubTask(name);
 			refreshJobInfo(info);
@@ -319,6 +326,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 		@Override
 		public void clearBlocked() {
+			JobInfo info = getJobInfo(job);
 			info.setBlockedStatus(null);
 			refreshJobInfo(info);
 			monitors.stream().forEach(IProgressMonitorWithBlocking::clearBlocked);
@@ -326,6 +334,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 		@Override
 		public void setBlocked(IStatus reason) {
+			JobInfo info = getJobInfo(job);
 			info.setBlockedStatus(reason);
 			refreshJobInfo(info);
 			monitors.stream().forEach(listener -> listener.setBlocked(reason));
@@ -348,44 +357,44 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		Job.getJobManager().addJobChangeListener(this.changeListener);
 		StatusManager.getManager().addListener(notificationListener);
 
-		uiRefreshThrottler = new Throttler(Display.getDefault(), Duration.ofMillis(100), this::notifyListeners);
-	}
+		uiRefreshThrottler = new Throttler(Display.getDefault(), Duration.ofMillis(100), () -> {
+			Set<GroupInfo> localPendingGroupUpdates, localPendingGroupRemoval;
+			Map<JobInfo, Set<IJobProgressManagerListener>> localPendingJobUpdates, localPendingJobAddition,
+					localPendingJobRemoval;
+			synchronized (pendingUpdatesMutex) {
+				localPendingJobUpdates = pendingJobUpdates;
+				pendingJobUpdates = new LinkedHashMap<>();
+				localPendingGroupUpdates = pendingGroupUpdates;
+				pendingGroupUpdates = new LinkedHashSet<>();
+				localPendingJobRemoval = pendingJobRemoval;
+				pendingJobRemoval = new LinkedHashMap<>();
+				localPendingGroupRemoval = pendingGroupRemoval;
+				pendingGroupRemoval = new LinkedHashSet<>();
+				localPendingJobAddition = pendingJobAddition;
+				pendingJobAddition = new LinkedHashMap<>();
+			}
 
-	/* Visible for testing */ public void notifyListeners() {
-		Set<GroupInfo> localPendingGroupUpdates, localPendingGroupRemoval;
-		Map<JobInfo, Set<IJobProgressManagerListener>> localPendingJobUpdates, localPendingJobAddition,
-				localPendingJobRemoval;
-		synchronized (pendingUpdatesMutex) {
-			localPendingJobUpdates = pendingJobUpdates;
-			pendingJobUpdates = new LinkedHashMap<>();
-			localPendingGroupUpdates = pendingGroupUpdates;
-			pendingGroupUpdates = new LinkedHashSet<>();
-			localPendingJobRemoval = pendingJobRemoval;
-			pendingJobRemoval = new LinkedHashMap<>();
-			localPendingGroupRemoval = pendingGroupRemoval;
-			pendingGroupRemoval = new LinkedHashSet<>();
-			localPendingJobAddition = pendingJobAddition;
-			pendingJobAddition = new LinkedHashMap<>();
-		}
+			localPendingJobAddition.entrySet()
+					.forEach(e -> e.getValue().forEach(listener -> listener.addJob(e.getKey())));
 
-		localPendingJobAddition.entrySet().forEach(e -> e.getValue().forEach(listener -> listener.addJob(e.getKey())));
+			// Adds all non null JobInfo#getGroupInfo to the list of groups to
+			// be refreshed
+			localPendingJobUpdates.entrySet().stream().map(e -> e.getKey().getGroupInfo()).filter(Objects::nonNull)
+					.forEach(localPendingGroupUpdates::add);
 
-		// Adds all non null JobInfo#getGroupInfo to the list of groups to
-		// be refreshed
-		localPendingJobUpdates.entrySet().stream().map(e -> e.getKey().getGroupInfo()).filter(Objects::nonNull)
-				.forEach(localPendingGroupUpdates::add);
+			localPendingJobUpdates.entrySet()
+					.forEach(e -> e.getValue().forEach(listener -> listener.refreshJobInfo(e.getKey())));
 
-		localPendingJobUpdates.entrySet()
-				.forEach(e -> e.getValue().forEach(listener -> listener.refreshJobInfo(e.getKey())));
+			// refresh groups
+			localPendingGroupUpdates
+					.forEach(groupInfo -> listeners.forEach(listener -> listener.refreshGroup(groupInfo)));
 
-		// refresh groups
-		localPendingGroupUpdates.forEach(groupInfo -> listeners.forEach(listener -> listener.refreshGroup(groupInfo)));
+			localPendingJobRemoval.entrySet()
+					.forEach(e -> e.getValue().forEach(listener -> listener.removeJob(e.getKey())));
 
-		localPendingJobRemoval.entrySet()
-				.forEach(e -> e.getValue().forEach(listener -> listener.removeJob(e.getKey())));
-
-		localPendingGroupRemoval.forEach(group -> {
-			listeners.forEach(listener -> listener.removeGroup(group));
+			localPendingGroupRemoval.forEach(group -> {
+				listeners.forEach(listener -> listener.removeGroup(group));
+			});
 		});
 	}
 
@@ -423,7 +432,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		return new JobChangeAdapter() {
 			@Override
 			public void aboutToRun(IJobChangeEvent event) {
-				JobInfo info = progressFor(event.getJob()).getJobInfo();
+				JobInfo info = getJobInfo(event.getJob());
 				refreshJobInfo(info);
 				Iterator<IJobBusyListener> startListeners = busyListenersForJob(event.getJob()).iterator();
 				while (startListeners.hasNext()) {
@@ -443,7 +452,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 					next.decrementBusy(event.getJob());
 				}
 
-				final JobInfo info = progressFor(event.getJob()).getJobInfo();
+				final JobInfo info = getJobInfo(event.getJob());
 				removeJobInfo(info);
 
 				/*
@@ -501,10 +510,10 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 			 * @param event
 			 */
 			private void updateFor(IJobChangeEvent event) {
-				if (managedJobs.contains(event.getJob())) {
-					refreshJobInfo(progressFor(event.getJob()).getJobInfo());
+				if (jobs.containsKey(event.getJob())) {
+					refreshJobInfo(getJobInfo(event.getJob()));
 				} else {
-					addJobInfo(progressFor(event.getJob()).getJobInfo());
+					addJobInfo(new JobInfo(event.getJob()));
 				}
 			}
 
@@ -515,8 +524,9 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 			@Override
 			public void sleeping(IJobChangeEvent event) {
-				if (managedJobs.contains(event.getJob()))// Are we showing this?
-					sleepJobInfo(progressFor(event.getJob()).getJobInfo());
+
+				if (jobs.containsKey(event.getJob()))// Are we showing this?
+					sleepJobInfo(getJobInfo(event.getJob()));
 			}
 		};
 	}
@@ -604,9 +614,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 * @return IProgressMonitor
 	 */
 	public JobMonitor progressFor(Job job) {
-		return runnableMonitors.computeIfAbsent(job, (j) -> {
-			return new JobMonitor(j, new JobInfo(j));
-		});
+		return runnableMonitors.computeIfAbsent(job, JobMonitor::new);
 	}
 
 	/**
@@ -626,6 +634,27 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 */
 	void removeListener(IJobProgressManagerListener listener) {
 		listeners.remove(listener);
+	}
+
+	/**
+	 * Returns the JobInfo for the job. If it does not exist create it.
+	 *
+	 * @param job
+	 * @return JobInfo
+	 */
+	JobInfo getJobInfo(Job job) {
+		return jobs.computeIfAbsent(job, JobInfo::new);
+	}
+
+	/**
+	 * Returns an existing job info for the given Job or <code>null</code> if
+	 * there isn't one.
+	 *
+	 * @param job
+	 * @return JobInfo
+	 */
+	JobInfo internalGetJobInfo(Job job) {
+		return jobs.get(job);
 	}
 
 	/**
@@ -662,7 +691,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 */
 	public void removeJobInfo(JobInfo info) {
 		Job job = info.getJob();
-		managedJobs.remove(job);
+		jobs.remove(job);
 		synchronized (pendingUpdatesMutex) {
 			rememberListenersForJob(info, pendingJobRemoval);
 		}
@@ -694,7 +723,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 			refreshGroup(group);
 		}
 
-		managedJobs.add(info.getJob());
+		jobs.put(info.getJob(), info);
 		synchronized (pendingUpdatesMutex) {
 			rememberListenersForJob(info, pendingJobAddition);
 		}
@@ -743,8 +772,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 * @return JobInfo[]
 	 */
 	public JobInfo[] getJobInfos(boolean debug) {
-		return managedJobs.stream().filter(job -> !isCurrentDisplaying(job, debug))
-				.map(job -> progressFor(job).getJobInfo())
+		return jobs.entrySet().stream().filter(entry -> !isCurrentDisplaying(entry.getKey(), debug))
 				.toArray(JobInfo[]::new);
 	}
 
@@ -755,8 +783,8 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 * @return JobTreeElement[]
 	 */
 	public JobTreeElement[] getRootElements(boolean debug) {
-		return managedJobs.stream().filter(job -> !isCurrentDisplaying(job, debug)).map(job -> {
-			JobInfo jobInfo = progressFor(job).getJobInfo();
+		return jobs.entrySet().stream().filter(entry -> !isCurrentDisplaying(entry.getKey(), debug)).map(entry -> {
+			JobInfo jobInfo = entry.getValue();
 			GroupInfo group = jobInfo.getGroupInfo();
 			if (group == null) {
 				return jobInfo;
@@ -771,7 +799,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 * @return boolean
 	 */
 	public boolean hasJobInfos() {
-		return !managedJobs.isEmpty();
+		return !jobs.isEmpty();
 	}
 
 	/**
@@ -896,7 +924,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		JobMonitor monitor = progressFor(job);
 		if (group instanceof GroupInfo) {
 			GroupInfo groupInfo = (GroupInfo) group;
-			JobInfo jobInfo = monitor.getJobInfo();
+			JobInfo jobInfo = getJobInfo(job);
 			jobInfo.setGroupInfo(groupInfo);
 			jobInfo.setTicks(ticks);
 			groupInfo.addJobInfo(jobInfo);
@@ -1077,7 +1105,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 */
 	boolean checkForStaleness(Job job) {
 		if (job.getState() == Job.NONE) {
-			removeJobInfo(progressFor(job).getJobInfo());
+			removeJobInfo(getJobInfo(job));
 			return true;
 		}
 		return false;
