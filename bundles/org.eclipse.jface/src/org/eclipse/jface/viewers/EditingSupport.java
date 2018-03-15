@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     											   fix in bug 151295,167325,201905
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 486650
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -63,10 +64,9 @@ public abstract class EditingSupport {
 
 	/**
 	 * Sets the new value on the given element. Note that implementers need to
-	 * ensure that <code>getViewer().update(element, null)</code> or similar
-	 * methods are called, either directly or through some kind of listener
-	 * mechanism on the implementer's model, to cause the new value to appear in
-	 * the viewer.
+	 * ensure that <code>getViewer().update(element)</code> or similar methods
+	 * are called, either directly or through some kind of listener mechanism on
+	 * the implementer's model, to cause the new value to appear in the viewer.
 	 *
 	 * <p>
 	 * <b>Subclasses should overwrite.</b>
