@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     René Brandstetter - Bug 433778
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug Bug 495065
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -53,7 +54,8 @@ import org.eclipse.ui.keys.IBindingService;
 
 /**
  * This is the quick access popup dialog used in 3.x. The new quick access is
- * done through a shell in {@link SearchField}.
+ * done through a shell in {@link SearchField}. This legacy quick access shares
+ * the list of previous picks with the new one.
  *
  * @since 3.3
  *
@@ -65,7 +67,7 @@ public class QuickAccessDialog extends PopupDialog {
 	private KeyAdapter keyAdapter;
 	private Text filterText;
 	private IWorkbenchWindow window;
-	private LinkedList previousPicksList = new LinkedList();
+	private LinkedList<QuickAccessElement> previousPicksList = new LinkedList<>();
 	private static final String TEXT_ARRAY = "textArray"; //$NON-NLS-1$
 	private static final String TEXT_ENTRIES = "textEntries"; //$NON-NLS-1$
 	private static final String ORDERED_PROVIDERS = "orderedProviders"; //$NON-NLS-1$
@@ -76,12 +78,18 @@ public class QuickAccessDialog extends PopupDialog {
 	protected Map elementMap = new HashMap();
 	protected Map providerMap;
 
-	public QuickAccessDialog(final IWorkbenchWindow window, final Command invokingCommand) {
+	public QuickAccessDialog(final IWorkbenchWindow window, final Command invokingCommand,
+			LinkedList<QuickAccessElement> previousPicksList) {
 		super(ProgressManagerUtil.getDefaultParent(), SWT.RESIZE, true, true, // persist
 																				// size
 				false, // but not location
 				true, true, null, QuickAccessMessages.QuickAccess_StartTypingToFindMatches);
 		this.window = window;
+
+		if (previousPicksList != null) {
+			// Share the same list of previous picks, if defined
+			this.previousPicksList = previousPicksList;
+		}
 
 		WorkbenchWindow workbenchWindow = (WorkbenchWindow) window;
 		final MWindow model = workbenchWindow.getModel();
@@ -132,7 +140,7 @@ public class QuickAccessDialog extends PopupDialog {
 							/**
 							 * @param element
 							 */
-							void addPreviousPick(String text, Object element) {
+							void addPreviousPick(String text, QuickAccessElement element) {
 								// previousPicksList:
 								// Remove element from previousPicksList so
 								// there are no duplicates
@@ -207,7 +215,7 @@ public class QuickAccessDialog extends PopupDialog {
 							@Override
 							protected void handleElementSelected(String text, Object selectedElement) {
 								if (selectedElement instanceof QuickAccessElement) {
-									addPreviousPick(text, selectedElement);
+									addPreviousPick(text, (QuickAccessElement) selectedElement);
 									storeDialog(getDialogSettings());
 
 									/*
@@ -372,7 +380,7 @@ public class QuickAccessDialog extends PopupDialog {
 		String[] textEntries = new String[previousPicksList.size()];
 		ArrayList arrayList = new ArrayList();
 		for (int i = 0; i < orderedElements.length; i++) {
-			QuickAccessElement quickAccessElement = (QuickAccessElement) previousPicksList.get(i);
+			QuickAccessElement quickAccessElement = previousPicksList.get(i);
 			ArrayList elementText = (ArrayList) textMap.get(quickAccessElement);
 			Assert.isNotNull(elementText);
 			orderedElements[i] = quickAccessElement.getId();

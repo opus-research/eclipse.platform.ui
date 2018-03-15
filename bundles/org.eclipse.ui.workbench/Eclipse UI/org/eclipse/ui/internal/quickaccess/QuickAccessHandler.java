@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,9 +8,11 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     René Brandstetter - Bug 431707 - [QuickAccess] Quick Access should open a dialog if hidden
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug Bug 495065
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
+import java.util.LinkedList;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -53,10 +55,17 @@ public class QuickAccessHandler extends AbstractHandler {
 			}
 		}
 
+		// if available, get previous pick list
+		LinkedList<QuickAccessElement> previousPicksList = null;
+		if (searchField != null && searchField.getObject() instanceof SearchField) {
+			SearchField field = (SearchField) searchField.getObject();
+			previousPicksList = field.getPreviousPicksList();
+		}
+
 		// open the original/legacy QuickAccess Dialog if the toolbars are
 		// hidden or if the search field isn't available (maybe because the
 		// dialog is explicitly wanted)
-		displayQuickAccessDialog(window, executionEvent.getCommand());
+		displayQuickAccessDialog(window, executionEvent.getCommand(), previousPicksList);
 		return null;
 	}
 
@@ -67,9 +76,12 @@ public class QuickAccessHandler extends AbstractHandler {
 	 *            the active workbench window
 	 * @param command
 	 *            the command which invokes the open of the dialog
+	 * @param previousPicksList
+	 *            list of previously picked elements or null
 	 */
-	private static void displayQuickAccessDialog(IWorkbenchWindow window, Command command) {
-		PopupDialog popupDialog = new QuickAccessDialog(window, command);
+	private static void displayQuickAccessDialog(IWorkbenchWindow window, Command command,
+			LinkedList<QuickAccessElement> previousPicksList) {
+		PopupDialog popupDialog = new QuickAccessDialog(window, command, previousPicksList);
 		popupDialog.open();
 	}
 
