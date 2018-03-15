@@ -15,6 +15,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.preference.PreferenceManager;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
@@ -164,7 +165,7 @@ public class WorkbenchPreferenceDialog extends FilteredPreferenceDialog {
 	}
 
 	@Override
-	protected void okPressed() {
+	public void okPressed() {
 		super.okPressed();
 	}
 
@@ -220,4 +221,34 @@ public class WorkbenchPreferenceDialog extends FilteredPreferenceDialog {
 		initialPageId = pageId;
 	}
 
+	@Override
+	public Control createContents(Composite parent) {
+		return super.createContents(parent);
+	}
+
+	@Override
+	public Control createDialogArea(Composite parent) {
+		return super.createDialogArea(parent);
+	}
+
+	@Override
+	public Control createButtonBar(Composite parent) {
+		// TODO Auto-generated method stub
+		return super.createButtonBar(parent);
+	}
+
+	@Override
+	public void createButtonsForButtonBar(Composite parent) {
+		super.createButtonsForButtonBar(parent);
+	}
+
+	@Override
+	public void handleSave() {
+		super.handleSave();
+	}
+
+	@Override
+	public boolean isCurrentPageValid() {
+		return super.isCurrentPageValid();
+	}
 }
