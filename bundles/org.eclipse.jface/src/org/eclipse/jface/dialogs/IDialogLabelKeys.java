@@ -206,14 +206,4 @@ public interface IDialogLabelKeys {
      * @since 3.7
      */
     public String HELP_LABEL_KEY = "help"; //$NON-NLS-1$
-
-	/**
-	 * The key used to retrieve the label for restart buttons. Clients should
-	 * use the pattern
-	 * <code>JFaceResources.getString(IDialogLabelKeys.RESTART_LABEL_KEY)</code>
-	 * to retrieve the label dynamically when using multiple locales.
-	 *
-	 * @since 3.7
-	 */
-	public String RESTART_LABEL_KEY = "restart"; //$NON-NLS-1$
 }
