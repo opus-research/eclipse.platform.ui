@@ -46,8 +46,8 @@ public abstract class AbstractExtensionWizardRegistry extends
 		reader.setInitialCollection(getWizardElements());
 		IConfigurationElement[] configurationElements = extension
 				.getConfigurationElements();
-		for (int i = 0; i < configurationElements.length; i++) {
-			reader.readElement(configurationElements[i]);
+		for (IConfigurationElement configurationElement : configurationElements) {
+			reader.readElement(configurationElement);
 		}
 		// no need to reset the wizard elements - getWizardElements will parse
 		// the
@@ -135,14 +135,14 @@ public abstract class AbstractExtensionWizardRegistry extends
 
 		WizardCollectionElement[] collections = collection
 				.getCollectionElements();
-		for (int i = 0; i < collections.length; i++) {
-			IConfigurationElement configurationElement = collections[i]
+		for (WizardCollectionElement collection2 : collections) {
+			IConfigurationElement configurationElement = collection2
 					.getConfigurationElement();
 			if (configurationElement != null) {
 				register(configurationElement.getDeclaringExtension(),
-						collections[i]);
+						collection2);
 			}
-			registerWizards(collections[i]);
+			registerWizards(collection2);
 		}
 	}
 
@@ -153,9 +153,9 @@ public abstract class AbstractExtensionWizardRegistry extends
 	 *            the wizards to register
 	 */
 	private void registerWizards(WorkbenchWizardElement[] wizards) {
-		for (int i = 0; i < wizards.length; i++) {
-			register(wizards[i].getConfigurationElement()
-					.getDeclaringExtension(), wizards[i]);
+		for (WorkbenchWizardElement wizard : wizards) {
+			register(wizard.getConfigurationElement()
+					.getDeclaringExtension(), wizard);
 		}
 	}
 
@@ -165,8 +165,7 @@ public abstract class AbstractExtensionWizardRegistry extends
 				getExtensionPointFilter().getUniqueIdentifier())) {
 			return;
 		}
-		for (int i = 0; i < objects.length; i++) {
-			Object object = objects[i];
+		for (Object object : objects) {
 			if (object instanceof WizardCollectionElement) {
 				// TODO: should we move child wizards to the "other" node?
 				WizardCollectionElement collection = (WizardCollectionElement) object;

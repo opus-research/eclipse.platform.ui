@@ -85,8 +85,7 @@ public final class SourceProviderService implements ISourceProviderService,
 		}
 
 		final String[] sourceNames = sourceProvider.getProvidedSourceNames();
-		for (int i = 0; i < sourceNames.length; i++) {
-			final String sourceName = sourceNames[i];
+		for (final String sourceName : sourceNames) {
 			sourceProvidersByName.put(sourceName, sourceProvider);
 		}
 		sourceProviders.add(sourceProvider);
@@ -98,17 +97,17 @@ public final class SourceProviderService implements ISourceProviderService,
 		}
 
 		final String[] sourceNames = sourceProvider.getProvidedSourceNames();
-		for (int i = 0; i < sourceNames.length; i++) {
-			sourceProvidersByName.remove(sourceNames[i]);
+		for (String sourceName : sourceNames) {
+			sourceProvidersByName.remove(sourceName);
 		}
 		sourceProviders.remove(sourceProvider);
 	}
 
 	public final void readRegistry() {
 		AbstractSourceProvider[] sp = WorkbenchServiceRegistry.getRegistry().getSourceProviders();
-		for (int i = 0; i < sp.length; i++) {
-			sp[i].initialize(locator);
-			registerProvider(sp[i]);
+		for (AbstractSourceProvider element : sp) {
+			element.initialize(locator);
+			registerProvider(element);
 		}
 	}
 }
