@@ -349,9 +349,9 @@ public class FilteredResourcesSelectionDialog extends
 
 		List resultToReturn = new ArrayList();
 
-		for (Object element : result) {
-			if (element instanceof IResource) {
-				resultToReturn.add((element));
+		for (int i = 0; i < result.length; i++) {
+			if (result[i] instanceof IResource) {
+				resultToReturn.add((result[i]));
 			}
 		}
 
@@ -517,7 +517,8 @@ public class FilteredResourcesSelectionDialog extends
 					progressMonitor);
 
 			if (visitor.visit(container.createProxy())) {
-				for (IResource member : members) {
+				for (int i= 0; i < members.length; i++) {
+					IResource member = members[i];
 					if (member.isAccessible())
 						member.accept(visitor, IResource.NONE);
 					progressMonitor.worked(1);
