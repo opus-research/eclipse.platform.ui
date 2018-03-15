@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -155,7 +155,8 @@ public class RadioGroupFieldEditor extends FieldEditor {
         if (table == null) {
 			return false;
 		}
-        for (String[] array : table) {
+        for (int i = 0; i < table.length; i++) {
+            String[] array = table[i];
             if (array == null || array.length != 2) {
 				return false;
 			}
@@ -249,12 +250,15 @@ public class RadioGroupFieldEditor extends FieldEditor {
                 radio.setText(labelAndValue[0]);
                 radio.setData(labelAndValue[1]);
                 radio.setFont(font);
-                radio.addSelectionListener(widgetSelectedAdapter(event -> {
-				    String oldValue = value;
-				    value = (String) event.widget.getData();
-				    setPresentsDefaultValue(false);
-				    fireValueChanged(VALUE, oldValue, value);
-				}));
+                radio.addSelectionListener(new SelectionAdapter() {
+                    @Override
+					public void widgetSelected(SelectionEvent event) {
+                        String oldValue = value;
+                        value = (String) event.widget.getData();
+                        setPresentsDefaultValue(false);
+                        fireValueChanged(VALUE, oldValue, value);
+                    }
+                });
             }
             radioBox.addDisposeListener(event -> {
 			    radioBox = null;
@@ -292,7 +296,8 @@ public class RadioGroupFieldEditor extends FieldEditor {
 
         if (this.value != null) {
             boolean found = false;
-            for (Button radio : radioButtons) {
+            for (int i = 0; i < radioButtons.length; i++) {
+                Button radio = radioButtons[i];
                 boolean selection = false;
                 if (((String) radio.getData()).equals(this.value)) {
                     selection = true;
@@ -322,8 +327,8 @@ public class RadioGroupFieldEditor extends FieldEditor {
         if (!useGroup) {
 			super.setEnabled(enabled, parent);
 		}
-        for (Button radioButton : radioButtons) {
-            radioButton.setEnabled(enabled);
+        for (int i = 0; i < radioButtons.length; i++) {
+            radioButtons[i].setEnabled(enabled);
         }
 
     }

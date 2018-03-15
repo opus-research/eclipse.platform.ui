@@ -379,9 +379,9 @@ public class StackDropAgent extends DropAgent {
 		CTabFolder ctf = (CTabFolder) dropStack.getWidget();
 		CTabItem[] items = ctf.getItems();
 		CTabItem item = null;
-		for (CTabItem tabItem : items) {
-			if (tabItem.getData(AbstractPartRenderer.OWNING_ME) == dragElement) {
-				item = tabItem;
+		for (int i = 0; i < items.length; i++) {
+			if (items[i].getData(AbstractPartRenderer.OWNING_ME) == dragElement) {
+				item = items[i];
 				break;
 			}
 		}

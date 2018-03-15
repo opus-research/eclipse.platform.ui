@@ -190,23 +190,26 @@ public class NavigationHistory implements INavigationHistory {
         /* Ignore all entries until the async exec runs. Workaround to avoid
          * extra entry when using Open Declaration (F3) that opens another editor. */
         ignoreEntries++;
-        getDisplay().asyncExec(() -> {
-		    if (--ignoreEntries == 0) {
-		        if (part.getEditorSite() instanceof EditorSite) {
-					EditorSite site = (EditorSite) part.getEditorSite();
-					Control c = (Control) site.getModel().getWidget();
-		            if (c == null || c.isDisposed()) {
-						return;
-					}
-		            NavigationHistoryEntry e = getEntry(activeEntry);
-		            if (e != null
-		                    && part.getEditorInput() != e.editorInfo.editorInput) {
-						updateEntry(e);
-					}
-		            addEntry(part);
-		        }
-		    }
-		});
+        getDisplay().asyncExec(new Runnable() {
+            @Override
+			public void run() {
+                if (--ignoreEntries == 0) {
+	                if (part.getEditorSite() instanceof EditorSite) {
+						EditorSite site = (EditorSite) part.getEditorSite();
+						Control c = (Control) site.getModel().getWidget();
+		                if (c == null || c.isDisposed()) {
+							return;
+						}
+		                NavigationHistoryEntry e = getEntry(activeEntry);
+		                if (e != null
+		                        && part.getEditorInput() != e.editorInfo.editorInput) {
+							updateEntry(e);
+						}
+		                addEntry(part);
+	                }
+                }
+            }
+        });
     }
 
     @Override
@@ -898,8 +901,8 @@ public class NavigationHistory implements INavigationHistory {
 
     private void disposeHistoryForTabs() {
     	Object[] keys = perTabHistoryMap.keySet().toArray();
-    	for (Object key : keys) {
-			disposeHistoryForTab(key);
+    	for (int i = 0; i < keys.length; i++) {
+			disposeHistoryForTab(keys[i]);
 		}
     }
 

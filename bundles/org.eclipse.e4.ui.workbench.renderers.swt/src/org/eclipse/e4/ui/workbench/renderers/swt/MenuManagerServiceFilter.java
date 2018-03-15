@@ -35,7 +35,7 @@ public class MenuManagerServiceFilter implements Listener {
 	private static final String TMP_ORIGINAL_CONTEXT = "MenuServiceFilter.original.context"; //$NON-NLS-1$
 
 	private static void trace(String msg, Widget menu, MMenu menuModel) {
-		WorkbenchSWTActivator.trace(Policy.DEBUG_MENUS_FLAG, msg + ": " + menu + ": " //$NON-NLS-1$ //$NON-NLS-2$
+		WorkbenchSWTActivator.trace(Policy.MENUS, msg + ": " + menu + ": " //$NON-NLS-1$ //$NON-NLS-2$
 				+ menuModel, null);
 	}
 
@@ -151,11 +151,14 @@ public class MenuManagerServiceFilter implements Listener {
 				.get(TMP_ORIGINAL_CONTEXT);
 		popupContext.remove(TMP_ORIGINAL_CONTEXT);
 		if (!menu.isDisposed()) {
-			menu.getDisplay().asyncExec(() -> {
-				if (originalChild == null) {
-					popupContext.deactivate();
-				} else {
-					originalChild.activate();
+			menu.getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (originalChild == null) {
+						popupContext.deactivate();
+					} else {
+						originalChild.activate();
+					}
 				}
 			});
 		}

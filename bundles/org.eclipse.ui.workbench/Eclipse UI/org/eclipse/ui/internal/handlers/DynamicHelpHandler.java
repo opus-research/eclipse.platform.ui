@@ -25,7 +25,12 @@ public class DynamicHelpHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) {
 
-		BusyIndicator.showWhile(null, () -> PlatformUI.getWorkbench().getHelpSystem().displayDynamicHelp());
+		BusyIndicator.showWhile(null, new Runnable() {
+			@Override
+			public void run() {
+				PlatformUI.getWorkbench().getHelpSystem().displayDynamicHelp();
+			}
+		});
 		return null;
 	}
 
