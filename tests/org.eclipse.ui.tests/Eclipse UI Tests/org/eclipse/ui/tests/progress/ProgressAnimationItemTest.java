@@ -18,6 +18,9 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.Accessible;
 import org.eclipse.swt.layout.FillLayout;
@@ -39,6 +42,15 @@ import org.junit.Test;
 public class ProgressAnimationItemTest {
 	private Shell shell;
 	private ProgressAnimationItem animationItem;
+	private JobChangeAdapter consumeEventLoopOnJobDone = new JobChangeAdapter() {
+		@Override
+		public void done(IJobChangeEvent event) {
+			PlatformUI.getWorkbench().getDisplay().syncExec(() -> {
+				while (PlatformUI.getWorkbench().getDisplay().readAndDispatch()) {
+				}
+			});
+		}
+	};
 
 	@Before
 	public void setUp() {
@@ -59,11 +71,17 @@ public class ProgressAnimationItemTest {
 
 	@Test
 	public void testSingleJobRefreshOnce() throws Exception {
-		createAndScheduleJob();
+		try {
+			Job.getJobManager().addJobChangeListener(consumeEventLoopOnJobDone);
 
-		refresh();
+			createAndScheduleJob();
 
-		assertSingleAccessibleListener();
+			refresh();
+
+			assertSingleAccessibleListener();
+		} finally {
+			Job.getJobManager().removeJobChangeListener(consumeEventLoopOnJobDone);
+		}
 	}
 
 	@Test
@@ -78,12 +96,18 @@ public class ProgressAnimationItemTest {
 
 	@Test
 	public void testSingleJobRefreshTwice() throws Exception {
-		createAndScheduleJob();
+		try {
+			Job.getJobManager().addJobChangeListener(consumeEventLoopOnJobDone);
 
-		refresh();
-		refresh();
+			createAndScheduleJob();
 
-		assertSingleAccessibleListener();
+			refresh();
+			refresh();
+
+			assertSingleAccessibleListener();
+		} finally {
+			Job.getJobManager().removeJobChangeListener(consumeEventLoopOnJobDone);
+		}
 	}
 
 	private ProgressAnimationItem createProgressAnimationItem(Composite composite) {
