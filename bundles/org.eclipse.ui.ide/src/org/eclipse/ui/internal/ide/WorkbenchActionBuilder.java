@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Andreas Buchen <andreas.buchen@sap.com> - Bug 206584
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440975, 431862
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 492974
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -36,12 +35,10 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.StatusLineContributionItem;
 import org.eclipse.jface.internal.provisional.action.IToolBarContributionItem;
-import org.eclipse.jface.internal.provisional.action.ToolBarManager2;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.Util;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IPartListener;
@@ -1354,20 +1351,13 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 		        if (enabled && !found) {
 		            toolBarManager.appendToGroup(IWorkbenchActionConstants.BUILD_GROUP,
 		                    buildAllAction);
-					toolBarManager.update(false);
+		            toolBarManager.update(false);
 		            toolBarItem.update(ICoolBarManager.SIZE);
 		        } else if (buildAllAction != null && found && !enabled) {
 		            toolBarManager.remove(buildAllAction.getId());
-					toolBarManager.update(false);
+		            toolBarManager.update(false);
 		            toolBarItem.update(ICoolBarManager.SIZE);
 		        }
-
-				if (toolBarManager instanceof ToolBarManager2) {
-					ToolBar control = ((ToolBarManager2) toolBarManager).getControl();
-					if (control != null) {
-						control.requestLayout();
-					}
-				}
             }
 
 			private void updateCommandEnablement(String commandId) {
