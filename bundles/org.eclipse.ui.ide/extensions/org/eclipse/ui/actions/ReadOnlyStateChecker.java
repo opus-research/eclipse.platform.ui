@@ -151,7 +151,8 @@ public class ReadOnlyStateChecker {
         boolean noneSkipped = true;
         List selectedChildren = new ArrayList();
 
-        for (IResource resourceToCheck : itemsToCheck) {
+        for (int i = 0; i < itemsToCheck.length; i++) {
+            IResource resourceToCheck = itemsToCheck[i];
             ResourceAttributes checkAttributes = resourceToCheck.getResourceAttributes();
             if (!yesToAllSelected && shouldCheck(resourceToCheck)
             		&& checkAttributes!=null
