@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -155,7 +155,7 @@ public class ReadmeCreationPage extends WizardNewFileCreationPage {
         if (!sectionCheckbox.getSelection())
             return null;
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(MessageUtil.getString("SAMPLE_README_FILE")); //$NON-NLS-1$
         sb.append(MessageUtil.getString("SECTION_1")); //$NON-NLS-1$
         sb.append(MessageUtil.getString("SECTION_1_BODY_1")); //$NON-NLS-1$
@@ -179,17 +179,11 @@ public class ReadmeCreationPage extends WizardNewFileCreationPage {
         return new ByteArrayInputStream(sb.toString().getBytes());
     }
 
-    /** (non-Javadoc)
-     * Method declared on WizardNewFileCreationPage.
-     */
     @Override
 	protected String getNewFileLabel() {
         return MessageUtil.getString("Readme_file_name"); //$NON-NLS-1$
     }
 
-    /** (non-Javadoc)
-     * Method declared on WizardNewFileCreationPage.
-     */
     @Override
 	public void handleEvent(Event e) {
         Widget source = e.widget;

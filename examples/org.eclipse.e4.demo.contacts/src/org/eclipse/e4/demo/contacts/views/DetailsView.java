@@ -192,7 +192,7 @@ public class DetailsView {
 	}
 
 	private void updatePartTitle(Contact contact) {
-		StringBuffer title = new StringBuffer("Details of ");
+		StringBuilder title = new StringBuilder("Details of ");
 		title.append(contact.getFirstName()).append(' ')
 		.append(contact.getLastName());
 		uiItem.setLabel(title.toString());
@@ -205,7 +205,7 @@ public class DetailsView {
 			if (dirtyable.isDirty()) {
 				MessageDialog dialog = new MessageDialog(
 						detailComposite.getShell(), "Save vCard", null,
-						"The current vCard has been modified. Save changes?",
+						"Save changes in vCard?",
 						MessageDialog.CONFIRM, 0,
 						IDialogConstants.YES_LABEL,
 						IDialogConstants.NO_LABEL);

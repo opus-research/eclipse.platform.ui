@@ -552,6 +552,10 @@
             id="org.eclipse.ui.ide.open"
             label="%PreferenceKeywords.Open">
       </keyword>
+      <keyword
+            id="org.eclipse.ui.ide.nature"
+            label="%PreferenceKeywords.Nature">
+      </keyword>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -652,6 +656,10 @@
             name="%PreferencePages.Workspace">
          <keywordReference id="org.eclipse.ui.ide.workspace"/>
          <keywordReference id="org.eclipse.ui.ide.encoding"/>
+         <keywordReference id="org.eclipse.ui.ide.project"/>
+         <keywordReference
+               id="org.eclipse.ui.ide.nature">
+         </keywordReference>
       </page>
       <page
             category="org.eclipse.ui.preferencePages.Workspace"
@@ -688,6 +696,7 @@
             name="%PreferencePages.ContentTypes">
          <keywordReference id="org.eclipse.ui.ide.editing"/>
          <keywordReference id="org.eclipse.ui.ide.encoding"/>
+         <keywordReference id="org.eclipse.ui.ide.editors"/>
       </page>
    </extension>
    <extension
@@ -2519,8 +2528,17 @@
               disable "print" button which is defined by org.eclipse.ui.actions.ActionFactory.PRINT
               and contributed by org.eclipse.ui.internal.ide.WorkbenchActionBuilder
          -->
-         <hiddenToolBarItem id="print">
-         </hiddenToolBarItem>
+         <hiddenToolBarItem id="print" />
+         <!--
+              disable "undo" button which is defined by org.eclipse.ui.actions.ActionFactory.UNDO
+              and contributed by org.eclipse.ui.internal.ide.WorkbenchActionBuilder
+         -->
+         <hiddenToolBarItem id="org.eclipse.ui.edit.undo" />
+         <!--
+              disable "redo" button which is defined by org.eclipse.ui.actions.ActionFactory.REDO
+              and contributed by org.eclipse.ui.internal.ide.WorkbenchActionBuilder
+         -->
+         <hiddenToolBarItem id="org.eclipse.ui.edit.redo" />
       </perspectiveExtension>
    </extension>
    <extension

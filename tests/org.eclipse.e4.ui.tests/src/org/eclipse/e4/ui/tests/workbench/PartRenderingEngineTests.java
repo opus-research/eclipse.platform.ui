@@ -57,10 +57,13 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.test.Screenshots;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
@@ -81,6 +84,9 @@ public class PartRenderingEngineTests {
 	private boolean logged = false;
 	private EModelService ems;
 	private Consumer<RuntimeException> runtimeExceptionHandler;
+
+	@Rule
+	public TestName testName = new TestName();
 
 	private boolean checkMacBug466636() {
 		if (Platform.OS_MACOSX.equals(Platform.getOS())) {
@@ -206,8 +212,7 @@ public class PartRenderingEngineTests {
 		MPartStack stack = (MPartStack) container.getChildren().get(0);
 		MPart part = (MPart) stack.getChildren().get(0);
 
-		IPresentationEngine renderer = (IPresentationEngine) appContext
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine renderer = appContext.get(IPresentationEngine.class);
 		renderer.removeGui(part);
 		renderer.removeGui(window);
 
@@ -637,8 +642,7 @@ public class PartRenderingEngineTests {
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
-		IPresentationEngine engine = (IPresentationEngine) appContext
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine engine = appContext.get(IPresentationEngine.class);
 
 		CTabFolder folder = (CTabFolder) stack.getWidget();
 		CTabItem itemA = folder.getItem(0);
@@ -880,8 +884,7 @@ public class PartRenderingEngineTests {
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getChildren().add(part);
 
-		IPresentationEngine renderer = (IPresentationEngine) appContext
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine renderer = appContext.get(IPresentationEngine.class);
 		renderer.createGui(part);
 		renderer.removeGui(part);
 
@@ -929,8 +932,7 @@ public class PartRenderingEngineTests {
 		assertNull(partB.getWidget());
 
 		// try to remove the tab
-		IPresentationEngine renderer = (IPresentationEngine) appContext
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine renderer = appContext.get(IPresentationEngine.class);
 		renderer.removeGui(partB);
 
 		// item removed, one item
@@ -3275,6 +3277,8 @@ public class PartRenderingEngineTests {
 				window.getContext());
 		Control control = (Control) part.getWidget();
 		assertEquals(subShell, control.getParent());
+
+		Screenshots.takeScreenshot(getClass(), testName.getMethodName());
 
 		appContext.get(EPartService.class).activate(part);
 		assertEquals(subShell, control.getParent());
