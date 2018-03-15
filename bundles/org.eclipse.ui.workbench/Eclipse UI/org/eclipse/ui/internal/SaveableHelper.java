@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 511198
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -30,7 +31,6 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.LegacyActionTools;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -120,9 +120,8 @@ public class SaveableHelper {
 							WorkbenchMessages.Save_Resource, null, message,
 							MessageDialog.QUESTION,
 							0,
-							IDialogConstants.YES_LABEL,
-							IDialogConstants.NO_LABEL,
-							IDialogConstants.CANCEL_LABEL) {
+							WorkbenchMessages.SaveableHelper_Save, WorkbenchMessages.SaveableHelper_Dont_Save,
+							WorkbenchMessages.SaveableHelper_Cancel) {
 						@Override
 						protected int getShellStyle() {
 							return super.getShellStyle() | SWT.SHEET;
@@ -150,12 +149,9 @@ public class SaveableHelper {
 		}
 
 		// Create save block.
-		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
-			@Override
-			public void run(IProgressMonitor monitor) {
-				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
-				saveable.doSave(monitorWrap);
-			}
+		IRunnableWithProgress progressOp = monitor -> {
+			IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
+			saveable.doSave(monitorWrap);
 		};
 
 		// Do the save.
@@ -172,10 +168,8 @@ public class SaveableHelper {
 	 *   was canceled or an error occurred while saving.
 	 */
 	private static boolean saveModels(ISaveablesSource modelSource, final IWorkbenchWindow window, final boolean confirm) {
-		Saveable[] selectedModels = modelSource.getActiveSaveables();
 		final ArrayList<Saveable> dirtyModels = new ArrayList<>();
-		for (int i = 0; i < selectedModels.length; i++) {
-			Saveable model = selectedModels[i];
+		for (Saveable model : modelSource.getActiveSaveables()) {
 			if (model.isDirty()) {
 				dirtyModels.add(model);
 			}
@@ -185,28 +179,24 @@ public class SaveableHelper {
 		}
 
 		// Create save block.
-		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
-			@Override
-			public void run(IProgressMonitor monitor) {
-				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
-				SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Save, dirtyModels.size());
-				try {
-					for (Iterator<Saveable> i = dirtyModels.iterator(); i.hasNext();) {
-						Saveable model = i.next();
-						// handle case where this model got saved as a result of
-						// saving another
-						if (!model.isDirty()) {
-							subMonitor.worked(1);
-							continue;
-						}
-						doSaveModel(model, subMonitor.split(1), window, confirm);
-						if (subMonitor.isCanceled()) {
-							break;
-						}
+		IRunnableWithProgress progressOp = monitor -> {
+			IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
+			SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Save, dirtyModels.size());
+			try {
+				for (Saveable model : dirtyModels) {
+					// handle case where this model got saved as a result of
+					// saving another
+					if (!model.isDirty()) {
+						subMonitor.worked(1);
+						continue;
 					}
-				} finally {
-					monitorWrap.done();
+					doSaveModel(model, subMonitor.split(1), window, confirm);
+					if (subMonitor.isCanceled()) {
+						break;
+					}
 				}
+			} finally {
+				monitorWrap.done();
 			}
 		};
 
@@ -248,12 +238,9 @@ public class SaveableHelper {
 		}
 
 		// Create save block.
-		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
-			@Override
-			public void run(IProgressMonitor monitor) {
-				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
-				saveable.doSave(monitorWrap);
-			}
+		IRunnableWithProgress progressOp = monitor -> {
+			IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
+			saveable.doSave(monitorWrap);
 		};
 
 		// Do the save.
@@ -280,14 +267,11 @@ public class SaveableHelper {
 			final IRunnableWithProgress progressOp,
 			final IRunnableContext runnableContext, final IShellProvider shellProvider) {
 		final boolean[] success = new boolean[] { false };
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			@Override
-			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				progressOp.run(monitor);
-				// Only indicate success if the monitor wasn't canceled
-				if (!monitor.isCanceled())
-					success[0] = true;
-			}
+		IRunnableWithProgress runnable = monitor -> {
+			progressOp.run(monitor);
+			// Only indicate success if the monitor wasn't canceled
+			if (!monitor.isCanceled())
+				success[0] = true;
 		};
 
 		try {
@@ -320,9 +304,7 @@ public class SaveableHelper {
 	 * @since 3.2
 	 */
 	public static boolean needsSave(ISaveablesSource modelSource) {
-		Saveable[] selectedModels = modelSource.getActiveSaveables();
-		for (int i = 0; i < selectedModels.length; i++) {
-			Saveable model = selectedModels[i];
+		for (Saveable model : modelSource.getActiveSaveables()) {
 			if (model.isDirty() && !((InternalSaveable)model).isSavingInBackground()) {
 				return true;
 			}
@@ -395,8 +377,7 @@ public class SaveableHelper {
 				final IWorkbenchPart[] parts = saveablesList.getPartsForSaveable(model);
 
 				// this will cause the parts tabs to show the ongoing background operation
-				for (int i = 0; i < parts.length; i++) {
-					IWorkbenchPart workbenchPart = parts[i];
+				for (IWorkbenchPart workbenchPart : parts) {
 					IWorkbenchSiteProgressService progressService = Adapters.adapt(workbenchPart.getSite(),
 							IWorkbenchSiteProgressService.class);
 					progressService.showBusyForFamily(model);
@@ -410,12 +391,9 @@ public class SaveableHelper {
 					public void done(final IJobChangeEvent event) {
 						((InternalSaveable) model).setBackgroundSaveJob(null);
 						shellProvider.getShell().getDisplay().asyncExec(
-								new Runnable() {
-									@Override
-									public void run() {
-										notifySaveAction(parts);
-										model.enableUI(parts);
-									}
+								() -> {
+									notifySaveAction(parts);
+									model.enableUI(parts);
 								});
 					}
 				});
@@ -436,11 +414,11 @@ public class SaveableHelper {
 
 	private static void notifySaveAction(final IWorkbenchPart[] parts) {
 		Set<IWorkbenchWindow> wwindows = new HashSet<>();
-		for (int i = 0; i < parts.length; i++) {
-			wwindows.add(parts[i].getSite().getWorkbenchWindow());
+		for (IWorkbenchPart part : parts) {
+			wwindows.add(part.getSite().getWorkbenchWindow());
 		}
-		for (Iterator<IWorkbenchWindow> it = wwindows.iterator(); it.hasNext();) {
-			WorkbenchWindow wwin = (WorkbenchWindow) it.next();
+		for (IWorkbenchWindow iWorkbenchWindow : wwindows) {
+			WorkbenchWindow wwin = (WorkbenchWindow) iWorkbenchWindow;
 			wwin.fireBackgroundSaveStarted();
 		}
 	}
@@ -468,12 +446,7 @@ public class SaveableHelper {
 	public static boolean waitForBackgroundSaveJobs(final List modelsToSave) {
 		// block if any of the saveables is still saving in the background
 		try {
-			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
-				@Override
-				public void run(IProgressMonitor monitor) throws InterruptedException {
-					Job.getJobManager().join(new DynamicFamily(modelsToSave), monitor);
-				}
-			});
+			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(monitor -> Job.getJobManager().join(new DynamicFamily(modelsToSave), monitor));
 		} catch (InvocationTargetException e) {
 			StatusUtil.handleStatus(e, StatusManager.SHOW | StatusManager.LOG);
 		} catch (InterruptedException e) {

@@ -37,12 +37,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -57,7 +53,6 @@ import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -659,12 +654,9 @@ public abstract class QuickAccessContents {
 				// do nothing
 			}
 		});
-		filterText.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				String text = ((Text) e.widget).getText().toLowerCase();
-				refresh(text);
-			}
+		filterText.addModifyListener(e -> {
+			String text = ((Text) e.widget).getText().toLowerCase();
+			refresh(text);
 		});
 	}
 
@@ -722,12 +714,7 @@ public abstract class QuickAccessContents {
 	 * @return the created table
 	 */
 	public Table createTable(Composite composite, int defaultOrientation) {
-		composite.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				doDispose();
-			}
-		});
+		composite.addDisposeListener(e -> doDispose());
 		Composite tableComposite = new Composite(composite, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tableComposite);
 		TableColumnLayout tableColumnLayout = new TableColumnLayout();
@@ -736,13 +723,12 @@ public abstract class QuickAccessContents {
 		textLayout = new TextLayout(table.getDisplay());
 		textLayout.setOrientation(defaultOrientation);
 		Font boldFont = resourceManager.createFont(FontDescriptor.createFrom(
-				JFaceResources.getDialogFont()).setStyle(SWT.BOLD));
+				table.getFont()).setStyle(SWT.BOLD));
 		textLayout.setFont(table.getFont());
 		textLayout.setText(QuickAccessMessages.QuickAccess_AvailableCategories);
 		int maxProviderWidth = (textLayout.getBounds().width);
 		textLayout.setFont(boldFont);
-		for (int i = 0; i < providers.length; i++) {
-			QuickAccessProvider provider = providers[i];
+		for (QuickAccessProvider provider : providers) {
 			textLayout.setText(provider.getName());
 			int width = (textLayout.getBounds().width);
 			if (width > maxProviderWidth) {
@@ -757,14 +743,11 @@ public abstract class QuickAccessContents {
 				if (!showAllMatches) {
 					if (!resized) {
 						resized = true;
-						e.display.timerExec(100, new Runnable() {
-							@Override
-							public void run() {
-								if (table != null && !table.isDisposed() && filterText !=null && !filterText.isDisposed()) {
-									refresh(filterText.getText().toLowerCase());
-								}
-								resized = false;
+						e.display.timerExec(100, () -> {
+							if (table != null && !table.isDisposed() && filterText !=null && !filterText.isDisposed()) {
+								refresh(filterText.getText().toLowerCase());
 							}
+							resized = false;
 						});
 					}
 				}
@@ -849,22 +832,19 @@ public abstract class QuickAccessContents {
 		} else {
 			boldStyle = null;
 		}
-		Listener listener = new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				QuickAccessEntry entry = (QuickAccessEntry) event.item.getData();
-				if (entry != null) {
-					switch (event.type) {
-					case SWT.MeasureItem:
-						entry.measure(event, textLayout, resourceManager, boldStyle);
-						break;
-					case SWT.PaintItem:
-						entry.paint(event, textLayout, resourceManager, boldStyle, grayColor);
-						break;
-					case SWT.EraseItem:
-						entry.erase(event);
-						break;
-					}
+		Listener listener = event -> {
+			QuickAccessEntry entry = (QuickAccessEntry) event.item.getData();
+			if (entry != null) {
+				switch (event.type) {
+				case SWT.MeasureItem:
+					entry.measure(event, textLayout, resourceManager, boldStyle);
+					break;
+				case SWT.PaintItem:
+					entry.paint(event, textLayout, resourceManager, boldStyle, grayColor);
+					break;
+				case SWT.EraseItem:
+					entry.erase(event);
+					break;
 				}
 			}
 		};

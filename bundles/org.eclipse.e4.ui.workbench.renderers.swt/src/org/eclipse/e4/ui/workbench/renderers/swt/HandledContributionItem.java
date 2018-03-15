@@ -25,7 +25,6 @@ import org.eclipse.core.commands.IStateListener;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.State;
 import org.eclipse.core.commands.common.NotDefinedException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.commands.internal.ICommandHelpService;
@@ -36,8 +35,9 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
-import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
+import org.eclipse.e4.ui.internal.workbench.swt.Policy;
+import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -52,6 +52,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolItem;
+import org.osgi.service.log.LogService;
 
 public class HandledContributionItem extends AbstractContributionItem {
 	/**
@@ -89,12 +90,7 @@ public class HandledContributionItem extends AbstractContributionItem {
 
 	private Runnable unreferenceRunnable;
 
-	private IStateListener stateListener = new IStateListener() {
-		@Override
-		public void handleStateChange(State state, Object oldValue) {
-			updateState();
-		}
-	};
+	private IStateListener stateListener = (state, oldValue) -> updateState();
 
 	private IEclipseContext infoContext;
 
@@ -138,7 +134,7 @@ public class HandledContributionItem extends AbstractContributionItem {
 		if (getModel().getCommand() != null && getModel().getWbCommand() == null) {
 			String cmdId = getModel().getCommand().getElementId();
 			if (cmdId == null) {
-				Activator.log(IStatus.ERROR, "Unable to generate parameterized command for " + getModel() //$NON-NLS-1$
+				Activator.log(LogService.LOG_ERROR, "Unable to generate parameterized command for " + getModel() //$NON-NLS-1$
 						+ ". ElementId is not allowed to be null."); //$NON-NLS-1$
 				return;
 			}
@@ -148,9 +144,11 @@ public class HandledContributionItem extends AbstractContributionItem {
 				parameters.put(mParm.getName(), mParm.getValue());
 			}
 			ParameterizedCommand parmCmd = commandService.createCommand(cmdId, parameters);
-			Activator.trace(Policy.DEBUG_MENUS, "command: " + parmCmd, null); //$NON-NLS-1$
+			if (Policy.DEBUG_MENUS) {
+				WorkbenchSWTActivator.trace(Policy.DEBUG_MENUS_FLAG, "command: " + parmCmd, null); //$NON-NLS-1$
+			}
 			if (parmCmd == null) {
-				Activator.log(IStatus.ERROR, "Unable to generate parameterized command for " + getModel() //$NON-NLS-1$
+				Activator.log(LogService.LOG_ERROR, "Unable to generate parameterized command for " + getModel() //$NON-NLS-1$
 								+ " with " + parameters); //$NON-NLS-1$
 				return;
 			}
@@ -248,7 +246,7 @@ public class HandledContributionItem extends AbstractContributionItem {
 				try {
 					text = parmCmd.getName(getModel().getCommand().getLocalizedCommandName());
 				} catch (NotDefinedException e) {
-					e.printStackTrace();
+					Activator.log(LogService.LOG_DEBUG, e.getMessage(), e);
 				}
 			}
 			if (bindingService != null) {
@@ -275,7 +273,7 @@ public class HandledContributionItem extends AbstractContributionItem {
 		} else {
 			item.setText(""); //$NON-NLS-1$
 		}
-		final String tooltip = getToolTipText(false);
+		final String tooltip = getModel().getLocalizedTooltip();
 		item.setToolTipText(tooltip);
 		item.setSelection(getModel().isSelected());
 		item.setEnabled(getModel().isEnabled());

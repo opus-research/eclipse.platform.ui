@@ -60,9 +60,9 @@ public class WorkbenchIntroManager implements IIntroManager {
 
 			@Override
 			public void removeExtension(IExtension source, Object[] objects) {
-                for (int i = 0; i < objects.length; i++) {
-                    if (objects[i] instanceof IIntroPart) {
-                        closeIntro((IIntroPart) objects[i]);
+                for (Object object : objects) {
+                    if (object instanceof IIntroPart) {
+                        closeIntro((IIntroPart) object);
                     }
                 }
 
@@ -86,6 +86,10 @@ public class WorkbenchIntroManager implements IIntroManager {
             //assumption is that there is only ever one intro per workbench
             //if we ever support one per window then this will need revisiting
             IWorkbenchPage page = introView.getSite().getPage();
+			if (page == null) {
+				introPart = null;
+				return true;
+			}
             IViewReference reference = page
                     .findViewReference(IIntroConstants.INTRO_VIEW_ID);
             page.hideView(introView);
@@ -244,12 +248,9 @@ public class WorkbenchIntroManager implements IIntroManager {
      * cannot be found.
      */
     /*package*/ViewIntroAdapterPart getViewIntroAdapterPart() {
-		IWorkbenchWindow[] windows = this.workbench.getWorkbenchWindows();
-		for (int i = 0; i < windows.length; i++) {
-			WorkbenchWindow window = (WorkbenchWindow) windows[i];
-			MUIElement introPart = window.modelService
-.find(IIntroConstants.INTRO_VIEW_ID,
-					window.getModel());
+		for (IWorkbenchWindow iWorkbenchWindow : this.workbench.getWorkbenchWindows()) {
+			WorkbenchWindow window = (WorkbenchWindow) iWorkbenchWindow;
+			MUIElement introPart = window.modelService.find(IIntroConstants.INTRO_VIEW_ID, window.getModel());
 			if (introPart instanceof MPlaceholder) {
 				MPlaceholder introPH = (MPlaceholder) introPart;
 				MPart introModelPart = (MPart) introPH.getRef();

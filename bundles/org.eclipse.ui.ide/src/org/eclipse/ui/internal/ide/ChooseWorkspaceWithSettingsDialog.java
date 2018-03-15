@@ -34,6 +34,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -152,7 +153,6 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 		});
 
 		Composite sectionClient = toolkit.createComposite(expandable);
-		sectionClient.setLayout(new GridLayout());
 		sectionClient.setBackground(workArea.getBackground());
 
 		if (createButtons(toolkit, sectionClient))
@@ -171,29 +171,30 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 	 */
 	private boolean createButtons(FormToolkit toolkit, Composite sectionClient) {
 
-		IConfigurationElement[] settings = SettingsTransfer
-				.getSettingsTransfers();
 
 		String[] enabledSettings = getEnabledSettings(IDEWorkbenchPlugin
 				.getDefault().getDialogSettings()
 				.getSection(WORKBENCH_SETTINGS));
 
-		for (int i = 0; i < settings.length; i++) {
-			final IConfigurationElement settingsTransfer = settings[i];
-			final Button button = toolkit.createButton(sectionClient,
-					settings[i].getAttribute(ATT_NAME), SWT.CHECK);
+		RowLayout layout = new RowLayout(SWT.VERTICAL);
+		layout.marginLeft = 14;
+		layout.spacing = 6;
+		sectionClient.setLayout(layout);
 
-			String helpId = settings[i].getAttribute(ATT_HELP_CONTEXT);
+		for (final IConfigurationElement settingsTransfer : SettingsTransfer.getSettingsTransfers()) {
+			final Button button = toolkit.createButton(sectionClient,
+					settingsTransfer.getAttribute(ATT_NAME), SWT.CHECK);
+
+			String helpId = settingsTransfer.getAttribute(ATT_HELP_CONTEXT);
 
 			if (helpId != null)
-				PlatformUI.getWorkbench().getHelpSystem().setHelp(button,
-						helpId);
+				PlatformUI.getWorkbench().getHelpSystem().setHelp(button, helpId);
 
 			if (enabledSettings != null && enabledSettings.length > 0) {
 
-				String id = settings[i].getAttribute(ATT_ID);
-				for (int j = 0; j < enabledSettings.length; j++) {
-					if (enabledSettings[j].equals(id)) {
+				String id = settingsTransfer.getAttribute(ATT_ID);
+				for (String enabledSetting : enabledSettings) {
+					if (enabledSetting.equals(id)) {
 						button.setSelection(true);
 						selectedSettings.add(settingsTransfer);
 						break;
