@@ -709,10 +709,14 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		orButton.setSelection(!andFilters);
 
 		filterGroups.clear();
-		filterGroups.addAll(generator.getDeclaredFilters());
+		List<MarkerFieldFilterGroup> declaredFilters = new ArrayList<>(generator.getDeclaredFilters());
+		filterGroups.addAll(declaredFilters);
 		configsTable.refresh();
-		if (!filterGroups.isEmpty()) {
-			configsTable.setCheckedElements(filterGroups.iterator().next());
+
+		for (MarkerFieldFilterGroup marker : declaredFilters) {
+			if (marker.isEnabled()) {
+				configsTable.setChecked(marker, true);
+			}
 		}
 
 		IPreferenceStore preferenceStore = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
