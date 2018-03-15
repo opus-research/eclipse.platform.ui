@@ -100,7 +100,7 @@ import org.osgi.framework.FrameworkUtil;
 public class MenuHelper {
 
 	public static void trace(String msg, Throwable error) {
-		WorkbenchSWTActivator.trace(Policy.MENUS, msg, error);
+		WorkbenchSWTActivator.trace(Policy.DEBUG_MENUS_FLAG, msg, error);
 	}
 
 	private static final Pattern SCHEME_PATTERN = Pattern.compile("\\p{Alpha}[\\p{Alnum}+.-]*:.*"); //$NON-NLS-1$
@@ -280,8 +280,13 @@ public class MenuHelper {
 		return (expectedType.isInstance(rawValue)) ? expectedType.cast(rawValue) : null;
 	}
 
-	/*
-	 * Support Utilities
+	/**
+	 * Returns id attribute of the element or unique string computed from the
+	 * element registry handle
+	 *
+	 * @param element
+	 *            non null
+	 * @return non null id
 	 */
 	public static String getId(IConfigurationElement element) {
 		String id = element.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
@@ -293,10 +298,24 @@ public class MenuHelper {
 			id = getCommandId(element);
 		}
 		if (id == null || id.length() == 0) {
-			id = element.toString();
+			id = getConfigurationHandleId(element);
 		}
-
 		return id;
+	}
+
+	/**
+	 * @return unique string computed from the element registry handle
+	 */
+	private static String getConfigurationHandleId(IConfigurationElement element) {
+		// Note: the line below depends on internal details of
+		// ConfigurationElementHandle implementation, see bug 515405 and 515587.
+
+		// ConfigurationElementHandle.hashCode() is implemented in the way that
+		// it returns same number for different element instances with the same
+		// registry handle id (see org.eclipse.core.internal.registry.Handle).
+
+		// Once the bug 515587 provides new API, we should use that
+		return element.toString();
 	}
 
 	static String getName(IConfigurationElement element) {
@@ -392,8 +411,10 @@ public class MenuHelper {
 			return ItemType.RADIO;
 		}
 		if (IWorkbenchRegistryConstants.STYLE_PULLDOWN.equals(style)) {
-			trace("Failed to get style for " + IWorkbenchRegistryConstants.STYLE_PULLDOWN, null); //$NON-NLS-1$
-			// return CommandContributionItem.STYLE_PULLDOWN;
+			if (Policy.DEBUG_MENUS) {
+				trace("Failed to get style for " + IWorkbenchRegistryConstants.STYLE_PULLDOWN, null); //$NON-NLS-1$
+				// return CommandContributionItem.STYLE_PULLDOWN;
+			}
 		}
 		return ItemType.PUSH;
 	}
@@ -416,9 +437,9 @@ public class MenuHelper {
 		HashMap<String, String> map = new HashMap<>();
 		IConfigurationElement[] parameters = element
 				.getChildren(IWorkbenchRegistryConstants.TAG_PARAMETER);
-		for (int i = 0; i < parameters.length; i++) {
-			String name = parameters[i].getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
-			String value = parameters[i].getAttribute(IWorkbenchRegistryConstants.ATT_VALUE);
+		for (IConfigurationElement parameter : parameters) {
+			String name = parameter.getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
+			String value = parameter.getAttribute(IWorkbenchRegistryConstants.ATT_VALUE);
 			if (name != null && value != null) {
 				map.put(name, value);
 			}

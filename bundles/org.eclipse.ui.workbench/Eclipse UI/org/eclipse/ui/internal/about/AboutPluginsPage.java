@@ -15,6 +15,8 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.about;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -49,8 +51,6 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -274,8 +274,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 	protected void handleSigningInfoPressed() {
 		if (signingArea == null) {
 			signingArea = new BundleSigningInfo();
-			AboutBundleData bundleInfo = (AboutBundleData) ((IStructuredSelection) vendorInfo
-					.getSelection()).getFirstElement();
+			AboutBundleData bundleInfo = (AboutBundleData) vendorInfo.getStructuredSelection().getFirstElement();
 			signingArea.setData(bundleInfo);
 
 			signingArea.createContents(sashForm);
@@ -344,9 +343,9 @@ public class AboutPluginsPage extends ProductInfoPage {
 			// include only resolved bundles (bug 65548)
 			SubMonitor subMonitor = SubMonitor.convert(monitor, bundles.length + 1);
 			Map<String, AboutBundleData> map = new HashMap<>();
-			for (int i = 0; i < bundles.length; ++i) {
+			for (Bundle bundle : bundles) {
 				subMonitor.split(1);
-				AboutBundleData data = new AboutBundleData(bundles[i]);
+				AboutBundleData data = new AboutBundleData(bundle);
 				if (BundleUtility.isReady(data.getState()) && !map.containsKey(data.getVersionedId())) {
 					map.put(data.getVersionedId(), data);
 				}
@@ -396,12 +395,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 			column.setWidth(columnWidths[i]);
 			column.setText(columnTitles[i]);
 			final int columnIndex = i;
-			column.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					updateTableSorting(columnIndex);
-				}
-			});
+			column.addSelectionListener(widgetSelectedAdapter(e -> updateTableSorting(columnIndex)));
 		}
 
 		vendorInfo.setContentProvider(new ArrayContentProvider());
@@ -497,8 +491,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 	private void checkEnablement() {
 		// enable if there is an item selected and that
 		// item has additional info
-		IStructuredSelection selection = (IStructuredSelection) vendorInfo
-				.getSelection();
+		IStructuredSelection selection = vendorInfo.getStructuredSelection();
 		if (selection.getFirstElement() instanceof AboutBundleData) {
 			AboutBundleData selected = (AboutBundleData) selection
 					.getFirstElement();
@@ -566,8 +559,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 		if (vendorInfo.getSelection().isEmpty())
 			return;
 
-		AboutBundleData bundleInfo = (AboutBundleData) ((IStructuredSelection) vendorInfo
-				.getSelection()).getFirstElement();
+		AboutBundleData bundleInfo = (AboutBundleData) vendorInfo.getStructuredSelection().getFirstElement();
 
 		if (!AboutUtils.openBrowser(getShell(),
 				getMoreInfoURL(bundleInfo, true))) {

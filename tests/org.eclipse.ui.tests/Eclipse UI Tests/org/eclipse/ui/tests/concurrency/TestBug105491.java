@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IThreadListener;
 import org.eclipse.swt.widgets.Display;
@@ -45,28 +45,26 @@ public class TestBug105491 extends TestCase {
 		@Override
 		public void execute(final IProgressMonitor pm) {
 			//clients assume this would not deadlock because it runs in an asyncExec
-			Display.getDefault().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
-					try {
-						dialog.run(true, false, new WorkspaceModifyOperation() {
-							@Override
-							protected void execute(IProgressMonitor monitor) {}
-						});
-					} catch (InvocationTargetException e) {
-						e.printStackTrace();
-						fail(e.getMessage());
-					} catch (InterruptedException e) {
-						//ignore
-					}
+			Display.getDefault().asyncExec(() -> {
+				ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
+				try {
+					dialog.run(true, false, new WorkspaceModifyOperation() {
+						@Override
+						protected void execute(IProgressMonitor monitor) {
+						}
+					});
+				} catch (InvocationTargetException e1) {
+					e1.printStackTrace();
+					fail(e1.getMessage());
+				} catch (InterruptedException e2) {
+					// ignore
 				}
 			});
 		}
 
 		@Override
 		public void threadChange(Thread thread) {
-			Platform.getJobManager().transferRule(workspace.getRoot(), thread);
+			Job.getJobManager().transferRule(workspace.getRoot(), thread);
 		}
 	}
 
@@ -87,18 +85,15 @@ public class TestBug105491 extends TestCase {
 		if (Thread.interrupted()) {
 			fail("Thread was interrupted at start of test");
 		}
-		workspace.run(new IWorkspaceRunnable() {
-			@Override
-			public void run(IProgressMonitor monitor) {
-				ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
-				try {
-					dialog.run(true, false, new TransferTestOperation());
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
-					fail(e.getMessage());
-				} catch (InterruptedException e) {
-					//ignore
-				}
+		workspace.run((IWorkspaceRunnable) monitor -> {
+			ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
+			try {
+				dialog.run(true, false, new TransferTestOperation());
+			} catch (InvocationTargetException e1) {
+				e1.printStackTrace();
+				fail(e1.getMessage());
+			} catch (InterruptedException e2) {
+				// ignore
 			}
 		}, workspace.getRoot(), IResource.NONE, null);
 		if (Thread.interrupted()) {
