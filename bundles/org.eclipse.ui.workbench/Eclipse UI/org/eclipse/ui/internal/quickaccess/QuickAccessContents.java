@@ -10,13 +10,15 @@
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 491272, 491398
  *     Leung Wang Hei <gemaspecial@yahoo.com.hk> - Bug 483343
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, 491529, 491293, 492434, 492452, 459989
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, 491529, 491293, 492434, 492452, 459989, 507322
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -35,12 +37,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -55,7 +53,6 @@ import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -410,6 +407,7 @@ public abstract class QuickAccessContents {
 		}
 		boolean done;
 		String category = null;
+		Set<String> prevPickIds = new HashSet<>();
 		do {
 			// will be set to false if we find a provider with remaining
 			// elements
@@ -437,15 +435,24 @@ public abstract class QuickAccessContents {
 				if (filter.length() > 0 || provider.isAlwaysPresent() || showAllMatches) {
 					QuickAccessElement[] sortedElements = provider.getElementsSorted();
 
-					// count number or previous picks
-					if ((provider instanceof PreviousPicksProvider)) {
+					// count previous picks and store ids
+					if (isPreviousPickProvider) {
 						prevPick = sortedElements.length;
+						Stream.of(sortedElements).forEach(e -> prevPickIds.add(e.getId()));
 					}
 
 					int j = indexPerProvider[i];
+					// loops on all the elements of a provider
 					while (j < sortedElements.length
 							&& (showAllMatches || (count < countPerProvider && countTotal < maxCount))) {
 						QuickAccessElement element = sortedElements[j];
+
+						// Skip element if already in contained amid previous picks
+						if (!isPreviousPickProvider && prevPickIds.contains(element.getId())) {
+							j++;
+							continue;
+						}
+
 						QuickAccessEntry entry = null;
 						if (filter.length() == 0) {
 							if (i == 0 || showAllMatches) {
@@ -647,12 +654,9 @@ public abstract class QuickAccessContents {
 				// do nothing
 			}
 		});
-		filterText.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				String text = ((Text) e.widget).getText().toLowerCase();
-				refresh(text);
-			}
+		filterText.addModifyListener(e -> {
+			String text = ((Text) e.widget).getText().toLowerCase();
+			refresh(text);
 		});
 	}
 
@@ -710,12 +714,7 @@ public abstract class QuickAccessContents {
 	 * @return the created table
 	 */
 	public Table createTable(Composite composite, int defaultOrientation) {
-		composite.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				doDispose();
-			}
-		});
+		composite.addDisposeListener(e -> doDispose());
 		Composite tableComposite = new Composite(composite, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tableComposite);
 		TableColumnLayout tableColumnLayout = new TableColumnLayout();
@@ -745,14 +744,11 @@ public abstract class QuickAccessContents {
 				if (!showAllMatches) {
 					if (!resized) {
 						resized = true;
-						e.display.timerExec(100, new Runnable() {
-							@Override
-							public void run() {
-								if (table != null && !table.isDisposed() && filterText !=null && !filterText.isDisposed()) {
-									refresh(filterText.getText().toLowerCase());
-								}
-								resized = false;
+						e.display.timerExec(100, () -> {
+							if (table != null && !table.isDisposed() && filterText !=null && !filterText.isDisposed()) {
+								refresh(filterText.getText().toLowerCase());
 							}
+							resized = false;
 						});
 					}
 				}
@@ -837,22 +833,19 @@ public abstract class QuickAccessContents {
 		} else {
 			boldStyle = null;
 		}
-		Listener listener = new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				QuickAccessEntry entry = (QuickAccessEntry) event.item.getData();
-				if (entry != null) {
-					switch (event.type) {
-					case SWT.MeasureItem:
-						entry.measure(event, textLayout, resourceManager, boldStyle);
-						break;
-					case SWT.PaintItem:
-						entry.paint(event, textLayout, resourceManager, boldStyle, grayColor);
-						break;
-					case SWT.EraseItem:
-						entry.erase(event);
-						break;
-					}
+		Listener listener = event -> {
+			QuickAccessEntry entry = (QuickAccessEntry) event.item.getData();
+			if (entry != null) {
+				switch (event.type) {
+				case SWT.MeasureItem:
+					entry.measure(event, textLayout, resourceManager, boldStyle);
+					break;
+				case SWT.PaintItem:
+					entry.paint(event, textLayout, resourceManager, boldStyle, grayColor);
+					break;
+				case SWT.EraseItem:
+					entry.erase(event);
+					break;
 				}
 			}
 		};
