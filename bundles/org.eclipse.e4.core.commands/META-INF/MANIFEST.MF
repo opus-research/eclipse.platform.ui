@@ -7,7 +7,7 @@ Bundle-Localization: plugin
 Bundle-Version: 0.12.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: javax.annotation,
- javax.inject;version="1.0.0",
+ javax.inject,
  org.eclipse.core.commands,
  org.eclipse.core.commands.common,
  org.eclipse.core.expressions,
