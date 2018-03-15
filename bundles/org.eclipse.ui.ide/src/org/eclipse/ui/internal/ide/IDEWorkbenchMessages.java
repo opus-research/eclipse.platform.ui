@@ -18,7 +18,7 @@
  * Lars Vogel <Lars.Vogel@vogella.com> - Bug 431862
  * Christian Georgi (SAP SE)           - bug 432480, bug 458811
  * Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
- * Patrik Suzzi <psuzzi@gmail.com> - Bug 485201
+ * Patrik Suzzi <psuzzi@gmail.com> - Bug 485201, 502050
  * Simon Scholz <simon.scholz@vogella.com> - Bug 486777
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
@@ -524,6 +524,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEWorkspacePreference_workspaceLocation;
 	public static String IDEWorkspacePreference_showLocationInWindowTitle;
 	public static String IDEWorkspacePreference_showLocationInWindowTitle_lockedByCommandLine;
+	public static String IDEWorkspacePreference_showFullPathInWindowTitle;
 	public static String IDEWorkspacePreference_workspaceName;
 	public static String IDEWorkbenchPreference_workbenchSystemExplorer;
 
