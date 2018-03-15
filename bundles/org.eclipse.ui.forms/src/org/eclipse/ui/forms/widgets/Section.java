@@ -113,10 +113,6 @@ public class Section extends ExpandableComposite {
 		reflow();
 	}
 
-	/**
-	 * Reflows this section and all the parents up the hierarchy until a
-	 * SharedScrolledComposite is reached.
-	 */
 	@Override
 	protected void reflow() {
 		super.reflow();

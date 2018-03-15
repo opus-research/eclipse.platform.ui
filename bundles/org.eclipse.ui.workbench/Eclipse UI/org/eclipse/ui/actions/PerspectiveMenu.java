@@ -12,7 +12,6 @@
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
-import com.ibm.icu.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,12 +19,23 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import com.ibm.icu.text.Collator;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.common.NotDefinedException;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IAction;
@@ -33,11 +43,7 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
+
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.IWorkbenchCommandConstants;
@@ -249,7 +255,7 @@ public abstract class PerspectiveMenu extends ContributionItem {
      * @return a list of <code>IPerspectiveDescriptor</code> items
      */
     private ArrayList getPerspectiveShortcuts() {
-		ArrayList list = new ArrayList();
+        ArrayList list = new ArrayList();
 
         IWorkbenchPage page = window.getActivePage();
         if (page == null) {
@@ -258,8 +264,8 @@ public abstract class PerspectiveMenu extends ContributionItem {
 
         String[] ids = page.getPerspectiveShortcuts();
 
-		for (String perspectiveId : ids) {
-			IPerspectiveDescriptor desc = reg.findPerspectiveWithId(perspectiveId);
+        for (String id2 : ids) {
+            IPerspectiveDescriptor desc = reg.findPerspectiveWithId(id2);
             if (desc != null && !list.contains(desc)) {
                 if (WorkbenchActivityHelper.filterItem(desc)) {
 					continue;
