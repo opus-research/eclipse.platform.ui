@@ -14,7 +14,6 @@ package org.eclipse.ui.internal.views.properties.tabbed.view;
 
 import java.util.Map;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
@@ -948,12 +947,8 @@ public class TabbedPropertyList
 		widgetNormalShadow = Display.getCurrent().getSystemColor(
 				SWT.COLOR_WIDGET_NORMAL_SHADOW);
 
-		RGB infoBackground;
-		if (Platform.WS_GTK.equals(Platform.getWS())) {
-			infoBackground = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB();
-		} else {
-			infoBackground = Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND).getRGB();
-		}
+		RGB infoBackground = Display.getCurrent().getSystemColor(
+				SWT.COLOR_INFO_BACKGROUND).getRGB();
 		RGB white = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE)
 				.getRGB();
 		RGB black = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK)
