@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,34 +24,23 @@ import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -68,7 +57,6 @@ import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
-import org.eclipse.ui.internal.progress.ProgressManager;
 import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -84,7 +72,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 public class ContentTypesPreferencePage extends PreferencePage implements
 		IWorkbenchPreferencePage {
 
-	private TableViewer fileAssociationViewer;
+	private ListViewer fileAssociationViewer;
 
 	private Button removeButton;
 
@@ -121,11 +109,13 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			} else {
 				toString = "*." + ext; //$NON-NLS-1$
 			}
-			return toString;
-		}
 
-		public boolean getPredefined() {
-			return isPredefined;
+			if (isPredefined) {
+				toString = NLS.bind(
+						WorkbenchMessages.ContentTypes_lockedFormat, toString);
+			}
+
+			return toString;
 		}
 	}
 
@@ -142,17 +132,6 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 		public String getText(Object element) {
 			String label = super.getText(element);
 			return TextProcessor.process(label, "*."); //$NON-NLS-1$
-		}
-
-		@Override
-		public Image getImage(Object element) {
-			// only Spec objects will be in here
-			Spec spec = (Spec) element;
-			if (spec.getPredefined()) {
-				// Temporary until we decide on a location to host the icon
-				return JFaceResources.getImage(ProgressManager.BLOCKED_JOB_KEY);
-			}
-			return null;
 		}
 	}
 
@@ -215,51 +194,10 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 	}
 
 	private class ContentTypesLabelProvider extends LabelProvider {
-		private Image silhouette;
-
-		public ContentTypesLabelProvider() {
-			this.silhouette = createImage(getFont(), "\uD83D\uDC64"); //$NON-NLS-1$
-		}
-
-		private Image createImage(Font font, String s) {
-			TextLayout textLayout = new TextLayout(font.getDevice());
-			textLayout.setText(s);
-			textLayout.setFont(font);
-			Rectangle bounds = textLayout.getBounds();
-			PaletteData palette = new PaletteData(0xFF, 0xFF00, 0xFF0000);
-			ImageData imageData = new ImageData(bounds.width, bounds.height, 32, palette);
-			imageData.transparentPixel = palette
-					.getPixel(font.getDevice().getSystemColor(SWT.COLOR_TRANSPARENT).getRGB());
-			for (int column = 0; column < imageData.width; column++) {
-				for (int line = 0; line < imageData.height; line++) {
-					imageData.setPixel(column, line, imageData.transparentPixel);
-				}
-			}
-			Image image = new Image(font.getDevice(), imageData);
-			GC gc = new GC(image);
-			textLayout.draw(gc, 0, 0);
-			return image;
-		}
-
 		@Override
 		public String getText(Object element) {
 			IContentType contentType = (IContentType) element;
 			return contentType.getName();
-		}
-
-		@Override
-		public Image getImage(Object element) {
-			IContentType contentType = (IContentType) element;
-			if (contentType.isUserDefined()) {
-				return this.silhouette;
-			}
-			return super.getImage(element);
-		}
-
-		@Override
-		public void dispose() {
-			this.silhouette.dispose();
-			super.dispose();
 		}
 	}
 
@@ -385,19 +323,16 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			}
 		});
 
-		charsetField.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				String errorMessage = null;
-				String text = charsetField.getText();
-				try {
-					if (text.length() != 0 && !Charset.isSupported(text))
-						errorMessage = WorkbenchMessages.ContentTypes_unsupportedEncoding;
-				} catch (IllegalCharsetNameException ex) {
+		charsetField.addModifyListener(e -> {
+			String errorMessage = null;
+			String text = charsetField.getText();
+			try {
+				if (text.length() != 0 && !Charset.isSupported(text))
 					errorMessage = WorkbenchMessages.ContentTypes_unsupportedEncoding;
-				}
-				setErrorMessage(errorMessage);
+			} catch (IllegalCharsetNameException ex) {
+				errorMessage = WorkbenchMessages.ContentTypes_unsupportedEncoding;
 			}
+			setErrorMessage(errorMessage);
 		});
 
 	}
@@ -414,7 +349,7 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			label.setLayoutData(data);
 		}
 		{
-			fileAssociationViewer = new TableViewer(composite);
+			fileAssociationViewer = new ListViewer(composite);
 			fileAssociationViewer.setComparator(new FileSpecComparator());
 			fileAssociationViewer.getControl().setFont(composite.getFont());
 			fileAssociationViewer
@@ -424,36 +359,31 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			data.horizontalSpan = 1;
 			fileAssociationViewer.getControl().setLayoutData(data);
 			fileAssociationViewer
-					.addSelectionChangedListener(new ISelectionChangedListener() {
-
-						@Override
-						public void selectionChanged(SelectionChangedEvent event) {
-							IStructuredSelection selection = (IStructuredSelection) event
-									.getSelection();
-							if (selection.isEmpty()) {
-								editButton.setEnabled(false);
-								removeButton.setEnabled(false);
-								return;
-							}
-							boolean enabled = true;
-							List elements = selection.toList();
-							for (Iterator i = elements.iterator(); i.hasNext();) {
-								Spec spec = (Spec) i.next();
-								if (spec.isPredefined) {
-									enabled = false;
-								}
-							}
-							editButton.setEnabled(enabled && selection.size() == 1);
-							removeButton.setEnabled(enabled);
+					.addSelectionChangedListener(event -> {
+						IStructuredSelection selection = (IStructuredSelection) event
+								.getSelection();
+						if (selection.isEmpty()) {
+							editButton.setEnabled(false);
+							removeButton.setEnabled(false);
+							return;
 						}
+						boolean enabled = true;
+						List elements = selection.toList();
+						for (Iterator i = elements.iterator(); i.hasNext();) {
+							Spec spec = (Spec) i.next();
+							if (spec.isPredefined) {
+								enabled = false;
+							}
+						}
+						editButton.setEnabled(enabled && selection.size() == 1);
+						removeButton.setEnabled(enabled);
 					});
 		}
 		{
 			Composite buttonArea = new Composite(composite, SWT.NONE);
 			GridLayout layout = new GridLayout(1, false);
-			layout.marginHeight = layout.marginWidth = 0;
 			buttonArea.setLayout(layout);
-			GridData data = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+			GridData data = new GridData(SWT.DEFAULT, SWT.TOP, false, false);
 			buttonArea.setLayoutData(data);
 
 			addButton = new Button(buttonArea, SWT.PUSH);
@@ -635,32 +565,30 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			contentTypesViewer.getControl().setLayoutData(data);
 
 			contentTypesViewer
-					.addSelectionChangedListener(new ISelectionChangedListener() {
+					.addSelectionChangedListener(event -> {
+						IContentType contentType = (IContentType) ((IStructuredSelection) event
+								.getSelection()).getFirstElement();
+						fileAssociationViewer.setInput(contentType);
+						editButton.setEnabled(false);
+						removeButton.setEnabled(false);
 
-						@Override
-						public void selectionChanged(SelectionChangedEvent event) {
-							IContentType contentType = (IContentType) ((IStructuredSelection) event
-									.getSelection()).getFirstElement();
-							fileAssociationViewer.setInput(contentType);
-
-							if (contentType != null) {
-								String charset = contentType
-										.getDefaultCharset();
-								if (charset == null) {
-									charset = ""; //$NON-NLS-1$
-								}
-								charsetField.setText(charset);
-							} else {
-								charsetField.setText(""); //$NON-NLS-1$
+						if (contentType != null) {
+							String charset = contentType
+									.getDefaultCharset();
+							if (charset == null) {
+								charset = ""; //$NON-NLS-1$
 							}
-
-							charsetField.setEnabled(contentType != null);
-							addButton.setEnabled(contentType != null);
-							setButton.setEnabled(false);
-
-							addChildContentTypeButton.setEnabled(contentType != null);
-							removeContentTypeButton.setEnabled(contentType != null && contentType.isUserDefined());
+							charsetField.setText(charset);
+						} else {
+							charsetField.setText(""); //$NON-NLS-1$
 						}
+
+						charsetField.setEnabled(contentType != null);
+						addButton.setEnabled(contentType != null);
+						setButton.setEnabled(false);
+
+						addChildContentTypeButton.setEnabled(contentType != null);
+						removeContentTypeButton.setEnabled(contentType != null && contentType.isUserDefined());
 					});
 		}
 		Composite buttonsComposite = new Composite(composite, SWT.NONE);
