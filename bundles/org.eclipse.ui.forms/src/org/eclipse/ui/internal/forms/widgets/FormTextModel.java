@@ -9,20 +9,13 @@
  *     IBM Corporation - initial API and implementation
  *     Ralf M Petter<ralf.petter@gmail.com> - Bug 259846
  *     Karsten Thoms<karsten.thoms@itemis.de> - Bug 521493
- *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 322337
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -60,63 +53,8 @@ public class FormTextModel {
 		}
 	}
 
-	/*
-	 * This class is used to determine the rawText attribute when the
-	 * parseInputStream() method is called to assign content by wrapping the
-	 * actually provided input stream.
-	 */
-	private static class CharDataInputStream extends FilterInputStream {
-
-		private ByteArrayOutputStream data;
-
-		protected CharDataInputStream(InputStream in) {
-			super(in);
-			data = new ByteArrayOutputStream();
-		}
-
-		@Override
-		public int read() throws IOException {
-			int result = super.read();
-			if (result != -1) {
-				data.write(result);
-			}
-			return result;
-		}
-
-		@Override
-		public int read(byte[] b, int off, int len) throws IOException {
-			len = super.read(b, off, len);
-			if (len != -1) {
-				data.write(b, off, len);
-			}
-			return len;
-		}
-
-		@Override
-		public long skip(long n) throws IOException {
-			byte[] buf = new byte[512];
-			long total = 0;
-			while (total < n) {
-				long len = n - total;
-				len = read(buf, 0, len < buf.length ? (int) len : buf.length);
-				if (len == -1) {
-					return total;
-				}
-				total += len;
-			}
-			return total;
-		}
-
-		public String toString(String charsetName) throws UnsupportedEncodingException {
-			return data.toString(charsetName);
-		}
-
-	}
-
 	private static final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
 			.newInstance();
-
-	private String rawText;
 
 	private boolean whitespaceNormalized = true;
 
@@ -140,13 +78,6 @@ public class FormTextModel {
 
 	public FormTextModel() {
 		reset();
-	}
-
-	/**
-	 * @return the original text set to the model.
-	 */
-	public String getRawText() {
-		return rawText;
 	}
 
 	/*
@@ -179,13 +110,12 @@ public class FormTextModel {
 			reset();
 			return;
 		}
-		String originalText = taggedText;
 		taggedText = taggedText.replace("&", "&amp;"); //$NON-NLS-1$//$NON-NLS-2$
 		InputStream stream = new ByteArrayInputStream(taggedText.getBytes(StandardCharsets.UTF_8));
-		doParseInputStream(originalText, stream, expandURLs);
+		parseInputStream(stream, expandURLs);
 	}
 
-	private void doParseInputStream(String originalText, InputStream is, boolean expandURLs) {
+	public void parseInputStream(InputStream is, boolean expandURLs) {
 
 		documentBuilderFactory.setNamespaceAware(true);
 		documentBuilderFactory.setIgnoringComments(true);
@@ -195,33 +125,9 @@ public class FormTextModel {
 			DocumentBuilder parser = documentBuilderFactory
 					.newDocumentBuilder();
 			parser.setErrorHandler(new ParseErrorHandler());
-			CharDataInputStream wrapper = null;
-			if (originalText == null) {
-				is = wrapper = new CharDataInputStream(is);
-			}
 			InputSource source = new InputSource(is);
 			Document doc = parser.parse(source);
 			processDocument(doc, expandURLs);
-			if (wrapper == null) {
-				rawText = originalText;
-			} else {
-				// Attempt to guess the encoding of the XML,
-				// any failure will use UTF-8 as fall back:
-				String encoding = doc.getXmlEncoding();
-				if (encoding != null) {
-					try {
-						encoding = Charset.forName(encoding).name();
-					} catch (IllegalCharsetNameException e) {
-						encoding = null;
-					} catch (UnsupportedCharsetException e) {
-						encoding = null;
-					}
-				}
-				if (encoding == null) {
-					encoding = "UTF-8"; //$NON-NLS-1$
-				}
-				rawText = wrapper.toString(encoding);
-			}
 		} catch (ParserConfigurationException e) {
 			SWT.error(SWT.ERROR_INVALID_ARGUMENT, e, " " + e.getMessage()); //$NON-NLS-1$
 		} catch (SAXException e) {
@@ -229,10 +135,6 @@ public class FormTextModel {
 		} catch (IOException e) {
 			SWT.error(SWT.ERROR_IO, e);
 		}
-	}
-
-	public void parseInputStream(InputStream is, boolean expandURLs) {
-		doParseInputStream(null, is, expandURLs);
 	}
 
 	private void processDocument(Document doc, boolean expandURLs) {
@@ -646,7 +548,7 @@ public class FormTextModel {
 
 		if (regularText == null)
 			return;
-		rawText = regularText;
+
 		regularText = getNormalizedText(regularText);
 
 		Paragraph p = new Paragraph(true);
@@ -686,7 +588,6 @@ public class FormTextModel {
 	}
 
 	private void reset() {
-		rawText = ""; //$NON-NLS-1$
 		if (paragraphs == null)
 			paragraphs = new Vector<>();
 		paragraphs.clear();

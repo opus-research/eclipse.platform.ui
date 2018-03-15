@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Martin Donnelly (m2a3@eircom.net) - patch (see Bugzilla #145997)
- *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 322337
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -643,17 +642,6 @@ public class FormText extends Canvas {
 			resourceTable.remove(FormTextModel.BOLD_FONT_ID);
 		}
 		ensureBoldFontPresent(getFont());
-	}
-
-	/**
-	 * Returns the text as is was provided by {@link #setText(String, boolean, boolean)}, except
-	 * that a {@code null} text is represented by an empty string.
-	 *
-	 * @return the provided text.
-	 * @since 3.8
-	 */
-	public String getText() {
-		return model.getRawText();
 	}
 
 	/**
