@@ -16,6 +16,7 @@
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -31,7 +32,10 @@ import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.bindings.internal.BindingTableManager;
+import org.eclipse.e4.ui.bindings.internal.ContextSet;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -80,6 +84,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.keys.IBindingService;
@@ -344,29 +349,29 @@ public class SearchField {
 		return quickAccessTriggerSequenceFormat;
 	}
 
+	@Inject
+	private BindingTableManager manager;
+	@Inject
+	private ECommandService eCommandService;
+
+	@Inject
+	IContextService contextService;
+
 	/**
-	 * FIXME this compute the correct binding, but we should get it using
-	 * {@code bindingService.getBestActiveBindingFor(QUICK_ACCESS_COMMAND_ID)}
+	 * Compute the best binding for the command and returns the trigger
 	 *
 	 * @return the trigger
 	 */
 	protected void updateQuickAccessTriggerSequenceFormat() {
-		TriggerSequence triggerSequence = bindingService.getBestActiveBindingFor(QUICK_ACCESS_COMMAND_ID);
-		// FIXME: workaround for QuickSearch command is active but
-		// getActiveBinding returns null
-		if (triggerSequence == null) {
-			for (Binding b : bindingService.getBindings()) {
-				if (b.getParameterizedCommand() != null
-						&& QUICK_ACCESS_COMMAND_ID.equalsIgnoreCase(b.getParameterizedCommand().getId())) {
-					triggerSequence = b.getTriggerSequence();
-					// NOTE: uncomment below will break the behavior in Linux.
-					// System.out.println("update: " + triggerSequence.format())
-					// break;
-				}
-			}
-		}
+		TriggerSequence triggerSequence;
+		// FIXME: workaround for
+		// bindingService.getBestActiveBindingFor(QUICK_ACCESS_COMMAND_ID)
+		ParameterizedCommand cmd = eCommandService.createCommand(QUICK_ACCESS_COMMAND_ID, null);
+		ContextSet contextSet = manager.createContextSet(Arrays.asList(contextService.getDefinedContexts()));
+		Binding binding = manager.getBestSequenceFor(contextSet, cmd);
+		triggerSequence = binding.getTriggerSequence();
 		//
-		this.quickAccessTriggerSequenceFormat = triggerSequence.format();
+		this.quickAccessTriggerSequenceFormat = (triggerSequence == null) ? "" : triggerSequence.format(); //$NON-NLS-1$
 	}
 
 	private Text createText(Composite parent) {
