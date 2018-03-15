@@ -1543,7 +1543,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		private ILabelDecorator selectionDecorator;
 
 		// Need to keep our own list of listeners
-		private ListenerList<ILabelProviderListener> listeners = new ListenerList<>();
+		private ListenerList listeners = new ListenerList();
 
 		/**
 		 * Creates a new instance of the class.
@@ -1786,8 +1786,9 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		@Override
 		public void labelProviderChanged(LabelProviderChangedEvent event) {
-			for (ILabelProviderListener l : listeners) {
-				l.labelProviderChanged(event);
+			Object[] l = listeners.getListeners();
+			for (int i = 0; i < listeners.size(); i++) {
+				((ILabelProviderListener) l[i]).labelProviderChanged(event);
 			}
 		}
 	}
