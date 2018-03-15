@@ -11,12 +11,13 @@
 
 package org.eclipse.ui.tests.concurrency;
 
-import junit.framework.TestCase;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
+
+import junit.framework.TestCase;
 
 /**
  * This tests the simple traditional deadlock of a thread holding a scheduling rule trying
@@ -53,8 +54,11 @@ public class SyncExecWhileUIThreadWaitsForRuleTest extends TestCase {
 						@Override
 						public void run() {
 							blocked[0] = true;
-							Job.getJobManager().beginRule(rule, beginRuleMonitor);
-							Job.getJobManager().endRule(rule);
+							try {
+								Job.getJobManager().beginRule(rule, beginRuleMonitor);
+							} finally {
+								Job.getJobManager().endRule(rule);
+							}
 							blocked[0] = false;
 						}
 					});
@@ -112,5 +116,11 @@ public class SyncExecWhileUIThreadWaitsForRuleTest extends TestCase {
 		}
 		//if the monitor was canceled then we got a deadlock
 		assertFalse("deadlock occurred", beginRuleMonitor.isCanceled());
+		// if we get here, the test succeeded
+		boolean interrupted = Thread.interrupted();
+		if (interrupted) {
+			// TODO: re-enable this check after bug 505920 is fixed
+			// fail("Thread was interrupted at end of test");
+		}
 	}
 }
