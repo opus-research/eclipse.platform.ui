@@ -8,7 +8,7 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430639
- *     Fabio Zadrozny <fabiofz@gmail.com> - Bug 434201, 434309, 430278
+ *     Fabio Zadrozny <fabiofz@gmail.com> - Bug 434201, 434309
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
@@ -16,11 +16,11 @@ import org.eclipse.e4.ui.css.core.dom.IElementProvider;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Item;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -52,6 +52,9 @@ public class SWTElementProvider implements IElementProvider {
 	public Element getElement(Object element, CSSEngine engine) {
 		// Note that the order is important (must appear before
 		// Control/Item/Widget)
+		if (element instanceof Link) {
+			return new LinkElement((Link) element, engine);
+		}
 		if (element instanceof Text) {
 			return new TextElement((Text) element, engine);
 		}
@@ -75,9 +78,6 @@ public class SWTElementProvider implements IElementProvider {
 		}
 		if (element instanceof Table) {
 			return new TableElement((Table) element, engine);
-		}
-		if (element instanceof StyledText) {
-			return new StyledTextElement((StyledText) element, engine);
 		}
 		if (element instanceof Composite) {
 			return new CompositeElement((Composite) element, engine);
