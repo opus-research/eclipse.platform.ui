@@ -136,11 +136,6 @@ CTabFolder Tree, CTabFolder Canvas {
     color: #CCC;
 }
 
-Table {
-	swt-table-header-color: #CCC;
-	swt-table-header-background-color: #383D3F;
-}
-
 .MPartStack.active CTabFolder Canvas {
     background-color: #262626;
     color: #CCC;
