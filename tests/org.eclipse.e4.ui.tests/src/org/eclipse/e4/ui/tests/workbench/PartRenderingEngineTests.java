@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.function.Consumer;
 import org.eclipse.core.databinding.observable.Realm;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.statusreporter.StatusReporter;
@@ -45,6 +44,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
+import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.addons.cleanupaddon.CleanupAddon;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -57,10 +57,13 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.test.Screenshots;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
@@ -82,21 +85,25 @@ public class PartRenderingEngineTests {
 	private EModelService ems;
 	private Consumer<RuntimeException> runtimeExceptionHandler;
 
-	private boolean checkMacBug466636() {
-		if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-			System.out.println("skipping " + PartRenderingEngineTests.class.getName() + "#"
-					+ this.getClass().getSimpleName()
-					+ " on Mac for now, see bug 466636");
-			return true;
-		}
-		return false;
-	}
+	@Rule
+	public TestName testName = new TestName();
+
+	// private boolean checkMacBug466636() {
+	// if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+	// System.out.println("skipping " + PartRenderingEngineTests.class.getName() +
+	// "#"
+	// + this.getClass().getSimpleName()
+	// + " on Mac for now, see bug 466636");
+	// return true;
+	// }
+	// return false;
+	// }
 
 	@Before
 	public void setUp() throws Exception {
 		logged = false;
 		appContext = E4Application.createDefaultContext();
-		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
+		appContext.set(IWorkbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
 
 		final Display d = Display.getDefault();
@@ -206,8 +213,7 @@ public class PartRenderingEngineTests {
 		MPartStack stack = (MPartStack) container.getChildren().get(0);
 		MPart part = (MPart) stack.getChildren().get(0);
 
-		IPresentationEngine renderer = (IPresentationEngine) appContext
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine renderer = appContext.get(IPresentationEngine.class);
 		renderer.removeGui(part);
 		renderer.removeGui(window);
 
@@ -637,8 +643,7 @@ public class PartRenderingEngineTests {
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
-		IPresentationEngine engine = (IPresentationEngine) appContext
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine engine = appContext.get(IPresentationEngine.class);
 
 		CTabFolder folder = (CTabFolder) stack.getWidget();
 		CTabItem itemA = folder.getItem(0);
@@ -880,8 +885,7 @@ public class PartRenderingEngineTests {
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getChildren().add(part);
 
-		IPresentationEngine renderer = (IPresentationEngine) appContext
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine renderer = appContext.get(IPresentationEngine.class);
 		renderer.createGui(part);
 		renderer.removeGui(part);
 
@@ -929,8 +933,7 @@ public class PartRenderingEngineTests {
 		assertNull(partB.getWidget());
 
 		// try to remove the tab
-		IPresentationEngine renderer = (IPresentationEngine) appContext
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine renderer = appContext.get(IPresentationEngine.class);
 		renderer.removeGui(partB);
 
 		// item removed, one item
@@ -1022,8 +1025,8 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug324839() throws Exception {
-		if (checkMacBug466636())
-			return;
+		// if (checkMacBug466636())
+		// return;
 
 		MApplication application = ems.createModelElement(MApplication.class);
 		application.setContext(appContext);
@@ -2177,8 +2180,8 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug326175_False() {
-		if (checkMacBug466636())
-			return;
+		// if (checkMacBug466636())
+		// return;
 		testBug326175(false);
 	}
 
@@ -3275,6 +3278,8 @@ public class PartRenderingEngineTests {
 				window.getContext());
 		Control control = (Control) part.getWidget();
 		assertEquals(subShell, control.getParent());
+
+		Screenshots.takeScreenshot(getClass(), testName.getMethodName());
 
 		appContext.get(EPartService.class).activate(part);
 		assertEquals(subShell, control.getParent());
