@@ -94,7 +94,7 @@ public abstract class UITestCase extends TestCase {
     public UITestCase(String testName) {
         super(testName);
         //		ErrorDialog.NO_UI = true;
-        testWindows = new ArrayList<IWorkbenchWindow>(3);
+        testWindows = new ArrayList<>(3);
     }
 
 	/**
@@ -185,7 +185,6 @@ public abstract class UITestCase extends TestCase {
     	super.setUp();
 		fWorkbench = PlatformUI.getWorkbench();
     	trace("----- " + this.getName()); //$NON-NLS-1$
-        trace(this.getName() + ": setUp..."); //$NON-NLS-1$
         addWindowListener();
         doSetUp();
 
@@ -208,7 +207,6 @@ public abstract class UITestCase extends TestCase {
      */
     @Override
 	protected final void tearDown() throws Exception {
-        trace(this.getName() + ": tearDown...\n"); //$NON-NLS-1$
         removeWindowListener();
         doTearDown();
     	fWorkbench = null;
@@ -419,7 +417,7 @@ public abstract class UITestCase extends TestCase {
 	 * Close all test windows.
 	 */
     public void closeAllTestWindows() {
-		List<IWorkbenchWindow> testWindowsCopy = new ArrayList<IWorkbenchWindow>(testWindows);
+		List<IWorkbenchWindow> testWindowsCopy = new ArrayList<>(testWindows);
 		for (IWorkbenchWindow testWindow : testWindowsCopy) {
 			testWindow.close();
         }
