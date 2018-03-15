@@ -84,7 +84,6 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.internal.util.PrefUtil;
-import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.themes.ITheme;
 import org.eclipse.ui.themes.IThemeManager;
 import org.eclipse.ui.themes.IThemePreview;
@@ -1181,7 +1180,7 @@ getPreferenceStore(),
     }
 
     protected ColorDefinition getSelectedColorDefinition() {
-		Object o = tree.getViewer().getStructuredSelection().getFirstElement();
+        Object o = ((IStructuredSelection) tree.getViewer().getSelection()).getFirstElement();
 		if (o instanceof ColorDefinition) {
 			return themeRegistry.findColor(((ColorDefinition) o).getId());
 		}
@@ -1189,7 +1188,7 @@ getPreferenceStore(),
     }
 
     protected FontDefinition getSelectedFontDefinition() {
-		Object o = tree.getViewer().getStructuredSelection().getFirstElement();
+        Object o = ((IStructuredSelection) tree.getViewer().getSelection()).getFirstElement();
 		if (o instanceof FontDefinition) {
 			return themeRegistry.findFont(((FontDefinition) o).getId());
 		}
@@ -1197,12 +1196,12 @@ getPreferenceStore(),
     }
 
     protected boolean isFontSelected() {
-		Object o = tree.getViewer().getStructuredSelection().getFirstElement();
+    	Object o = ((IStructuredSelection) tree.getViewer().getSelection()).getFirstElement();
     	return (o instanceof FontDefinition);
     }
 
     protected boolean isColorSelected() {
-		Object o = tree.getViewer().getStructuredSelection().getFirstElement();
+    	Object o = ((IStructuredSelection) tree.getViewer().getSelection()).getFirstElement();
     	return (o instanceof ColorDefinition);
     }
 
@@ -1770,7 +1769,7 @@ getPreferenceStore(),
 	 * @since 3.1
 	 */
 	private void saveTreeSelection() {
-		IStructuredSelection selection = tree.getViewer().getStructuredSelection();
+		IStructuredSelection selection = (IStructuredSelection) tree.getViewer().getSelection();
 		Object element = selection.getFirstElement();
 		StringBuffer buffer = new StringBuffer();
 		appendMarkerToBuffer(buffer, element);
@@ -1787,7 +1786,7 @@ getPreferenceStore(),
 		String expandedElementsString = getPreferenceStore().getString(EXPANDED_ELEMENTS_PREF);
 		if (expandedElementsString == null)
 			return;
-		String[] expandedElementIDs = Util.getArrayFromList(expandedElementsString, EXPANDED_ELEMENTS_TOKEN);
+		String[] expandedElementIDs = expandedElementsString.split(EXPANDED_ELEMENTS_TOKEN);
 		if (expandedElementIDs.length == 0)
 			return;
 
