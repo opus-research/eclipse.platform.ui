@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Michael Krkoska - initial API and implementation (bug 188333)
- *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427, 487940, 510301
+ *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427, 487940
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
@@ -140,7 +140,7 @@ public class Snippet049StyledCellLabelProvider {
 				// With JFace 3.4, the font information (bold in this example) will be ignored.
 				Styler style= file.isDirectory() ? fBoldStyler: null;
 				StyledString styledString= new StyledString(file.getName(), style);
-				String decoration = MessageFormat.format(" ({0} bytes)", Long.valueOf(file.length())); //$NON-NLS-1$
+				String decoration = MessageFormat.format(" ({0} bytes)", new Long(file.length())); //$NON-NLS-1$
 				styledString.append(decoration, StyledString.COUNTER_STYLER);
 
 				cell.setText(styledString.toString());
@@ -169,8 +169,8 @@ public class Snippet049StyledCellLabelProvider {
 		@Override
 		public Object[] getElements(Object element) {
 			File[] roots = File.listRoots();
-			for (File root : roots) {
-				File[] list = root.listFiles();
+			for (int i = 0; i < roots.length; i++) {
+				File[] list = roots[i].listFiles();
 				if (list != null && list.length > 0) {
 					return list;
 				}

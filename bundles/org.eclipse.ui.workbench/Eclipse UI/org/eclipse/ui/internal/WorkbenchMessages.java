@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,9 +14,6 @@
  * 		Implemented workbench auto-save to correctly restore state in case of crash.
  * Andrey Loskutov <loskutov@gmx.de> - Bug 388476, 445538, 463262
  * Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
- * Patrik Suzzi <psuzzi@gmail.com> - Bug 491785, 368977, 501811, 511198
- * Kaloyan Raev <kaloyan.r@zend.com> - Bug 322002
- * Lucas Bullen (Red Hat Inc.) - Bug 500051
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -170,9 +167,6 @@ public class WorkbenchMessages extends NLS {
 	// --- Window Menu ---
 	public static String PerspectiveMenu_otherItem;
 	public static String SelectPerspective_shellTitle;
-	public static String SelectPerspective_selectPerspectiveHelp;
-	public static String SelectPerspective_noDesc;
-	public static String SelectPerspective_open_button_label;
 	public static String Workbench_showPerspectiveError;
 	public static String ChangeToPerspectiveMenu_errorTitle;
     public static String OpenPerspectiveDialogAction_text;
@@ -182,7 +176,6 @@ public class WorkbenchMessages extends NLS {
 	public static String ShowView_shellTitle;
 	public static String ShowView_selectViewHelp;
 	public static String ShowView_noDesc;
-	public static String ShowView_open_button_label;
 
 	public static String ToggleEditor_hideEditors;
 	public static String ToggleEditor_showEditors;
@@ -190,7 +183,6 @@ public class WorkbenchMessages extends NLS {
 
 	public static String LockToolBarAction_toolTip;
 
-	public static String CustomizePerspectiveDialog_okButtonLabel;
 	public static String EditActionSetsAction_text;
 	public static String EditActionSetsAction_toolTip;
 	public static String ActionSetSelection_customize;
@@ -245,7 +237,6 @@ public class WorkbenchMessages extends NLS {
 	public static String SavePerspective_text;
 	public static String SavePerspective_toolTip;
 	public static String SavePerspective_shellTitle;
-	public static String SavePerspective_saveButtonLabel;
 	public static String SavePerspectiveDialog_description;
 	public static String SavePerspective_name;
 	public static String SavePerspective_existing;
@@ -258,7 +249,6 @@ public class WorkbenchMessages extends NLS {
 	public static String ResetPerspective_text;
 	public static String ResetPerspective_toolTip;
 	public static String ResetPerspective_message;
-	public static String ResetPerspective_buttonLabel;
 	public static String ResetPerspective_title;
 	public static String RevertPerspective_note;
 
@@ -294,9 +284,6 @@ public class WorkbenchMessages extends NLS {
 	public static String ActivateEditorAction_toolTip;
 	public static String MaximizePartAction_toolTip;
 	public static String MinimizePartAction_toolTip;
-
-	// --- Filtered Table Base ---
-	public static String FilteredTableBase_Filter;
 
 
 
@@ -370,7 +357,6 @@ public class WorkbenchMessages extends NLS {
 
 	//--- Coolbar ---
 	public static String WorkbenchWindow_FileToolbar;
-	public static String WorkbenchWindow_EditToolbar;
 	public static String WorkbenchWindow_NavigateToolbar;
 	public static String WorkbenchWindow_HelpToolbar;
 	public static String WorkbenchWindow_searchCombo_toolTip;
@@ -453,10 +439,6 @@ public class WorkbenchMessages extends NLS {
 	public static String PreferenceNode_errorMessage;
     public static String PreferenceNode_NotFound;
 	public static String Preference_note;
-	public static String Preference_importTooltip;
-	public static String Preference_exportTooltip;
-	public static String Preference_import;
-	public static String Preference_export;
 
 	// --- Workbench ---
 	public static String WorkbenchPreference_showMultipleEditorTabsButton;
@@ -476,9 +458,6 @@ public class WorkbenchMessages extends NLS {
 	public static String ViewsPreference_visibleTabs_description;
 	public static String ViewsPreference_enableMRU;
 	public static String ViewsPreference_useColoredLabels;
-	public static String ToggleFullScreenMode_ActivationPopup_Description;
-	public static String ToggleFullScreenMode_ActivationPopup_Description_NoKeybinding;
-	public static String ToggleFullScreenMode_ActivationPopup_DoNotShowAgain;
 
 	// --- File Editors ---
 	public static String FileEditorPreference_fileTypes;
@@ -642,11 +621,6 @@ public class WorkbenchMessages extends NLS {
 	public static String Save_Resource;
 	public static String Saving_Modifications;
 	public static String Save_All;
-	public static String Dont_Save;
-
-	public static String SaveableHelper_Save;
-	public static String SaveableHelper_Cancel;
-	public static String SaveableHelper_Dont_Save;
 
 
 	// ==============================================================================
@@ -735,6 +709,9 @@ public class WorkbenchMessages extends NLS {
 	public static String EditorManager_reuseEditorDialogTitle;
 	public static String PinEditorAction_toolTip;
 	public static String WorkbenchPreference_reuseEditors;
+	public static String WorkbenchPreference_reuseDirtyEditorGroupTitle;
+	public static String WorkbenchPreference_promptToReuseEditor;
+	public static String WorkbenchPreference_openNewEditor;
 	public static String WorkbenchPreference_reuseEditorsThreshold;
 	public static String WorkbenchPreference_reuseEditorsThresholdError;
 	public static String WorkbenchPreference_recentFiles;
@@ -768,8 +745,6 @@ public class WorkbenchMessages extends NLS {
 	public static String ToggleCoolbarVisibilityAction_hide_text;
 	public static String ToggleCoolbarVisibilityAction_toolTip;
 
-	public static String ToggleStatusBarVisibilityAction_show_text;
-	public static String ToggleStatusBarVisibilityAction_hide_text;
 
 	// ==============================================================================
 	// Working Set Framework.
@@ -918,20 +893,7 @@ public class WorkbenchMessages extends NLS {
     public static String ContentTypes_editDialog_messageHeader;
     public static String ContentTypes_editDialog_message;
     public static String ContentTypes_editDialog_label;
-	public static String ContentTypes_addRootContentTypeButton;
-	public static String ContentTypes_addChildContentTypeButton;
-	public static String ContentTypes_removeContentTypeButton;
-	public static String ContentTypes_newContentTypeDialog_title;
-	public static String ContentTypes_newContentTypeDialog_descritption;
-	public static String ContentTypes_newContentTypeDialog_nameLabel;
-	public static String ContentTypes_newContentTypeDialog_defaultNameNoParent;
-	public static String ContentTypes_newContentTypeDialog_defaultNameWithParent;
-	public static String ContentTypes_newContentTypeDialog_invalidContentTypeName;
-	public static String ContentTypes_failedAtEditingContentTypes;
     public static String Edit;
-	public static String ContentTypes_editorAssociations;
-	public static String ContentTypes_editorAssociationAddLabel;
-	public static String ContentTypes_editorAssociationRemoveLabel;
 
     // =========================================================================
     // Deprecated actions support
@@ -991,12 +953,9 @@ public class WorkbenchMessages extends NLS {
     public static String ContentAssist_Cue_Description_Key;
 
 	//Settings transfer
-	public static String WorkbenchLayoutSettings_Name;
-	public static String WorkbenchSettings_CouldNotCreateDirectories;
 	public static String WorkbenchSettings_CouldNotFindLocation;
 	public static String WorkingSets_Name;
 	public static String WorkingSets_CannotSave;
-	public static String WorkbenchPreferences_Name;
 
 	// StatusDialog
 	public static String WorkbenchStatusDialog_SupportTooltip;
@@ -1026,11 +985,10 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkingSetGroup_WorkingSetSelection_message;
 	public static String WorkingSetGroup_EnableWorkingSet_button;
 
-	public static String FilteredTableBaseHandler_Close;
-
 	// Util
 	public static String Util_List;
 	public static String Util_listNull;
+
 
 
 }

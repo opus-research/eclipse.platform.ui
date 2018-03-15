@@ -34,7 +34,6 @@ public class Messages extends NLS {
 	public static String actionWebBrowserForward;
 	public static String actionWebBrowserStop;
 	public static String actionWebBrowserRefresh;
-	public static String actionWebBrowserAutoRefresh;
 	public static String dialogResourceDeletedTitle;
 	public static String dialogResourceDeletedMessage;
 	public static String dialogResourceDeletedIgnore;
@@ -55,7 +54,6 @@ public class Messages extends NLS {
 	public static String preferenceWebBrowserTitle;
 	public static String searching;
 	public static String errorDialogTitle;
-	public static String errorCouldNotLaunchExternalWebBrowser;
 	public static String errorCouldNotLaunchWebBrowser;
 	public static String errorNoBrowser;
 	public static String editExternalBrowser;

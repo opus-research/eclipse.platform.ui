@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,8 @@ import java.util.Set;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.osgi.util.NLS;
+
+import org.eclipse.ui.internal.navigator.extensions.NavigatorContentDescriptor;
 import org.eclipse.ui.internal.navigator.extensions.NavigatorContentExtension;
 import org.eclipse.ui.navigator.INavigatorContentDescriptor;
 import org.eclipse.ui.navigator.INavigatorPipelineService;
@@ -70,7 +72,8 @@ public class NavigatorPipelineService implements INavigatorPipelineService {
 						.next();
 				if (contentService.isVisible(overridingDescriptor.getId())
 						&& contentService.isActive(overridingDescriptor.getId())) {
-					trackedSet.setContributor(overridingDescriptor, descriptor);
+					trackedSet.setContributor((NavigatorContentDescriptor) overridingDescriptor,
+							(NavigatorContentDescriptor) descriptor);
 					final NavigatorContentExtension extension = contentService
 							.getExtension(overridingDescriptor);
 					if (extension.internalGetContentProvider().isPipelined()) {
@@ -106,7 +109,7 @@ public class NavigatorPipelineService implements INavigatorPipelineService {
 
 		Set interestedExtensions = new LinkedHashSet();
 		for (Iterator iter = trackedSet.iterator(); iter.hasNext();) {
-			Object element = iter.next();
+			Object element = (Object) iter.next();
 			if(element instanceof TreePath) {
 				interestedExtensions.addAll(contentService.findOverrideableContentExtensionsForPossibleChild(((TreePath)element).getLastSegment()));
 			} else {
@@ -131,7 +134,7 @@ public class NavigatorPipelineService implements INavigatorPipelineService {
 				.hasNext();) {
 			final NavigatorContentExtension overridingExtension = (NavigatorContentExtension) extensionsItr
 					.next();
-			trackedSet.setContributor(overridingExtension
+			trackedSet.setContributor((NavigatorContentDescriptor) overridingExtension
 					.getDescriptor(), null);
 			if (overridingExtension.internalGetContentProvider().isPipelined()) {
 				SafeRunner.run(new NavigatorSafeRunnable() {
@@ -182,7 +185,8 @@ public class NavigatorPipelineService implements INavigatorPipelineService {
 
 		final NavigatorContentExtension[] overridingExtensions = overrideableExtension
 				.getOverridingExtensions();
-		for (final NavigatorContentExtension nceLocal : overridingExtensions) {
+		for (int i = 0; i < overridingExtensions.length; i++) {
+			final NavigatorContentExtension nceLocal = overridingExtensions[i];
 			if (nceLocal.internalGetContentProvider().isPipelined()) {
 				SafeRunner.run(new NavigatorSafeRunnable() {
 					@Override
@@ -235,8 +239,9 @@ public class NavigatorPipelineService implements INavigatorPipelineService {
 		final boolean[] intercepted = new boolean[1];
 		final NavigatorContentExtension[] overridingExtensions = overrideableExtension
 				.getOverridingExtensions();
-		for (final NavigatorContentExtension nceLocal : overridingExtensions) {
-			if (nceLocal.internalGetContentProvider().isPipelined()) {
+		for (int i = 0; i < overridingExtensions.length; i++) {
+			if (overridingExtensions[i].internalGetContentProvider().isPipelined()) {
+				final NavigatorContentExtension nceLocal = overridingExtensions[i];
 				SafeRunner.run(new NavigatorSafeRunnable() {
 					@Override
 					public void run() throws Exception {

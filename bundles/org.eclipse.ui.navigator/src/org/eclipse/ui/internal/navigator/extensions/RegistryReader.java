@@ -77,7 +77,7 @@ public abstract class RegistryReader {
 	 */
 	protected static void logError(IConfigurationElement element, String text) {
 		IExtension extension = element.getDeclaringExtension();
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		buf.append("Plugin " + extension.getNamespaceIdentifier() + ", extension " + extension.getExtensionPointUniqueIdentifier());//$NON-NLS-2$//$NON-NLS-1$
 		buf.append("\n" + text);//$NON-NLS-1$
 		NavigatorPlugin.logError(0, buf.toString(), null);
@@ -180,8 +180,8 @@ public abstract class RegistryReader {
 				}
 				IExtension[] extensions = point.getExtensions();
 				extensions = orderExtensions(extensions);
-				for (IExtension extension : extensions) {
-					readExtension(extension);
+				for (int i = 0; i < extensions.length; i++) {
+					readExtension(extensions[i]);
 				}
 				isInitialized = true;
 			}

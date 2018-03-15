@@ -9,7 +9,6 @@
  *     Serge Beauchamp (Freescale Semiconductor) - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *     Mickael Istria (Red Hat Inc.) - Bug 486901
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  ******************************************************************************/
 
 package org.eclipse.ui.internal.ide.dialogs;
@@ -377,10 +376,10 @@ public class LinkedResourceEditor {
 			if (parentElement instanceof LinkedResourceEditor) {
 				ArrayList list = new ArrayList();
 				Object[] objs = { BROKEN, ABSOLUTE, FIXED };
-				for (Object obj : objs) {
-					Object[] children = getChildren(obj);
+				for (int i = 0; i < objs.length; i++) {
+					Object[] children = getChildren(objs[i]);
 					if (children != null && children.length > 0)
-						list.add(obj);
+						list.add(objs[i]);
 				}
 				return list.toArray(new Object[0]);
 			} else if (parentElement instanceof String) {
@@ -456,7 +455,8 @@ return true;
 		fBrokenResources = new TreeMap/* <String, IResource> */();
 		fFixedResources = new TreeMap/* <String, IResource> */();
 		fAbsoluteResources = new TreeMap/* <String, IResource> */();
-		for (IResource resource : projectFiles) {
+		for (int i = 0; i < projectFiles.length; i++) {
+			IResource resource = projectFiles[i];
 			String fullPath = resource.getFullPath().toPortableString();
 			try {
 				if (exists(resource)) {
@@ -503,8 +503,8 @@ return true;
 	}
 
 	boolean areFixed(IResource[] res) {
-		for (IResource resource : res) {
-			String fullPath = resource.getFullPath().toPortableString();
+		for (int i = 0; i < res.length; i++) {
+			String fullPath = res[i].getFullPath().toPortableString();
 			if (!fFixedResources.containsKey(fullPath))
 				return false;
 		}
@@ -551,11 +551,11 @@ return true;
 			IRunnableWithProgress op = monitor -> {
 				SubMonitor subMonitor = SubMonitor.convert(monitor,
 						IDEWorkbenchMessages.LinkedResourceEditor_removingMessage, selectedResources.length);
-				for (IResource selectedResource : selectedResources) {
-					String fullPath = selectedResource.getFullPath().toPortableString();
+				for (int i = 0; i < selectedResources.length; i++) {
+					String fullPath = selectedResources[i].getFullPath().toPortableString();
 					try {
-						selectedResource.delete(true, subMonitor.split(1));
-						removedResources.add(selectedResource);
+						selectedResources[i].delete(true, subMonitor.split(1));
+						removedResources.add(selectedResources[i]);
 						fBrokenResources.remove(fullPath);
 						fFixedResources.remove(fullPath);
 						fAbsoluteResources.remove(fullPath);
@@ -633,7 +633,7 @@ return true;
 	 */
 	private void reportResult(IResource[] selectedResources,
 			ArrayList/* <String> */report, String title) {
-		StringBuilder message = new StringBuilder();
+		StringBuffer message = new StringBuffer();
 		Iterator/* <String> */stringIt = report.iterator();
 		while (stringIt.hasNext()) {
 			message.append(stringIt.next());
@@ -641,9 +641,12 @@ return true;
 				message.append("\n"); //$NON-NLS-1$
 		}
 		final String resultMessage = message.toString();
-		MessageDialog dialog = new MessageDialog(fConvertAbsoluteButton.getShell(), title, null,
-				IDEWorkbenchMessages.LinkedResourceEditor_convertionResults, MessageDialog.INFORMATION, 0,
-				IDEWorkbenchMessages.linkedResourceEditor_OK) {
+		MessageDialog dialog = new MessageDialog(fConvertAbsoluteButton
+				.getShell(), title, null,
+				IDEWorkbenchMessages.LinkedResourceEditor_convertionResults,
+				MessageDialog.INFORMATION,
+				new String[] { IDEWorkbenchMessages.linkedResourceEditor_OK },
+				0) {
 
 			@Override
 			protected boolean isResizable() {
@@ -902,7 +905,7 @@ return true;
 			else
 				variableName = variableName.substring(0, variableName.length() -1); // remove the tailing ':'
 		}
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < variableName.length(); i++) {
 			char c = variableName.charAt(i);
 			if (Character.isLetterOrDigit(c) || (c == '_'))
@@ -939,7 +942,7 @@ return true;
 		try {
 			setLinkLocation(resource, location);
 		} catch (Exception e) {
-			IDEWorkbenchPlugin.log(e.getMessage(), e);
+			e.printStackTrace();
 		}
 		reparent(new IResource[] { resource });
 	}
@@ -947,7 +950,8 @@ return true;
 	void reparent(IResource[] resources) {
 		boolean changed = false;
 
-		for (IResource resource : resources) {
+		for (int i = 0; i < resources.length; i++) {
+			IResource resource = resources[i];
 			boolean isBroken;
 			try {
 				isBroken = !exists(resource);

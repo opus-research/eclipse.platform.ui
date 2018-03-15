@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2017 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
-import org.eclipse.e4.ui.workbench.IWorkbench;
+import org.eclipse.e4.ui.tests.Activator;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.IPartListener;
@@ -44,7 +44,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * Ensure that setting focus to a widget within an non-active part causes the
@@ -67,7 +66,7 @@ public class PartFocusTest {
 	@Before
 	public void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
-		appContext.set(IWorkbench.PRESENTATION_URI_ARG,
+		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
 
 		ems = appContext.get(EModelService.class);
@@ -88,12 +87,12 @@ public class PartFocusTest {
 		part.setElementId("Part");
 		part.setLabel("Part");
 		part.setToolbar(ems.createModelElement(MToolBar.class));
-		part.setContributionURI(asURI(PartBackend.class));
+		part.setContributionURI(Activator.asURI(PartBackend.class));
 		stack.getChildren().add(part);
 
 		toolControl = ems.createModelElement(MToolControl.class);
 		toolControl.setElementId("ToolControl");
-		toolControl.setContributionURI(asURI(TextField.class));
+		toolControl.setContributionURI(Activator.asURI(TextField.class));
 		part.getToolbar().getChildren().add(toolControl);
 
 		stack = ems.createModelElement(MPartStack.class);
@@ -103,7 +102,7 @@ public class PartFocusTest {
 		otherPart = ems.createModelElement(MPart.class);
 		otherPart.setElementId("OtherPart");
 		otherPart.setLabel("OtherPart");
-		otherPart.setContributionURI(asURI(PartBackend.class));
+		otherPart.setContributionURI(Activator.asURI(PartBackend.class));
 		stack.getChildren().add(otherPart);
 
 		MApplication application = ems.createModelElement(MApplication.class);
@@ -215,17 +214,6 @@ public class PartFocusTest {
 		assertTrue(((PartBackend) otherPart.getObject()).text2.isFocusControl());
 		assertFalse(changed[0]);
 
-	}
-
-	/**
-	 * Generate a platform URI referencing the provided class.
-	 *
-	 * @param clazz
-	 *            the class to be referenced
-	 * @return the platform-based URI: bundleclass://X/X.Y
-	 */
-	private static String asURI(Class<?> clazz) {
-		return "bundleclass://" + FrameworkUtil.getBundle(clazz).getSymbolicName() + '/' + clazz.getName();
 	}
 
 }

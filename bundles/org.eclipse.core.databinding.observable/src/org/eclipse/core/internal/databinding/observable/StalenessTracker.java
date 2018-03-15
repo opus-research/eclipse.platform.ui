@@ -54,7 +54,8 @@ public class StalenessTracker {
 	public StalenessTracker(IObservable[] observables,
 			IStalenessConsumer stalenessConsumer) {
 		this.stalenessConsumer = stalenessConsumer;
-		for (IObservable observable : observables) {
+		for (int i = 0; i < observables.length; i++) {
+			IObservable observable = observables[i];
 			doAddObservable(observable, false);
 		}
 		stalenessConsumer.setStale(staleCount > 0);

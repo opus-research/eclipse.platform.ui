@@ -213,41 +213,44 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 	public IMarkerResolution[] getResolutions(IMarker marker) {
 		// Collect all matches
 		ArrayList resolutions = new ArrayList();
-		for (Object resolutionQueryEntry : resolutionQueries.entrySet()) {
-			Map.Entry entry = (Entry) resolutionQueryEntry;
+		for (Iterator iter = resolutionQueries.entrySet().iterator(); iter
+				.hasNext();) {
+			Map.Entry entry = (Entry) iter.next();
 			MarkerQuery query = (MarkerQuery) entry.getKey();
 			MarkerQueryResult result = query.performQuery(marker);
 			if (result != null) {
 				// See if a matching result is registered
 				Map resultsTable = (Map) entry.getValue();
+
 				if (resultsTable.containsKey(result)) {
-					Iterator elements = ((Collection) resultsTable.get(result)).iterator();
+
+					Iterator elements = ((Collection) resultsTable.get(result))
+							.iterator();
 					while (elements.hasNext()) {
-						IConfigurationElement element = (IConfigurationElement) elements.next();
+						IConfigurationElement element = (IConfigurationElement) elements
+								.next();
+
 						IMarkerResolutionGenerator generator = null;
 						try {
-							generator = (IMarkerResolutionGenerator) element.createExecutableExtension(ATT_CLASS);
-							IMarkerResolution[] res = generator.getResolutions(marker);
-							if (res != null) {
-								for (IMarkerResolution generatedResolution : res) {
-									resolutions.add(generatedResolution);
-								}
-							} else {
-								StatusManager.getManager()
-										.handle(new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH,
-												IStatus.ERROR, "Failure in " + generator.getClass().getName() + //$NON-NLS-1$
-														" from plugin " + element.getContributor().getName() + //$NON-NLS-1$
-														": getResolutions(IMarker) must not return null", //$NON-NLS-1$
-												null), StatusManager.LOG);
-							}
+							generator = (IMarkerResolutionGenerator) element
+									.createExecutableExtension(ATT_CLASS);
 						} catch (CoreException e) {
 							Policy.handle(e);
 						}
+						if (generator != null) {
+							IMarkerResolution[] generatedResolutions = generator
+									.getResolutions(marker);
+							for (int i = 0; i < generatedResolutions.length; i++) {
+								resolutions.add(generatedResolutions[i]);
+							}
+						}
+
 					}
 				}
 			}
 		}
-		return (IMarkerResolution[]) resolutions.toArray(new IMarkerResolution[resolutions.size()]);
+		return (IMarkerResolution[]) resolutions
+				.toArray(new IMarkerResolution[resolutions.size()]);
 	}
 
 	/**

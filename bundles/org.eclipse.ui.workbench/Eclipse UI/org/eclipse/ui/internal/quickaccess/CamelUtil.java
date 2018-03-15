@@ -33,7 +33,7 @@ public class CamelUtil {
 	 *         the given string.
 	 */
 	public static String getCamelCase(String s) {
-		StringBuilder result = new StringBuilder();
+		StringBuffer result = new StringBuffer();
 		if (s.length() > 0) {
 			int index = 0;
 			while (index != -1) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -146,8 +145,8 @@ public final class BindingManager extends HandleObjectManager implements
 			return new String[0];
 		}
 
-		final List<String> strings = new ArrayList<>();
-		final StringBuilder stringBuffer = new StringBuilder();
+		final List strings = new ArrayList();
+		final StringBuffer stringBuffer = new StringBuffer();
 		string = string.trim(); // remove whitespace
 		if (string.length() > 0) {
 			final StringTokenizer stringTokenizer = new StringTokenizer(string,
@@ -164,7 +163,7 @@ public final class BindingManager extends HandleObjectManager implements
 		Collections.reverse(strings);
 		strings.add(Util.ZERO_LENGTH_STRING);
 		strings.add(null);
-		return strings.toArray(new String[strings.size()]);
+		return (String[]) strings.toArray(new String[strings.size()]);
 	}
 
 	/**
@@ -463,7 +462,8 @@ public final class BindingManager extends HandleObjectManager implements
 	private final int compareSchemes(final String schemeId1,
 			final String schemeId2) {
 		if (!schemeId2.equals(schemeId1)) {
-			for (final String schemePointer : activeSchemeIds) {
+			for (int i = 0; i < activeSchemeIds.length; i++) {
+				final String schemePointer = activeSchemeIds[i];
 				if (schemeId2.equals(schemePointer)) {
 					return 1;
 
@@ -550,8 +550,8 @@ public final class BindingManager extends HandleObjectManager implements
 			final String schemeId = binding.getSchemeId();
 			found = false;
 			if (activeSchemeIds != null) {
-				for (String activeSchemeId : activeSchemeIds) {
-					if (Objects.equals(schemeId, activeSchemeId)) {
+				for (int j = 0; j < activeSchemeIds.length; j++) {
+					if (Util.equals(schemeId, activeSchemeIds[j])) {
 						found = true;
 						break;
 					}
@@ -705,7 +705,8 @@ public final class BindingManager extends HandleObjectManager implements
 	 */
 	private final int countStrokes(final Trigger[] triggers) {
 		int strokeCount = triggers.length;
-		for (final Trigger trigger : triggers) {
+		for (int i = 0; i < triggers.length; i++) {
+			final Trigger trigger = triggers[i];
 			if (trigger instanceof KeyStroke) {
 				final KeyStroke keyStroke = (KeyStroke) trigger;
 				final int modifierKeys = keyStroke.getModifierKeys();
@@ -895,8 +896,8 @@ public final class BindingManager extends HandleObjectManager implements
 		}
 
 		final Object[] listeners = getListeners();
-		for (Object l : listeners) {
-			final IBindingManagerListener listener = (IBindingManagerListener) l;
+		for (int i = 0; i < listeners.length; i++) {
+			final IBindingManagerListener listener = (IBindingManagerListener) listeners[i];
 			listener.bindingManagerChanged(event);
 		}
 	}
@@ -1301,7 +1302,7 @@ public final class BindingManager extends HandleObjectManager implements
 			if ((bestLocale == null) && (currentLocale != null)) {
 				bestBinding = currentBinding;
 			}
-			if (!(Objects.equals(bestLocale, currentLocale))) {
+			if (!(Util.equals(bestLocale, currentLocale))) {
 				continue;
 			}
 
@@ -1314,7 +1315,7 @@ public final class BindingManager extends HandleObjectManager implements
 			if ((bestPlatform == null) && (currentPlatform != null)) {
 				bestBinding = currentBinding;
 			}
-			if (!(Objects.equals(bestPlatform, currentPlatform))) {
+			if (!(Util.equals(bestPlatform, currentPlatform))) {
 				continue;
 			}
 
@@ -1648,8 +1649,8 @@ public final class BindingManager extends HandleObjectManager implements
 			return true; // shortcut a common case
 		}
 
-		for (String localString : locales) {
-			if (Objects.equals(localString, locale)) {
+		for (int i = 0; i < locales.length; i++) {
+			if (Util.equals(locales[i], locale)) {
 				matches = true;
 				break;
 			}
@@ -1681,8 +1682,8 @@ public final class BindingManager extends HandleObjectManager implements
 			return true; // shortcut a common case
 		}
 
-		for (String platformString : platforms) {
-			if (Objects.equals(platformString, platform)) {
+		for (int i = 0; i < platforms.length; i++) {
+			if (Util.equals(platforms[i], platform)) {
 				matches = true;
 				break;
 			}
@@ -1862,11 +1863,11 @@ public final class BindingManager extends HandleObjectManager implements
 		for (int i = 0; i < bindingCount; i++) {
 			final Binding binding = bindings[i];
 			boolean equals = true;
-			equals &= Objects.equals(sequence, binding.getTriggerSequence());
-			equals &= Objects.equals(schemeId, binding.getSchemeId());
-			equals &= Objects.equals(contextId, binding.getContextId());
-			equals &= Objects.equals(locale, binding.getLocale());
-			equals &= Objects.equals(platform, binding.getPlatform());
+			equals &= Util.equals(sequence, binding.getTriggerSequence());
+			equals &= Util.equals(schemeId, binding.getSchemeId());
+			equals &= Util.equals(contextId, binding.getContextId());
+			equals &= Util.equals(locale, binding.getLocale());
+			equals &= Util.equals(platform, binding.getPlatform());
 			equals &= (type == binding.getType());
 			if (equals) {
 				bindingsChanged = true;
@@ -2233,13 +2234,13 @@ public final class BindingManager extends HandleObjectManager implements
 			throw new NullPointerException("Cannot activate a null scheme"); //$NON-NLS-1$
 		}
 
-		if (!scheme.isDefined()) {
+		if ((scheme == null) || (!scheme.isDefined())) {
 			throw new NotDefinedException(
 					"Cannot activate an undefined scheme. " //$NON-NLS-1$
 							+ scheme.getId());
 		}
 
-		if (Objects.equals(activeScheme, scheme)) {
+		if (Util.equals(activeScheme, scheme)) {
 			return;
 		}
 
@@ -2271,7 +2272,8 @@ public final class BindingManager extends HandleObjectManager implements
 		if (bindings != null) {
 			// discard bindings not applicable for this platform
 			List newList = new ArrayList();
-			for (Binding binding : bindings) {
+			for (int i = 0; i < bindings.length; i++) {
+				Binding binding = bindings[i];
 				String p = binding.getPlatform();
 				if (p == null) {
 					newList.add(binding);
@@ -2316,7 +2318,7 @@ public final class BindingManager extends HandleObjectManager implements
 			throw new NullPointerException("The locale cannot be null"); //$NON-NLS-1$
 		}
 
-		if (!Objects.equals(this.locale, locale)) {
+		if (!Util.equals(this.locale, locale)) {
 			this.locale = locale;
 			this.locales = expand(locale, LOCALE_SEPARATOR);
 			clearSolution();
@@ -2347,7 +2349,7 @@ public final class BindingManager extends HandleObjectManager implements
 			throw new NullPointerException("The platform cannot be null"); //$NON-NLS-1$
 		}
 
-		if (!Objects.equals(this.platform, platform)) {
+		if (!Util.equals(this.platform, platform)) {
 			this.platform = platform;
 			this.platforms = expand(platform, Util.ZERO_LENGTH_STRING);
 			clearSolution();

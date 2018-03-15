@@ -518,16 +518,6 @@
                name="swt-hot-border-color">
          </property-name>
       </handler>
-        <handler
-            adapter="org.eclipse.e4.ui.css.swt.dom.TreeElement"
-            handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertyHeaderHandler">
-         <property-name
-               name="swt-header-color">
-         </property-name>
-         <property-name
-               name="swt-header-background-color">
-         </property-name>
-      </handler>
       <handler
             adapter="org.eclipse.e4.ui.css.swt.dom.TableElement"
             handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertySelectionBackgroundHandler">
@@ -545,16 +535,6 @@
          </property-name>
          <property-name
                name="swt-hot-border-color">
-         </property-name>
-      </handler>
-      <handler
-            adapter="org.eclipse.e4.ui.css.swt.dom.TableElement"
-            handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertyHeaderHandler">
-         <property-name
-               name="swt-header-color">
-         </property-name>
-         <property-name
-               name="swt-header-background-color">
          </property-name>
       </handler>
       <handler
@@ -585,13 +565,6 @@
                name="swt-scrollbar-border-radius">
          </property-name>
       </handler>
-      <handler
-            adapter="org.eclipse.e4.ui.css.swt.dom.LinkElement"
-            handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertyLinkSWTHandler">
-         <property-name
-               name="swt-link-foreground-color">
-         </property-name>
-      </handler>
 
 
       <!-- Theme element definitions -->
@@ -608,7 +581,6 @@
        	 <property-name name="font-family"/>
          <property-name name="font-size"/>       
          <property-name name="font-style"/>
-         <property-name name="font-weight"/>
       </handler>
       <handler
             adapter="org.eclipse.e4.ui.css.swt.dom.definition.ColorDefinitionElement"

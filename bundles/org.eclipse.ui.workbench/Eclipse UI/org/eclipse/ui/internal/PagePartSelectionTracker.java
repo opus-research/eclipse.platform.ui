@@ -44,9 +44,19 @@ public class PagePartSelectionTracker extends AbstractPartSelectionTracker
      */
     private IWorkbenchPart fPart;
 
-    private ISelectionChangedListener selectionListener = event -> fireSelection(getPart(), event.getSelection());
+    private ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
+        @Override
+		public void selectionChanged(SelectionChangedEvent event) {
+            fireSelection(getPart(), event.getSelection());
+        }
+    };
 
-    private ISelectionChangedListener postSelectionListener = event -> firePostSelection(getPart(), event.getSelection());
+    private ISelectionChangedListener postSelectionListener = new ISelectionChangedListener() {
+        @Override
+		public void selectionChanged(SelectionChangedEvent event) {
+            firePostSelection(getPart(), event.getSelection());
+        }
+    };
 
     public PagePartSelectionTracker(IWorkbenchPage page, String partId) {
         super(partId);
@@ -126,7 +136,7 @@ public class PagePartSelectionTracker extends AbstractPartSelectionTracker
      *
      * @since 3.0
      */
-	static String getPartId(IWorkbenchPart part) {
+    private Object getPartId(IWorkbenchPart part) {
         String id = part.getSite().getId();
         if (part instanceof IViewPart) {
             String secondaryId = ((IViewPart) part).getViewSite()

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -199,7 +199,8 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 					privateInterface, privateInterface, null);
 
 			stale = false;
-			for (IObservable observable : newDependencies) {
+			for (int i = 0; i < newDependencies.length; i++) {
+				IObservable observable = newDependencies[i];
 				// Add a change listener to the new dependency.
 				if (observable.isStale()) {
 					stale = true;
@@ -257,7 +258,9 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	private void stopListening() {
 		// Stop listening for dependency changes.
 		if (dependencies != null) {
-			for (IObservable observable : dependencies) {
+			for (int i = 0; i < dependencies.length; i++) {
+				IObservable observable = dependencies[i];
+
 				observable.removeChangeListener(privateInterface);
 				observable.removeStaleListener(privateInterface);
 			}
@@ -304,14 +307,17 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	 * do with those notifications.
 	 */
 	private void computeValueForListeners() {
-		getRealm().exec(() -> {
-			if (dependencies == null) {
-				// We are not currently listening.
-				if (hasListeners()) {
-					// But someone is listening for changes. Call getValue()
-					// to make sure we start listening to the observables we
-					// depend on.
-					getValue();
+		getRealm().exec(new Runnable() {
+			@Override
+			public void run() {
+				if (dependencies == null) {
+					// We are not currently listening.
+					if (hasListeners()) {
+						// But someone is listening for changes. Call getValue()
+						// to make sure we start listening to the observables we
+						// depend on.
+						getValue();
+					}
 				}
 			}
 		});

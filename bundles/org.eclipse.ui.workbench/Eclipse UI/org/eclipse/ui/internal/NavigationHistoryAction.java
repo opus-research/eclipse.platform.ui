@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -20,6 +18,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -76,8 +76,8 @@ public class NavigationHistoryAction extends PageEventAction {
     			if (recreateMenu) {
 					Menu m = (Menu) e.widget;
 					MenuItem[] items = m.getItems();
-					for (MenuItem item : items) {
-						item.dispose();
+					for (int i = 0; i < items.length; i++) {
+						items[i].dispose();
 					}
 					fillMenu(m);
 				}
@@ -117,8 +117,15 @@ public class NavigationHistoryAction extends PageEventAction {
 							Integer.valueOf(entriesCount[i]));
     			}
     			item.setText(text);
-				item.addSelectionListener(widgetSelectedAdapter(
-						e -> history.shiftCurrentEntry((NavigationHistoryEntry) e.widget.getData(), forward)));
+    			item.addSelectionListener(new SelectionAdapter() {
+    				@Override
+					public void widgetSelected(SelectionEvent e) {
+    					history
+    					.shiftCurrentEntry(
+    							(NavigationHistoryEntry) e.widget
+    							.getData(), forward);
+    				}
+    			});
     		}
     	}
     	recreateMenu = false;
@@ -171,7 +178,7 @@ public class NavigationHistoryAction extends PageEventAction {
                     .getImageDescriptor(ISharedImages.IMG_TOOL_BACK_DISABLED));
             setActionDefinitionId(IWorkbenchCommandConstants.NAVIGATE_BACKWARD_HISTORY);
         }
-        // PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IHelpContextIds.CLOSE_ALL_PAGES_ACTION);
+        // WorkbenchHelp.setHelp(this, IHelpContextIds.CLOSE_ALL_PAGES_ACTION);
         setEnabled(false);
         this.forward = forward;
         setMenuCreator(new MenuCreator());
@@ -185,11 +192,11 @@ public class NavigationHistoryAction extends PageEventAction {
 
     private NavigationHistoryEntry[] collapseEntries(
             NavigationHistoryEntry[] entries, int entriesCount[]) {
-		ArrayList<NavigationHistoryEntry> allEntries = new ArrayList<>(Arrays.asList(entries));
+        ArrayList allEntries = new ArrayList(Arrays.asList(entries));
         NavigationHistoryEntry previousEntry = null;
         int i = -1;
-        for (Iterator<NavigationHistoryEntry> iter = allEntries.iterator(); iter.hasNext();) {
-            NavigationHistoryEntry entry = iter.next();
+        for (Iterator iter = allEntries.iterator(); iter.hasNext();) {
+            NavigationHistoryEntry entry = (NavigationHistoryEntry) iter.next();
             if (previousEntry != null) {
                 String text = previousEntry.getHistoryText();
                 if (text != null) {
@@ -205,7 +212,7 @@ public class NavigationHistoryAction extends PageEventAction {
             i++;
         }
         entries = new NavigationHistoryEntry[allEntries.size()];
-        return allEntries.toArray(entries);
+        return (NavigationHistoryEntry[]) allEntries.toArray(entries);
     }
 
     @Override

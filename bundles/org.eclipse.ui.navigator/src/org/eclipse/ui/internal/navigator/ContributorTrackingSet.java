@@ -50,8 +50,8 @@ public class ContributorTrackingSet extends LinkedHashSet {
 	 */
 	public ContributorTrackingSet(NavigatorContentService aContentService, Object[] elements) {
 
-		for (Object element : elements)
-			super.add(element);
+		for (int i = 0; i < elements.length; i++)
+			super.add(elements[i]);
 
 		contentService = aContentService;
 	}
@@ -111,8 +111,8 @@ public class ContributorTrackingSet extends LinkedHashSet {
 	public void setContents(Object[] contents) {
 		super.clear();
 		if(contents != null)
-			for (Object content : contents)
-				add(content);
+			for (int i = 0; i < contents.length; i++)
+				add(contents[i]);
 
 	}
 

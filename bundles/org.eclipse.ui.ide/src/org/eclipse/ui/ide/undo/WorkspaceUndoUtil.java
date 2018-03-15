@@ -338,8 +338,8 @@ public class WorkspaceUndoUtil {
 							createVirtual, createLinks, relativeToVariable);
 					// We don't record the copy since this recursive call will
 					// do so. Just record the overwrites.
-					for (ResourceDescription resourceDesc : overwritten) {
-						overwrittenResources.add(resourceDesc);
+					for (int j = 0; j < overwritten.length; j++) {
+						overwrittenResources.add(overwritten[j]);
 					}
 				} else {
 					// delete the destination folder, copying a linked folder
@@ -366,8 +366,8 @@ public class WorkspaceUndoUtil {
 						source.copy(destinationPath, IResource.SHALLOW, iterationProgress.split(100));
 					// Record the copy
 					resourcesAtDestination.add(getWorkspace().getRoot().findMember(destinationPath));
-					for (ResourceDescription resourceDes : deleted) {
-						overwrittenResources.add(resourceDes);
+					for (int j = 0; j < deleted.length; j++) {
+						overwrittenResources.add(deleted[j]);
 					}
 				}
 			} else {
@@ -405,8 +405,8 @@ public class WorkspaceUndoUtil {
 						}
 						resourcesAtDestination.add(getWorkspace().getRoot()
 								.findMember(destinationPath));
-						for (ResourceDescription resourceDesc : deleted) {
-							overwrittenResources.add(resourceDesc);
+						for (int j = 0; j < deleted.length; j++) {
+							overwrittenResources.add(deleted[j]);
 						}
 					} else {
 						if (source.isLinked() == existing.isLinked()) {
@@ -426,8 +426,8 @@ public class WorkspaceUndoUtil {
 							// Record the copy
 							resourcesAtDestination.add(getWorkspace().getRoot()
 									.findMember(destinationPath));
-							for (ResourceDescription resourceDesc : deleted) {
-								overwrittenResources.add(resourceDesc);
+							for (int j = 0; j < deleted.length; j++) {
+								overwrittenResources.add(deleted[j]);
 							}
 						}
 					}
@@ -542,55 +542,56 @@ public class WorkspaceUndoUtil {
 		SubMonitor subMonitor = SubMonitor.convert(mon, resources.length);
 		subMonitor.setTaskName(UndoMessages.AbstractResourcesOperation_MovingResources);
 		List<ResourceDescription> overwrittenResources = new ArrayList<>();
-		for (IResource resource : resources) {
+		for (int i = 0; i < resources.length; i++) {
 			SubMonitor iterationProgress = subMonitor.split(1);
+			IResource source = resources[i];
 			IPath destinationPath;
 			if (pathIncludesName) {
 				destinationPath = destination;
 			} else {
-				destinationPath = destination.append(resource.getName());
+				destinationPath = destination.append(source.getName());
 			}
 			IWorkspaceRoot workspaceRoot = getWorkspaceRoot();
 			IResource existing = workspaceRoot.findMember(destinationPath);
-			if (resource.getType() == IResource.FOLDER && existing != null) {
+			if (source.getType() == IResource.FOLDER && existing != null) {
 				// The resource is a folder and it exists in the destination.
 				// Move its children to the existing destination.
-				if (resource.isLinked() == existing.isLinked()) {
-					IResource[] children = ((IContainer) resource).members();
+				if (source.isLinked() == existing.isLinked()) {
+					IResource[] children = ((IContainer) source).members();
 					// move only linked resource children (267173)
-					if (resource.isLinked() && resource.getLocation().equals(existing.getLocation()))
+					if (source.isLinked() && source.getLocation().equals(existing.getLocation()))
 						children = filterNonLinkedResources(children);
 					ResourceDescription[] overwritten = move(children, destinationPath, resourcesAtDestination,
 							reverseDestinations, iterationProgress.split(90), uiInfo, false);
 					// We don't record the moved resources since the recursive
 					// call has done so. Just record the overwrites.
-					for (ResourceDescription resourceDesc : overwritten) {
-						overwrittenResources.add(resourceDesc);
+					for (int j = 0; j < overwritten.length; j++) {
+						overwrittenResources.add(overwritten[j]);
 					}
 					// Delete the source. No need to record it since it
 					// will get moved back.
-					delete(resource, iterationProgress.split(10), uiInfo, false, false);
+					delete(source, iterationProgress.split(10), uiInfo, false, false);
 				} else {
 					// delete the destination folder, moving a linked folder
 					// over an unlinked one or vice versa. Fixes bug 28772.
 					ResourceDescription[] deleted = delete(new IResource[] { existing }, iterationProgress.split(10),
 							uiInfo, false);
 					// Record the original path
-					reverseDestinations.add(resource.getFullPath());
-					resource.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
+					reverseDestinations.add(source.getFullPath());
+					source.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
 							iterationProgress.split(90));
 					// Record the resource at its destination
 					resourcesAtDestination.add(getWorkspace().getRoot().findMember(destinationPath));
-					for (ResourceDescription resourceDesc : deleted) {
-						overwrittenResources.add(resourceDesc);
+					for (int j = 0; j < deleted.length; j++) {
+						overwrittenResources.add(deleted[j]);
 					}
 				}
 			} else {
 				if (existing != null) {
-					if (resource.isLinked() == existing.isLinked()) {
+					if (source.isLinked() == existing.isLinked()) {
 						// Record the original path
-						reverseDestinations.add(resource.getFullPath());
-						overwrittenResources.add(copyOverExistingResource(resource, existing,
+						reverseDestinations.add(source.getFullPath());
+						overwrittenResources.add(copyOverExistingResource(source, existing,
 								iterationProgress.split(100), uiInfo, true));
 						resourcesAtDestination.add(existing);
 					} else {
@@ -600,21 +601,21 @@ public class WorkspaceUndoUtil {
 								new IResource[] { existing },
 								iterationProgress.split(1), uiInfo,
 								false);
-						reverseDestinations.add(resource.getFullPath());
-						resource.move(destinationPath, IResource.SHALLOW
+						reverseDestinations.add(source.getFullPath());
+						source.move(destinationPath, IResource.SHALLOW
 								| IResource.KEEP_HISTORY,
 								iterationProgress.split(99));
 						// Record the resource at its destination
 						resourcesAtDestination.add(getWorkspace().getRoot()
 								.findMember(destinationPath));
-						for (ResourceDescription resourceDesc : deleted) {
-							overwrittenResources.add(resourceDesc);
+						for (int j = 0; j < deleted.length; j++) {
+							overwrittenResources.add(deleted[j]);
 						}
 					}
 				} else {
 					// No resources are being overwritten.
 					// First record the source path
-					reverseDestinations.add(resource.getFullPath());
+					reverseDestinations.add(source.getFullPath());
 					// ensure the destination path exists
 					IPath parentPath = destination;
 					if (pathIncludesName) {
@@ -622,7 +623,7 @@ public class WorkspaceUndoUtil {
 					}
 
 					IContainer generatedParent = generateContainers(parentPath);
-					resource.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
+					source.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
 							iterationProgress.split(100));
 					// Record the move. If we had to generate a parent
 					// folder, that should be recorded as part of the copy
@@ -647,9 +648,9 @@ public class WorkspaceUndoUtil {
 	 */
 	private static IResource[] filterNonLinkedResources(IResource[] resources) {
 		List<IResource> result = new ArrayList<>();
-		for (IResource resource : resources) {
-			if (resource.isLinked())
-				result.add(resource);
+		for (int i = 0; i < resources.length; i++) {
+			if (resources[i].isLinked())
+				result.add(resources[i]);
 		}
 		return result.toArray(new IResource[0]);
 	}
@@ -762,7 +763,7 @@ public class WorkspaceUndoUtil {
 		IFile existingFile = (IFile) existing;
 		SubMonitor subMonitor = SubMonitor.convert(monitor,
 				UndoMessages.AbstractResourcesOperation_CopyingResourcesProgress, deleteSourceFile ? 3 : 2);
-		if (file != null) {
+		if (file != null && existingFile != null) {
 			if (validateEdit(file, existingFile, getShell(uiInfo))) {
 				// Remember the state of the existing file so it can be
 				// restored.
@@ -874,8 +875,8 @@ public class WorkspaceUndoUtil {
 		CoreException[] children = exceptions
 				.toArray(new CoreException[exceptionCount]);
 		boolean outOfSync = false;
-		for (CoreException exception : children) {
-			if (exception.getStatus().getCode() == IResourceStatus.OUT_OF_SYNC_LOCAL) {
+		for (int i = 0; i < children.length; i++) {
+			if (children[i].getStatus().getCode() == IResourceStatus.OUT_OF_SYNC_LOCAL) {
 				outOfSync = true;
 				break;
 			}

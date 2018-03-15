@@ -94,13 +94,15 @@ public class WorkingCopyPreferences extends EventManager implements
 		checkRemoved();
 
 		// clear all values (long way so people get notified)
-		for (String key : keys()) {
-			remove(key);
+		String[] keys = keys();
+		for (int i = 0; i < keys.length; i++) {
+			remove(keys[i]);
 		}
 
 		// remove children
-		for (String childName : childrenNames()) {
-			node(childName).removeNode();
+		String[] childNames = childrenNames();
+		for (int i = 0; i < childNames.length; i++) {
+			node(childNames[i]).removeNode();
 		}
 
 		// mark as removed
@@ -120,8 +122,9 @@ public class WorkingCopyPreferences extends EventManager implements
 		if (!visitor.visit(this)) {
 			return;
 		}
-		for (String childName : childrenNames()) {
-			((IEclipsePreferences) node(childName)).accept(visitor);
+		String[] childNames = childrenNames();
+		for (int i = 0; i < childNames.length; i++) {
+			((IEclipsePreferences) node(childNames[i])).accept(visitor);
 		}
 	}
 
@@ -149,8 +152,8 @@ public class WorkingCopyPreferences extends EventManager implements
 			return;
 		}
 		PreferenceChangeEvent event = new PreferenceChangeEvent(this, key, oldValue, newValue);
-		for (Object listener : listeners) {
-			((IPreferenceChangeListener) listener).preferenceChange(event);
+		for (int i = 0; i < listeners.length; i++) {
+			((IPreferenceChangeListener) listeners[i]).preferenceChange(event);
 		}
 	}
 

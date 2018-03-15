@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.css.swt.dom.scrollbar;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -156,8 +155,6 @@ implements ControlListener, Listener, DisposeListener, KeyListener, MouseWheelLi
 
 	protected boolean installed = false;
 
-	private final static boolean isWindowsOS = Platform.OS_WIN32.equals(Platform.getOS());
-
 	public AbstractThemedScrollBarAdapter(Scrollable scrollable, AbstractScrollHandler horizontalScrollHandler,
 			AbstractScrollHandler verticalScrollHandler, IScrollBarSettings scrollBarSettings) {
 		this.fScrollable = scrollable;
@@ -187,7 +184,6 @@ implements ControlListener, Listener, DisposeListener, KeyListener, MouseWheelLi
 		fDisplay.addFilter(SWT.MouseDown, this);
 		fDisplay.addFilter(SWT.MouseUp, this);
 		fDisplay.addFilter(SWT.MouseMove, this);
-		fDisplay.addFilter(SWT.MenuDetect, this);
 
 		fScrollable.addControlListener(this);
 		fScrollable.addKeyListener(this);
@@ -217,7 +213,6 @@ implements ControlListener, Listener, DisposeListener, KeyListener, MouseWheelLi
 			fDisplay.removeFilter(SWT.MouseDown, this);
 			fDisplay.removeFilter(SWT.MouseUp, this);
 			fDisplay.removeFilter(SWT.MouseMove, this);
-			fDisplay.removeFilter(SWT.MenuDetect, this);
 		}
 
 		fHorizontalScrollHandler.uninstall(this, disposing);
@@ -305,25 +300,10 @@ implements ControlListener, Listener, DisposeListener, KeyListener, MouseWheelLi
 			return;
 		}
 		Control control = (Control) event.widget;
-
-		Point displayPos;
-		if (event.type == SWT.MenuDetect) {
-			// a MenuDetect is already in display coordinates
-			displayPos = new Point(event.x, event.y);
-		} else {
-			// MouseUp/Down/Move is in control coordinates
-			displayPos = control.toDisplay(event.x, event.y);
-		}
+		Point displayPos = control.toDisplay(event.x, event.y);
 		Point controlPos = fScrollable.toControl(displayPos);
 
-		if (event.type == SWT.MenuDetect || (isWindowsOS && event.type == SWT.MouseDown && event.button != 1)) {
-			// Bug 491577: on windows, don't scroll if we're not left-clicking
-			// (and do nothing for the context menu on all platforms).
-			if (this.fHorizontalScrollHandler.mousePosOverScroll(fScrollable, controlPos)
-					|| this.fVerticalScrollHandler.mousePosOverScroll(fScrollable, controlPos)) {
-				this.stopEventPropagation(event);
-			}
-		} else if (event.type == SWT.MouseDown) {
+		if (event.type == SWT.MouseDown) {
 			fLastHorizontalAndTopPixel = computeHorizontalAndTopPixel();
 
 			if (event.widget == fScrollable) {
@@ -348,13 +328,9 @@ implements ControlListener, Listener, DisposeListener, KeyListener, MouseWheelLi
 
 		} else if (event.type == SWT.MouseUp) {
 			this.fScrollOnMouseDownTimer.stop();
-			boolean handled = this.fHorizontalScrollHandler.stopDragOnMouseUp(fScrollable);
-			handled |= this.fVerticalScrollHandler.stopDragOnMouseUp(fScrollable);
+			this.fHorizontalScrollHandler.stopDragOnMouseUp(fScrollable);
+			this.fVerticalScrollHandler.stopDragOnMouseUp(fScrollable);
 			checkChangedHorizontalAndTopPixel();
-			if (handled) {
-				this.stopEventPropagation(event);
-			}
-
 
 		} else if (event.type == SWT.MouseMove) {
 			if (!fHorizontalScrollHandler.isDragging() && !fVerticalScrollHandler.isDragging()) {
@@ -388,7 +364,6 @@ implements ControlListener, Listener, DisposeListener, KeyListener, MouseWheelLi
 				return;
 			}
 			checkChangedHorizontalAndTopPixel();
-
 		}
 	}
 
@@ -441,11 +416,6 @@ implements ControlListener, Listener, DisposeListener, KeyListener, MouseWheelLi
 	}
 
 	public void setScrollBarBackgroundColor(Color newColor) {
-		Color currBackgroundColor = fScrollBarSettings.getBackgroundColor();
-		if (currBackgroundColor != null && currBackgroundColor.equals(newColor)) {
-			// No need to reset if the color is still the same.
-			return;
-		}
 		fScrollBarSettings.setBackgroundColor(newColor);
 		this.fPainter.redrawScrollBars();
 	}
@@ -455,11 +425,6 @@ implements ControlListener, Listener, DisposeListener, KeyListener, MouseWheelLi
 	}
 
 	public void setScrollBarForegroundColor(Color newColor) {
-		Color currForegroundColor = fScrollBarSettings.getForegroundColor();
-		if (currForegroundColor != null && currForegroundColor.equals(newColor)) {
-			// No need to reset if the color is still the same.
-			return;
-		}
 		fScrollBarSettings.setForegroundColor(newColor);
 		this.fPainter.redrawScrollBars();
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Markus Alexander Kuppe, Versant Corporation - bug #215797
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -80,12 +79,13 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 			String iconURI = descriptor.getIconURI();
 			if (iconURI == null) {
 				// If the icon attribute was omitted, use the default one
-				IWorkbench workbench = application.getContext().get(IWorkbench.class);
+				IWorkbench workbench = (IWorkbench) application.getContext().get(
+						IWorkbench.class.getName());
 				imageDescriptor = workbench.getSharedImages().getImageDescriptor(
 						ISharedImages.IMG_DEF_VIEW);
 			} else {
 				ISWTResourceUtilities utility = (ISWTResourceUtilities) application.getContext()
-						.get(IResourceUtilities.class);
+						.get(IResourceUtilities.class.getName());
 				imageDescriptor = utility.imageDescriptorFromURI(URI.createURI(iconURI));
 			}
 		}
@@ -100,6 +100,7 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 
 	@Override
 	public float getFastViewWidthRatio() {
+		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -119,9 +120,9 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	}
 
 	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
 		if (adapter != null && adapter.equals(IConfigurationElement.class)) {
-			return adapter.cast(getConfigurationElement());
+			return getConfigurationElement();
 		}
 		return null;
 	}

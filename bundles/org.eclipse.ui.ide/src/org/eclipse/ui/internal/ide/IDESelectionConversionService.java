@@ -64,12 +64,14 @@ public class IDESelectionConversionService implements
 					StatusManager.getManager().handle(e, IDEWorkbenchPlugin.IDE_WORKBENCH);
 				}
 				if (traversals != null) {
+					ResourceTraversal traversal = null;
 					IResource[] resources = null;
-					for (ResourceTraversal traversal : traversals) {
+					for (int i = 0; i < traversals.length; i++) {
+						traversal = traversals[i];
 						resources = traversal.getResources();
 						if (resources != null) {
-							for (IResource traversalResource : resources) {
-								result.add(traversalResource);
+							for (int j = 0; j < resources.length; j++) {
+								result.add(resources[j]);
 							}
 						}
 					}

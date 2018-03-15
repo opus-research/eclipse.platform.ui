@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 Matthew Hall and others.
+ * Copyright (c) 2009, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,8 @@
 
 package org.eclipse.core.internal.databinding.property;
 
+import org.eclipse.core.databinding.observable.DisposeEvent;
+import org.eclipse.core.databinding.observable.IDisposeListener;
 import org.eclipse.core.databinding.observable.IObservable;
 
 /**
@@ -30,6 +32,11 @@ public class PropertyObservableUtil {
 	 */
 	public static void cascadeDispose(IObservable source,
 			final IObservable target) {
-		source.addDisposeListener(staleEvent -> target.dispose());
+		source.addDisposeListener(new IDisposeListener() {
+			@Override
+			public void handleDispose(DisposeEvent staleEvent) {
+				target.dispose();
+			}
+		});
 	}
 }

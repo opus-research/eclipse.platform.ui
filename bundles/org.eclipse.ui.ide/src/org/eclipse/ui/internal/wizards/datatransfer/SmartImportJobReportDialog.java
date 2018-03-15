@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2017 Red Hat Inc., and others
+ * Copyright (c) 2014-2016 Red Hat Inc., and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -75,19 +74,14 @@ public class SmartImportJobReportDialog extends ProgressMonitorFocusJobDialog {
 			public int compare(Viewer viewer, Object o1, Object o2) {
 				IProject project1 = ((Entry<IProject, List<ProjectConfigurator>>) o1).getKey();
 				IProject project2 = ((Entry<IProject, List<ProjectConfigurator>>) o2).getKey();
-				return toString(project1).compareTo(toString(project2));
-			}
-
-			private String toString(IProject p) {
-				IPath location = p.getLocation();
-				return location == null ? "" : location.toString(); //$NON-NLS-1$
+				return project1.getLocation().toString().compareTo(project2.getLocation().toString());
 			}
 		});
 		nestedProjectsTable.setFilters(new ViewerFilter[] { new ViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				Entry<IProject, List<ProjectConfigurator>> entry = (Entry<IProject, List<ProjectConfigurator>>) element;
-				return SmartImportWizard.toAbsolutePath(entry.getKey()).startsWith(job.getRoot().getAbsolutePath());
+				return entry.getKey().getLocation().toFile().getAbsolutePath().startsWith(job.getRoot().getAbsolutePath());
 			}
 		} });
 		nestedProjectsTable.getTable().setHeaderVisible(true);
@@ -115,7 +109,7 @@ public class SmartImportJobReportDialog extends ProgressMonitorFocusJobDialog {
 				for (ProjectConfigurator configurator : ((Entry<IProject, List<ProjectConfigurator>>)element).getValue()) {
 					builder.append(ProjectConfiguratorExtensionManager.getLabel(configurator));
 					builder.append(", "); //$NON-NLS-1$
-				}
+				};
 				if (builder.length() > 0) {
 					builder.delete(builder.length() - 2, builder.length());
 				}
@@ -131,9 +125,6 @@ public class SmartImportJobReportDialog extends ProgressMonitorFocusJobDialog {
 			public String getText(Object element) {
 				IProject project = ((Entry<IProject, List<ProjectConfigurator>>)element).getKey();
 				IPath projectLocation = project.getLocation();
-				if (projectLocation == null) {
-					return "?"; //$NON-NLS-1$
-				}
 				return projectLocation.toFile().getAbsolutePath().substring(job.getRoot().getAbsolutePath().length());
 			}
 		});
@@ -264,11 +255,6 @@ public class SmartImportJobReportDialog extends ProgressMonitorFocusJobDialog {
 			throw new IllegalArgumentException("Job must be an instance of " + SmartImportJob.class.getSimpleName()); //$NON-NLS-1$
 		}
 		super.show(job, shell);
-	}
-
-	@Override
-	public Image getImage() {
-		return null;
 	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -104,7 +104,6 @@ public class DataTransferMessages extends NLS {
 	public static String WizardProjectsImportPage_noProjectsToImport;
 	public static String WizardProjectsImportPage_projectLabel;
 	public static String WizardProjectsImportPage_hideExistingProjects;
-	public static String WizardProjectsImportPage_closeProjectsAfterImport;
 	public static String WizardProjectsImportPage_invalidProjectName;
 
 	// --- Export Wizards ---
@@ -154,7 +153,6 @@ public class DataTransferMessages extends NLS {
 
 	// Smart import
 	public static String SmartImportWizardPage_selectFolderOrArchiveToImport;
-	public static String SmartImportWizardPage_browseForFolder;
 	public static String SmartImportProposals_alreadyImportedAsProject_title;
 	public static String SmartImportProposals_anotherProjectWithSameNameExists_description;
 
@@ -177,19 +175,12 @@ public class DataTransferMessages extends NLS {
 	public static String SmartImportWizardPage_overwriteArchiveDirectory_message;
 	public static String SmartImportWizardPage_incompleteExpand_title;
 	public static String SmartImportWizardPage_incompleteExpand_message;
-	public static String SmartImportWizardPage_scanProjectsFailed;
-	public static String SmartImportWizardPage_selectAtLeastOneFolderToOpenAsProject;
-	public static String SmartImportWizardPage_showOtherSpecializedImportWizard;
-	public static String SmartImportWizardPage_closeProjectsAfterImport;
 
 	public static String SmartImportJob_discardRootProject_title;
 	public static String SmartImportJob_discardRootProject_description;
 	public static String SmartImportProposals_selectionSummary;
 	public static String SmartImportProposals_folder;
 	public static String SmartImportProposals_importAs;
-	public static String SmartImportProposals_hideExistingProjects;
-	public static String SmartImportProposals_inspecitionCanceled;
-	public static String SmartImportProposals_errorWhileInspecting;
 
 	public static String SmartImportReport_importedProjects;
 	public static String SmartImportReport_importedProjectsWithCount;
@@ -206,6 +197,8 @@ public class DataTransferMessages extends NLS {
 	public static String SmartImportJob_continuingConfiguration;
 	public static String SmartImportJob_inspecting;
 	public static String SmartImportJob_importingProjectIntoWorkspace;
+
+
 
 	static {
 		// load message values from bundle file

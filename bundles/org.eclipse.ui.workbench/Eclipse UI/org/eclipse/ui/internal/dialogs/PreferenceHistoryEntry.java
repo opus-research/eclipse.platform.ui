@@ -61,7 +61,9 @@ final class PreferenceHistoryEntry {
 	public String getLabel() {
 		return label;
 	}
-
+	/*
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		if (argument == null) {
@@ -69,7 +71,9 @@ final class PreferenceHistoryEntry {
 		}
 		return id + "(" + argument + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
-
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof PreferenceHistoryEntry) {
@@ -80,7 +84,9 @@ final class PreferenceHistoryEntry {
 		}
 		return super.equals(obj);
 	}
-
+	/*
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		int argHash= argument == null ? 0 : argument.hashCode() & 0x0000ffff;

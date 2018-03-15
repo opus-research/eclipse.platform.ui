@@ -13,8 +13,6 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
-import static org.eclipse.swt.events.SelectionListener.widgetDefaultSelectedAdapter;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -34,14 +32,22 @@ import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleControlAdapter;
 import org.eclipse.swt.accessibility.AccessibleControlEvent;
 import org.eclipse.swt.accessibility.AccessibleEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -409,7 +415,12 @@ public class FilteredTree extends Composite {
 		treeViewer = doCreateTreeViewer(parent, style);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		treeViewer.getControl().setLayoutData(data);
-		treeViewer.getControl().addDisposeListener(e -> refreshJob.cancel());
+		treeViewer.getControl().addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				refreshJob.cancel();
+			}
+		});
 		if (treeViewer instanceof NotifyingTreeViewer) {
 			patternFilter.setUseCache(true);
 		}
@@ -439,12 +450,12 @@ public class FilteredTree extends Composite {
 	 * @return the first matching TreeItem
 	 */
 	private TreeItem getFirstMatchingItem(TreeItem[] items) {
-		for (TreeItem item : items) {
-			if (patternFilter.isLeafMatch(treeViewer, item.getData())
-					&& patternFilter.isElementSelectable(item.getData())) {
-				return item;
+		for (int i = 0; i < items.length; i++) {
+			if (patternFilter.isLeafMatch(treeViewer, items[i].getData())
+					&& patternFilter.isElementSelectable(items[i].getData())) {
+				return items[i];
 			}
-			TreeItem treeItem = getFirstMatchingItem(item.getItems());
+			TreeItem treeItem = getFirstMatchingItem(items[i].getItems());
 			if (treeItem != null) {
 				return treeItem;
 			}
@@ -501,7 +512,8 @@ public class FilteredTree extends Composite {
 					if (!narrowingDown) {
 						// collapse all
 						TreeItem[] is = treeViewer.getTree().getItems();
-						for (TreeItem item : is) {
+						for (int i = 0; i < is.length; i++) {
+							TreeItem item = is[i];
 							if (item.getExpanded()) {
 								treeViewer.setExpandedState(item.getData(),
 										false);
@@ -645,8 +657,8 @@ public class FilteredTree extends Composite {
 					private int getFilteredItemsCount() {
 						int total = 0;
 						TreeItem[] items = getViewer().getTree().getItems();
-						for (TreeItem item : items) {
-							total += itemCount(item);
+						for (int i = 0; i < items.length; i++) {
+							total += itemCount(items[i]);
 
 						}
 						return total;
@@ -660,8 +672,8 @@ public class FilteredTree extends Composite {
 					private int itemCount(TreeItem treeItem) {
 						int count = 1;
 						TreeItem[] children = treeItem.getItems();
-						for (TreeItem element : children) {
-							count += itemCount(element);
+						for (int i = 0; i < children.length; i++) {
+							count += itemCount(children[i]);
 
 						}
 						return count;
@@ -677,11 +689,14 @@ public class FilteredTree extends Composite {
 					 * using mouse to give focus to text.
 					 */
 					Display display= filterText.getDisplay();
-					display.asyncExec(() -> {
-						if (!filterText.isDisposed()) {
-							if (getInitialText().equals(
-									filterText.getText().trim())) {
-								filterText.selectAll();
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							if (!filterText.isDisposed()) {
+								if (getInitialText().equals(
+										filterText.getText().trim())) {
+									filterText.selectAll();
+								}
 							}
 						}
 					});
@@ -727,26 +742,37 @@ public class FilteredTree extends Composite {
 		});
 
 		// enter key set focus to tree
-		filterText.addTraverseListener(e -> {
-			if (quickSelectionMode) {
-				return;
-			}
-			if (e.detail == SWT.TRAVERSE_RETURN) {
-				e.doit = false;
-				updateTreeSelection(true);
+		filterText.addTraverseListener(new TraverseListener() {
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				if (quickSelectionMode) {
+					return;
+				}
+				if (e.detail == SWT.TRAVERSE_RETURN) {
+					e.doit = false;
+					updateTreeSelection(true);
+				}
 			}
 		});
 
-		filterText.addModifyListener(e -> textChanged());
+		filterText.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				textChanged();
+			}
+		});
 
 		// if we're using a field with built in cancel we need to listen for
 		// default selection changes (which tell us the cancel button has been
 		// pressed)
 		if ((filterText.getStyle() & SWT.ICON_CANCEL) != 0) {
-			filterText.addSelectionListener(widgetDefaultSelectedAdapter(e -> {
-				if (e.detail == SWT.ICON_CANCEL)
-					clearText();
-			}));
+			filterText.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+					if (e.detail == SWT.ICON_CANCEL)
+						clearText();
+				}
+			});
 		}
 
 		GridData gridData= new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -959,10 +985,13 @@ public class FilteredTree extends Composite {
 				public void mouseHover(MouseEvent e) {
 				}
 			});
-			clearButton.addDisposeListener(e -> {
-				inactiveImage.dispose();
-				activeImage.dispose();
-				pressedImage.dispose();
+			clearButton.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent e) {
+					inactiveImage.dispose();
+					activeImage.dispose();
+					pressedImage.dispose();
+				}
 			});
 			clearButton.getAccessible().addAccessibleListener(
 				new AccessibleAdapter() {
@@ -1056,10 +1085,13 @@ public class FilteredTree extends Composite {
 				setFilterText(initialText);
 				textChanged();
 			} else {
-				getDisplay().asyncExec(() -> {
-					if (!filterText.isDisposed() && filterText.isFocusControl()) {
-						setFilterText(initialText);
-						textChanged();
+				getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						if (!filterText.isDisposed() && filterText.isFocusControl()) {
+							setFilterText(initialText);
+							textChanged();
+						}
 					}
 				});
 			}

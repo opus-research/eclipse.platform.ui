@@ -30,12 +30,12 @@ public class CSS2ColorHelper {
 	/**
 	 * Map with key=color name and value=hexadecimal color.
 	 */
-	private static Map<String, String> colorNamesMap = new HashMap<>();
+	private static Map<String, String> colorNamesMap = new HashMap<String, String>();
 
 	/**
 	 * Map with key=hexadecimal color and value=color name.
 	 */
-	private static Map<String, String> colorHexasMap = new HashMap<>();
+	private static Map<String, String> colorHexasMap = new HashMap<String, String>();
 
 	/**
 	 * Return w3c {@link RGBColor} from string value. Format String value is
@@ -86,14 +86,19 @@ public class CSS2ColorHelper {
 			case ICSSValueConverterColorConfig.COLOR_NAME_FORMAT:
 				// Get the Hexa color string value
 				String hexaColor = getHexaColorStringValue(rgbColor);
-				// Search into hexa map the color name
-				String colorName = getColorNameFromHexaColor(hexaColor);
-				if (colorName != null) {
-					return colorName;
+				if (hexaColor != null) {
+					// Search into hexa map the color name
+					String colorName = getColorNameFromHexaColor(hexaColor);
+					if (colorName != null) {
+						return colorName;
+					}
+					// Color name is not found, return the Hexa value
+					return hexaColor;
+
 				}
-				// Color name is not found, return the Hexa value
-				return hexaColor;
+				return getRGBColorStringValue(rgbColor);
 			}
+
 		}
 		return getHexaColorStringValue(rgbColor);
 	}

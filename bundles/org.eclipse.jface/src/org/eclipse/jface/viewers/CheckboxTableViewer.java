@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,7 +43,7 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
     /**
      * List of check state listeners (element type: <code>ICheckStateListener</code>).
      */
-	private ListenerList<ICheckStateListener> checkStateListeners = new ListenerList<>();
+    private ListenerList checkStateListeners = new ListenerList();
 
     /**
      * Provides the desired state of the check boxes.
@@ -205,7 +205,9 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
      * @see ICheckStateListener#checkStateChanged
      */
     private void fireCheckStateChanged(final CheckStateChangedEvent event) {
-		for (ICheckStateListener l : checkStateListeners) {
+        Object[] array = checkStateListeners.getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final ICheckStateListener l = (ICheckStateListener) array[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -238,7 +240,8 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
 	public Object[] getCheckedElements() {
 		TableItem[] children = getTable().getItems();
 		ArrayList v = new ArrayList(children.length);
-		for (TableItem item : children) {
+		for (int i = 0; i < children.length; i++) {
+			TableItem item = children[i];
 			Object data = item.getData();
 			if (data != null) {
 				if (item.getChecked()) {
@@ -278,7 +281,8 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
 	public Object[] getGrayedElements() {
 		TableItem[] children = getTable().getItems();
 		List v = new ArrayList(children.length);
-		for (TableItem item : children) {
+		for (int i = 0; i < children.length; i++) {
+			TableItem item = children[i];
 			Object data = item.getData();
 			if (data != null) {
 				if (item.getGrayed()) {
@@ -324,7 +328,8 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
         CustomHashtable checked = newHashtable(children.length * 2 + 1);
         CustomHashtable grayed = newHashtable(children.length * 2 + 1);
 
-        for (TableItem item : children) {
+        for (int i = 0; i < children.length; i++) {
+            TableItem item = children[i];
             Object data = item.getData();
             if (data != null) {
                 if (item.getChecked()) {
@@ -339,7 +344,8 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
         super.preservingSelection(updateCode);
 
         children = getTable().getItems();
-        for (TableItem item : children) {
+        for (int i = 0; i < children.length; i++) {
+            TableItem item = children[i];
             Object data = item.getData();
             if (data != null) {
                 item.setChecked(checked.containsKey(data));
@@ -362,7 +368,8 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
      */
 	public void setAllChecked(boolean state) {
 		TableItem[] children = getTable().getItems();
-		for (TableItem item : children) {
+		for (int i = 0; i < children.length; i++) {
+			TableItem item = children[i];
 			if (item.getData() != null) {
 				if (item.getChecked() != state)
 					item.setChecked(state);
@@ -378,8 +385,9 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
      */
     public void setAllGrayed(boolean state) {
         TableItem[] children = getTable().getItems();
-        for (TableItem item : children) {
-            if (item.getData() != null) {
+        for (int i = 0; i < children.length; i++) {
+            TableItem item = children[i];
+			if (item.getData() != null) {
 				if (item.getGrayed() != state)
 					item.setGrayed(state);
 			}
@@ -415,11 +423,12 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
     public void setCheckedElements(Object[] elements) {
         assertElementsNotNull(elements);
         CustomHashtable set = newHashtable(elements.length * 2 + 1);
-        for (Object element : elements) {
-            set.put(element, element);
+        for (int i = 0; i < elements.length; ++i) {
+            set.put(elements[i], elements[i]);
         }
         TableItem[] items = getTable().getItems();
-        for (TableItem item : items) {
+        for (int i = 0; i < items.length; ++i) {
+            TableItem item = items[i];
             Object element = item.getData();
             if (element != null) {
                 boolean check = set.containsKey(element);
@@ -468,11 +477,12 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
     public void setGrayedElements(Object[] elements) {
         assertElementsNotNull(elements);
         CustomHashtable set = newHashtable(elements.length * 2 + 1);
-        for (Object element : elements) {
-            set.put(element, element);
+        for (int i = 0; i < elements.length; ++i) {
+            set.put(elements[i], elements[i]);
         }
         TableItem[] items = getTable().getItems();
-        for (TableItem item : items) {
+        for (int i = 0; i < items.length; ++i) {
+            TableItem item = items[i];
             Object element = item.getData();
             if (element != null) {
                 boolean gray = set.containsKey(element);

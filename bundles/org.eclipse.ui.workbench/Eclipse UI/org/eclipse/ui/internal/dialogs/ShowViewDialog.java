@@ -41,6 +41,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
@@ -148,7 +150,7 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		okButton = createButton(parent, IDialogConstants.OK_ID, WorkbenchMessages.ShowView_open_button_label,
+		okButton = createButton(parent, IDialogConstants.OK_ID, JFaceResources.getString(IDialogLabelKeys.OK_LABEL_KEY),
 				true);
 		createButton(parent, IDialogConstants.CANCEL_ID, JFaceResources.getString(IDialogLabelKeys.CANCEL_LABEL_KEY),
 				false);
@@ -223,7 +225,12 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 		RGB dimmedRGB = blend(treeControl.getForeground().getRGB(), treeControl.getBackground()
 				.getRGB(), 60);
 		dimmedForeground = new Color(treeControl.getDisplay(), dimmedRGB);
-		treeControl.addDisposeListener(e -> dimmedForeground.dispose());
+		treeControl.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				dimmedForeground.dispose();
+			}
+		});
 
 		treeViewer.setLabelProvider(new ViewLabelProvider(context, modelService, partService, window,dimmedForeground));
 		treeViewer.setContentProvider(new ViewContentProvider(application));

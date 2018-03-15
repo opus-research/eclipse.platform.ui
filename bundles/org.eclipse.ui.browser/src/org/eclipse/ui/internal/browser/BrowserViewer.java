@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,21 +8,12 @@
  * Contributors:
  *    IBM Corporation - Initial API and implementation
  *    Jacek Pospychala - jacek.pospychala@pl.ibm.com - fix for bug 224887
- *    Ian Pun & Lucas Bullen (Red Hat Inc.) - Bug 508508
  *******************************************************************************/
 package org.eclipse.ui.internal.browser;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.ClosedWatchServiceException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,27 +21,32 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
-import org.eclipse.swt.SWTException;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.LocationAdapter;
+import org.eclipse.swt.browser.CloseWindowListener;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
+import org.eclipse.swt.browser.OpenWindowListener;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
-import org.eclipse.swt.browser.VisibilityWindowAdapter;
+import org.eclipse.swt.browser.StatusTextEvent;
+import org.eclipse.swt.browser.StatusTextListener;
+import org.eclipse.swt.browser.TitleEvent;
+import org.eclipse.swt.browser.TitleListener;
+import org.eclipse.swt.browser.VisibilityWindowListener;
 import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -109,8 +105,6 @@ public class BrowserViewer extends Composite {
 
     protected ToolItem forward;
 
-    protected MenuItem autoRefresh;
-
     protected BusyIndicator busy;
 
     protected boolean loading;
@@ -128,8 +122,6 @@ public class BrowserViewer extends Composite {
     protected String title;
 
     protected int progressWorked = 0;
-
-	protected WatchService watcher;
 
 	 protected List<PropertyChangeListener> propertyListeners;
 
@@ -191,29 +183,42 @@ public class BrowserViewer extends Composite {
         setLayoutData(new GridData(GridData.FILL_BOTH));
         clipboard = new Clipboard(parent.getDisplay());
 
-		if (showToolbar || showURLbar) {
-			Composite toolbarComp = new Composite(this, SWT.NONE);
-			toolbarComp.setLayout(new ToolbarLayout());
-			toolbarComp.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL));
+        if (showToolbar || showURLbar) {
+            Composite toolbarComp = new Composite(this, SWT.NONE);
+            toolbarComp.setLayout(new ToolbarLayout());
+            toolbarComp.setLayoutData(new GridData(
+                  GridData.VERTICAL_ALIGN_BEGINNING
+                  | GridData.FILL_HORIZONTAL));
 
-			if (showToolbar)
-				createToolbar(toolbarComp);
+            if (showToolbar)
+                createToolbar(toolbarComp);
 
-			if (showURLbar)
-				createLocationBar(toolbarComp);
+				if (showURLbar)
+                createLocationBar(toolbarComp);
 
-			if (showToolbar | showURLbar) {
-				busy = new BusyIndicator(toolbarComp, SWT.NONE);
-				busy.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
-				busy.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseDown(MouseEvent e) {
-						setURL("http://www.eclipse.org"); //$NON-NLS-1$
-					}
-				});
-			}
-			PlatformUI.getWorkbench().getHelpSystem().setHelp(this, ContextIds.WEB_BROWSER);
-		}
+				if (showToolbar | showURLbar) {
+				    busy = new BusyIndicator(toolbarComp, SWT.NONE);
+				    busy.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+				    busy.addMouseListener(new MouseListener() {
+						@Override
+						public void mouseDoubleClick(MouseEvent e) {
+							// ignore
+						}
+
+						@Override
+						public void mouseDown(MouseEvent e) {
+							setURL("http://www.eclipse.org"); //$NON-NLS-1$
+						}
+
+						@Override
+						public void mouseUp(MouseEvent e) {
+							// ignore
+						}
+				    });
+				}
+				PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
+                  ContextIds.WEB_BROWSER);
+        }
 
         // create a new SWT Web browser widget, checking once again to make sure
         // we can use it in this environment
@@ -315,61 +320,76 @@ public class BrowserViewer extends Composite {
         if (browser==null) return;
         // respond to ExternalBrowserInstance StatusTextEvents events by
         // updating the status line
-		browser.addStatusTextListener(event -> {
-			// System.out.println("status: " + event.text); //$NON-NLS-1$
-			if (container != null) {
-				IStatusLineManager status = container.getActionBars().getStatusLineManager();
-				status.setMessage(event.text);
-			}
-		});
+        browser.addStatusTextListener(new StatusTextListener() {
+            @Override
+			public void changed(StatusTextEvent event) {
+					//System.out.println("status: " + event.text); //$NON-NLS-1$
+                if (container != null) {
+                    IStatusLineManager status = container.getActionBars()
+                            .getStatusLineManager();
+                    status.setMessage(event.text);
+                }
+            }
+        });
 
         // Add listener for new window creation so that we can instead of
         // opening a separate
         // new window in which the session is lost, we can instead open a new
         // window in a new
         // shell within the browser area thereby maintaining the session.
-		browser.addOpenWindowListener(event -> {
-			Shell shell2 = new Shell(getShell(), SWT.SHELL_TRIM);
-			shell2.setLayout(new FillLayout());
-			shell2.setText(Messages.viewWebBrowserTitle);
-			shell2.setImage(getShell().getImage());
-			if (event.location != null)
-				shell2.setLocation(event.location);
-			if (event.size != null)
-				shell2.setSize(event.size);
-			int style = 0;
-			if (showURLbar)
-				style += LOCATION_BAR;
-			if (showToolbar)
-				style += BUTTON_BAR;
-			BrowserViewer browser2 = new BrowserViewer(shell2, style);
-			browser2.newWindow = true;
-			event.browser = browser2.browser;
-		});
+        browser.addOpenWindowListener(new OpenWindowListener() {
+            @Override
+			public void open(WindowEvent event) {
+                Shell shell2 = new Shell(getShell(), SWT.SHELL_TRIM );
+                shell2.setLayout(new FillLayout());
+                shell2.setText(Messages.viewWebBrowserTitle);
+                shell2.setImage(getShell().getImage());
+                if (event.location != null)
+                    shell2.setLocation(event.location);
+                if (event.size != null)
+                    shell2.setSize(event.size);
+				int style = 0;
+				if (showURLbar)
+					style += LOCATION_BAR;
+				if (showToolbar)
+					style += BUTTON_BAR;
+                BrowserViewer browser2 = new BrowserViewer(shell2, style);
+                browser2.newWindow = true;
+                event.browser = browser2.browser;
+            }
+        });
 
-		browser.addVisibilityWindowListener(new VisibilityWindowAdapter() {
-			@Override
-			public void show(WindowEvent e) {
-				Browser browser2 = (Browser) e.widget;
-				if (browser2.getParent().getParent() instanceof Shell) {
-					Shell shell = (Shell) browser2.getParent().getParent();
-					if (e.location != null)
-						shell.setLocation(e.location);
-					if (e.size != null)
-						shell.setSize(shell.computeSize(e.size.x, e.size.y));
-					shell.open();
+		  browser.addVisibilityWindowListener(new VisibilityWindowListener() {
+				@Override
+				public void hide(WindowEvent e) {
+					// ignore
 				}
-			}
-		});
 
-		browser.addCloseWindowListener(event -> {
-			// if shell is not null, it must be a secondary popup window,
-			// else its an editor window
-			if (newWindow)
-				getShell().dispose();
-			else
-				container.close();
-		});
+				@Override
+				public void show(WindowEvent e) {
+					Browser browser2 = (Browser)e.widget;
+					if (browser2.getParent().getParent() instanceof Shell) {
+						Shell shell = (Shell) browser2.getParent().getParent();
+						if (e.location != null)
+							shell.setLocation(e.location);
+						if (e.size != null)
+							shell.setSize(shell.computeSize(e.size.x, e.size.y));
+						shell.open();
+					}
+				}
+			});
+
+        browser.addCloseWindowListener(new CloseWindowListener() {
+            @Override
+			public void close(WindowEvent event) {
+                // if shell is not null, it must be a secondary popup window,
+                // else its an editor window
+                if (newWindow)
+                    getShell().dispose();
+                else
+                    container.close();
+            }
+        });
 
         browser.addProgressListener(new ProgressListener() {
             @Override
@@ -426,7 +446,7 @@ public class BrowserViewer extends Composite {
         });
 
         if (showURLbar) {
-			browser.addLocationListener(new LocationAdapter() {
+            browser.addLocationListener(new LocationListener() {
                 @Override
 				public void changed(LocationEvent event) {
                     if (!event.top)
@@ -439,27 +459,23 @@ public class BrowserViewer extends Composite {
                         }// else
                         //    combo.setText(""); //$NON-NLS-1$
                     }
-                    // enable auto-refresh button if URL is a file
-                    File temp = getFile(browser.getUrl());
-                    if (temp != null && temp.exists()) {
-                        autoRefresh.setEnabled(true);
-                        if (autoRefresh.getSelection()) {
-                            fileChangedWatchService(temp);
-                        }
-					} else {
-						autoRefresh.setSelection(false);
-						toggleAutoRefresh();
-						autoRefresh.setEnabled(false);
-                    }
+                }
+
+                @Override
+				public void changing(LocationEvent event) {
+                    // do nothing
                 }
             });
         }
 
-		browser.addTitleListener(event -> {
-			String oldTitle = title;
-			title = event.title;
-			firePropertyChangeEvent(PROPERTY_TITLE, oldTitle, title);
-		});
+        browser.addTitleListener(new TitleListener() {
+            @Override
+			public void changed(TitleEvent event) {
+					 String oldTitle = title;
+                title = event.title;
+					 firePropertyChangeEvent(PROPERTY_TITLE, oldTitle, title);
+            }
+        });
     }
 
 	 /**
@@ -647,20 +663,6 @@ public class BrowserViewer extends Composite {
 		  }
     }
 
-	private void toggleAutoRefresh() {
-        File temp = getFile(browser.getUrl());
-        if (temp != null && temp.exists() && autoRefresh.getSelection()) {
-			refresh();
-			fileChangedWatchService(temp);
-        } else if (watcher != null) {
-            try {
-                watcher.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private void setURL(String url, boolean browse) {
         Trace.trace(Trace.FINEST, "setURL: " + url + " " + browse); //$NON-NLS-1$ //$NON-NLS-2$
         if (url == null) {
@@ -732,16 +734,24 @@ public class BrowserViewer extends Composite {
 
         updateHistory();
 
-		combo.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-			try {
-				if (combo.getSelectionIndex() != -1 && !combo.getListVisible()) {
-					setURL(combo.getItem(combo.getSelectionIndex()));
-				}
-			} catch (Exception e1) {
-				// ignore
-			}
-		}));
-		combo.addListener(SWT.DefaultSelection, e -> setURL(combo.getText()));
+        combo.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent we) {
+                try {
+                    if (combo.getSelectionIndex() != -1 && !combo.getListVisible()) {
+                        setURL(combo.getItem(combo.getSelectionIndex()));
+                    }
+                } catch (Exception e) {
+                    // ignore
+                }
+            }
+        });
+        combo.addListener(SWT.DefaultSelection, new Listener() {
+            @Override
+			public void handleEvent(Event e) {
+                setURL(combo.getText());
+            }
+        });
 
         ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
 
@@ -751,9 +761,14 @@ public class BrowserViewer extends Composite {
         go.setDisabledImage(ImageResource
                 .getImage(ImageResource.IMG_DLCL_NAV_GO));
         go.setToolTipText(Messages.actionWebBrowserGo);
-		go.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> setURL(combo.getText())));
+        go.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
+                setURL(combo.getText());
+            }
+        });
 
-		return toolbar;
+		  return toolbar;
     }
 
     private ToolBar createToolbar(Composite parent) {
@@ -768,7 +783,12 @@ public class BrowserViewer extends Composite {
         back.setDisabledImage(ImageResource
                 .getImage(ImageResource.IMG_DLCL_NAV_BACKWARD));
         back.setToolTipText(Messages.actionWebBrowserBack);
-		back.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> back()));
+        back.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
+                back();
+            }
+        });
 
         forward = new ToolItem(toolbar, SWT.NONE);
         forward.setImage(ImageResource
@@ -778,7 +798,12 @@ public class BrowserViewer extends Composite {
         forward.setDisabledImage(ImageResource
                 .getImage(ImageResource.IMG_DLCL_NAV_FORWARD));
         forward.setToolTipText(Messages.actionWebBrowserForward);
-		forward.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> forward()));
+        forward.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
+                forward();
+            }
+        });
 
         // create refresh, stop, and print actions
         ToolItem stop = new ToolItem(toolbar, SWT.NONE);
@@ -788,29 +813,29 @@ public class BrowserViewer extends Composite {
         stop.setDisabledImage(ImageResource
                 .getImage(ImageResource.IMG_DLCL_NAV_STOP));
         stop.setToolTipText(Messages.actionWebBrowserStop);
-		stop.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> stop()));
+        stop.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
+                stop();
+            }
+        });
 
-        ToolItem refresh = new ToolItem(toolbar, SWT.DROP_DOWN);
-        refresh.setImage(ImageResource.getImage(ImageResource.IMG_ELCL_NAV_REFRESH));
-        refresh.setHotImage(ImageResource.getImage(ImageResource.IMG_CLCL_NAV_REFRESH));
-        refresh.setDisabledImage(ImageResource.getImage(ImageResource.IMG_DLCL_NAV_REFRESH));
+        ToolItem refresh = new ToolItem(toolbar, SWT.NONE);
+        refresh.setImage(ImageResource
+                .getImage(ImageResource.IMG_ELCL_NAV_REFRESH));
+        refresh.setHotImage(ImageResource
+                .getImage(ImageResource.IMG_CLCL_NAV_REFRESH));
+        refresh.setDisabledImage(ImageResource
+                .getImage(ImageResource.IMG_DLCL_NAV_REFRESH));
         refresh.setToolTipText(Messages.actionWebBrowserRefresh);
-
-        // create auto-refresh action
-        Menu refreshMenu = new Menu(getShell(), SWT.POP_UP);
-        autoRefresh = new MenuItem(refreshMenu, SWT.CHECK);
-        autoRefresh.setText(Messages.actionWebBrowserAutoRefresh);
-		autoRefresh.setEnabled(false);
-        refresh.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-            if (e.detail == SWT.ARROW) {
-                refreshMenu.setVisible(true);
-            } else {
+        refresh.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
                 refresh();
             }
-        }));
-		autoRefresh.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> toggleAutoRefresh()));
+        });
 
-        return toolbar;
+		  return toolbar;
     }
 
     /**
@@ -882,51 +907,61 @@ public class BrowserViewer extends Composite {
     protected Object syncObject = new Object();
 
     protected void addSynchronizationListener() {
-		if (fileListenerThread != null)
-			return;
+   	 if (fileListenerThread != null)
+   		 return;
 
-		fileListenerThread = new Thread("Browser file synchronization") { //$NON-NLS-1$
-			@Override
-			public void run() {
-				while (fileListenerThread != null) {
-					try {
-						Thread.sleep(2000);
-					} catch (Exception e) {
-						// ignore
-					}
-					synchronized (syncObject) {
-						if (file != null && file.lastModified() != timestamp) {
-							timestamp = file.lastModified();
-							Display.getDefault().syncExec(() -> refresh());
-						}
-					}
-				}
-			}
-		};
-		fileListenerThread.setDaemon(true);
-		fileListenerThread.setPriority(Thread.MIN_PRIORITY);
+   	 fileListenerThread = new Thread("Browser file synchronization") { //$NON-NLS-1$
+   		 @Override
+		public void run() {
+   			 while (fileListenerThread != null) {
+   				 try {
+   					 Thread.sleep(2000);
+   				 } catch (Exception e) {
+   					 // ignore
+   				 }
+   				 synchronized (syncObject) {
+						 if (file != null && file.lastModified() != timestamp) {
+	   					 timestamp = file.lastModified();
+	   					 Display.getDefault().syncExec(new Runnable() {
+	 							@Override
+								public void run() {
+	 								refresh();
+	 							}
+	   					 });
+						 }
+					  }
+   			 }
+   		 }
+   	 };
+   	 fileListenerThread.setDaemon(true);
+   	 fileListenerThread.setPriority(Thread.MIN_PRIORITY);
 
-		locationListener2 = new LocationAdapter() {
-			@Override
-			public void changed(LocationEvent event) {
-				File temp = getFile(event.location);
-				if (temp != null && temp.exists()) {
-					synchronized (syncObject) {
-						file = temp;
-						timestamp = file.lastModified();
-					}
-				} else
-					file = null;
-			}
-		};
-		browser.addLocationListener(locationListener2);
+   	 locationListener2 = new LocationListener() {
+          @Override
+		public void changed(LocationEvent event) {
+         	 File temp = getFile(event.location);
+         	 if (temp != null && temp.exists()) {
+         		 synchronized (syncObject) {
+         			 file = temp;
+            		 timestamp = file.lastModified();
+					 }
+         	 } else
+         		 file = null;
+          }
 
-		File temp = getFile(browser.getUrl());
-		if (temp != null && temp.exists()) {
-			file = temp;
-			timestamp = file.lastModified();
-		}
-		fileListenerThread.start();
+          @Override
+		public void changing(LocationEvent event) {
+             // do nothing
+         }
+       };
+       browser.addLocationListener(locationListener2);
+
+       File temp = getFile(browser.getUrl());
+   	 if (temp != null && temp.exists()) {
+   		file = temp;
+      	timestamp = file.lastModified();
+   	 }
+   	 fileListenerThread.start();
     }
 
     protected static File getFile(String location) {
@@ -946,46 +981,4 @@ public class BrowserViewer extends Composite {
    	 browser.removeLocationListener(locationListener2);
    	 locationListener2 = null;
     }
-
-	/*
-	 * Start the WatchService so that it monitors the local file system for any
-	 * changes. This is used by the auto-refresh action as it will monitor the file
-	 * being displayed and refresh the browser when there are changes.
-	 */
-	private void fileChangedWatchService(File file) {
-		while (file.isFile()) {
-			// get the directory as that is the requirement of WatchService
-			file = file.getParentFile();
-		}
-		try {
-			if (watcher != null) {
-				watcher.close();
-			}
-			watcher = FileSystems.getDefault().newWatchService();
-			final Path path = FileSystems.getDefault().getPath(file.getAbsolutePath());
-			path.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
-			new Thread(() -> {
-				try {
-					WatchKey key = watcher.take();
-					while (key != null) {
-						for (WatchEvent<?> event : key.pollEvents()) {
-							final Path changedPath = (Path) event.context();
-							Display.getDefault().asyncExec(() -> {
-								if (browser.getUrl().endsWith(changedPath.toString())) {
-									browser.refresh();
-								}
-							});
-						}
-						key.reset();
-						key = watcher.take();
-					}
-				} catch (InterruptedException | ClosedWatchServiceException e) {
-					// catch and continue to abort the thread
-				}
-			}).start();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 }

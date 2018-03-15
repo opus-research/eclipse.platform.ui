@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,7 +50,8 @@ public class ContextTest {
 
 		defineContexts(appContext);
 
-		EContextService cs = appContext.get(EContextService.class);
+		EContextService cs = (EContextService) appContext
+				.get(EContextService.class.getName());
 		assertEquals(0, cs.getActiveContextIds().size());
 
 		cs.activateContext(DIALOG_AND_WINDOW_ID);
@@ -62,13 +63,15 @@ public class ContextTest {
 
 		defineContexts(appContext);
 
-		EContextService cs = appContext.get(EContextService.class);
+		EContextService cs = (EContextService) appContext
+				.get(EContextService.class.getName());
 		assertEquals(0, cs.getActiveContextIds().size());
 
 		IEclipseContext window = appContext.createChild("windowContext");
 		window.activate();
 
-		EContextService windowService = window.get(EContextService.class);
+		EContextService windowService = (EContextService) window
+				.get(EContextService.class.getName());
 		cs.activateContext(DIALOG_AND_WINDOW_ID);
 
 		assertEquals(1, cs.getActiveContextIds().size());
@@ -84,13 +87,15 @@ public class ContextTest {
 
 		defineContexts(appContext);
 
-		EContextService cs = appContext.get(EContextService.class);
+		EContextService cs = (EContextService) appContext
+				.get(EContextService.class.getName());
 		assertEquals(0, cs.getActiveContextIds().size());
 
 		IEclipseContext window = appContext.createChild("windowContext");
 		window.activate();
 
-		EContextService windowService = window.get(EContextService.class);
+		EContextService windowService = (EContextService) window
+				.get(EContextService.class.getName());
 		windowService.activateContext(DIALOG_AND_WINDOW_ID);
 
 		assertEquals(1, cs.getActiveContextIds().size());
@@ -115,15 +120,18 @@ public class ContextTest {
 
 		defineContexts(appContext);
 
-		EContextService cs = appContext.get(EContextService.class);
+		EContextService cs = (EContextService) appContext
+				.get(EContextService.class.getName());
 
 		IEclipseContext window = appContext.createChild("windowContext");
-		EContextService windowService = window.get(EContextService.class);
+		EContextService windowService = (EContextService) window
+				.get(EContextService.class.getName());
 
 		IEclipseContext dialog = appContext.createChild("dialogContext");
 		dialog.activate();
 
-		EContextService dialogService = dialog.get(EContextService.class);
+		EContextService dialogService = (EContextService) dialog
+				.get(EContextService.class.getName());
 
 		cs.activateContext(DIALOG_AND_WINDOW_ID);
 		windowService.activateContext(WINDOW_ID);
@@ -173,7 +181,8 @@ public class ContextTest {
 	}
 
 	private void defineContexts(IEclipseContext appContext) {
-		EContextService cs = appContext.get(EContextService.class);
+		EContextService cs = (EContextService) appContext
+				.get(EContextService.class.getName());
 		Context daw = cs.getContext(DIALOG_AND_WINDOW_ID);
 		daw.define("Dialog and Window", null, null);
 		Context d = cs.getContext(DIALOG_ID);

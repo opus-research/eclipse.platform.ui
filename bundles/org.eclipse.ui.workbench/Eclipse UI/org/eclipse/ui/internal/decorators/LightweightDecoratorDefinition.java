@@ -246,7 +246,8 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 
 			if (isAdaptable()) {
 				String[] classes = getObjectClasses();
-				for (String className : classes) {
+				for (int i = 0; i < classes.length; i++) {
+					String className = classes[i];
 					Object adapted = LegacyResourceSupport.getAdapter(element,
 							className);
 					if (adapted != null) {
@@ -254,8 +255,10 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 					}
 				}
 			}
-			else if (element != null) {
-				currentDecorator.decorate(element, decoration);
+			else{
+				if (currentDecorator != null && element != null) {
+					currentDecorator.decorate(element, decoration);
+				}
 			}
 		} catch (CoreException exception) {
 			handleCoreException(exception);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440149, 472654
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 496319, 498301
- *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 527162
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -35,6 +31,10 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -50,7 +50,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.ProductProperties;
 import org.eclipse.ui.internal.WorkbenchMessages;
@@ -61,18 +60,12 @@ import org.eclipse.ui.internal.about.AboutTextManager;
 import org.eclipse.ui.internal.about.InstallationDialog;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
-import org.eclipse.ui.services.IServiceLocator;
 
 /**
  * Displays information about the product.
  */
 public class AboutDialog extends TrayDialog {
-	/**
-	 *
-	 */
-	private static final String COPY_BUILD_ID_COMMAND = "org.eclipse.ui.ide.copyBuildIdCommand"; //$NON-NLS-1$
-
-	private final static int MAX_IMAGE_WIDTH_FOR_TEXT = 250;
+    private final static int MAX_IMAGE_WIDTH_FOR_TEXT = 250;
 
     private final static int DETAILS_ID = IDialogConstants.CLIENT_ID + 1;
 
@@ -124,11 +117,14 @@ public class AboutDialog extends TrayDialog {
 	protected void buttonPressed(int buttonId) {
         switch (buttonId) {
         case DETAILS_ID:
-			BusyIndicator.showWhile(getShell().getDisplay(), () -> {
-				IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-				InstallationDialog dialog = new InstallationDialog(getShell(), workbenchWindow);
-				dialog.setModalParent(AboutDialog.this);
-				dialog.open();
+			BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
+				@Override
+				public void run() {
+					IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+					InstallationDialog dialog = new InstallationDialog(getShell(), workbenchWindow);
+					dialog.setModalParent(AboutDialog.this);
+					dialog.open();
+				}
 			});
             break;
         default:
@@ -137,15 +133,16 @@ public class AboutDialog extends TrayDialog {
         }
     }
 
-	@Override
+    @Override
 	public boolean close() {
-		// dispose all images
-		for (int i = 0; i < images.size(); ++i) {
-			Image image = images.get(i);
-			image.dispose();
-		}
-		return super.close();
-	}
+        // dispose all images
+        for (int i = 0; i < images.size(); ++i) {
+            Image image = images.get(i);
+            image.dispose();
+        }
+
+        return super.close();
+    }
 
     @Override
 	protected void configureShell(Shell newShell) {
@@ -175,7 +172,8 @@ public class AboutDialog extends TrayDialog {
         layout.numColumns++;
         layout.makeColumnsEqualWidth = false;
 
-		Button b = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.CLOSE_LABEL, true);
+        Button b = createButton(parent, IDialogConstants.OK_ID,
+                IDialogConstants.OK_LABEL, true);
         b.setFocus();
     }
 
@@ -393,20 +391,22 @@ public class AboutDialog extends TrayDialog {
 	 */
 	private void createTextMenu() {
 		final MenuManager textManager = new MenuManager();
-		IServiceLocator serviceLocator = PlatformUI.getWorkbench();
-		ICommandService commandService = serviceLocator.getService(ICommandService.class);
 		textManager.add(new CommandContributionItem(
-				new CommandContributionItemParameter(serviceLocator, null, IWorkbenchCommandConstants.EDIT_COPY,
+				new CommandContributionItemParameter(PlatformUI
+						.getWorkbench(), null, IWorkbenchCommandConstants.EDIT_COPY,
 						CommandContributionItem.STYLE_PUSH)));
-		if (commandService.getCommand(COPY_BUILD_ID_COMMAND).isDefined()) {
-			textManager.add(new CommandContributionItem(new CommandContributionItemParameter(serviceLocator, null,
-					COPY_BUILD_ID_COMMAND, CommandContributionItem.STYLE_PUSH)));
-		}
-		textManager.add(new CommandContributionItem(new CommandContributionItemParameter(serviceLocator, null,
-				IWorkbenchCommandConstants.EDIT_SELECT_ALL,
+		textManager.add(new CommandContributionItem(
+				new CommandContributionItemParameter(PlatformUI
+						.getWorkbench(), null, IWorkbenchCommandConstants.EDIT_SELECT_ALL,
 						CommandContributionItem.STYLE_PUSH)));
 		text.setMenu(textManager.createContextMenu(text));
-		text.addDisposeListener(e -> textManager.dispose());
+		text.addDisposeListener(new DisposeListener() {
+
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				textManager.dispose();
+			}
+		});
 
 	}
 
@@ -446,12 +446,19 @@ public class AboutDialog extends TrayDialog {
 				e.result = info.getProviderName();
 			}
         });
-        button.addSelectionListener(widgetSelectedAdapter(event -> {
-			AboutBundleGroupData[] groupInfos = buttonManager.getRelatedInfos(info);
-			AboutBundleGroupData selection = (AboutBundleGroupData) event.widget.getData();
-			AboutFeaturesDialog d = new AboutFeaturesDialog(getShell(), productName, groupInfos, selection);
-		    d.open();
-		}));
+        button.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
+                AboutBundleGroupData[] groupInfos = buttonManager
+                        .getRelatedInfos(info);
+                AboutBundleGroupData selection = (AboutBundleGroupData) event.widget
+                        .getData();
+
+                AboutFeaturesDialog d = new AboutFeaturesDialog(getShell(),
+                        productName, groupInfos, selection);
+                d.open();
+            }
+        });
 
         return button;
     }

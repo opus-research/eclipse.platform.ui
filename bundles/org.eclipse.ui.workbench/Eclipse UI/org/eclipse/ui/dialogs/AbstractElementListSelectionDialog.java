@@ -26,6 +26,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -409,7 +410,12 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
 
         text.setText((fFilter == null ? "" : fFilter)); //$NON-NLS-1$
 
-        Listener listener = e -> fFilteredList.setFilter(fFilterText.getText());
+        Listener listener = new Listener() {
+            @Override
+			public void handleEvent(Event e) {
+                fFilteredList.setFilter(fFilterText.getText());
+            }
+        };
         text.addListener(SWT.Modify, listener);
 
         text.addKeyListener(new KeyListener() {
@@ -443,19 +449,22 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
     @Override
 	public void create() {
 
-        BusyIndicator.showWhile(null, () -> {
-		    access$superCreate();
+        BusyIndicator.showWhile(null, new Runnable() {
+            @Override
+			public void run() {
+                access$superCreate();
 
-		    Assert.isNotNull(fFilteredList);
+                Assert.isNotNull(fFilteredList);
 
-		    if (fFilteredList.isEmpty()) {
-		        handleEmptyList();
-		    } else {
-		        validateCurrentSelection();
-		        fFilterText.selectAll();
-		        fFilterText.setFocus();
-		    }
-		});
+                if (fFilteredList.isEmpty()) {
+                    handleEmptyList();
+                } else {
+                    validateCurrentSelection();
+                    fFilterText.selectAll();
+                    fFilterText.setFocus();
+                }
+            }
+        });
 
     }
 

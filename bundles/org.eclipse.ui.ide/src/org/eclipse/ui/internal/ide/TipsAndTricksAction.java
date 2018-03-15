@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,8 +27,6 @@ import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.PartEventAction;
-import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
-import org.eclipse.ui.internal.WorkbenchImages;
 
 /**
  * Launch the tips and tricks action.
@@ -56,7 +54,6 @@ public class TipsAndTricksAction extends PartEventAction implements
         window.getWorkbench().getHelpSystem().setHelp(this,
 				IIDEHelpContextIds.TIPS_AND_TRICKS_ACTION);
         setActionDefinitionId(IWorkbenchCommandConstants.HELP_TIPS_AND_TRICKS);
-		setImageDescriptor(WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_ETOOL_TIPS_AND_TRICKS));
         workbenchWindow.getPartService().addPartListener(this);
     }
 
@@ -73,9 +70,9 @@ public class TipsAndTricksAction extends PartEventAction implements
         AboutInfo[] featureInfos = IDEWorkbenchPlugin.getDefault()
                 .getFeatureInfos();
         ArrayList tipsAndTricksFeatures = new ArrayList(featureInfos.length);
-        for (AboutInfo featureInfo : featureInfos) {
-            if (featureInfo.getTipsAndTricksHref() != null) {
-				tipsAndTricksFeatures.add(featureInfo);
+        for (int i = 0; i < featureInfos.length; i++) {
+            if (featureInfos[i].getTipsAndTricksHref() != null) {
+				tipsAndTricksFeatures.add(featureInfos[i]);
 			}
         }
 
