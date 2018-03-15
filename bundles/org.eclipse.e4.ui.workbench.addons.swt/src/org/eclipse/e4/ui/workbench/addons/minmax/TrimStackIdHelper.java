@@ -58,9 +58,8 @@ public class TrimStackIdHelper {
 		Map<TrimStackIdPart, String> result = new LinkedHashMap<TrimStackIdHelper.TrimStackIdPart, String>();
 		result.put(TrimStackIdPart.ELEMENT_ID, stackId);
 		String suffix = trimStackId.substring(index);
-		if (ID_SUFFIX.equalsIgnoreCase(suffix)) {
+		if (ID_SUFFIX.equalsIgnoreCase(suffix))
 			return result;
-		}
 		String windowPerspId = suffix.substring(1, suffix.length() - 1);
 		int windowIdEnd = windowPerspId.indexOf(')');
 		if (windowIdEnd != -1) {
@@ -90,12 +89,10 @@ public class TrimStackIdHelper {
 		if (perspective == null) {
 			sb.append(ID_SUFFIX);
 		} else {
-			if (window != null && window.getElementId() != null) {
+			if (window != null && window.getElementId() != null)
 				sb.append('(' + window.getElementId() + ')' + '.');
-			}
-			if (perspective.getElementId() != null) {
+			if (perspective.getElementId() != null)
 				sb.append('(' + perspective.getElementId() + ')');
-			}
 		}
 		return sb.toString();
 	}
