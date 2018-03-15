@@ -15,9 +15,11 @@ package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -32,6 +34,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.swt.widgets.Display;
 
 public class ToolBarContributionRecord {
 	public static final String FACTORY = "ToolBarContributionFactory"; //$NON-NLS-1$
@@ -46,6 +49,8 @@ public class ToolBarContributionRecord {
 	private IEclipseContext infoContext;
 	private Runnable factoryDispose;
 
+	private Map<IEclipseContext, Integer> scheduledUpdate = new HashMap<>();
+
 	public ToolBarContributionRecord(MToolBar model,
 			MToolBarContribution contribution, ToolBarManagerRenderer renderer) {
 		this.toolbarModel = model;
@@ -58,6 +63,38 @@ public class ToolBarContributionRecord {
 	}
 
 	public void updateVisibility(IEclipseContext context) {
+		if (!scheduledUpdate.containsKey(context)) {
+			// Perform the action immediately so that Computation like RATs work
+			// appropriately
+			performUpdateVisibility(context);
+			// Schedule reset of state
+			Display current = Display.getCurrent();
+			Runnable r = () -> {
+				scheduledUpdate.remove(context);
+			};
+			current.asyncExec(r);
+			scheduledUpdate.put(context, Integer.valueOf(0));
+		} else if (scheduledUpdate.get(context).intValue() == 0) {
+			// Another request has been issued - Schedule a runnable to execute
+			// at the end
+			scheduledUpdate.put(context, Integer.valueOf(1));
+			Display current = Display.getCurrent();
+			Runnable r = () -> {
+				try {
+					performUpdateVisibility(context);
+				} finally {
+					synchronized (scheduledUpdate) {
+						scheduledUpdate.remove(context);
+					}
+				}
+			};
+			current.asyncExec(r);
+		} else {
+			// Skip all other update requests
+		}
+	}
+
+	private void performUpdateVisibility(IEclipseContext context) {
 		ExpressionContext exprContext = new ExpressionContext(context);
 		updateIsVisible(exprContext);
 		HashSet<ToolBarContributionRecord> recentlyUpdated = new HashSet<>();
