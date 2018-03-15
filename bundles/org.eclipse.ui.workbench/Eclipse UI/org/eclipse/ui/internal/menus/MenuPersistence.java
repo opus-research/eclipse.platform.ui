@@ -119,12 +119,12 @@ final public class MenuPersistence extends RegistryPersistence {
 				.getConfigurationElementsFor(EXTENSION_MENUS);
 
 		// Create a cache entry for every menu addition;
-		for (int i = 0; i < menusExtensionPoint.length; i++) {
-			if (PL_MENU_CONTRIBUTION.equals(menusExtensionPoint[i].getName())) {
+		for (IConfigurationElement element : menusExtensionPoint) {
+			if (PL_MENU_CONTRIBUTION.equals(element.getName())) {
 				if (contributorFilter == null
 						|| contributorFilter.matcher(
-								menusExtensionPoint[i].getContributor().getName()).matches()) {
-					configElements.add(menusExtensionPoint[i]);
+								element.getContributor().getName()).matches()) {
+					configElements.add(element);
 				}
 			}
 		}

@@ -116,8 +116,8 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 	@Override
 	public void refresh(Object[] elements) {
 		Object[] refreshes = getRoots(elements, true);
-		for (int i = 0; i < refreshes.length; i++) {
-			progressViewer.refresh(refreshes[i], true);
+		for (Object refreshe : refreshes) {
+			progressViewer.refresh(refreshe, true);
 		}
 	}
 
@@ -135,8 +135,7 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 		Set all = new HashSet();
 
-		for (int i = 0; i < elements.length; i++) {
-			Object element = elements[i];
+		for (Object element : elements) {
 			all.add(element);
 		}
 
@@ -167,8 +166,8 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 			return elements;
 		}
 		HashSet roots = new HashSet();
-		for (int i = 0; i < elements.length; i++) {
-			JobTreeElement element = (JobTreeElement) elements[i];
+		for (Object element2 : elements) {
+			JobTreeElement element = (JobTreeElement) element2;
 			if (element.isJobInfo()) {
 				GroupInfo group = ((JobInfo) element).getGroupInfo();
 				if (group == null) {

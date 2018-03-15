@@ -210,16 +210,16 @@ public class WorkingSetRegistry implements IExtensionChangeHandler {
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		WorkingSetRegistryReader reader = new WorkingSetRegistryReader(this);
 		IConfigurationElement[] elements = extension.getConfigurationElements();
-        for (int i = 0; i < elements.length; i++) {
-			reader.readElement(elements[i]);
+        for (IConfigurationElement element : elements) {
+			reader.readElement(element);
 		}
 	}
 
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (int i = 0; i < objects.length; i++) {
-            if (objects[i] instanceof WorkingSetDescriptor) {
-                WorkingSetDescriptor desc = (WorkingSetDescriptor) objects[i];
+		for (Object object : objects) {
+            if (object instanceof WorkingSetDescriptor) {
+                WorkingSetDescriptor desc = (WorkingSetDescriptor) object;
                 workingSetDescriptors.remove(desc.getId());
             }
         }

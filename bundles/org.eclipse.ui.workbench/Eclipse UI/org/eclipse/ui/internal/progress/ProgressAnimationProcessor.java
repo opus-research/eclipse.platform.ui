@@ -53,8 +53,8 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
         }
 
         ProgressAnimationItem[] animationItems = getAnimationItems();
-        for (int i = 0; i < animationItems.length; i++) {
-            animationItems[i].animationDone();
+        for (ProgressAnimationItem animationItem : animationItems) {
+            animationItem.animationDone();
         }
 
     }
@@ -84,8 +84,8 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
     @Override
 	public void animationStarted() {
         AnimationItem[] animationItems = getAnimationItems();
-        for (int i = 0; i < animationItems.length; i++) {
-            animationItems[i].animationStart();
+        for (AnimationItem animationItem : animationItems) {
+            animationItem.animationStart();
         }
 
     }
@@ -110,8 +110,8 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
     @Override
 	public void animationFinished() {
         AnimationItem[] animationItems = getAnimationItems();
-        for (int i = 0; i < animationItems.length; i++) {
-            animationItems[i].animationDone();
+        for (AnimationItem animationItem : animationItems) {
+            animationItem.animationDone();
         }
 
     }
