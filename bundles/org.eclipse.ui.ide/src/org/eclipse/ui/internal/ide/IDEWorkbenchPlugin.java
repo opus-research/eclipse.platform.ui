@@ -385,13 +385,19 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 			display.timerExec(PROBLEMS_VIEW_CREATION_DELAY, r);
 		} else {
 			Job job = new Job("Initializing Problems view") { //$NON-NLS-1$
+				private final static int MAX_ATTEMPTS = 10;
+				private int attempts = 1;
+
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					IWorkbench workbench = PlatformUI.isWorkbenchRunning() ? PlatformUI.getWorkbench() : null;
 					if (workbench == null) {
 						// Workbench not created yet, so avoid using display to
 						// avoid crash like in bug 513901
-						schedule(PROBLEMS_VIEW_CREATION_DELAY);
+						if (attempts <= MAX_ATTEMPTS) {
+							schedule(PROBLEMS_VIEW_CREATION_DELAY * attempts);
+							attempts++;
+						}
 						return Status.OK_STATUS;
 					}
 					if (workbench != null && workbench.isClosing()) {
