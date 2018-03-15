@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 497348
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
@@ -99,36 +98,13 @@ public class StackDropAgent extends DropAgent {
 		return displayBounds;
 	}
 
-	// number of tabs that are hidden
-	private int hiddenChildren = 0;
-	private List<CTabItem> visibleItemms = new ArrayList<>();
-
 	private void createInsertRects() {
-
-		hiddenChildren = 0;
-		CTabItem item;
-		CTabItem[] items = dropCTF.getItems();
-		visibleItemms = new ArrayList<>();
-		for (int i = 0; i < items.length; i++) {
-			item = items[i];
-			if (!item.isShowing()) {
-				// hidden dropStack children (tab overflow)
-				hiddenChildren++;
-			} else {
-				// item visible in CTabFolder
-				visibleItemms.add(item);
-			}
-		}
-
-		// for dropping, we consider visible tab only
-		items = visibleItemms.toArray(new CTabItem[visibleItemms.size()]);
-
 		itemRects = new ArrayList<Rectangle>();
+		if (dropCTF.getItems().length > 0) {
+			CTabItem[] items = dropCTF.getItems();
 
-		if (items.length > 0) {
 			// First rect is from left to the center of the item
-			item = items[0];
-			Rectangle itemRect = item.getBounds();
+			Rectangle itemRect = items[0].getBounds();
 			int centerX = itemRect.x + (itemRect.width / 2);
 			itemRect.width /= 2;
 			int curX = itemRect.x + itemRect.width;
@@ -137,8 +113,7 @@ public class StackDropAgent extends DropAgent {
 
 			// Process the other items
 			for (int i = 1; i < items.length; i++) {
-				item = items[i];
-				itemRect = item.getBounds();
+				itemRect = items[i].getBounds();
 				centerX = itemRect.x + (itemRect.width / 2);
 				itemRect.width = centerX - curX;
 				itemRect.x = curX;
@@ -147,16 +122,11 @@ public class StackDropAgent extends DropAgent {
 				itemRects.add(insertRect);
 			}
 
-			if (hiddenChildren < 0) {
-
-			} else {
-				// Finally, add a rectangle from the center of the last element
-				// to the end
-				itemRect.x = curX;
-				itemRect.width = dropCTF.getBounds().width - curX;
-				insertRect = dropCTF.getDisplay().map(dropCTF, null, itemRect);
-				itemRects.add(insertRect);
-			}
+			// Finally, add a rectangle from the center of the last element to the end
+			itemRect.x = curX;
+			itemRect.width = dropCTF.getBounds().width - curX;
+			insertRect = dropCTF.getDisplay().map(dropCTF, null, itemRect);
+			itemRects.add(insertRect);
 		} else {
 			// Empty stack, whole area is index == 0
 			itemRects.add(tabArea);
@@ -191,9 +161,6 @@ public class StackDropAgent extends DropAgent {
 		super.dragLeave(dragElement, info);
 	}
 
-	/**
-	 * Tracks movements of mouse on the Stack where the user is dropping the element
-	 */
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
 		if (!tabArea.contains(info.cursorPos) || dropStack == null || !dropStack.isToBeRendered())
@@ -206,21 +173,21 @@ public class StackDropAgent extends DropAgent {
 
 		dndManager.setCursor(Display.getCurrent().getSystemCursor(SWT.CURSOR_HAND));
 
-		if (dropStack.getChildren().indexOf(dragElement) == dropIndex){
+		if (dropStack.getChildren().indexOf(dragElement) == dropIndex)
 			return true;
-		}
+
 		if (dndManager.getFeedbackStyle() == DnDManager.HOSTED) {
 			dock(dragElement, dropIndex);
 			Display.getCurrent().update();
 			showFrame(dragElement);
 		} else {
-			if (dropIndex < visibleItemms.size()) {
-				Rectangle itemBounds = visibleItemms.get(dropIndex).getBounds();
+			if (dropIndex < dropCTF.getItemCount()) {
+				Rectangle itemBounds = dropCTF.getItem(dropIndex).getBounds();
 				itemBounds.width = 2;
 				itemBounds = Display.getCurrent().map(dropCTF, null, itemBounds);
 				dndManager.frameRect(itemBounds);
-			} else if (visibleItemms.size() > 0) {
-				Rectangle itemBounds = visibleItemms.get(dropIndex - 1).getBounds();
+			} else if (dropCTF.getItemCount() > 0) {
+				Rectangle itemBounds = dropCTF.getItem(dropIndex - 1).getBounds();
 				itemBounds.x = itemBounds.x + itemBounds.width;
 				itemBounds.width = 2;
 				itemBounds = Display.getCurrent().map(dropCTF, null, itemBounds);
@@ -230,6 +197,7 @@ public class StackDropAgent extends DropAgent {
 				fr.width = 2;
 				dndManager.frameRect(fr);
 			}
+
 			if (dndManager.getFeedbackStyle() == DnDManager.GHOSTED) {
 				Rectangle ca = dropCTF.getClientArea();
 				ca = Display.getCurrent().map(dropCTF, null, ca);
