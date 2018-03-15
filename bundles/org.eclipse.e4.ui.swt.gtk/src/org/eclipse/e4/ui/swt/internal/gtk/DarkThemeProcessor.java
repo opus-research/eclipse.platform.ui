@@ -51,8 +51,6 @@ public class DarkThemeProcessor {
 						OS.setDarkThemePreferred(isDark);
 					}
 				});
-				display.getActiveShell().getParent().getShell().getMenuBar().reskinWidget();
-
 			}
 		};
 		// using the IEventBroker explicitly because the @EventTopic annotation
