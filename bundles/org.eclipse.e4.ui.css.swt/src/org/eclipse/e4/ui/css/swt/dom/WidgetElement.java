@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
-import java.util.Objects;
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.dom.ElementAdapter;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
@@ -194,29 +193,21 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 	}
 
 	@Override
-	public final String getAttribute(String attr) {
-		return Objects.toString(internalGetAttribute(attr), "");
-	}
-
-	@Override
-	public final boolean hasAttribute(String attr) {
-		return internalGetAttribute(attr) != null;
-	}
-
-	protected String internalGetAttribute(String attr) {
+	public String getAttribute(String attr) {
 		Widget widget = getWidget();
 		if (attr.equals("style")) {
 			return swtStyles;
 		} else if (attr.equals("class")) {
 			String result = getCSSClass(widget);
-			return result;
+			return result != null ? result : "";
 		} else if ("swt-data-class".equals(attr)) {
 			Object data = widget.getData();
 			if (data == null) {
-				return null;
+				return "";
 			}
 			StringBuilder sb = new StringBuilder();
-			for (Class<?> clazz = data.getClass(); clazz != Object.class; sb.append(' ')) {
+			for (Class<?> clazz = data.getClass(); clazz != Object.class; sb
+					.append(' ')) {
 				sb.append(clazz.getName());
 				clazz = clazz.getSuperclass();
 			}
@@ -227,7 +218,16 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 			return o.toString();
 		}
 
-		return null;
+		// FIXME: Commented out dead code. Filed https://bugs.eclipse.org/415442 to review this part of the code.
+		//		try {
+		//			//o = PropertyUtils.getProperty(widget, attr);
+		//			if (o != null)
+		//				return o.toString();
+		//		} catch (Exception e) {
+		//			// e.printStackTrace();
+		//		}
+
+		return "";
 	}
 
 	@Override
