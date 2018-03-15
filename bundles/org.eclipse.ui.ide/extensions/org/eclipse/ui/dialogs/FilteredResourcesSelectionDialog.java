@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
@@ -83,7 +82,8 @@ import com.ibm.icu.text.Collator;
  *
  * @since 3.3
  */
-public class FilteredResourcesSelectionDialog extends FilteredItemsSelectionDialog {
+public class FilteredResourcesSelectionDialog extends
+		FilteredItemsSelectionDialog {
 
 	private static final String DIALOG_SETTINGS = "org.eclipse.ui.dialogs.FilteredResourcesSelectionDialog"; //$NON-NLS-1$
 
@@ -146,6 +146,7 @@ public class FilteredResourcesSelectionDialog extends FilteredItemsSelectionDial
 		setSelectionHistory(new ResourceSelectionHistory());
 
 		setTitle(IDEWorkbenchMessages.OpenResourceDialog_title);
+		setMessage(IDEWorkbenchMessages.OpenResourceDialog_message);
 
 		/*
 		 * Allow location of paths relative to a searchContainer, which is
@@ -506,25 +507,28 @@ public class FilteredResourcesSelectionDialog extends FilteredItemsSelectionDial
 			throws CoreException {
 		if (itemsFilter instanceof ResourceFilter) {
 			IResource[] members = container.members();
-			SubMonitor subMonitor = SubMonitor.convert(progressMonitor,
-					WorkbenchMessages.FilteredItemsSelectionDialog_searchJob_taskName,
-					members.length);
+			progressMonitor
+					.beginTask(
+							WorkbenchMessages.FilteredItemsSelectionDialog_searchJob_taskName,
+							members.length);
 
 			ResourceProxyVisitor visitor = new ResourceProxyVisitor(
 					contentProvider, (ResourceFilter) itemsFilter,
-					subMonitor.split(0));
+					progressMonitor);
 
 			if (visitor.visit(container.createProxy())) {
 				for (int i= 0; i < members.length; i++) {
 					IResource member = members[i];
-					if (member.isAccessible()) {
+					if (member.isAccessible())
 						member.accept(visitor, IResource.NONE);
-					}
-					subMonitor.step(1);
+					progressMonitor.worked(1);
+					if (progressMonitor.isCanceled())
+						break;
 				}
 			}
 
 		}
+		progressMonitor.done();
 	}
 
 	/**
