@@ -227,8 +227,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 			Control[] children = composite.getChildren();
 			if (children.length > 0) {
 				result = new Point(0, 0);
-				for (Control element : children) {
-					Point cp = element.computeSize(wHint, hHint, force);
+				for (int i = 0; i < children.length; i++) {
+					Point cp = children[i].computeSize(wHint, hHint, force);
 					result.x = Math.max(result.x, cp.x);
 					result.y = Math.max(result.y, cp.y);
 				}
@@ -270,8 +270,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		public void layout(Composite composite, boolean force) {
 			Rectangle rect = getClientArea(composite);
 			Control[] children = composite.getChildren();
-			for (Control element : children) {
-				element.setBounds(rect);
+			for (int i = 0; i < children.length; i++) {
+				children[i].setBounds(rect);
 			}
 		}
 
@@ -696,7 +696,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		wizard.createPageControls(pageContainer);
 		// Ensure that all of the created pages are initially not visible
 		IWizardPage[] pages = wizard.getPages();
-		for (IWizardPage page : pages) {
+		for (int i = 0; i < pages.length; i++) {
+			IWizardPage page = pages[i];
 			if (page.getControl() != null) {
 				page.getControl().setVisible(false);
 			}
@@ -1065,8 +1066,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 */
 	private void setDisplayCursor(Cursor c) {
 		Shell[] shells = getShell().getDisplay().getShells();
-		for (Shell shell2 : shells) {
-			shell2.setCursor(c);
+		for (int i = 0; i < shells.length; i++) {
+			shells[i].setCursor(c);
 		}
 	}
 
@@ -1409,9 +1410,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	private void updateSizeForWizard(IWizard sizingWizard) {
 		Point delta = new Point(0, 0);
 		IWizardPage[] pages = sizingWizard.getPages();
-		for (IWizardPage page : pages) {
+		for (int i = 0; i < pages.length; i++) {
 			// ensure the page container is large enough
-			Point pageDelta = calculatePageSizeDelta(page);
+			Point pageDelta = calculatePageSizeDelta(pages[i]);
 			delta.x = Math.max(delta.x, pageDelta.x);
 			delta.y = Math.max(delta.y, pageDelta.y);
 		}

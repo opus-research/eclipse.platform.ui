@@ -261,8 +261,8 @@ public final class ExternalActionManager {
 								.getManager(), IAction.TEXT, null, null);
 						if (value instanceof ListenerList) {
 							Object[] listeners= ((ListenerList) value).getListeners();
-							for (Object listener2 : listeners) {
-								final IPropertyChangeListener listener = (IPropertyChangeListener) listener2;
+							for (int i = 0; i < listeners.length; i++) {
+								final IPropertyChangeListener listener = (IPropertyChangeListener) listeners[i];
 								listener.propertyChange(propertyChangeEvent);
 							}
 						} else {
