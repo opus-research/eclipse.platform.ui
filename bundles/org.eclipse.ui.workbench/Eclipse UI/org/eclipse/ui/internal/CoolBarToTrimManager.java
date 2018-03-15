@@ -287,9 +287,6 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 
 	@Override
 	public void dispose() {
-		workbenchTrimElements.stream().filter(e -> e instanceof MToolBar).map(e -> (MToolBar) e)
-				.forEach(e -> renderer.clearModelToManager(e, null));
-
 		ArrayList<MToolBarElement> toRemove = new ArrayList<>();
 		for (MTrimElement child : topTrim.getChildren()) {
 			if (child instanceof MToolBar) {
@@ -305,6 +302,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				}
 			}
 		}
+
 	}
 
 	@Override

@@ -891,13 +891,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			IContributionItem ici = getContribution(element);
 			clearModelToContribution(element, ici);
 		}
-		MenuManager remove = modelToManager.remove(model);
-		if (manager == null) {
-			managerToModel.remove(remove);
-		} else {
-			managerToModel.remove(manager);
-		}
-
+		modelToManager.remove(model);
+		managerToModel.remove(manager);
 		if (Policy.DEBUG_RENDERER) {
 			logger.debug("\nMMR:clearModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
@@ -1151,9 +1146,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 				ici = getManager(menuElement);
 				clearModelToManager(menuElement, (MenuManager) ici);
 			} else {
-				// Bug 518036: the call below removes too much.
-				// clearModelToContribution(menuModel, ici);
-				contributionToModel.remove(ici);
+				clearModelToContribution(menuModel, ici);
 			}
 			menuManager.remove(ici);
 			clearModelToContribution(mMenuElement, ici);

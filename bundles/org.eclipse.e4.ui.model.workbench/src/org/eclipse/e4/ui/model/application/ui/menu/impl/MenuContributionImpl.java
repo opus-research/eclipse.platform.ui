@@ -239,7 +239,7 @@ public class MenuContributionImpl extends ElementContainerImpl<MMenuElement> imp
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (positionInParent: "); //$NON-NLS-1$
 		result.append(positionInParent);
 		result.append(", parentId: "); //$NON-NLS-1$
