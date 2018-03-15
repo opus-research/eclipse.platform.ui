@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 411639, 372799, 466230
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 473063
- *     Axel Richard <axel.richard@obeo.fr> - Bug 486644
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -110,7 +109,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IAutoSaveableEditorPart;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorLauncher;
@@ -387,7 +385,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 				ViewReference viewReference = getViewReference(part);
 				if (viewReference != null) {
-					E4PartWrapper legacyPart = E4PartWrapper.getE4PartWrapper(part);
+					E4PartWrapper legacyPart = new E4PartWrapper(part);
 					try {
 						viewReference.initialize(legacyPart);
 					} catch (PartInitException e) {
@@ -3620,23 +3618,14 @@ public class WorkbenchPage implements IWorkbenchPage {
 	public IWorkbenchPart[] getDirtyWorkbenchParts() {
 		List<IWorkbenchPart> result = new ArrayList<>(3);
 		IWorkbenchPartReference[] allParts = getSortedParts(true, true, true);
-		boolean autoSave = WorkbenchPlugin.getDefault().getPreferenceStore()
-				.getBoolean(IPreferenceConstants.SAVE_AUTOMATICALLY);
 		for (int i = 0; i < allParts.length; i++) {
 			IWorkbenchPartReference reference = allParts[i];
 
 			IWorkbenchPart part = reference.getPart(false);
-			if (autoSave && part instanceof IAutoSaveableEditorPart) {
-				if (((IAutoSaveableEditorPart) part).isDirty()
-						&& ((IAutoSaveableEditorPart) part).getAutoSavePolicy()) {
+			ISaveablePart saveable = SaveableHelper.getSaveable(part);
+			if (saveable != null) {
+				if (saveable.isDirty()) {
 					result.add(part);
-				}
-			} else {
-				ISaveablePart saveable = SaveableHelper.getSaveable(part);
-				if (saveable != null) {
-					if (saveable.isDirty()) {
-						result.add(part);
-					}
 				}
 			}
 		}
@@ -4961,33 +4950,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 				});
 			}
 		}
-		else if (client != null) {
-			if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-				IWorkbenchPart workbenchPart = (IWorkbenchPart) part.getTransientData()
-						.get(E4PartWrapper.E4_WRAPPER_KEY);
-				final IWorkbenchPartReference partReference = getReference(workbenchPart);
-
-				if (partReference != null) {
-					for (final Object listener : partListenerList.getListeners()) {
-						SafeRunner.run(new SafeRunnable() {
-							@Override
-							public void run() throws Exception {
-								((IPartListener) listener).partActivated(workbenchPart);
-							}
-						});
-					}
-
-					for (final Object listener : partListener2List.getListeners()) {
-						SafeRunner.run(new SafeRunnable() {
-							@Override
-							public void run() throws Exception {
-								((IPartListener2) listener).partActivated(partReference);
-							}
-						});
-					}
-				}
-			}
-		}
 	}
 
 	private void firePartDeactivated(MPart part) {
@@ -5012,32 +4974,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 						((IPartListener2) listener).partDeactivated(partReference);
 					}
 				});
-			}
-		} else if (client != null) {
-			if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-				IWorkbenchPart workbenchPart = (IWorkbenchPart) part.getTransientData()
-						.get(E4PartWrapper.E4_WRAPPER_KEY);
-				final IWorkbenchPartReference partReference = getReference(workbenchPart);
-
-				if (partReference != null) {
-					for (final Object listener : partListenerList.getListeners()) {
-						SafeRunner.run(new SafeRunnable() {
-							@Override
-							public void run() throws Exception {
-								((IPartListener) listener).partDeactivated(workbenchPart);
-							}
-						});
-					}
-
-					for (final Object listener : partListener2List.getListeners()) {
-						SafeRunner.run(new SafeRunnable() {
-							@Override
-							public void run() throws Exception {
-								((IPartListener2) listener).partDeactivated(partReference);
-							}
-						});
-					}
-				}
 			}
 		}
 	}
