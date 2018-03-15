@@ -602,6 +602,8 @@ public class WorkbenchMessages extends NLS {
 	public static String CheckedTreeSelectionDialog_select_all;
 	public static String CheckedTreeSelectionDialog_deselect_all;
 
+	public static String PreferencesDialog_okButton_label;
+
 	// ==============================================================================
 	// Editor Framework
 	// ==============================================================================

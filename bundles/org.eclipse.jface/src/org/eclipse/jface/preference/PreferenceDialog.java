@@ -277,6 +277,17 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		setSelectedNodePreference(null);
 	}
 
+	/**
+	 * Sets the ok Button for the preference dialog.
+	 *
+	 * @param okButton
+	 *            the ok button
+	 * @since 3.13
+	 */
+	public void setOkButton(Button okButton) {
+		this.okButton = okButton;
+	}
+
 	@Override
 	public boolean close() {
 
@@ -1480,5 +1491,4 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	protected boolean isResizable() {
     	return true;
     }
-
 }
