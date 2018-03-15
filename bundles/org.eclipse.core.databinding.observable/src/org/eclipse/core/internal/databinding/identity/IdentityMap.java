@@ -370,13 +370,13 @@ public class IdentityMap<K, V> implements Map<K, V> {
 				boolean changed = false;
 				Object[] toRetain = c.toArray();
 				outer: for (Object element : this) {
-for (int i = 0; i < toRetain.length; i++)
-				if (element == toRetain[i])
-					continue outer;
-// element not contained in collection, remove.
-remove(element);
-changed = true;
-}
+					for (int i = 0; i < toRetain.length; i++)
+						if (element == toRetain[i])
+							continue outer;
+					// element not contained in collection, remove.
+					remove(element);
+					changed = true;
+				}
 				return changed;
 			}
 
