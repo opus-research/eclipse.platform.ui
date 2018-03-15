@@ -769,7 +769,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ProjectLocationSelectionDialog_locationIsSelf;
 	public static String ProjectLocationSelectionDialog_selectionTitle;
 	public static String ProjectLocationSelectionDialog_useDefaultLabel;
-	public static String ProjectLocationSelectionDialog_copyButtonLabel;
 
 	public static String ResourceSelectionDialog_title;
 	public static String ResourceSelectionDialog_message;

@@ -74,7 +74,6 @@ public abstract class AbstractPropertySection
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#createControls(org.eclipse.swt.widgets.Composite,
 	 *      org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
 	 */
-	@Override
 	public void createControls(Composite parent,
 			TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		this.tabbedPropertySheetPage = aTabbedPropertySheetPage;
@@ -84,7 +83,6 @@ public abstract class AbstractPropertySection
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#setInput(org.eclipse.ui.IWorkbenchPart,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
-	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection) {
 		this.selection = selection;
 		this.part = part;
@@ -93,7 +91,6 @@ public abstract class AbstractPropertySection
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#aboutToBeShown()
 	 */
-	@Override
 	public void aboutToBeShown() {
 		/* empty default implementation */
 	}
@@ -101,7 +98,6 @@ public abstract class AbstractPropertySection
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#aboutToBeHidden()
 	 */
-	@Override
 	public void aboutToBeHidden() {
 		/* empty default implementation */
 	}
@@ -109,7 +105,6 @@ public abstract class AbstractPropertySection
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#dispose()
 	 */
-	@Override
 	public void dispose() {
 		/* empty default implementation */
 	}
@@ -117,7 +112,6 @@ public abstract class AbstractPropertySection
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#getMinimumHeight()
 	 */
-	@Override
 	public int getMinimumHeight() {
 		return SWT.DEFAULT;
 	}
@@ -125,7 +119,6 @@ public abstract class AbstractPropertySection
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#shouldUseExtraSpace()
 	 */
-	@Override
 	public boolean shouldUseExtraSpace() {
 		return false;
 	}
@@ -133,7 +126,6 @@ public abstract class AbstractPropertySection
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#refresh()
 	 */
-	@Override
 	public void refresh() {
 		/* empty default implementation */
 	}
