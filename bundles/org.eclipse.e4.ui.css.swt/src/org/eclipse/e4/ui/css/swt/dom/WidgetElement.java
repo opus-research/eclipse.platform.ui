@@ -11,6 +11,7 @@
 package org.eclipse.e4.ui.css.swt.dom;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.dom.ElementAdapter;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
@@ -195,7 +196,8 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	@Override
 	public final String getAttribute(String attr) {
-		return Objects.toString(internalGetAttribute(attr), "");
+		Supplier<String> attribute = internalGetAttribute(attr);
+		return attribute != null ? attribute.get() : "";
 	}
 
 	@Override
@@ -203,28 +205,29 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		return internalGetAttribute(attr) != null;
 	}
 
-	protected String internalGetAttribute(String attr) {
+	protected Supplier<String> internalGetAttribute(String attr) {
 		Widget widget = getWidget();
 		if (attr.equals("style")) {
-			return swtStyles;
+			return () -> swtStyles;
 		} else if (attr.equals("class")) {
-			String result = getCSSClass(widget);
-			return result;
+			return () -> Objects.toString(getCSSClass(widget), "");
 		} else if ("swt-data-class".equals(attr)) {
-			Object data = widget.getData();
-			if (data == null) {
-				return null;
-			}
-			StringBuilder sb = new StringBuilder();
-			for (Class<?> clazz = data.getClass(); clazz != Object.class; sb.append(' ')) {
-				sb.append(clazz.getName());
-				clazz = clazz.getSuperclass();
-			}
-			return sb.toString();
+			return () -> {
+				Object data = widget.getData();
+				if (data == null) {
+					return "";
+				}
+				StringBuilder sb = new StringBuilder();
+				for (Class<?> clazz = data.getClass(); clazz != Object.class; sb.append(' ')) {
+					sb.append(clazz.getName());
+					clazz = clazz.getSuperclass();
+				}
+				return sb.toString();
+			};
 		}
 		Object o = widget.getData(attr.toLowerCase());
 		if (o != null) {
-			return o.toString();
+			return () -> o.toString();
 		}
 
 		return null;
