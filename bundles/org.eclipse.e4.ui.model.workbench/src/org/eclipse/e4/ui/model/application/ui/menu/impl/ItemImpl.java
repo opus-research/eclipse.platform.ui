@@ -521,7 +521,7 @@ public abstract class ItemImpl extends UIElementImpl implements MItem {
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (label: "); //$NON-NLS-1$
 		result.append(label);
 		result.append(", iconURI: "); //$NON-NLS-1$
