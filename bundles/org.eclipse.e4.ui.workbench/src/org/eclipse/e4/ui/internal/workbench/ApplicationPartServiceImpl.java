@@ -8,10 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 395825
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 486876
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
 import java.util.Collection;
+import java.util.Optional;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -69,8 +71,8 @@ public class ApplicationPartServiceImpl implements EPartService {
 	}
 
 	@Override
-	public void switchPerspective(String perspectiveId) {
-		getActiveWindowService().switchPerspective(perspectiveId);
+	public Optional<MPerspective> switchPerspective(String perspectiveId) {
+		return getActiveWindowService().switchPerspective(perspectiveId);
 	}
 
 	@Override
