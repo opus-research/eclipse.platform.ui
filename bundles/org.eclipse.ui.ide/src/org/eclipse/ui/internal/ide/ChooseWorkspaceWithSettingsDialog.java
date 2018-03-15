@@ -11,9 +11,6 @@
 
 package org.eclipse.ui.internal.ide;
 
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,13 +27,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -80,7 +74,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 	private static final String ATT_ID = "id"; //$NON-NLS-1$
 	private static final String ATT_HELP_CONTEXT = "helpContext"; //$NON-NLS-1$
 
-	private Collection<IConfigurationElement> selectedSettings = new HashSet<>();
+	private Collection selectedSettings = new HashSet();
 
 	/**
 	 * Open a new instance of the receiver.
@@ -191,15 +185,6 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 			final Button button = toolkit.createButton(sectionClient,
 					settingsTransfer.getAttribute(ATT_NAME), SWT.CHECK);
 
-			ControlDecoration deco = new ControlDecoration(button, SWT.TOP | SWT.RIGHT);
-			Image image = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_WARNING)
-					.getImage();
-			deco.setDescriptionText(IDEWorkbenchMessages.CleanDialog_copySettingsDecoLabel);
-			deco.setImage(image);
-
-			toggleDecoForSettingsImportButtons(button, deco);
-			getCombo().addModifyListener(e -> toggleDecoForSettingsImportButtons(button, deco));
-
 			String helpId = settingsTransfer.getAttribute(ATT_HELP_CONTEXT);
 
 			if (helpId != null)
@@ -222,12 +207,10 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					if (button.getSelection()) {
+					if (button.getSelection())
 						selectedSettings.add(settingsTransfer);
-					} else {
+					else
 						selectedSettings.remove(settingsTransfer);
-					}
-					toggleDecoForSettingsImportButtons(button, deco);
 				}
 			});
 
@@ -235,18 +218,6 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 		return enabledSettings != null && enabledSettings.length > 0;
 	}
 
-	private void toggleDecoForSettingsImportButtons(Button button, ControlDecoration deco) {
-		if (!button.getSelection()) {
-			deco.hide();
-			return;
-		}
-
-		if (Files.exists(Paths.get(getWorkspaceLocation()), LinkOption.NOFOLLOW_LINKS)) {
-			deco.show();
-		} else {
-			deco.hide();
-		}
-	}
 	/**
 	 * Get the settings for the receiver based on the entries in section.
 	 *
@@ -264,7 +235,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	@Override
 	protected void okPressed() {
-		Iterator<IConfigurationElement> settingsIterator = selectedSettings.iterator();
+		Iterator settingsIterator = selectedSettings.iterator();
 		MultiStatus result = new MultiStatus(
 				PlatformUI.PLUGIN_ID,
 				IStatus.OK,
@@ -276,7 +247,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 		int index = 0;
 
 		while (settingsIterator.hasNext()) {
-			IConfigurationElement elem = settingsIterator
+			IConfigurationElement elem = (IConfigurationElement) settingsIterator
 					.next();
 			result.add(transferSettings(elem, path));
 			selectionIDs[index] = elem.getAttribute(ATT_ID);
@@ -363,4 +334,5 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 	protected int getDialogBoundsStrategy() {
 		return DIALOG_PERSISTLOCATION;
 	}
+
 }

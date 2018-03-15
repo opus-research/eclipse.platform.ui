@@ -554,7 +554,4 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         return section;
 	}
 
-	public Combo getCombo() {
-		return text;
-	}
 }
