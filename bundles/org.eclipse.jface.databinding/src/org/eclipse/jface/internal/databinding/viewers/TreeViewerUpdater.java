@@ -12,13 +12,11 @@
 
 package org.eclipse.jface.internal.databinding.viewers;
 
-import java.util.Objects;
-
+import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
 /**
@@ -78,50 +76,9 @@ public class TreeViewerUpdater {
 			treeViewer.replace(parent, position, newElement);
 			treeViewer.refresh(newElement);
 		} else {
-			ITreeSelection selection = viewer.getStructuredSelection();
-
 			remove(parent, oldElement, position);
 			insert(parent, newElement, position);
-
-			// don't call selectionContains(...) here, because we have to
-			// iterate all selected paths anyway.
-			replaceElementInSelection(getPathParent(parent), oldElement, newElement, selection);
 		}
-	}
-
-	/**
-	 * In the TreePath, the viewers input (root) appears as null.
-	 */
-	private Object getPathParent(Object parent) {
-		return parent == viewer.getInput() ? null : parent;
-	}
-
-	/**
-	 * TODO: if the oldElement was expanded and no child element selected, the
-	 * newElement will appear collapsed, but selected
-	 */
-	private void replaceElementInSelection(final Object parent, final Object oldElement, final Object newElement,
-			final ITreeSelection selection) {
-		IElementComparer comparer = viewer.getComparer();
-		TreePath[] paths = selection.getPaths();
-		for (int i = 0; i < paths.length; i++) {
-			TreePath path = paths[i];
-			Object[] segments = new Object[path.getSegmentCount()];
-			boolean replacePath = false;
-			for (int j = 0; j < path.getSegmentCount(); j++) {
-				segments[j] = path.getSegment(j);
-				Object pathParent = j > 0 ? path.getSegment(j - 1) : null;
-				Object pathElement = path.getSegment(j);
-				if (!replacePath && eq(comparer, parent, pathParent) && eq(comparer, oldElement, pathElement)) {
-					segments[j] = newElement;
-					replacePath = true;
-				}
-			}
-			if (replacePath) {
-				paths[i] = new TreePath(segments);
-			}
-		}
-		viewer.setSelection(new TreeSelection(paths, viewer.getComparer()));
 	}
 
 	boolean isElementOrderPreserved() {
@@ -154,7 +111,7 @@ public class TreeViewerUpdater {
 
 			// If the moved element is selected (or is an ancestor of a selected
 			// element), restore the selection.
-			if (selectionContains(selection, getPathParent(parent), element))
+			if (selectionContains(selection, parent, element))
 				viewer.setSelection(selection);
 		}
 	}
@@ -164,7 +121,8 @@ public class TreeViewerUpdater {
 		if (!selection.isEmpty()) {
 			IElementComparer comparer = viewer.getComparer();
 			TreePath[] paths = selection.getPaths();
-			for (TreePath path : paths) {
+			for (int i = 0; i < paths.length; i++) {
+				TreePath path = paths[i];
 				for (int j = 0; j < path.getSegmentCount() - 1; j++) {
 					Object pathParent = path.getSegment(j);
 					Object pathElement = path.getSegment(j + 1);
@@ -179,7 +137,7 @@ public class TreeViewerUpdater {
 	}
 
 	private boolean eq(IElementComparer comparer, Object o1, Object o2) {
-		return comparer == null ? Objects.equals(o1, o2) : comparer.equals(o1, o2);
+		return comparer == null ? Util.equals(o1, o2) : comparer.equals(o1, o2);
 	}
 
 	/**

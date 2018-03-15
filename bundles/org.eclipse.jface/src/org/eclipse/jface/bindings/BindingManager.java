@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -147,7 +146,7 @@ public final class BindingManager extends HandleObjectManager implements
 		}
 
 		final List<String> strings = new ArrayList<>();
-		final StringBuilder stringBuffer = new StringBuilder();
+		final StringBuffer stringBuffer = new StringBuffer();
 		string = string.trim(); // remove whitespace
 		if (string.length() > 0) {
 			final StringTokenizer stringTokenizer = new StringTokenizer(string,
@@ -551,7 +550,7 @@ public final class BindingManager extends HandleObjectManager implements
 			found = false;
 			if (activeSchemeIds != null) {
 				for (String activeSchemeId : activeSchemeIds) {
-					if (Objects.equals(schemeId, activeSchemeId)) {
+					if (Util.equals(schemeId, activeSchemeId)) {
 						found = true;
 						break;
 					}
@@ -1301,7 +1300,7 @@ public final class BindingManager extends HandleObjectManager implements
 			if ((bestLocale == null) && (currentLocale != null)) {
 				bestBinding = currentBinding;
 			}
-			if (!(Objects.equals(bestLocale, currentLocale))) {
+			if (!(Util.equals(bestLocale, currentLocale))) {
 				continue;
 			}
 
@@ -1314,7 +1313,7 @@ public final class BindingManager extends HandleObjectManager implements
 			if ((bestPlatform == null) && (currentPlatform != null)) {
 				bestBinding = currentBinding;
 			}
-			if (!(Objects.equals(bestPlatform, currentPlatform))) {
+			if (!(Util.equals(bestPlatform, currentPlatform))) {
 				continue;
 			}
 
@@ -1649,7 +1648,7 @@ public final class BindingManager extends HandleObjectManager implements
 		}
 
 		for (String localString : locales) {
-			if (Objects.equals(localString, locale)) {
+			if (Util.equals(localString, locale)) {
 				matches = true;
 				break;
 			}
@@ -1682,7 +1681,7 @@ public final class BindingManager extends HandleObjectManager implements
 		}
 
 		for (String platformString : platforms) {
-			if (Objects.equals(platformString, platform)) {
+			if (Util.equals(platformString, platform)) {
 				matches = true;
 				break;
 			}
@@ -1862,11 +1861,11 @@ public final class BindingManager extends HandleObjectManager implements
 		for (int i = 0; i < bindingCount; i++) {
 			final Binding binding = bindings[i];
 			boolean equals = true;
-			equals &= Objects.equals(sequence, binding.getTriggerSequence());
-			equals &= Objects.equals(schemeId, binding.getSchemeId());
-			equals &= Objects.equals(contextId, binding.getContextId());
-			equals &= Objects.equals(locale, binding.getLocale());
-			equals &= Objects.equals(platform, binding.getPlatform());
+			equals &= Util.equals(sequence, binding.getTriggerSequence());
+			equals &= Util.equals(schemeId, binding.getSchemeId());
+			equals &= Util.equals(contextId, binding.getContextId());
+			equals &= Util.equals(locale, binding.getLocale());
+			equals &= Util.equals(platform, binding.getPlatform());
 			equals &= (type == binding.getType());
 			if (equals) {
 				bindingsChanged = true;
@@ -2239,7 +2238,7 @@ public final class BindingManager extends HandleObjectManager implements
 							+ scheme.getId());
 		}
 
-		if (Objects.equals(activeScheme, scheme)) {
+		if (Util.equals(activeScheme, scheme)) {
 			return;
 		}
 
@@ -2316,7 +2315,7 @@ public final class BindingManager extends HandleObjectManager implements
 			throw new NullPointerException("The locale cannot be null"); //$NON-NLS-1$
 		}
 
-		if (!Objects.equals(this.locale, locale)) {
+		if (!Util.equals(this.locale, locale)) {
 			this.locale = locale;
 			this.locales = expand(locale, LOCALE_SEPARATOR);
 			clearSolution();
@@ -2347,7 +2346,7 @@ public final class BindingManager extends HandleObjectManager implements
 			throw new NullPointerException("The platform cannot be null"); //$NON-NLS-1$
 		}
 
-		if (!Objects.equals(this.platform, platform)) {
+		if (!Util.equals(this.platform, platform)) {
 			this.platform = platform;
 			this.platforms = expand(platform, Util.ZERO_LENGTH_STRING);
 			clearSolution();

@@ -17,6 +17,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -54,7 +55,6 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.SubContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.bindings.TriggerSequence;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.internal.provisional.action.ToolBarContributionItem2;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -418,8 +418,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		 * states need to change as a result of their ShortcutItems.
 		 */
 		public void update() {
-			for (ShortcutItem shortcutItem : contributionItems) {
-				DisplayItem item = shortcutItem;
+			for (Iterator<ShortcutItem> i = contributionItems.iterator(); i.hasNext();) {
+				DisplayItem item = i.next();
 				if (item.getState()) {
 					this.setCheckState(true);
 					return;
@@ -543,16 +543,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		shell.setText(title);
 		window.getWorkbench().getHelpSystem().setHelp(shell,
 				IWorkbenchHelpContextIds.ACTION_SET_SELECTION_DIALOG);
-	}
-
-	@Override
-	protected void createButtonsForButtonBar(Composite parent) {
-
-		Button okButton = createButton(parent, IDialogConstants.OK_ID,
-				WorkbenchMessages.CustomizePerspectiveDialog_okButtonLabel, true);
-		okButton.setFocus();
-
-		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
 	@Override
@@ -1503,8 +1493,9 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			category.addShortcutItem(item);
 		}
 		// @issue should not pass in null
-		for (IWizardCategory child : element.getCategories()) {
-			initializeNewWizardsMenu(menu, category, child, activeIds);
+		IWizardCategory[] children = element.getCategories();
+		for (IWizardCategory element2 : children) {
+			initializeNewWizardsMenu(menu, category, element2, activeIds);
 		}
 	}
 

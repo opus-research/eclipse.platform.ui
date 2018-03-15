@@ -504,7 +504,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 				}
 			} catch (final CoreException e) {
 				// We will just fall through an let it return false.
-				final StringBuilder message = new StringBuilder(
+				final StringBuffer message = new StringBuffer(
 						"An exception occurred while evaluating the enabledWhen expression for "); //$NON-NLS-1$
 				if (delegate != null) {
 					message.append(delegate);
@@ -694,7 +694,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 
 	@Override
 	public final String toString() {
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer();
 		buffer.append("ActionDelegateHandlerProxy("); //$NON-NLS-1$
 		buffer.append(getDelegate());
 		if (element != null) {

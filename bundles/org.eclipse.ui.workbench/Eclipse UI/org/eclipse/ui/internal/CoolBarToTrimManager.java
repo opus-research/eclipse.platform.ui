@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2017 IBM Corporation and others.
+ * Copyright (c) 2011, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457237, 472654
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 420956, 457198, 395601, 445538
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 409633
- *     Kaloyan Raev <kaloyan.r@zend.com> - Bug 322002
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -227,9 +225,6 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		if (IWorkbenchActionConstants.TOOLBAR_FILE.equalsIgnoreCase(elementId)) {
 			return WorkbenchMessages.WorkbenchWindow_FileToolbar;
 		}
-		if (IWorkbenchActionConstants.TOOLBAR_EDIT.equalsIgnoreCase(elementId)) {
-			return WorkbenchMessages.WorkbenchWindow_EditToolbar;
-		}
 		if (IWorkbenchActionConstants.TOOLBAR_NAVIGATE.equalsIgnoreCase(elementId)) {
 			return WorkbenchMessages.WorkbenchWindow_NavigateToolbar;
 		}
@@ -291,9 +286,6 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 
 	@Override
 	public void dispose() {
-		workbenchTrimElements.stream().filter(e -> e instanceof MToolBar).map(e -> (MToolBar) e)
-				.forEach(e -> renderer.clearModelToManager(e, null));
-
 		ArrayList<MToolBarElement> toRemove = new ArrayList<>();
 		for (MTrimElement child : topTrim.getChildren()) {
 			if (child instanceof MToolBar) {
@@ -309,6 +301,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				}
 			}
 		}
+
 	}
 
 	@Override
@@ -532,7 +525,6 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 
 	@Override
 	public void setLockLayout(boolean value) {
-		// 409633 Not implemented, see LockToolBarHandler
 	}
 
 	@Override

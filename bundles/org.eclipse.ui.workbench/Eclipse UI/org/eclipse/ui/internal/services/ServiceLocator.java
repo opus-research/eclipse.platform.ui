@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,10 +45,11 @@ public final class ServiceLocator implements IDisposable, INestable,
 			key = serviceInterface;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public <T> T getService(Class<T> api) {
 			if (key.equals(api)) {
-				return api.cast(locator.getService(key));
+				return (T) locator.getService(key);
 			}
 			return null;
 		}
@@ -195,6 +196,7 @@ public final class ServiceLocator implements IDisposable, INestable,
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public final <T> T getService(final Class<T> key) {
 		IEclipseContext context = e4Context;
@@ -202,7 +204,7 @@ public final class ServiceLocator implements IDisposable, INestable,
 			return null;
 		}
 		if (IEclipseContext.class.equals(key)) {
-			return key.cast(context);
+			return (T) context;
 		}
 
 		Object service = context.get(key.getName());
@@ -238,7 +240,7 @@ public final class ServiceLocator implements IDisposable, INestable,
 				registerService(key, service, true);
 			}
 		}
-		return key.cast(service);
+		return (T) service;
 	}
 
 	@Override

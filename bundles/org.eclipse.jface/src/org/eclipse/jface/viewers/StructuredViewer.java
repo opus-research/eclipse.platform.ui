@@ -14,8 +14,6 @@
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -37,6 +35,7 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -1258,7 +1257,12 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 				handleDoubleSelect(e);
 			}
 		});
-		handler.addPostSelectionListener(widgetSelectedAdapter(e -> handlePostSelect(e)));
+		handler.addPostSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				handlePostSelect(e);
+			}
+		});
 		handler.addOpenListener(StructuredViewer.this::handleOpen);
 	}
 
@@ -1621,7 +1625,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			resetFilters();
 		} else {
 			this.filters = new ArrayList<>(Arrays.asList(filters));
-			refresh(false);
+			refresh();
 		}
 	}
 
@@ -1632,7 +1636,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	public void resetFilters() {
 		if (filters != null) {
 			filters = null;
-			refresh(false);
+			refresh();
 		}
 	}
 

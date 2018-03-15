@@ -71,7 +71,11 @@ class GroupInfo extends JobTreeElement implements IProgressMonitor {
 
 	@Override
 	public void beginTask(String name, int totalWork) {
-		taskName = name != null && !name.isEmpty() ? name : ProgressMessages.SubTaskInfo_UndefinedTaskName;
+		if (name == null) {
+			name = ProgressMessages.SubTaskInfo_UndefinedTaskName;
+		} else {
+			taskName = name;
+		}
 		total = totalWork;
 		synchronized (lock) {
 			isActive = true;
@@ -178,8 +182,9 @@ class GroupInfo extends JobTreeElement implements IProgressMonitor {
 
 	@Override
 	public void cancel() {
-		for (Object jobInfo : getChildren()) {
-			((JobInfo) jobInfo).cancel();
+		Object[] jobInfos = getChildren();
+		for (int i = 0; i < jobInfos.length; i++) {
+			((JobInfo) jobInfos[i]).cancel();
 		}
 		// Call the refresh so that this is updated immediately
 		updateInProgressManager();

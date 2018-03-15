@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2017 Ovidio Mallo and others.
+ * Copyright (c) 2010, 2015 Ovidio Mallo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,13 +20,17 @@ import java.util.List;
 import java.util.RandomAccess;
 
 import org.eclipse.core.databinding.observable.Diffs;
+import org.eclipse.core.databinding.observable.DisposeEvent;
+import org.eclipse.core.databinding.observable.IDisposeListener;
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.IObserving;
 import org.eclipse.core.databinding.observable.IStaleListener;
 import org.eclipse.core.databinding.observable.ObservableTracker;
+import org.eclipse.core.databinding.observable.StaleEvent;
 import org.eclipse.core.databinding.observable.list.AbstractObservableList;
 import org.eclipse.core.databinding.observable.list.IListChangeListener;
 import org.eclipse.core.databinding.observable.list.IObservableList;
+import org.eclipse.core.databinding.observable.list.ListChangeEvent;
 import org.eclipse.core.databinding.observable.list.ListDiff;
 import org.eclipse.core.databinding.observable.list.ListDiffEntry;
 import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
@@ -62,22 +66,38 @@ public class ListDetailValueObservableList<M, E> extends
 
 	private IdentitySet<IObservable> staleDetailObservables = new IdentitySet<>();
 
-	private IListChangeListener<M> masterListListener = event -> handleMasterListChange(event.diff);
-
-	private IValueChangeListener<E> detailValueListener = event -> {
-		if (!event.getObservable().isStale()) {
-			staleDetailObservables.remove(event.getObservable());
+	private IListChangeListener<M> masterListListener = new IListChangeListener<M>() {
+		@Override
+		public void handleListChange(ListChangeEvent<? extends M> event) {
+			handleMasterListChange(event.diff);
 		}
-		handleDetailValueChange(event);
 	};
 
-	private IStaleListener masterStaleListener = staleEvent -> fireStale();
+	private IValueChangeListener<E> detailValueListener = new IValueChangeListener<E>() {
+		@Override
+		public void handleValueChange(ValueChangeEvent<? extends E> event) {
+			if (!event.getObservable().isStale()) {
+				staleDetailObservables.remove(event.getObservable());
+			}
+			handleDetailValueChange(event);
+		}
+	};
 
-	private IStaleListener detailStaleListener = staleEvent -> {
-		boolean wasStale = isStale();
-		staleDetailObservables.add((staleEvent.getObservable()));
-		if (!wasStale) {
+	private IStaleListener masterStaleListener = new IStaleListener() {
+		@Override
+		public void handleStale(StaleEvent staleEvent) {
 			fireStale();
+		}
+	};
+
+	private IStaleListener detailStaleListener = new IStaleListener() {
+		@Override
+		public void handleStale(StaleEvent staleEvent) {
+			boolean wasStale = isStale();
+			staleDetailObservables.add((staleEvent.getObservable()));
+			if (!wasStale) {
+				fireStale();
+			}
 		}
 	};
 
@@ -99,7 +119,12 @@ public class ListDetailValueObservableList<M, E> extends
 		// Add change/stale/dispose listeners on the master list.
 		masterList.addListChangeListener(masterListListener);
 		masterList.addStaleListener(masterStaleListener);
-		masterList.addDisposeListener(event -> ListDetailValueObservableList.this.dispose());
+		masterList.addDisposeListener(new IDisposeListener() {
+			@Override
+			public void handleDispose(DisposeEvent event) {
+				ListDetailValueObservableList.this.dispose();
+			}
+		});
 
 		List<M> emptyList = Collections.emptyList();
 		ListDiff<M> initMasterDiff = Diffs.computeListDiff(emptyList, masterList);
@@ -138,7 +163,8 @@ public class ListDetailValueObservableList<M, E> extends
 		boolean hasListeners = hasListeners();
 		ListDiffEntry<? extends M>[] masterEntries = masterListDiff.getDifferences();
 		List<ListDiffEntry<E>> detailEntries = new ArrayList<>(masterEntries.length);
-		for (ListDiffEntry<? extends M> masterEntry : masterEntries) {
+		for (int i = 0; i < masterEntries.length; i++) {
+			ListDiffEntry<? extends M> masterEntry = masterEntries[i];
 			int index = masterEntry.getPosition();
 
 			M masterElement = masterEntry.getElement();

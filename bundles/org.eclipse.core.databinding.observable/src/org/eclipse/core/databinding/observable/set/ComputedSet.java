@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2017 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -201,16 +201,16 @@ privateInterface, privateInterface, null);
 			// even if we were already stale before recomputing. This is in case
 			// clients assume that a set change is indicative of non-staleness.
 			stale = false;
-			for (IObservable newDependency : newDependencies) {
-				if (newDependency.isStale()) {
+			for (int i = 0; i < newDependencies.length; i++) {
+				if (newDependencies[i].isStale()) {
 					makeStale();
 					break;
 				}
 			}
 
 			if (!stale) {
-				for (IObservable newDependency : newDependencies) {
-					newDependency.addStaleListener(privateInterface);
+				for (int i = 0; i < newDependencies.length; i++) {
+					newDependencies[i].addStaleListener(privateInterface);
 				}
 			}
 
@@ -271,7 +271,9 @@ privateInterface, privateInterface, null);
 
 	private void stopListening() {
 		if (dependencies != null) {
-			for (IObservable observable : dependencies) {
+			for (int i = 0; i < dependencies.length; i++) {
+				IObservable observable = dependencies[i];
+
 				observable.removeChangeListener(privateInterface);
 				observable.removeStaleListener(privateInterface);
 			}
@@ -324,13 +326,16 @@ privateInterface, privateInterface, null);
 		// they may receive change notifications before the runnable below has
 		// been executed. It is their job to figure out what to do with those
 		// notifications.
-		getRealm().exec(() -> {
-			if (dependencies == null) {
-				// We are not currently listening.
-				// But someone is listening for changes. Call getValue()
-				// to make sure we start listening to the observables we
-				// depend on.
-				getSet();
+		getRealm().exec(new Runnable() {
+			@Override
+			public void run() {
+				if (dependencies == null) {
+					// We are not currently listening.
+					// But someone is listening for changes. Call getValue()
+					// to make sure we start listening to the observables we
+					// depend on.
+					getSet();
+				}
 			}
 		});
 	}

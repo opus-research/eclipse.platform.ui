@@ -94,7 +94,7 @@ public class LegacyEditorActionBarExpression extends Expression {
 
 	@Override
 	public final String toString() {
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer();
 		buffer.append("LegacyEditorActionBarExpression("); //$NON-NLS-1$
 		buffer.append(activeEditorId);
 		buffer.append(')');

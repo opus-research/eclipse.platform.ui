@@ -172,7 +172,7 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 		button = toolkit.createButton(sectionClient, "Radio 2", SWT.RADIO);
 		section.setClient(sectionClient);
 
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		buf.append("<form>");
 		buf.append("<p>");
 		buf.append("Here is some plain text for the text to render; ");

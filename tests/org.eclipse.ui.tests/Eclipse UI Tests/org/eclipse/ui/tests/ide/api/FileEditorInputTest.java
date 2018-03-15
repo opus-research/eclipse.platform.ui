@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,15 +10,18 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.ide.api;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
+
 import org.eclipse.jface.resource.ImageDescriptor;
+
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.part.FileEditorInput;
@@ -41,8 +44,7 @@ public class FileEditorInputTest extends UITestCase {
     /**
      * Regression test for bug 72337 - [IDE] FileEditorInput .equals() not implemented against interface
      */
-	@SuppressWarnings("unlikely-arg-type")
-	public void testBug72337() {
+    public void testBug72337() {
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IPath path = new Path("/foo/bar.txt");
         IFile fileA = workspace.getRoot().getFile(path);
@@ -97,14 +99,13 @@ public class FileEditorInputTest extends UITestCase {
             return file.getFullPath().toString();
         }
 
-		@SuppressWarnings("unchecked")
-		@Override
-		public <T> T getAdapter(Class<T> adapter) {
+        @Override
+		public Object getAdapter(Class adapter) {
             if (adapter == IResource.class) {
-				return (T) file;
+				return file;
 			}
             if (adapter == IFile.class) {
-				return (T) file;
+				return file;
 			}
             return null;
         }

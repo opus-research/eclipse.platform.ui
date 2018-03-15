@@ -21,13 +21,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ISelection;
@@ -467,7 +466,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		removeButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				removeFilters(configsTable.getStructuredSelection());
+				removeFilters(configsTable.getSelection());
 			}
 		});
 		removeButton.setEnabled(false);
@@ -563,14 +562,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		return config;
 	}
 
-	@Override
-	protected void createButtonsForButtonBar(Composite parent) {
-		super.createButtonsForButtonBar(parent);
-		Button okButton = getButton(IDialogConstants.OK_ID);
-		okButton.setText(MarkerMessages.filtersDialog_applyAndCloseButton);
-		setButtonLayoutData(okButton);
-	}
-
 	/**
 	 * Return the dialog settings for the receiver.
 	 *
@@ -617,11 +608,11 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		List<MarkerFieldFilterGroup> selectedElements = new ArrayList<>();
 
 		if (selectedElementNames != null) {
-			for (String selectedElementName : selectedElementNames) {
+			for (int i = 0; i < selectedElementNames.length; i++) {
 				Iterator<MarkerFieldFilterGroup> filterGroupIterator = filterGroups.iterator();
 				while (filterGroupIterator.hasNext()) {
 					MarkerFieldFilterGroup group = filterGroupIterator.next();
-					if (Objects.equals(group.getName(), selectedElementName)) {
+					if (Util.equals(group.getName(), selectedElementNames[i])) {
 						selectedElements.add(group);
 						break;
 					}
@@ -743,8 +734,9 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	private void setEnabled(boolean enabled, Control control) {
 		control.setEnabled(enabled);
 		if (control instanceof Composite) {
-			for (Control child : ((Composite) control).getChildren()) {
-				setEnabled(enabled, child);
+			Control[] children = ((Composite) control).getChildren();
+			for (int i = 0; i < children.length; i++) {
+				setEnabled(enabled, children[i]);
 			}
 		}
 	}

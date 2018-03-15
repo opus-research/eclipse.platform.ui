@@ -115,7 +115,7 @@ public class ThemeRegistryReader extends RegistryReader {
 		}
 
         return new ThemeElementCategory(name, id, parentId, description,
-                element.getNamespace(), element);
+				element.getNamespaceIdentifier(), element);
     }
 
     /**
@@ -162,7 +162,7 @@ public class ThemeRegistryReader extends RegistryReader {
 
         return new ColorDefinition(name, id, defaultMapping, value, categoryId,
                 isEditable, description, element.getDeclaringExtension()
-                        .getNamespace());
+						.getNamespaceIdentifier());
     }
 
     /**
@@ -210,7 +210,8 @@ public class ThemeRegistryReader extends RegistryReader {
         String osname = Platform.getOS();
         String wsname = Platform.getWS();
 
-        for (IConfigurationElement element : elements) {
+        for (int i = 0; i < elements.length; i++) {
+            IConfigurationElement element = elements[i];
             String elementOs = element.getAttribute(IWorkbenchRegistryConstants.ATT_OS);
             String elementWs = element.getAttribute(IWorkbenchRegistryConstants.ATT_WS);
 

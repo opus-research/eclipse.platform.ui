@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,10 +24,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.Diffs;
+import org.eclipse.core.databinding.observable.DisposeEvent;
+import org.eclipse.core.databinding.observable.IDisposeListener;
 import org.eclipse.core.databinding.observable.IStaleListener;
 import org.eclipse.core.databinding.observable.ObservableTracker;
+import org.eclipse.core.databinding.observable.StaleEvent;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.set.ISetChangeListener;
+import org.eclipse.core.databinding.observable.set.SetChangeEvent;
 import org.eclipse.core.internal.databinding.identity.IdentitySet;
 
 /**
@@ -47,34 +51,45 @@ public abstract class ComputedObservableMap<K, V> extends AbstractObservableMap<
 
 	private Object valueType;
 
-	private ISetChangeListener<K> setChangeListener = event -> {
-		Set<K> addedKeys = new HashSet<K>(event.diff.getAdditions());
-		Set<K> removedKeys = new HashSet<K>(event.diff.getRemovals());
-		Map<K, V> oldValues = new HashMap<>();
-		Map<K, V> newValues = new HashMap<>();
-		for (K removedKey : removedKeys) {
-			V oldValue = null;
-			if (removedKey != null) {
-				oldValue = doGet(removedKey);
-				unhookListener(removedKey);
-				knownKeys.remove(removedKey);
+	private ISetChangeListener<K> setChangeListener = new ISetChangeListener<K>() {
+		@Override
+		public void handleSetChange(SetChangeEvent<? extends K> event) {
+			Set<K> addedKeys = new HashSet<K>(event.diff.getAdditions());
+			Set<K> removedKeys = new HashSet<K>(event.diff.getRemovals());
+			Map<K, V> oldValues = new HashMap<>();
+			Map<K, V> newValues = new HashMap<>();
+			for (Iterator<K> it = removedKeys.iterator(); it.hasNext();) {
+				K removedKey = it.next();
+				V oldValue = null;
+				if (removedKey != null) {
+					oldValue = doGet(removedKey);
+					unhookListener(removedKey);
+					knownKeys.remove(removedKey);
+				}
+				oldValues.put(removedKey, oldValue);
 			}
-			oldValues.put(removedKey, oldValue);
-		}
-		for (K addedKey : addedKeys) {
-			V newValue = null;
-			if (addedKey != null) {
-				newValue = doGet(addedKey);
-				hookListener(addedKey);
-				knownKeys.add(addedKey);
+			for (Iterator<K> it = addedKeys.iterator(); it.hasNext();) {
+				K addedKey = it.next();
+				V newValue = null;
+				if (addedKey != null) {
+					newValue = doGet(addedKey);
+					hookListener(addedKey);
+					knownKeys.add(addedKey);
+				}
+				newValues.put(addedKey, newValue);
 			}
-			newValues.put(addedKey, newValue);
+			Set<K> changedKeys = Collections.emptySet();
+			fireMapChange(Diffs.createMapDiff(addedKeys, removedKeys,
+					changedKeys, oldValues, newValues));
 		}
-		Set<K> changedKeys = Collections.emptySet();
-		fireMapChange(Diffs.createMapDiff(addedKeys, removedKeys, changedKeys, oldValues, newValues));
 	};
 
-	private IStaleListener staleListener = staleEvent -> fireStale();
+	private IStaleListener staleListener = new IStaleListener() {
+		@Override
+		public void handleStale(StaleEvent staleEvent) {
+			fireStale();
+		}
+	};
 
 	private Set<Map.Entry<K, V>> entrySet = new EntrySet();
 
@@ -144,7 +159,12 @@ public abstract class ComputedObservableMap<K, V> extends AbstractObservableMap<
 		this.keySet = keySet;
 		this.valueType = valueType;
 
-		keySet.addDisposeListener(disposeEvent -> ComputedObservableMap.this.dispose());
+		keySet.addDisposeListener(new IDisposeListener() {
+			@Override
+			public void handleDispose(DisposeEvent disposeEvent) {
+				ComputedObservableMap.this.dispose();
+			}
+		});
 	}
 
 	/**
@@ -156,7 +176,12 @@ public abstract class ComputedObservableMap<K, V> extends AbstractObservableMap<
 
 	@Override
 	protected void firstListenerAdded() {
-		getRealm().exec(() -> hookListeners());
+		getRealm().exec(new Runnable() {
+			@Override
+			public void run() {
+				hookListeners();
+			}
+		});
 	}
 
 	@Override
@@ -169,7 +194,8 @@ public abstract class ComputedObservableMap<K, V> extends AbstractObservableMap<
 			knownKeys = new IdentitySet<>();
 			keySet.addSetChangeListener(setChangeListener);
 			keySet.addStaleListener(staleListener);
-			for (K key : this.keySet) {
+			for (Iterator<K> it = this.keySet.iterator(); it.hasNext();) {
+				K key = it.next();
 				hookListener(key);
 				knownKeys.add(key);
 			}

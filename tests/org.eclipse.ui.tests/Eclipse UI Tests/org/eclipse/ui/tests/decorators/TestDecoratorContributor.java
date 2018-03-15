@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ public class TestDecoratorContributor implements ILabelDecorator {
 
     public static TestDecoratorContributor contributor;
 
-	private Set<ILabelProviderListener> listeners = new HashSet<>();
+    private Set listeners = new HashSet();
 
     public static String DECORATOR_SUFFIX = "_SUFFIX";
 
@@ -33,6 +33,9 @@ public class TestDecoratorContributor implements ILabelDecorator {
         contributor = this;
     }
 
+    /*
+     * @see ILabelDecorator#decorateText(String, Object)
+     */
     @Override
 	public String decorateText(String text, Object element) {
         //Check that the element is adapted to IResource
@@ -40,28 +43,43 @@ public class TestDecoratorContributor implements ILabelDecorator {
         return text + DECORATOR_SUFFIX;
     }
 
+    /*
+     * @see ILabelDecorator#decorateImage(Image, Object)
+     */
     @Override
 	public Image decorateImage(Image image, Object element) {
         Assert.isTrue(element instanceof IResource);
         return image;
     }
 
+    /*
+     * @see IBaseLabelProvider#addListener(ILabelProviderListener)
+     */
     @Override
 	public void addListener(ILabelProviderListener listener) {
         listeners.add(listener);
     }
 
+    /*
+     * @see IBaseLabelProvider#dispose()
+     */
     @Override
 	public void dispose() {
         contributor = null;
-		listeners = new HashSet<>();
+        listeners = new HashSet();
     }
 
+    /*
+     * @see IBaseLabelProvider#isLabelProperty(Object, String)
+     */
     @Override
 	public boolean isLabelProperty(Object element, String property) {
         return false;
     }
 
+    /*
+     * @see IBaseLabelProvider#removeListener(ILabelProviderListener)
+     */
     @Override
 	public void removeListener(ILabelProviderListener listener) {
         listeners.remove(listener);
@@ -73,11 +91,13 @@ public class TestDecoratorContributor implements ILabelDecorator {
      */
 
     public void refreshListeners(Object element) {
-		Iterator<ILabelProviderListener> iterator = listeners.iterator();
-		while (iterator.hasNext()) {
-			LabelProviderChangedEvent event = new LabelProviderChangedEvent(this, element);
-			iterator.next().labelProviderChanged(event);
-		}
+        Iterator iterator = listeners.iterator();
+        while (iterator.hasNext()) {
+            LabelProviderChangedEvent event = new LabelProviderChangedEvent(
+                    this, element);
+            ((ILabelProviderListener) iterator.next())
+                    .labelProviderChanged(event);
+        }
     }
 
 }

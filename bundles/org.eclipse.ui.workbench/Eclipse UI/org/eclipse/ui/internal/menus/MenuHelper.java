@@ -100,7 +100,7 @@ import org.osgi.framework.FrameworkUtil;
 public class MenuHelper {
 
 	public static void trace(String msg, Throwable error) {
-		WorkbenchSWTActivator.trace(Policy.DEBUG_MENUS_FLAG, msg, error);
+		WorkbenchSWTActivator.trace(Policy.MENUS, msg, error);
 	}
 
 	private static final Pattern SCHEME_PATTERN = Pattern.compile("\\p{Alpha}[\\p{Alnum}+.-]*:.*"); //$NON-NLS-1$
@@ -280,13 +280,8 @@ public class MenuHelper {
 		return (expectedType.isInstance(rawValue)) ? expectedType.cast(rawValue) : null;
 	}
 
-	/**
-	 * Returns id attribute of the element or unique string computed from the
-	 * element registry handle
-	 *
-	 * @param element
-	 *            non null
-	 * @return non null id
+	/*
+	 * Support Utilities
 	 */
 	public static String getId(IConfigurationElement element) {
 		String id = element.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
@@ -298,16 +293,10 @@ public class MenuHelper {
 			id = getCommandId(element);
 		}
 		if (id == null || id.length() == 0) {
-			id = getConfigurationHandleId(element);
+			id = element.toString();
 		}
-		return id;
-	}
 
-	/**
-	 * @return unique string computed from the element registry handle
-	 */
-	private static String getConfigurationHandleId(IConfigurationElement element) {
-		return String.valueOf(element.getHandleId());
+		return id;
 	}
 
 	static String getName(IConfigurationElement element) {
@@ -403,10 +392,8 @@ public class MenuHelper {
 			return ItemType.RADIO;
 		}
 		if (IWorkbenchRegistryConstants.STYLE_PULLDOWN.equals(style)) {
-			if (Policy.DEBUG_MENUS) {
-				trace("Failed to get style for " + IWorkbenchRegistryConstants.STYLE_PULLDOWN, null); //$NON-NLS-1$
-				// return CommandContributionItem.STYLE_PULLDOWN;
-			}
+			trace("Failed to get style for " + IWorkbenchRegistryConstants.STYLE_PULLDOWN, null); //$NON-NLS-1$
+			// return CommandContributionItem.STYLE_PULLDOWN;
 		}
 		return ItemType.PUSH;
 	}
@@ -429,9 +416,9 @@ public class MenuHelper {
 		HashMap<String, String> map = new HashMap<>();
 		IConfigurationElement[] parameters = element
 				.getChildren(IWorkbenchRegistryConstants.TAG_PARAMETER);
-		for (IConfigurationElement parameter : parameters) {
-			String name = parameter.getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
-			String value = parameter.getAttribute(IWorkbenchRegistryConstants.ATT_VALUE);
+		for (int i = 0; i < parameters.length; i++) {
+			String name = parameters[i].getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
+			String value = parameters[i].getAttribute(IWorkbenchRegistryConstants.ATT_VALUE);
 			if (name != null && value != null) {
 				map.put(name, value);
 			}

@@ -688,7 +688,6 @@
             name="%PreferencePages.ContentTypes">
          <keywordReference id="org.eclipse.ui.ide.editing"/>
          <keywordReference id="org.eclipse.ui.ide.encoding"/>
-         <keywordReference id="org.eclipse.ui.ide.editors"/>
       </page>
    </extension>
    <extension
@@ -1201,14 +1200,14 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
       <key
             commandId="org.eclipse.ui.window.fullscreenmode"
-            contextId="org.eclipse.ui.contexts.dialogAndWindow"
+            contextId="org.eclipse.ui.contexts.window"
             platform="win32"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+F11">
       </key>
       <key
             commandId="org.eclipse.ui.window.fullscreenmode"
-            contextId="org.eclipse.ui.contexts.dialogAndWindow"
+            contextId="org.eclipse.ui.contexts.window"
             platform="gtk"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+F11">
@@ -2520,35 +2519,26 @@
               disable "print" button which is defined by org.eclipse.ui.actions.ActionFactory.PRINT
               and contributed by org.eclipse.ui.internal.ide.WorkbenchActionBuilder
          -->
-         <hiddenToolBarItem id="print" />
-         <!--
-              disable "undo" button which is defined by org.eclipse.ui.actions.ActionFactory.UNDO
-              and contributed by org.eclipse.ui.internal.ide.WorkbenchActionBuilder
-         -->
-         <hiddenToolBarItem id="org.eclipse.ui.edit.undo" />
-         <!--
-              disable "redo" button which is defined by org.eclipse.ui.actions.ActionFactory.REDO
-              and contributed by org.eclipse.ui.internal.ide.WorkbenchActionBuilder
-         -->
-         <hiddenToolBarItem id="org.eclipse.ui.edit.redo" />
+         <hiddenToolBarItem id="print">
+         </hiddenToolBarItem>
       </perspectiveExtension>
    </extension>
    <extension
          point="org.eclipse.ui.ide.unassociatedEditorStrategy">
       <strategy
-            class="org.eclipse.ui.internal.ide.registry.SystemEditorOrTextEditorStrategy"
+            class="org.eclipse.ui.internal.ide.SystemEditorOrTextEditorStrategy"
             id="org.eclipse.ui.ide.systemEditorThenTextEditor"
             interactive="false"
             label="%systemEditorThenTextEditor">
       </strategy>
       <strategy
-            class="org.eclipse.ui.internal.ide.registry.TextEditorStrategy"
+            class="org.eclipse.ui.internal.ide.TextEditorStrategy"
             id="org.eclipse.ui.ide.textEditor"
             interactive="false"
             label="%textEditor">
       </strategy>
       <strategy
-            class="org.eclipse.ui.internal.ide.registry.AskUserViaPopupUnassociatedEditorStrategy"
+            class="org.eclipse.ui.internal.ide.AskUserViaPopupUnassociatedEditorStrategy"
             id="org.eclipse.ui.ide.askUserForUnassociatedEditor"
             interactive="true"
             label="%askUserViaPopup">

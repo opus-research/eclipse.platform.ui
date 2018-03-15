@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -352,14 +352,7 @@ public class PropertySheet extends PageBookView
     @Override
 	protected boolean isImportant(IWorkbenchPart part) {
 		// Don't interfere with other property views
-		if (part == null) {
-			return false;
-		}
-    	IWorkbenchPartSite site = part.getSite();
-		if (site == null) {
-			return false;
-		}
-		String partID = site.getId();
+    	String partID = part.getSite().getId();
 		boolean isPropertyView = getSite().getId().equals(partID);
 		return !isPinned() && !isPropertyView && !isViewIgnored(partID);
     }
@@ -560,10 +553,11 @@ public class PropertySheet extends PageBookView
 	 *
 	 * @since 3.2
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	protected <T> T getViewAdapter(Class<T> key) {
 		if (ISaveablePart.class.equals(key)) {
-			return key.cast(getSaveablePart());
+			return (T) getSaveablePart();
 		}
 		return super.getViewAdapter(key);
 	}
@@ -602,12 +596,9 @@ public class PropertySheet extends PageBookView
 		if (!isPinned()
 				&& aContext instanceof PropertyShowInContext) {
 			PropertyShowInContext context = (PropertyShowInContext) aContext;
-			IWorkbenchPart part = context.getPart();
-			if (part != null) {
-				partActivated(part);
-				selectionChanged(part, context.getSelection());
-				return true;
-			}
+			partActivated(context.getPart());
+			selectionChanged(context.getPart(), context.getSelection());
+			return true;
 		}
 		return false;
 	}

@@ -13,7 +13,6 @@ package org.eclipse.jface.bindings;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Objects;
 
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.jface.util.Util;
@@ -217,17 +216,17 @@ public abstract class Binding {
 	 */
 	final boolean deletes(final Binding binding) {
 		boolean deletes = true;
-		deletes &= Objects.equals(getContextId(), binding.getContextId());
-		deletes &= Objects.equals(getTriggerSequence(), binding
+		deletes &= Util.equals(getContextId(), binding.getContextId());
+		deletes &= Util.equals(getTriggerSequence(), binding
 				.getTriggerSequence());
 		if (getLocale() != null) {
-			deletes &= !Objects.equals(getLocale(), binding.getLocale());
+			deletes &= !Util.equals(getLocale(), binding.getLocale());
 		}
 		if (getPlatform() != null) {
-			deletes &= !Objects.equals(getPlatform(), binding.getPlatform());
+			deletes &= !Util.equals(getPlatform(), binding.getPlatform());
 		}
 		deletes &= (binding.getType() == SYSTEM);
-		deletes &= Objects.equals(getParameterizedCommand(), null);
+		deletes &= Util.equals(getParameterizedCommand(), null);
 
 		return deletes;
 	}
@@ -252,23 +251,23 @@ public abstract class Binding {
 		}
 
 		final Binding binding = (Binding) object;
-		if (!Objects.equals(getParameterizedCommand(), binding
+		if (!Util.equals(getParameterizedCommand(), binding
 				.getParameterizedCommand())) {
 			return false;
 		}
-		if (!Objects.equals(getContextId(), binding.getContextId())) {
+		if (!Util.equals(getContextId(), binding.getContextId())) {
 			return false;
 		}
-		if (!Objects.equals(getTriggerSequence(), binding.getTriggerSequence())) {
+		if (!Util.equals(getTriggerSequence(), binding.getTriggerSequence())) {
 			return false;
 		}
-		if (!Objects.equals(getLocale(), binding.getLocale())) {
+		if (!Util.equals(getLocale(), binding.getLocale())) {
 			return false;
 		}
-		if (!Objects.equals(getPlatform(), binding.getPlatform())) {
+		if (!Util.equals(getPlatform(), binding.getPlatform())) {
 			return false;
 		}
-		if (!Objects.equals(getSchemeId(), binding.getSchemeId())) {
+		if (!Util.equals(getSchemeId(), binding.getSchemeId())) {
 			return false;
 		}
 		return (getType() == binding.getType());
