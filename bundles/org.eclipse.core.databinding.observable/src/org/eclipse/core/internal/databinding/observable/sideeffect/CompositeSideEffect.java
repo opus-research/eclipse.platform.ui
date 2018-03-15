@@ -14,8 +14,8 @@ package org.eclipse.core.internal.databinding.observable.sideeffect;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.databinding.observable.ISideEffect;
 import org.eclipse.core.databinding.observable.sideeffect.ICompositeSideEffect;
+import org.eclipse.core.databinding.observable.sideeffect.ISideEffect;
 
 /**
  * Implementation of the ICompositeSideEffect.
@@ -62,7 +62,9 @@ public final class CompositeSideEffect implements ICompositeSideEffect {
 
 	@Override
 	public void add(ISideEffect sideEffect) {
-		sideEffects.add(sideEffect);
+		if (!SideEffect.NULL_SIDE_EFFECT.equals(sideEffect)) {
+			sideEffects.add(sideEffect);
+		}
 	}
 
 	@Override
