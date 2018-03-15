@@ -355,18 +355,6 @@ public class SimplePropertyObservableSet<S, E> extends AbstractObservableSet<E>
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		getterCalled();
-		return getSet().equals(o);
-	}
-
-	@Override
-	public int hashCode() {
-		getterCalled();
-		return getSet().hashCode();
-	}
-
-	@Override
 	public Object getObserved() {
 		return source;
 	}
