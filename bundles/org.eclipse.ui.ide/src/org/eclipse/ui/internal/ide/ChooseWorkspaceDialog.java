@@ -169,20 +169,9 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 			createRecentWorkspacesComposite = true;
 		}
         createWorkspaceBrowseRow(composite);
-
-		Composite checkboxPanel = new Composite(composite, SWT.NONE);
-		checkboxPanel.setFont(parent.getFont());
-		GridLayout layout = new GridLayout(1, false);
-		layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
-		checkboxPanel.setLayout(layout);
-		GridData data = new GridData(GridData.FILL_BOTH);
-		data.verticalAlignment = GridData.END;
-		checkboxPanel.setLayoutData(data);
-
         if (!suppressAskAgain) {
-			createShowDialogButton(checkboxPanel);
+			createShowDialogButton(composite);
 		}
-		createPromptForCopyPreferences(checkboxPanel);
 		if (createRecentWorkspacesComposite) {
 			createRecentWorkspacesComposite(composite);
 		}
@@ -198,26 +187,6 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
-	private void createPromptForCopyPreferences(Composite parent) {
-		Composite panel = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
-		layout.marginWidth = 0;
-		panel.setLayout(layout);
-
-		Button promptUserToCopyPreferencesButton = new Button(panel, SWT.CHECK);
-		promptUserToCopyPreferencesButton
-				.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_promptToImportPreferencesButtonLabel);
-
-		Link link = new Link(panel, SWT.WRAP);
-		link.setText("<a>" + "No workspace selected" + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		link.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				ImportPreferencesDialog copyPreferencesDialog = new ImportPreferencesDialog(getShell(), launchData);
-				copyPreferencesDialog.open();
-			}
-		});
-	}
 	/**
 	 * Returns the title that the dialog (or splash) should have.
 	 *
@@ -326,13 +295,13 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		recentWorkspacesForm = toolkit.createForm(composite);
 		recentWorkspacesForm.setBackground(composite.getBackground());
 		recentWorkspacesForm.getBody().setLayout(new GridLayout());
-		ExpandableComposite expandableComposite = toolkit.createExpandableComposite(recentWorkspacesForm.getBody(),
+		ExpandableComposite recentWorkspacesExpandable = toolkit.createExpandableComposite(recentWorkspacesForm.getBody(),
 				ExpandableComposite.TWISTIE);
-		recentWorkspacesForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		expandableComposite.setBackground(composite.getBackground());
-		expandableComposite.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_recentWorkspaces);
-		expandableComposite.setExpanded(launchData.isShowRecentWorkspaces());
-		expandableComposite.addExpansionListener(new ExpansionAdapter() {
+		recentWorkspacesForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		recentWorkspacesExpandable.setBackground(composite.getBackground());
+		recentWorkspacesExpandable.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_recentWorkspaces);
+		recentWorkspacesExpandable.setExpanded(launchData.isShowRecentWorkspaces());
+		recentWorkspacesExpandable.addExpansionListener(new ExpansionAdapter() {
 			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				launchData.setShowRecentWorkspaces(((ExpandableComposite) e.getSource()).isExpanded());
@@ -343,8 +312,8 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 			}
 		});
 
-		Composite panel = new Composite(expandableComposite, SWT.NONE);
-		expandableComposite.setClient(panel);
+		Composite panel = new Composite(recentWorkspacesExpandable, SWT.NONE);
+		recentWorkspacesExpandable.setClient(panel);
 		RowLayout layout = new RowLayout(SWT.VERTICAL);
 		layout.marginLeft = 14;
 		layout.spacing = 6;
@@ -535,7 +504,18 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
      * The show dialog button allows the user to choose to neven be nagged again.
      */
     private void createShowDialogButton(Composite parent) {
-		Button button = new Button(parent, SWT.CHECK);
+        Composite panel = new Composite(parent, SWT.NONE);
+        panel.setFont(parent.getFont());
+
+        GridLayout layout = new GridLayout(1, false);
+        layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+        panel.setLayout(layout);
+
+        GridData data = new GridData(GridData.FILL_BOTH);
+        data.verticalAlignment = GridData.END;
+        panel.setLayoutData(data);
+
+        Button button = new Button(panel, SWT.CHECK);
         button.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_useDefaultMessage);
         button.setSelection(!launchData.getShowDialog());
         button.addSelectionListener(new SelectionAdapter() {
@@ -574,4 +554,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         return section;
 	}
 
+	public Combo getCombo() {
+		return text;
+	}
 }
