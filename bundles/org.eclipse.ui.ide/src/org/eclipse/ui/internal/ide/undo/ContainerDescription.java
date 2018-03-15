@@ -195,20 +195,20 @@ public abstract class ContainerDescription extends AbstractResourceDescription {
 		if (members != null) {
 			SubMonitor subMonitor = SubMonitor.convert(mon, UndoMessages.FolderDescription_SavingUndoInfoProgress,
 					members.length);
-			for (int i = 0; i < members.length; i++) {
+			for (AbstractResourceDescription member : members) {
 				SubMonitor iterationMonitor = subMonitor.split(1);
-				if (members[i] instanceof FileDescription) {
+				if (member instanceof FileDescription) {
 					IPath path = resource.getFullPath().append(
-							((FileDescription) members[i]).name);
+							((FileDescription) member).name);
 					IFile fileHandle = resource.getWorkspace().getRoot().getFile(
 							path);
-					members[i].recordStateFromHistory(fileHandle, iterationMonitor);
-				} else if (members[i] instanceof FolderDescription) {
+					member.recordStateFromHistory(fileHandle, iterationMonitor);
+				} else if (member instanceof FolderDescription) {
 					IPath path = resource.getFullPath().append(
-							((FolderDescription) members[i]).name);
+							((FolderDescription) member).name);
 					IFolder folderHandle = resource.getWorkspace().getRoot()
 							.getFolder(path);
-					members[i].recordStateFromHistory(folderHandle, iterationMonitor);
+					member.recordStateFromHistory(folderHandle, iterationMonitor);
 				}
 			}
 		}
@@ -236,9 +236,9 @@ public abstract class ContainerDescription extends AbstractResourceDescription {
 			return this;
 		}
 		// Traverse the members and find the first potential leaf
-		for (int i = 0; i < members.length; i++) {
-			if (members[i] instanceof ContainerDescription) {
-				return ((ContainerDescription) members[i]).getFirstLeafFolder();
+		for (AbstractResourceDescription member : members) {
+			if (member instanceof ContainerDescription) {
+				return ((ContainerDescription) member).getFirstLeafFolder();
 			}
 		}
 		// No child folders were found, this is a leaf

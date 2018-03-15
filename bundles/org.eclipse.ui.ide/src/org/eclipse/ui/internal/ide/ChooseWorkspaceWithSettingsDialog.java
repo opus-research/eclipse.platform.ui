@@ -171,31 +171,27 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 	 */
 	private boolean createButtons(FormToolkit toolkit, Composite sectionClient) {
 
-		IConfigurationElement[] settings = SettingsTransfer
-				.getSettingsTransfers();
 
 		String[] enabledSettings = getEnabledSettings(IDEWorkbenchPlugin
 				.getDefault().getDialogSettings()
 				.getSection(WORKBENCH_SETTINGS));
 
-		for (int i = 0; i < settings.length; i++) {
-			final IConfigurationElement settingsTransfer = settings[i];
+		for (final IConfigurationElement setting : SettingsTransfer.getSettingsTransfers()) {
 			final Button button = toolkit.createButton(sectionClient,
-					settings[i].getAttribute(ATT_NAME), SWT.CHECK);
+					setting.getAttribute(ATT_NAME), SWT.CHECK);
 
-			String helpId = settings[i].getAttribute(ATT_HELP_CONTEXT);
+			String helpId = setting.getAttribute(ATT_HELP_CONTEXT);
 
 			if (helpId != null)
-				PlatformUI.getWorkbench().getHelpSystem().setHelp(button,
-						helpId);
+				PlatformUI.getWorkbench().getHelpSystem().setHelp(button, helpId);
 
 			if (enabledSettings != null && enabledSettings.length > 0) {
 
-				String id = settings[i].getAttribute(ATT_ID);
-				for (int j = 0; j < enabledSettings.length; j++) {
-					if (enabledSettings[j].equals(id)) {
+				String id = setting.getAttribute(ATT_ID);
+				for (String enabledSetting : enabledSettings) {
+					if (enabledSetting.equals(id)) {
 						button.setSelection(true);
-						selectedSettings.add(settingsTransfer);
+						selectedSettings.add(setting);
 						break;
 					}
 				}
@@ -207,9 +203,9 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					if (button.getSelection())
-						selectedSettings.add(settingsTransfer);
+						selectedSettings.add(setting);
 					else
-						selectedSettings.remove(settingsTransfer);
+						selectedSettings.remove(setting);
 				}
 			});
 

@@ -92,13 +92,12 @@ public final class AboutInfo {
 			return null;
 		}
 
-        IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
-        for (int p = 0; p < providers.length; ++p) {
-            IBundleGroup[] groups = providers[p].getBundleGroups();
-            for (int g = 0; g < groups.length; ++g) {
-				if (id.equals(groups[g].getIdentifier())
-                        && versionId.equals(groups[g].getVersion())) {
-					return groups[g];
+		for (IBundleGroupProvider provider : Platform.getBundleGroupProviders()) {
+            IBundleGroup[] groups = provider.getBundleGroups();
+            for (IBundleGroup group : groups) {
+				if (id.equals(group.getIdentifier())
+                        && versionId.equals(group.getVersion())) {
+					return group;
 				}
 			}
         }
