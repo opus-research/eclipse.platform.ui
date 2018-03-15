@@ -10,7 +10,7 @@
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 491272, 491398
  *     Leung Wang Hei <gemaspecial@yahoo.com.hk> - Bug 483343
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, 491529, 491293, 492434, 492452
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, Bug 491529
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -136,11 +136,14 @@ public abstract class QuickAccessContents {
 
 			if (table.getItemCount() > 0) {
 				table.setSelection(selectionIndex);
-				hideHintText();
 			} else if (filterTextEmpty) {
-				showHintText(QuickAccessMessages.QuickAccess_StartTypingToFindMatches, grayColor);
+				TableItem item = new TableItem(table, SWT.NONE);
+				item.setText(0, QuickAccessMessages.QuickAccess_StartTypingToFindMatches);
+				item.setForeground(0, grayColor);
 			} else {
-				showHintText(QuickAccessMessages.QuickAccessContents_NoMatchingResults, grayColor);
+				TableItem item = new TableItem(table, SWT.NONE);
+				item.setText(0, QuickAccessMessages.QuickAccessContents_NoMatchingResults);
+				item.setForeground(0, grayColor);
 			}
 
 			// update info as-you-type
@@ -420,9 +423,7 @@ public abstract class QuickAccessContents {
 			}
 			// from now on, add one element per provider
 			countPerProvider = 1;
-		}
-		// add matches beyond countPerProvider
-		while (showAllMatches && !done);
+		} while ((showAllMatches || countTotal < maxCount) && !done);
 		if (!perfectMatchAdded) {
 			QuickAccessEntry entry = perfectMatch.match(filter, providers[0]);
 			if (entryEnabled(providers[0], entry)) {
@@ -589,52 +590,6 @@ public abstract class QuickAccessContents {
 				refresh(text);
 			}
 		});
-	}
-
-	private Text hintText;
-	private boolean displayHintText;
-
-	/** Create HintText as child of the given parent composite */
-	Text createHintText(Composite composite, int defaultOrientation) {
-		hintText = new Text(composite, SWT.FILL);
-		hintText.setOrientation(defaultOrientation);
-		displayHintText = true;
-		return hintText;
-	}
-
-	/** Hide the hint text */
-	void hideHintText() {
-		if (displayHintText) {
-			setHintTextToDisplay(false);
-		}
-	}
-
-	/** Show the hint text with the given color */
-	void showHintText(String text, Color color) {
-		if (hintText == null) {
-			// toolbar hidden
-			return;
-		}
-		hintText.setText(text);
-		if (color != null) {
-			hintText.setForeground(color);
-		}
-		if (!displayHintText) {
-			setHintTextToDisplay(true);
-		}
-	}
-
-	/**
-	 * Sets hint text to be displayed and requests the layout
-	 *
-	 * @param toDisplay
-	 */
-	private void setHintTextToDisplay(boolean toDisplay) {
-		GridData data = (GridData) hintText.getLayoutData();
-		data.exclude = !toDisplay;
-		hintText.setVisible(toDisplay);
-		hintText.requestLayout();
-		this.displayHintText = toDisplay;
 	}
 
 	/**
