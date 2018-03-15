@@ -113,10 +113,11 @@ public abstract class WorkbenchPart extends EventManager implements
      * @param propertyId the id of the property that changed
      */
     protected void firePropertyChange(final int propertyId) {
-		for (Object listener : getListeners()) {
-			final IPropertyListener propertyListener = (IPropertyListener) listener;
+        Object[] array = getListeners();
+        for (int nX = 0; nX < array.length; nX++) {
+            final IPropertyListener l = (IPropertyListener) array[nX];
             try {
-				propertyListener.propertyChanged(WorkbenchPart.this, propertyId);
+                l.propertyChanged(WorkbenchPart.this, propertyId);
             } catch (RuntimeException e) {
                 WorkbenchPlugin.log(e);
             }
@@ -229,7 +230,7 @@ public abstract class WorkbenchPart extends EventManager implements
 		}
 
         imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(
-                configElement.getNamespace(), strIcon);
+				configElement.getNamespaceIdentifier(), strIcon);
 
         if (imageDescriptor == null) {
 			return;

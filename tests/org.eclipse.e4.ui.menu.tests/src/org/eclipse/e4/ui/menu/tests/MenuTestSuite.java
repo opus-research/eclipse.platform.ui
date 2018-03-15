@@ -1,26 +1,26 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Ralf M Petter<ralf.petter@gmail.com> and others.
+ * Copyright (c) 2014, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Ralf M Petter<ralf.petter@gmail.com> - initial API and implementation
+ *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 452764
  *******************************************************************************/
-package org.eclipse.ui.tests.forms.widgets;
+
+package org.eclipse.e4.ui.menu.tests;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
-/**
- * Tests forms widgets (automated).
- */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({
-	ExpandableCompositeTest.class,
-	FormTextModelTest.class
+@SuiteClasses({
+	MMenuItemTest.class,
+	MToolItemTest.class
 })
-public class AllWidgetsTests {
+public class MenuTestSuite {
 
 }

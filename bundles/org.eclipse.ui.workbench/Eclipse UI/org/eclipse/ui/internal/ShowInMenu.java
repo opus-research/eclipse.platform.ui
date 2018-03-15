@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
@@ -75,9 +76,12 @@ public class ShowInMenu extends ContributionItem implements
 
 	private boolean dirty = true;
 
-	private IMenuListener menuListener = manager -> {
-		manager.markDirty();
-		dirty = true;
+	private IMenuListener menuListener = new IMenuListener() {
+		@Override
+		public void menuAboutToShow(IMenuManager manager) {
+			manager.markDirty();
+			dirty = true;
+		}
 	};
 
 	private IServiceLocator locator;
@@ -140,7 +144,8 @@ public class ShowInMenu extends ContributionItem implements
 			item.setText(NO_TARGETS_MSG);
 			item.setEnabled(false);
 		} else {
-			for (IContributionItem item : items) {
+			for (int i = 0; i < items.length; i++) {
+				IContributionItem item = items[i];
 				if (item.isVisible()) {
 					if (index == -1) {
 						item.fill(menu, -1);
@@ -184,8 +189,8 @@ public class ShowInMenu extends ContributionItem implements
 		}
 
 		IViewDescriptor[] viewDescs = getViewDescriptors(sourcePart);
-		for (IViewDescriptor viewDesc : viewDescs) {
-			IContributionItem cci = getContributionItem(viewDesc);
+		for (int i = 0; i < viewDescs.length; ++i) {
+			IContributionItem cci = getContributionItem(viewDescs[i]);
 			if (cci != null) {
 				innerMgr.add(cci);
 			}
@@ -362,8 +367,8 @@ public class ShowInMenu extends ContributionItem implements
 		ArrayList<Object> ids = getShowInPartIds(sourcePart);
 		ArrayList<IViewDescriptor> descs = new ArrayList<>();
 		IViewRegistry reg = WorkbenchPlugin.getDefault().getViewRegistry();
-		for (Object object : ids) {
-			String id = (String) object;
+		for (Iterator<Object> i = ids.iterator(); i.hasNext();) {
+			String id = (String) i.next();
 			IViewDescriptor desc = reg.find(id);
 			if (desc != null) {
 				descs.add(desc);

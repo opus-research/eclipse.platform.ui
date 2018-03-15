@@ -14,6 +14,7 @@
 package org.eclipse.jface.resource;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
@@ -103,8 +104,8 @@ public class ImageRegistry {
         }
 
         @Override
-		public ImageData getImageData(int zoom) {
-			return getDataProvider(original).getImageData(zoom);
+		public ImageData getImageData() {
+            return original.getImageData();
         }
     }
 
@@ -328,7 +329,8 @@ public class ImageRegistry {
         manager.cancelDisposeExec(disposeRunnable);
 
         if (table != null) {
-            for (Entry entry : table.values()) {
+            for (Iterator<Entry> i = table.values().iterator(); i.hasNext();) {
+                Entry entry = i.next();
                 if (entry.image != null) {
                     manager.destroyImage(entry.descriptor);
                 }

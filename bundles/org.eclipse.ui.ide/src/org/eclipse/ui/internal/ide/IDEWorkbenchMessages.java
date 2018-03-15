@@ -200,7 +200,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String PromptOnExitDialog_message0;
 	public static String PromptOnExitDialog_message1;
 	public static String PromptOnExitDialog_choice;
-	public static String PromptOnExitDialog_button_label_exit;
 
 	public static String Workbench_shortcuts;
 	public static String Workbench_openNewWindow;
@@ -527,8 +526,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEWorkspacePreference_showLocationInWindowTitle;
 	public static String IDEWorkspacePreference_showLocationInWindowTitle_lockedByCommandLine;
 	public static String IDEWorkspacePreference_showLocationNameInWindowTitle;
-	public static String IDEWorkspacePreference_showPerspectiveNameInWindowTitle;
-	public static String IDEWorkspacePreference_showProductNameInWindowTitle;
 	public static String IDEWorkspacePreference_workspaceName;
 	public static String IDEWorkbenchPreference_workbenchSystemExplorer;
 

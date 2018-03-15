@@ -14,7 +14,6 @@ package org.eclipse.ui.internal.services;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IParameter;
 import org.eclipse.core.commands.Parameterization;
@@ -172,7 +171,7 @@ public abstract class RegistryPersistence implements IDisposable,
 		String statusMessage = message;
 		if (element != null) {
 			statusMessage = statusMessage
-					+ ": plug-in='" + element.getNamespace() + '\''; //$NON-NLS-1$
+					+ ": plug-in='" + element.getNamespaceIdentifier() + '\''; //$NON-NLS-1$
 		}
 		if (id != null) {
 			if (element != null) {
@@ -385,7 +384,9 @@ public abstract class RegistryPersistence implements IDisposable,
 		}
 
 		final Collection parameters = new ArrayList();
-		for (final IConfigurationElement parameterElement : parameterElements) {
+		for (int i = 0; i < parameterElements.length; i++) {
+			final IConfigurationElement parameterElement = parameterElements[i];
+
 			// Read out the id.
 			final String id = parameterElement.getAttribute(ATT_ID);
 			if ((id == null) || (id.length() == 0)) {
@@ -400,7 +401,8 @@ public abstract class RegistryPersistence implements IDisposable,
 			try {
 				final IParameter[] commandParameters = command.getParameters();
 				if (parameters != null) {
-					for (final IParameter currentParameter : commandParameters) {
+					for (int j = 0; j < commandParameters.length; j++) {
+						final IParameter currentParameter = commandParameters[j];
 						if (Util.equals(currentParameter.getId(), id)) {
 							parameter = currentParameter;
 							break;
@@ -588,9 +590,17 @@ public abstract class RegistryPersistence implements IDisposable,
 	 * change listener is created.
 	 */
 	protected RegistryPersistence() {
-		registryChangeListener = event -> {
-			if (isChangeImportant(event)) {
-				Display.getDefault().asyncExec(() -> read());
+		registryChangeListener = new IRegistryChangeListener() {
+			@Override
+			public final void registryChanged(final IRegistryChangeEvent event) {
+				if (isChangeImportant(event)) {
+					Display.getDefault().asyncExec(new Runnable() {
+						@Override
+						public final void run() {
+							read();
+						}
+					});
+				}
 			}
 		};
 	}

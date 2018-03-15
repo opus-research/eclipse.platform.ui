@@ -16,7 +16,7 @@ package org.eclipse.ui.internal.ide.application;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
@@ -212,17 +211,12 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 						productName);
 			}
 
-			// use of LinkedHashMap to preserve insertion order
-			Map<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
-			buttonLabelToIdMap.put(IDEWorkbenchMessages.PromptOnExitDialog_button_label_exit, IDialogConstants.OK_ID);
-			buttonLabelToIdMap.put(IDialogConstants.CANCEL_LABEL, IDialogConstants.CANCEL_ID);
-			MessageDialogWithToggle dlg =
-					new MessageDialogWithToggle(
-							parentShell,
+			MessageDialogWithToggle dlg = MessageDialogWithToggle
+					.openOkCancelConfirm(parentShell,
 							IDEWorkbenchMessages.PromptOnExitDialog_shellTitle,
-							null,
-							message, MessageDialog.CONFIRM, buttonLabelToIdMap, 0, null, false);
-			dlg.open();
+							message,
+							IDEWorkbenchMessages.PromptOnExitDialog_choice,
+							false, null, null);
 			if (dlg.getReturnCode() != IDialogConstants.OK_ID) {
 				return false;
 			}
@@ -361,9 +355,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				String property = event.getProperty();
 				if (IDEInternalPreferences.WORKSPACE_NAME.equals(property)
 						|| IDEInternalPreferences.SHOW_LOCATION.equals(property)
-						|| IDEInternalPreferences.SHOW_LOCATION_NAME.equals(property)
-						|| IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE.equals(property)
-						|| IDEInternalPreferences.SHOW_PRODUCT_IN_TITLE.equals(property)) {
+						|| IDEInternalPreferences.SHOW_LOCATION_NAME.equals(property)) {
 					// Make sure the title is actually updated by
 					// setting last active page.
 					lastActivePage = null;
@@ -378,29 +370,17 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private String computeTitle() {
 		StringJoiner sj = new StringJoiner(" - "); //$NON-NLS-1$
 
-		IPreferenceStore ps = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
+		// workspace location / name
+		String workspaceLocation = wbAdvisor.getWorkspaceLocation();
+		if (workspaceLocation != null) {
+			sj.add(workspaceLocation);
+		}
 
 		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 		IWorkbenchPage currentPage = configurer.getWindow().getActivePage();
 		IEditorPart activeEditor = null;
 		if (currentPage != null) {
 			activeEditor = lastActiveEditor;
-		}
-
-		// show workspace name
-		if (ps.getBoolean(IDEInternalPreferences.SHOW_LOCATION_NAME)) {
-			String workspaceName = ps.getString(IDEInternalPreferences.WORKSPACE_NAME);
-			if (workspaceName != null && workspaceName.length() > 0) {
-				sj.add(workspaceName);
-			}
-		}
-
-		// perspective name
-		if (ps.getBoolean(IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE)) {
-			IPerspectiveDescriptor persp = currentPage.getPerspective();
-			if (persp != null) {
-				sj.add(persp.getLabel());
-			}
 		}
 
 		// active editor
@@ -410,19 +390,10 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			}
 		}
 
-		// workspace location is non null either when SHOW_LOCATION is true or
-		// when forcing -showlocation via command line
-		String workspaceLocation = wbAdvisor.getWorkspaceLocation();
-		if (workspaceLocation != null) {
-			sj.add(workspaceLocation);
-		}
-
 		// Application (product) name
-		if (ps.getBoolean(IDEInternalPreferences.SHOW_PRODUCT_IN_TITLE)) {
-			IProduct product = Platform.getProduct();
-			if (product != null) {
-				sj.add(product.getName());
-			}
+		IProduct product = Platform.getProduct();
+		if (product != null) {
+			sj.add(product.getName());
 		}
 
 		return sj.toString();
@@ -605,7 +576,11 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		} else {
 			// Show the welcome page for any newly installed features
 			List<AboutInfo> welcomeFeatures = new ArrayList<>();
-			for (AboutInfo info : wbAdvisor.getNewlyAddedBundleGroups().values()) {
+			for (Iterator it = wbAdvisor.getNewlyAddedBundleGroups().entrySet()
+					.iterator(); it.hasNext();) {
+				Map.Entry entry = (Map.Entry) it.next();
+				AboutInfo info = (AboutInfo) entry.getValue();
+
 				if (info != null && info.getWelcomePageURL() != null) {
 					welcomeFeatures.add(info);
 					// activate the feature plug-in so it can run some install
@@ -618,8 +593,13 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 							try {
 								bundle.start(Bundle.START_TRANSIENT);
 							} catch (BundleException exception) {
-								StatusManager.getManager().handle(new Status(IStatus.ERROR, IDEApplication.PLUGIN_ID,
-										"Failed to load feature", exception));//$NON-NLS-1$
+								StatusManager
+										.getManager()
+										.handle(
+												new Status(
+														IStatus.ERROR,
+														IDEApplication.PLUGIN_ID,
+														"Failed to load feature", exception));//$NON-NLS-1$
 							}
 						}
 					}
