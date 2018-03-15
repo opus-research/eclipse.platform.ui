@@ -185,8 +185,7 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 		if (flushCache) {
 			contentCache.flush();
 		}
-		Point newSize = contentCache.computeSize(FormUtil.getWidthHint(
-				clientArea.width, c), FormUtil.getHeightHint(clientArea.height,
+		Point newSize = contentCache.computeSize(clientArea.width, FormUtil.getHeightHint(clientArea.height,
 				c));
 
 		if (!(expandHorizontal && expandVertical)) {

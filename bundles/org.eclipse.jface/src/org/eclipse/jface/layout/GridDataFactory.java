@@ -500,7 +500,7 @@ public final class GridDataFactory {
 		}
 
 		if (data.horizontalIndent != 0 || data.verticalIndent != 0) {
-			builder.append("    .indent("); //$NON-NLS-1$
+			builder.append("    .indend("); //$NON-NLS-1$
 			builder.append(data.horizontalIndent);
 			builder.append(", "); //$NON-NLS-1$
 			builder.append(data.verticalIndent);
@@ -525,20 +525,13 @@ public final class GridDataFactory {
 
 		if (data.widthHint != SWT.DEFAULT || data.heightHint != SWT.DEFAULT) {
 			builder.append("    .hint("); //$NON-NLS-1$
-			builder.append(getHintString(data.widthHint));
+			builder.append(data.widthHint);
 			builder.append(", "); //$NON-NLS-1$
-			builder.append(getHintString(data.heightHint));
+			builder.append(data.heightHint);
 			builder.append(")\n"); //$NON-NLS-1$
 		}
 
 		return builder.toString();
-	}
-
-	private String getHintString(int widthHint) {
-		if (widthHint == -1) {
-			return "SWT.DEFAULT"; //$NON-NLS-1$
-		}
-		return Integer.toString(widthHint);
 	}
 
 	private String getAlignmentString(int alignment) {
