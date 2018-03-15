@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 503387
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -16,6 +15,7 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextFunction;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
@@ -26,7 +26,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
@@ -54,9 +54,7 @@ import org.eclipse.ui.testing.ContributionInfo;
 public class CompatibilityView extends CompatibilityPart {
 
 	private ViewReference reference;
-
-	@Inject
-	EModelService modelService;
+	private IWorkbenchPart legacyPart;
 
 	@Inject
 	CompatibilityView(MPart part, ViewReference ref) {
@@ -84,6 +82,7 @@ public class CompatibilityView extends CompatibilityPart {
 
 	@Override
 	protected boolean createPartControl(IWorkbenchPart legacyPart, Composite parent) {
+		this.legacyPart = legacyPart;
 		clearMenuItems();
 		part.getContext().set(IViewPart.class, (IViewPart) legacyPart);
 
@@ -100,7 +99,7 @@ public class CompatibilityView extends CompatibilityPart {
 		MenuManager mm = (MenuManager) actionBars.getMenuManager();
 		MMenu menu = getViewMenu();
 		if (menu == null) {
-			menu = modelService.createModelElement(MMenu.class);
+			menu = MenuFactoryImpl.eINSTANCE.createMenu();
 
 			// If the id contains a ':' use the part before it as the descriptor
 			// id
@@ -123,7 +122,7 @@ public class CompatibilityView extends CompatibilityPart {
 		// Construct the toolbar (if necessary)
 		MToolBar toolbar = part.getToolbar();
 		if (toolbar == null) {
-			toolbar = modelService.createModelElement(MToolBar.class);
+			toolbar = MenuFactoryImpl.eINSTANCE.createToolBar();
 
 			// If the id contains a ':' use the part before it as the descriptor
 			// id
@@ -144,7 +143,11 @@ public class CompatibilityView extends CompatibilityPart {
 			((ToolBarManagerRenderer) apr).linkModelToManager(toolbar, tbm);
 		}
 
+		// we perform dependency injection before the call to createPartControl
+		// so that injected values can be used
+		ContextInjectionFactory.inject(legacyPart, partContext);
 		super.createPartControl(legacyPart, parent);
+
 
 		ViewDescriptor desc = reference.getDescriptor();
 		if (desc != null && desc.getPluginId() != null) {
@@ -288,7 +291,7 @@ public class CompatibilityView extends CompatibilityPart {
 				}
 			}
 		}
-
+		ContextInjectionFactory.uninject(legacyPart, context);
 		super.disposeSite(site);
 	}
 }
