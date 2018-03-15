@@ -323,12 +323,10 @@ public final class ThemeElementHelper {
 				prefColor = definition.getValue();
 			} else if (definition.getDefaultsTo() != null) {
 				prefColor = registry.getRGB(definition.getDefaultsTo());
+			} else {
+				prefColor = defaultColor;
 			}
-		}
-
-		if (prefColor == null) {
-			prefColor = defaultColor;
-		}
+        }
 
         if (setInRegistry) {
         	registry.put(id, prefColor);
