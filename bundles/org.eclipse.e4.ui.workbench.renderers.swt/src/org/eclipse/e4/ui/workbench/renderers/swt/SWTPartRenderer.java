@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
+import org.eclipse.e4.ui.internal.workbench.ModelServiceImpl;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
@@ -32,6 +33,7 @@ import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -234,7 +236,13 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		if (image == null || image.isDisposed()) {
 			image = getImageFromURI(getIconURI(element));
 		}
-
+		if (image == null && element instanceof MPart) {
+			MPart part = (MPart) element;
+			if (ModelServiceImpl.COMPATIBILITY_VIEW_URI.equals(part.getContributionURI()) && part.getIconURI() == null) {
+				image = ImageDescriptor.getMissingImageDescriptor().createImage();
+				part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY, image);
+			}
+		}
 		if (image != null) {
 			image = adornImage((MUIElement) element, image);
 		}

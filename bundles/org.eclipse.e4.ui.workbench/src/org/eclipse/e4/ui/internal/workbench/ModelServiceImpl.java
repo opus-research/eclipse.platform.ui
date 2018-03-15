@@ -62,7 +62,6 @@ import org.eclipse.e4.ui.workbench.modeling.EPlaceholderResolver;
 import org.eclipse.e4.ui.workbench.modeling.ElementMatcher;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -72,7 +71,8 @@ import org.osgi.service.event.EventHandler;
 public class ModelServiceImpl implements EModelService {
 	private static String HOSTED_ELEMENT = "HostedElement"; //$NON-NLS-1$
 
-	private static final String COMPATIBILITY_VIEW_URI = "bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView"; //$NON-NLS-1$
+	/** URI for Compatibility views */
+	public static final String COMPATIBILITY_VIEW_URI = "bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView"; //$NON-NLS-1$
 
 	private static final String TAG_LABEL = "label"; //$NON-NLS-1$
 
@@ -541,15 +541,6 @@ public class ModelServiceImpl implements EModelService {
 				nullRefList.add(ph);
 			}
 		}
-		if (!resolveAlways) {
-			List<MPart> partList = findElements(element, null, MPart.class, null);
-			for (MPart part : partList) {
-				if (COMPATIBILITY_VIEW_URI.equals(part.getContributionURI()) && part.getIconURI() == null) {
-					part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
-							ImageDescriptor.getMissingImageDescriptor().createImage());
-				}
-			}
-		}
 		for (MPlaceholder ph : nullRefList) {
 			replacePlaceholder(ph);
 		}
@@ -568,8 +559,6 @@ public class ModelServiceImpl implements EModelService {
 	private void replacePlaceholder(MPlaceholder ph) {
 		MPart part = createModelElement(MPart.class);
 		part.setElementId(ph.getElementId());
-		part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
-				ImageDescriptor.getMissingImageDescriptor().createImage());
 		String label = (String) ph.getTransientData().get(TAG_LABEL);
 		if (label != null) {
 			part.setLabel(label);

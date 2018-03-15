@@ -23,6 +23,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.internal.workbench.ModelServiceImpl;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSRenderingUtils;
 import org.eclipse.e4.ui.internal.workbench.swt.ShellActivationListener;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
@@ -189,6 +190,14 @@ public class TrimStack {
 		if (imageObject != null && imageObject instanceof Image
 				&& !((Image) imageObject).isDisposed())
 			result = (Image) imageObject;
+		if (result == null && element instanceof MPart) {
+			MPart part = (MPart) element;
+			if (ModelServiceImpl.COMPATIBILITY_VIEW_URI.equals(part.getContributionURI()) && part.getIconURI() == null) {
+				result = ImageDescriptor.getMissingImageDescriptor().createImage();
+				element.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY, result);
+			}
+		}
+
 		return result;
 	}
 
