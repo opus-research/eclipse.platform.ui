@@ -12,9 +12,6 @@
 package org.eclipse.ui.tests.menus;
 
 
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -23,7 +20,6 @@ import junit.framework.TestSuite;
  * Tests for all code related to menus. This includes the
  * <code>popupMenus</code> extension point, and others.
  */
-@RunWith(AllTests.class)
 public class MenusTestSuite extends TestSuite {
 
     /**
