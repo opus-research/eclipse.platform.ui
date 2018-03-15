@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.IMarkerRelevance;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolution2;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -252,6 +253,13 @@ public class QuickFixPage extends WizardPage {
 		resolutionsList.setComparator(new ViewerComparator() {
 			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
+				if (e1 instanceof IMarkerRelevance && e2 instanceof IMarkerRelevance) {
+					int relevanceMarker1 = ((IMarkerRelevance) e1).getRelevanceForMarker();
+					int relevanceMarker2 = ((IMarkerRelevance) e2).getRelevanceForMarker();
+					if (relevanceMarker1 != relevanceMarker2) {
+						return Integer.valueOf(relevanceMarker1).compareTo(Integer.valueOf(relevanceMarker1));
+					}
+				}
 				return ((IMarkerResolution) e1).getLabel().compareTo(
 						((IMarkerResolution)e2).getLabel());
 			}
