@@ -129,9 +129,6 @@ public class JobCancelabilityPreferencePage extends FieldEditorPreferencePage
 		createBooleanEditor(PreferenceConstants.JOB_MONITORING_LOG_NON_CANCELLABLE_USER_JOB,
 				Messages.JobCancelabilityMonitorPreferencePage_log_non_cancelable_user_job_label, block);
 
-		createBooleanEditor(PreferenceConstants.JOB_MONITORING_DO_NOT_LOG_FAST_SYSTEM_JOB,
-				Messages.JobCancelabilityMonitorPreferencePage_not_log_fast_system_job_label, block);
-
 		GridLayoutFactory.fillDefaults()
 				.numColumns(2)
 				.spacing(LayoutConstants.getSpacing())

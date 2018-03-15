@@ -85,10 +85,5 @@ public class PreferenceConstants {
 	 */
 	public static final String JOB_MONITORING_LOG_NON_CANCELLABLE_USER_JOB = "job_monitoring_log_cancellable_user_job"; //$NON-NLS-1$
 
-	/**
-	 * If true, system jobs which  don't check for cancellation but run faster than the warning threshold won't be log.
-	 */
-	public static final String JOB_MONITORING_DO_NOT_LOG_FAST_SYSTEM_JOB = "job_monitoring_do_not_log_fast_system_job"; //$NON-NLS-1$
-
 	private PreferenceConstants() {}
 }

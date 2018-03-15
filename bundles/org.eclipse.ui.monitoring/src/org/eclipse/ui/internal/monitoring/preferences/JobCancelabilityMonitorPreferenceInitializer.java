@@ -28,6 +28,5 @@ public class JobCancelabilityMonitorPreferenceInitializer extends AbstractPrefer
 		store.setDefault(PreferenceConstants.JOB_MONITORING_ERROR_THRESHOLD_MILLIS, 3000); // 3 sec
 		store.setDefault(PreferenceConstants.JOB_MONITORING_MAX_STACK_SAMPLES, 3);
 		store.setDefault(PreferenceConstants.JOB_MONITORING_LOG_NON_CANCELLABLE_USER_JOB, true);
-		store.setDefault(PreferenceConstants.JOB_MONITORING_DO_NOT_LOG_FAST_SYSTEM_JOB, true);
 	}
 }

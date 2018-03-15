@@ -59,7 +59,6 @@ public class MonitoringStartup implements IStartup {
 		jobCancelabilityMonitorOptions.setWarningThreshold(TimeUnit.MILLISECONDS.toNanos(preferences.getInt(PreferenceConstants.JOB_MONITORING_WARNING_THRESHOLD_MILLIS)));
 		jobCancelabilityMonitorOptions.setMaxStackSamples(preferences.getInt(PreferenceConstants.JOB_MONITORING_MAX_STACK_SAMPLES));
 		jobCancelabilityMonitorOptions.setAlwaysReportNonCancelableUserJobAsError(preferences.getBoolean(PreferenceConstants.JOB_MONITORING_LOG_NON_CANCELLABLE_USER_JOB));
-		jobCancelabilityMonitorOptions.setDoNotReportNonCancelableFastSystemJob(preferences.getBoolean(PreferenceConstants.JOB_MONITORING_DO_NOT_LOG_FAST_SYSTEM_JOB));
 		MonitoringPlugin.getDefault().getBundle().getBundleContext().registerService(JobCancelabilityMonitor.Options.class, jobCancelabilityMonitorOptions, null);
 		return jobCancelabilityMonitorOptions;
 	}

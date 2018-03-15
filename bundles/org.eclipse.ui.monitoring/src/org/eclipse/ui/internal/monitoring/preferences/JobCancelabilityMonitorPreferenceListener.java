@@ -44,8 +44,6 @@ public final class JobCancelabilityMonitorPreferenceListener implements IPropert
 			options.setMaxStackSamples((Integer) event.getNewValue());
 		} else if (PreferenceConstants.JOB_MONITORING_LOG_NON_CANCELLABLE_USER_JOB.equals(changedProperty)) {
 			options.setAlwaysReportNonCancelableUserJobAsError((Boolean) event.getNewValue());
-		} else if (PreferenceConstants.JOB_MONITORING_DO_NOT_LOG_FAST_SYSTEM_JOB.equals(changedProperty)) {
-			options.setDoNotReportNonCancelableFastSystemJob((Boolean) event.getNewValue());
 		}
 	}
 }
