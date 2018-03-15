@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IBundleGroup;
 import org.eclipse.core.runtime.IBundleGroupProvider;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -181,6 +182,9 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	@Override
 	public void initialize(IWorkbenchConfigurer configurer) {
+		// Set the default value of the preference controlling the workspace
+		// name displayed in the window title.
+		setWorkspaceNameDefault();
 
 		PluginActionBuilder.setAllowIdeLogging(true);
 
@@ -206,6 +210,24 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		TrayDialog.setDialogHelpAvailable(true);
 
 		Policy.setComparator(Collator.getInstance());
+	}
+
+	/**
+	 * Sets the default value of the preference controlling the workspace name
+	 * displayed in the window title to the name of the workspace directory.
+	 * This preference cannot be set in the preference initializer because the
+	 * workspace directory may not be known when the preference initializer is
+	 * called.
+	 */
+	private static void setWorkspaceNameDefault() {
+		IPath workspaceDir = Platform.getLocation();
+		if (workspaceDir == null)
+			return;
+		String workspaceName = workspaceDir.lastSegment();
+		if (workspaceName == null)
+			return;
+		IPreferenceStore preferences = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
+		preferences.setDefault(IDEInternalPreferences.WORKSPACE_NAME, workspaceName);
 	}
 
 	@Override
