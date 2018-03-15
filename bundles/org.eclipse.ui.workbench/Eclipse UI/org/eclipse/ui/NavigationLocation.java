@@ -53,7 +53,7 @@ public abstract class NavigationLocation implements INavigationLocation {
 	public String getText() {
         IEditorPart part = getEditorPart();
         if (part == null) {
-			return ""; //$NON-NLS-1$
+			return new String();
 		}
         return part.getTitle();
     }

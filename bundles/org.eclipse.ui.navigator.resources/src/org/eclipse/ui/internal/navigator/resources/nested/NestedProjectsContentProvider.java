@@ -76,7 +76,14 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 			return null;
 		}
 		IContainer container = (IContainer)parentElement;
-		return NestedProjectManager.getInstance().getDirectChildrenProjects(container);
+		Set<IProject> nestedProjects = new HashSet<IProject>();
+		for (IProject project : container.getWorkspace().getRoot().getProjects()) {
+			if (container.getLocation().isPrefixOf(project.getLocation())
+					&& project.getLocation().segmentCount() - container.getLocation().segmentCount() == 1) {
+				nestedProjects.add(project);
+			}
+		}
+		return nestedProjects.toArray(new IProject[nestedProjects.size()]);
 	}
 
 	@Override
@@ -92,10 +99,8 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof IContainer) {
-			return NestedProjectManager.getInstance().hasDirectChildrenProjects((IContainer) element);
-		}
-		return false;
+		Object[] children = getChildren(element);
+		return children != null && children.length > 0;
 	}
 
 	@Override
