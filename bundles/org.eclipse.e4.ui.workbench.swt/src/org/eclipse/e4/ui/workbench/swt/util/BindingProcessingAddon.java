@@ -105,7 +105,7 @@ public class BindingProcessingAddon {
 	}
 
 	private final String[] getSchemeIds(String schemeId) {
-		final List<String> strings = new ArrayList<>();
+		final List<String> strings = new ArrayList<String>();
 		while (schemeId != null) {
 			strings.add(schemeId);
 			try {
@@ -217,7 +217,7 @@ public class BindingProcessingAddon {
 		}
 		Map<String, Object> parameters = null;
 		if (modelParms != null && !modelParms.isEmpty()) {
-			parameters = new HashMap<>();
+			parameters = new HashMap<String, Object>();
 			for (MParameter mParm : modelParms) {
 				parameters.put(mParm.getName(), mParm.getValue());
 			}
@@ -238,7 +238,7 @@ public class BindingProcessingAddon {
 				String locale = null;
 				String platform = null;
 
-				Map<String, String> attrs = new HashMap<>();
+				Map<String, String> attrs = new HashMap<String, String>();
 				List<String> tags = binding.getTags();
 				for (String tag : tags) {
 					// remember to skip the ':' in each tag!
