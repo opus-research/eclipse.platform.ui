@@ -363,8 +363,8 @@ public class DataBindingContext {
 	 */
 	public final void dispose() {
 		Binding[] bindingArray = (Binding[]) bindings.toArray(new Binding[bindings.size()]);
-		for (int i = 0; i < bindingArray.length; i++) {
-			bindingArray[i].dispose();
+		for (Binding element : bindingArray) {
+			element.dispose();
 		}
 		ValidationStatusProvider[] statusProviderArray = (ValidationStatusProvider[]) validationStatusProviders
 				.toArray(new ValidationStatusProvider[validationStatusProviders
