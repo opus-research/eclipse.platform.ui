@@ -23,16 +23,22 @@ import org.eclipse.ui.*;
  */
 public class ShowHelpAction implements IWorkbenchWindowActionDelegate {
 	private IWorkbenchWindow window;
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
+	 */
 	public void dispose() {
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
+	 */
 	public void init(IWorkbenchWindow window) {
 		this.window = window;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {
 		try {
 			window.getActivePage().showView("org.eclipse.ui.forms.examples.helpView");
@@ -42,7 +48,9 @@ public class ShowHelpAction implements IWorkbenchWindowActionDelegate {
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 	}
 }

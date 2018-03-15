@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2000, 2016 IBM Corporation and others.
+ *  Copyright (c) 2000, 2015 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Michael Williamson (eclipse-bugs@magnaworks.com) - patch (see Bugzilla #92545)
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 430205, 458055
- *     Ralf Petter <ralf.petter@gmail.com> - Bug 509654
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -25,9 +24,10 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.internal.forms.widgets.FormImages;
 import org.eclipse.ui.internal.forms.widgets.FormUtil;
 
@@ -85,15 +85,18 @@ public class Section extends ExpandableComposite {
 		super(parent, cstyle | getBackgroundStyle(style), style);
 		int rtl = cstyle & SWT.RIGHT_TO_LEFT;
 		if ((style & DESCRIPTION) != 0) {
-			descriptionControl = new Label(this, SWT.WRAP | rtl);
+			descriptionControl = new Text(this, SWT.READ_ONLY | SWT.WRAP | rtl);
 		}
 		if ((style & TITLE_BAR) != 0) {
-			Listener listener = e -> {
-				Image image = Section.super.getBackgroundImage();
-				if (image != null) {
-					FormImages.getInstance().markFinished(image, getDisplay());
+			Listener listener = new Listener() {
+				@Override
+				public void handleEvent(Event e) {
+					Image image = Section.super.getBackgroundImage();
+					if (image != null) {
+						FormImages.getInstance().markFinished(image, getDisplay());
+					}
+					Section.super.setBackgroundImage(null);
 				}
-				Section.super.setBackgroundImage(null);
 			};
 			addListener(SWT.Dispose, listener);
 			addListener(SWT.Resize, listener);
@@ -153,8 +156,8 @@ public class Section extends ExpandableComposite {
 	 * @param description
 	 */
 	public void setDescription(String description) {
-		if (descriptionControl instanceof Label)
-			((Label) descriptionControl).setText(description);
+		if (descriptionControl instanceof Text)
+			((Text) descriptionControl).setText(description);
 	}
 
 	/**
@@ -164,8 +167,8 @@ public class Section extends ExpandableComposite {
 	 *         not used to create the control.
 	 */
 	public String getDescription() {
-		if (descriptionControl instanceof Label)
-			return ((Label) descriptionControl).getText();
+		if (descriptionControl instanceof Text)
+			return ((Text) descriptionControl).getText();
 		return null;
 	}
 
@@ -184,8 +187,8 @@ public class Section extends ExpandableComposite {
 	}
 
 	/**
-	 * Returns the control that is used as a separator between the title and the
-	 * client, or <samp>null </samp> if not set.
+	 * Returns the control that is used as a separator betweeen the title and
+	 * the client, or <samp>null </samp> if not set.
 	 *
 	 * @return separator control or <samp>null </samp> if not set.
 	 */
@@ -239,8 +242,8 @@ public class Section extends ExpandableComposite {
 	/**
 	 * Sets the description control of this section. The control must not be
 	 * <samp>null</samp> and must be a direct child of this container. If
-	 * defined, control will be placed below the title text and the separator
-	 * and will be hidden in the collapsed state.
+	 * defined, contol will be placed below the title text and the separator and
+	 * will be hidden int he collapsed state.
 	 * <p>
 	 * This method and <code>DESCRIPTION</code> style are mutually exclusive.
 	 * Use the method only if you want to create the description control
@@ -440,7 +443,7 @@ public class Section extends ExpandableComposite {
 			gc.fillGradientRectangle(bounds.width - marginWidth - 1, marginHeight + 2, 1, theight + 2, true);
 		}
 		if ((getExpansionStyle() & TITLE_BAR) != 0) {
-			// New in 3.3 - edge treatment
+			// New in 3.3 - edge treatmant
 			gc.setForeground(getBackground());
 			gc.drawPolyline(new int[] { marginWidth + 1, marginHeight + gradientheight + 4, marginWidth + 1,
 					marginHeight + 2, marginWidth + 2, marginHeight + 2, marginWidth + 2, marginHeight + 1,

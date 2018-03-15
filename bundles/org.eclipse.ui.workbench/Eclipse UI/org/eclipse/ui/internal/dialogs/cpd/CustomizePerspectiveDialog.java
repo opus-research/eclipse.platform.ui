@@ -60,13 +60,16 @@ import org.eclipse.jface.internal.provisional.action.ToolBarContributionItem2;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckStateProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
@@ -120,6 +123,7 @@ import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.actions.NewWizardShortcutAction;
 import org.eclipse.ui.internal.dialogs.DialogUtil;
 import org.eclipse.ui.internal.dialogs.WorkbenchWizardElement;
+import org.eclipse.ui.internal.dialogs.cpd.TreeManager.CheckListener;
 import org.eclipse.ui.internal.dialogs.cpd.TreeManager.TreeItem;
 import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayout;
 import org.eclipse.ui.internal.intro.IIntroConstants;
@@ -640,21 +644,27 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				.getTreeContentProvider());
 		menuCategoriesViewer.setComparator(new WorkbenchViewerComparator());
 		menuCategoriesViewer.setCheckStateProvider(new CategoryCheckProvider());
-		menuCategoriesViewer.addCheckStateListener(event -> {
-			Category category = (Category) event.getElement();
-			category.setItemsState(event.getChecked());
-			updateCategoryAndParents(menuCategoriesViewer, category);
+		menuCategoriesViewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				Category category = (Category) event.getElement();
+				category.setItemsState(event.getChecked());
+				updateCategoryAndParents(menuCategoriesViewer, category);
+			}
 		});
 
-		treeManager.addListener(changedItem -> {
-			if (changedItem instanceof Category) {
-				menuCategoriesViewer.update(changedItem, null);
-			} else if (changedItem instanceof ShortcutItem) {
-				ShortcutItem item = (ShortcutItem) changedItem;
-				if (item.getCategory() != null) {
-					item.getCategory().update();
-					updateCategoryAndParents(menuCategoriesViewer, item
-							.getCategory());
+		treeManager.addListener(new CheckListener() {
+			@Override
+			public void checkChanged(TreeItem changedItem) {
+				if (changedItem instanceof Category) {
+					menuCategoriesViewer.update(changedItem, null);
+				} else if (changedItem instanceof ShortcutItem) {
+					ShortcutItem item = (ShortcutItem) changedItem;
+					if (item.getCategory() != null) {
+						item.getCategory().update();
+						updateCategoryAndParents(menuCategoriesViewer, item
+								.getCategory());
+					}
 				}
 			}
 		});
@@ -700,23 +710,29 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// update menuCategoriesViewer, and menuItemsViewer on a change to
 		// menusViewer
 		menusViewer
-				.addSelectionChangedListener(event -> {
-					Category category = (Category) ((IStructuredSelection) event
-							.getSelection()).getFirstElement();
-					menuCategoriesViewer.setInput(category);
-					menuItemsViewer.setInput(category);
-					if (category.getChildrenCount() != 0) {
-						setSelectionOn(menuCategoriesViewer, category
-								.getChildren().get(0));
+				.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
+					public void selectionChanged(SelectionChangedEvent event) {
+						Category category = (Category) ((IStructuredSelection) event
+								.getSelection()).getFirstElement();
+						menuCategoriesViewer.setInput(category);
+						menuItemsViewer.setInput(category);
+						if (category.getChildrenCount() != 0) {
+							setSelectionOn(menuCategoriesViewer, category
+									.getChildren().get(0));
+						}
 					}
 				});
 
 		// update menuItemsViewer on a change to menuCategoriesViewer
 		menuCategoriesViewer
-				.addSelectionChangedListener(event -> {
-					Category category = (Category) ((IStructuredSelection) event
-							.getSelection()).getFirstElement();
-					menuItemsViewer.setInput(category);
+				.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
+					public void selectionChanged(SelectionChangedEvent event) {
+						Category category = (Category) ((IStructuredSelection) event
+								.getSelection()).getFirstElement();
+						menuItemsViewer.setInput(category);
+					}
 				});
 
 		menuTable.setHeaderVisible(true);
@@ -818,15 +834,18 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		};
 
 		// Updates the check state of action sets
-		actionSetsViewer.addCheckStateListener(event -> {
-			final ActionSet actionSet = (ActionSet) event.getElement();
-			if (event.getChecked()) {
-				actionSet.setActive(true);
-				for (DisplayItem item : actionSet.contributionItems) {
-					item.setCheckState(true);
+		actionSetsViewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				final ActionSet actionSet = (ActionSet) event.getElement();
+				if (event.getChecked()) {
+					actionSet.setActive(true);
+					for (DisplayItem item : actionSet.contributionItems) {
+						item.setCheckState(true);
+					}
+				} else {
+					actionSet.setActive(false);
 				}
-			} else {
-				actionSet.setActive(false);
 			}
 		});
 
@@ -896,11 +915,14 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Updates the menu item and toolbar items tree viewers when the
 		// selection changes
 		actionSetsViewer
-				.addSelectionChangedListener(event -> {
-					selectedActionSet[0] = (ActionSet) ((IStructuredSelection) event
-							.getSelection()).getFirstElement();
-					actionSetMenuViewer.setInput(menuItems);
-					actionSetToolbarViewer.setInput(toolBarItems);
+				.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
+					public void selectionChanged(SelectionChangedEvent event) {
+						selectedActionSet[0] = (ActionSet) ((IStructuredSelection) event
+								.getSelection()).getFirstElement();
+						actionSetMenuViewer.setInput(menuItems);
+						actionSetToolbarViewer.setInput(toolBarItems);
+					}
 				});
 
 		sashComposite.setWeights(new int[] { 30, 70 });
@@ -998,17 +1020,20 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 		// Override any attempts to set an item to visible
 		// which exists in an unavailable action set
-		treeManager.addListener(changedItem -> {
-			if (!(changedItem instanceof DisplayItem)) {
-				return;
+		treeManager.addListener(new CheckListener() {
+			@Override
+			public void checkChanged(TreeItem changedItem) {
+				if (!(changedItem instanceof DisplayItem)) {
+					return;
+				}
+				if (!changedItem.getState()) {
+					return;
+				}
+				if (isAvailable((DisplayItem) changedItem)) {
+					return;
+				}
+				changedItem.setCheckState(false);
 			}
-			if (!changedItem.getState()) {
-				return;
-			}
-			if (isAvailable((DisplayItem) changedItem)) {
-				return;
-			}
-			changedItem.setCheckState(false);
 		});
 
 		final Button showCommandGroupFilterButton = new Button(
@@ -1152,17 +1177,20 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 		// Override any attempts to set an item to visible
 		// which exists in an unavailable action set
-		treeManager.addListener(changedItem -> {
-			if (!(changedItem instanceof DisplayItem)) {
-				return;
+		treeManager.addListener(new CheckListener() {
+			@Override
+			public void checkChanged(TreeItem changedItem) {
+				if (!(changedItem instanceof DisplayItem)) {
+					return;
+				}
+				if (!changedItem.getState()) {
+					return;
+				}
+				if (isAvailable((DisplayItem) changedItem)) {
+					return;
+				}
+				changedItem.setCheckState(false);
 			}
-			if (!changedItem.getState()) {
-				return;
-			}
-			if (isAvailable((DisplayItem) changedItem)) {
-				return;
-			}
-			changedItem.setCheckState(false);
 		});
 
 		final Button showCommandGroupFilterButton = new Button(

@@ -25,8 +25,12 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.LayoutConstants;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
@@ -295,12 +299,21 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 			}
 		});
 
-		viewer.addSelectionChangedListener(event -> updateDescription());
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
-		viewer.addCheckStateListener(event -> {
-			transferAllButton.setSelection(false);
-			updateEnablement();
-			updatePageCompletion();
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				updateDescription();
+			}
+		});
+
+		viewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				transferAllButton.setSelection(false);
+				updateEnablement();
+				updatePageCompletion();
+			}
 		});
 
 		addSelectionButtons(group);
@@ -977,7 +990,12 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
 		// run in syncExec because callback is from an operation,
 		// which is probably not running in the UI thread.
-		getControl().getDisplay().syncExec(() -> dialog.open());
+		getControl().getDisplay().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				dialog.open();
+			}
+		});
 		return dialog.getReturnCode() < 0 ? CANCEL : response[dialog
 				.getReturnCode()];
 	}
