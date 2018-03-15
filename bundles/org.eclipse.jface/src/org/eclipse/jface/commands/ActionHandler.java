@@ -157,7 +157,7 @@ public final class ActionHandler extends AbstractHandler {
 
 	@Override
 	public final String toString() {
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer();
 
 		buffer.append("ActionHandler("); //$NON-NLS-1$
 		buffer.append(action);

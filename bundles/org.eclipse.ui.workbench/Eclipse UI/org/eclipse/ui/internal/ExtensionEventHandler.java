@@ -195,7 +195,7 @@ class ExtensionEventHandler implements IRegistryChangeListener {
 			return;
 		}
 
-        final StringBuilder message = new StringBuilder(
+        final StringBuffer message = new StringBuffer(
                 ExtensionEventHandlerMessages.ExtensionEventHandler_following_changes);
 
         for (Iterator i = changeList.iterator(); i.hasNext();) {
