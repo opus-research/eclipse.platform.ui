@@ -504,9 +504,10 @@ public class KeyController {
 		final SafeRunnable runnable = new SafeRunnable() {
 			@Override
 			public final void run() throws IOException {
-				try (Writer fileWriter = new BufferedWriter(
-						new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8))) {
-
+				Writer fileWriter = null;
+				try {
+					fileWriter = new BufferedWriter(new OutputStreamWriter(
+							new FileOutputStream(filePath), StandardCharsets.UTF_8));
 					final Object[] bindingElements = bindingModel.getBindings().toArray();
 					for (Object bindingElement : bindingElements) {
 						final BindingElement be = (BindingElement) bindingElement;
@@ -524,10 +525,18 @@ public class KeyController {
 						buffer.append(ESCAPED_QUOTE + be.getTrigger().format()
 								+ ESCAPED_QUOTE + DELIMITER);
 						buffer.append(ESCAPED_QUOTE + be.getContext().getName()
-								+ ESCAPED_QUOTE + DELIMITER);
-						buffer.append(ESCAPED_QUOTE + be.getId() + ESCAPED_QUOTE);
+								+ ESCAPED_QUOTE);
 						buffer.append(System.getProperty("line.separator")); //$NON-NLS-1$
 						fileWriter.write(buffer.toString());
+					}
+
+				} finally {
+					if (fileWriter != null) {
+						try {
+							fileWriter.close();
+						} catch (final IOException e) {
+							// At least I tried.
+						}
 					}
 
 				}
