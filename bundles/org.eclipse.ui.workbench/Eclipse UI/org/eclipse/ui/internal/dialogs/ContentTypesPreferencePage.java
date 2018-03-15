@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) - [91965] associate contenttype with editors
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -41,24 +42,31 @@ import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.EditorSelectionDialog;
 import org.eclipse.ui.dialogs.PreferenceLinkArea;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.internal.progress.ProgressManager;
+import org.eclipse.ui.internal.registry.EditorRegistry;
 import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -73,6 +81,8 @@ import org.eclipse.ui.statushandlers.StatusManager;
  */
 public class ContentTypesPreferencePage extends PreferencePage implements
 		IWorkbenchPreferencePage {
+	public ContentTypesPreferencePage() {
+	}
 
 	private TableViewer fileAssociationViewer;
 
@@ -93,6 +103,10 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 	private Button removeContentTypeButton;
 
 	private Button addChildContentTypeButton;
+
+	private TableViewer editorAssociationsViewer;
+
+	private Button addEditorAssociationButton;
 
 	private class Spec {
 		String name;
@@ -254,7 +268,7 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 	@Override
 	protected Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(1, false);
 		layout.marginHeight = layout.marginWidth = 0;
 		composite.setLayout(layout);
 
@@ -269,8 +283,18 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 		contentTypeArea.getControl().setLayoutData(data);
 
 		createContentTypesTree(composite);
-		createFileAssociations(composite);
-		createCharset(composite);
+		Composite detailsComposite = new Composite(composite, SWT.NONE);
+		detailsComposite.setLayout(new GridLayout(2, true));
+		detailsComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		Composite leftColumnComposite = new Composite(detailsComposite, SWT.NONE);
+		leftColumnComposite.setLayout(new GridLayout(1, false));
+		leftColumnComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		createFileAssociations(leftColumnComposite);
+		createCharset(leftColumnComposite);
+		Composite rightColumnComposite = new Composite(detailsComposite, SWT.NONE);
+		rightColumnComposite.setLayout(new GridLayout(1, false));
+		rightColumnComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		createEditors(rightColumnComposite);
 
 		workbench.getHelpSystem().setHelp(parent,
 				IWorkbenchHelpContextIds.CONTENT_TYPES_PREFERENCE_PAGE);
@@ -279,12 +303,92 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 		return composite;
 	}
 
+	/**
+	 * @param rightColumnComposite
+	 */
+	private void createEditors(Composite parent) {
+		final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+		Group group = new Group(parent, SWT.NONE);
+		group.setLayout(new GridLayout(2, false));
+		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		group.setText(WorkbenchMessages.ContentTypes_editorAssociations);
+		editorAssociationsViewer = new TableViewer(group);
+		editorAssociationsViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		editorAssociationsViewer.setContentProvider(new IStructuredContentProvider() {
+			@Override
+			public Object[] getElements(Object arg0) {
+				if (arg0 instanceof IContentType) {
+					return editorRegistry.getEditors(null, (IContentType) arg0);
+				}
+				return new Object[0];
+			}
+		});
+		editorAssociationsViewer.setLabelProvider(new LabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((IEditorDescriptor) element).getLabel();
+			}
+
+			@Override
+			public Image getImage(Object element) {
+				// TODO dispose
+				return ((IEditorDescriptor) element).getImageDescriptor().createImage();
+			}
+		});
+		Composite buttonsComposite = new Composite(group, SWT.NONE);
+		buttonsComposite.setLayout(new GridLayout(1, false));
+		buttonsComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+		addEditorAssociationButton = new Button(buttonsComposite, SWT.PUSH);
+		addEditorAssociationButton.setText(WorkbenchMessages.ContentTypes_editorAssociationAddLabel);
+		setButtonLayoutData(addEditorAssociationButton);
+		addEditorAssociationButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (editorRegistry instanceof EditorRegistry) {
+					EditorSelectionDialog dialog = new EditorSelectionDialog(getShell());
+					EditorRegistry registry = (EditorRegistry) editorRegistry;
+					IContentType contentType = (IContentType) editorAssociationsViewer.getInput();
+					if (dialog.open() == IDialogConstants.OK_ID) {
+						registry.addUserAssociation(contentType, dialog.getSelectedEditor());
+						editorAssociationsViewer.refresh();
+					}
+				}
+			}
+		});
+		final Button removeEditorButton = new Button(buttonsComposite, SWT.PUSH);
+		removeEditorButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (editorRegistry instanceof EditorRegistry) {
+					EditorRegistry registry = (EditorRegistry) editorRegistry;
+					IEditorDescriptor editor = (IEditorDescriptor) ((IStructuredSelection) editorAssociationsViewer
+							.getSelection()).getFirstElement();
+					IContentType contentType = (IContentType) editorAssociationsViewer.getInput();
+					registry.removeUserAssociation(contentType, editor);
+					editorAssociationsViewer.refresh();
+				}
+			}
+		});
+		removeEditorButton.setText(WorkbenchMessages.ContentTypes_editorAssociationRemoveLabel);
+		setButtonLayoutData(removeEditorButton);
+		editorAssociationsViewer.addSelectionChangedListener(event -> {
+			if (editorRegistry instanceof EditorRegistry) {
+				EditorRegistry registry = (EditorRegistry) editorRegistry;
+				IEditorDescriptor editor = (IEditorDescriptor) ((IStructuredSelection) editorAssociationsViewer
+						.getSelection()).getFirstElement();
+				IContentType contentType = (IContentType) editorAssociationsViewer.getInput();
+				removeEditorButton.setEnabled(registry.isUserAssociation(contentType, editor));
+			}
+		});
+		addEditorAssociationButton.setEnabled(editorAssociationsViewer.getInput() != null);
+		removeEditorButton.setEnabled(editorAssociationsViewer.getInput() != null);
+	}
+
 	private void createCharset(final Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(3, false);
 		layout.marginHeight = layout.marginWidth = 0;
 		GridData compositeData = new GridData(GridData.FILL_HORIZONTAL);
-		compositeData.horizontalSpan = 2;
 		composite.setLayoutData(compositeData);
 		composite.setLayout(layout);
 
@@ -346,14 +450,11 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 	/**
 	 * @param composite
 	 */
-	private void createFileAssociations(final Composite composite) {
-		{
-			Label label = new Label(composite, SWT.NONE);
-			label.setText(WorkbenchMessages.ContentTypes_fileAssociationsLabel);
-			GridData data = new GridData();
-			data.horizontalSpan = 2;
-			label.setLayoutData(data);
-		}
+	private void createFileAssociations(final Composite parent) {
+		Group composite = new Group(parent, SWT.NONE);
+		composite.setLayout(new GridLayout(2, false));
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		composite.setText(WorkbenchMessages.ContentTypes_fileAssociationsLabel);
 		{
 			fileAssociationViewer = new TableViewer(composite);
 			fileAssociationViewer.setComparator(new FileSpecComparator());
@@ -536,7 +637,10 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 	/**
 	 * @param composite
 	 */
-	private void createContentTypesTree(Composite composite) {
+	private void createContentTypesTree(Composite parent) {
+		Composite composite = new Composite(parent, SWT.NONE);
+		composite.setLayout(new GridLayout(2, false));
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		{
 			Label label = new Label(composite, SWT.NONE);
 			label.setFont(composite.getFont());
@@ -563,6 +667,7 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 						IContentType contentType = (IContentType) ((IStructuredSelection) event
 								.getSelection()).getFirstElement();
 						fileAssociationViewer.setInput(contentType);
+						editorAssociationsViewer.setInput(contentType);
 						editButton.setEnabled(false);
 						removeButton.setEnabled(false);
 
@@ -578,6 +683,7 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 						}
 
 						charsetField.setEnabled(contentType != null);
+						addEditorAssociationButton.setEnabled(contentType != null);
 						addButton.setEnabled(contentType != null);
 						setButton.setEnabled(false);
 
