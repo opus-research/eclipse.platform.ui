@@ -1,13 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation\
- *     Mickael Istria (Red Hat Inc.) - [Cleanup] Take advantage of autoboxing
+ *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.ui.internal.views.markers;
@@ -29,8 +28,8 @@ public class ErrorsWarningsParameters extends FiltersContributionParameters {
 	private static Map<String, Integer> parametersMap;
 	static {
 		parametersMap = new HashMap<>();
-		parametersMap.put(IMarker.SEVERITY,
-				SeverityAndDescriptionFieldFilter.SEVERITY_WARNING | SeverityAndDescriptionFieldFilter.SEVERITY_ERROR);
+		parametersMap.put(IMarker.SEVERITY, new Integer(
+				SeverityAndDescriptionFieldFilter.SEVERITY_WARNING | SeverityAndDescriptionFieldFilter.SEVERITY_ERROR));
 	}
 
 	/**

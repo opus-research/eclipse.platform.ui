@@ -318,7 +318,7 @@ public class MarkersPropertyPage extends PropertyPage {
 				priority = IMarker.PRIORITY_LOW;
 			}
 
-			attrs.put(IMarker.PRIORITY, priority);
+			attrs.put(IMarker.PRIORITY, new Integer(priority));
 		}
 
 		if (completedCheckbox != null) {

@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - [Cleanup] Take advantage of autoboxing
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
@@ -199,7 +198,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
         GridData buttonData = new GridData(GridData.FILL_HORIZONTAL);
         button.setLayoutData(buttonData);
 
-		button.setData(id);
+        button.setData(new Integer(id));
         button.setText(label);
 
         if (defaultButton) {
