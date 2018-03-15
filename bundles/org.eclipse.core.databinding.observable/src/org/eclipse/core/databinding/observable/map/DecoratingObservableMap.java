@@ -334,6 +334,21 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		getterCalled();
+		if (this == obj) {
+			return true;
+		}
+		return decorated.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		getterCalled();
+		return decorated.hashCode();
+	}
+
+	@Override
 	public String toString() {
 		getterCalled();
 		return decorated.toString();

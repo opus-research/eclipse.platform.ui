@@ -143,7 +143,7 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 	private void removeMapping(Object key, V value) {
 		if (valuesToSingleKeys.containsKey(value)) {
 			K element = valuesToSingleKeys.get(value);
-			if (element != null && element.equals(key)) {
+			if (element == key || (element != null && element.equals(key))) {
 				valuesToSingleKeys.remove(value);
 			}
 		} else if (valuesToSetsOfKeys.containsKey(value)) {

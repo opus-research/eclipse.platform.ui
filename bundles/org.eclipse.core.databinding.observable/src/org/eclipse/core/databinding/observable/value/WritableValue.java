@@ -94,7 +94,7 @@ public class WritableValue<T> extends AbstractObservableValue<T> {
 	 */
 	@Override
 	public void doSetValue(T value) {
-		if (!(this.value == null) && !this.value.equals(value)) {
+		if (this.value != value) {
 			fireValueChange(Diffs.createValueDiff(this.value,
 					this.value = value));
 		}

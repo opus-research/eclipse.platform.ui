@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-;
 
 /**
  * @since 3.2
@@ -42,8 +41,8 @@ public class TreeViewerComparatorTest extends ViewerComparatorTest{
 		@Override
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof List){
-				List children = new ArrayList();
-				Iterator iter = ((List)parentElement).iterator();
+				List<Team> children = new ArrayList<>();
+				Iterator<?> iter = ((List<?>) parentElement).iterator();
 				while(iter.hasNext()){
 					Object next = iter.next();
 					if (next instanceof Team){
@@ -77,20 +76,21 @@ public class TreeViewerComparatorTest extends ViewerComparatorTest{
 	        return false;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			List oldElement = (List) oldInput;
+			List<Team> oldElement = (List<Team>) oldInput;
 	        if (oldElement != null) {
-	        	Iterator iter = oldElement.iterator();
+				Iterator<Team> iter = oldElement.iterator();
 	        	while (iter.hasNext()){
-	        		((Team)iter.next()).removeListener(this);
+					iter.next().removeListener(this);
 	        	}
 	        }
-	        List newElement = (List) newInput;
+			List<Team> newElement = (List<Team>) newInput;
 	        if (newElement != null) {
-	        	Iterator iter = newElement.iterator();
+				Iterator<Team> iter = newElement.iterator();
 	        	while (iter.hasNext()){
-	        		((Team)iter.next()).addListener(this);
+	        		iter.next().addListener(this);
 	        	}
 	        }
 		}
@@ -179,7 +179,7 @@ public class TreeViewerComparatorTest extends ViewerComparatorTest{
 
 	@Override
 	protected void setInput() {
-		List input = new ArrayList(3);
+		List<Team> input = new ArrayList<>(3);
 		input.add(team1);
 		input.add(team2);
 		input.add(team3);

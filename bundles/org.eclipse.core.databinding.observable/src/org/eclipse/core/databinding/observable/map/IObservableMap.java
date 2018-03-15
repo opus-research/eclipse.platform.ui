@@ -131,4 +131,16 @@ public interface IObservableMap<K, V> extends Map<K, V>, IObservable {
 	 */
 	@Override
 	public Set<Map.Entry<K, V>> entrySet();
+
+	/**
+	 * @TrackedGetter
+	 */
+	@Override
+	public boolean equals(Object o);
+
+	/**
+	 * @TrackedGetter
+	 */
+	@Override
+	public int hashCode();
 }

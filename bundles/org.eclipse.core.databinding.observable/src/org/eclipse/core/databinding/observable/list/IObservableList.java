@@ -138,6 +138,18 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 	 * @TrackedGetter
 	 */
 	@Override
+	public boolean equals(Object o);
+
+	/**
+	 * @TrackedGetter
+	 */
+	@Override
+	public int hashCode();
+
+	/**
+	 * @TrackedGetter
+	 */
+	@Override
 	public E get(int index);
 
 	/**

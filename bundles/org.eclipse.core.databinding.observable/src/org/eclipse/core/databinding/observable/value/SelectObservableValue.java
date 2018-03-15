@@ -206,13 +206,9 @@ public class SelectObservableValue<T> extends AbstractObservableValue<T> {
 	}
 
 	private int indexOfObservable(IObservableValue<? extends Boolean> observable) {
-		IObservableValue<? extends Boolean> observableValue;
-		for (int i = 0; i < options.size(); i++) {
-			observableValue = options.get(i).observable;
-			if (observableValue != null && observableValue.equals(observable)) {
+		for (int i = 0; i < options.size(); i++)
+			if (options.get(i).observable == observable)
 				return i;
-			}
-		}
 		return -1;
 	}
 }

@@ -180,7 +180,7 @@ public class SetBinding extends Binding {
 		destination.getRealm().exec(new Runnable() {
 			@Override
 			public void run() {
-				if (destination.equals(getTarget())) {
+				if (destination == getTarget()) {
 					updatingTarget = true;
 				} else {
 					updatingModel = true;
@@ -218,7 +218,7 @@ public class SetBinding extends Binding {
 				} finally {
 					setValidationStatus(multiStatus);
 
-					if (destination.equals(getTarget())) {
+					if (destination == getTarget()) {
 						updatingTarget = false;
 					} else {
 						updatingModel = false;
