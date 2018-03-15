@@ -583,8 +583,7 @@ public class EditorSelectionDialog extends Dialog {
 	 */
 	protected void restoreWidgetValues() {
 		IDialogSettings settings = getDialogSettings();
-		if (!getFileExtension(fileName).equals(settings.get(STORE_ID_FILE_EXTENSION))) {
-			// last selection most likely not relevant for other file types
+		if (!(selectedEditor == null || getFileExtension(fileName).equals(settings.get(STORE_ID_FILE_EXTENSION)))) {
 			return;
 		}
 		boolean wasExternal = settings.getBoolean(STORE_ID_INTERNAL_EXTERNAL);
