@@ -102,8 +102,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			 */
 			StringBuffer activatedFiltersPreferenceValue = new StringBuffer(DELIM);
 
-			for (String string : activeFilters) {
-				String id = string.toString();
+			for (String id : activeFilters) {
 				if (!dm.getFilterById(id).isVisibleInUi())
 					continue;
 				activatedFiltersPreferenceValue.append(id).append(DELIM);
@@ -244,8 +243,8 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		/* If so, update */
 		if (updateFilterActivation) {
 			if (nonUiVisible != null) {
-				for (String element : filterIdsToActivate)
-					nonUiVisible.add(element);
+				for (String filterIdToActivate : filterIdsToActivate)
+					nonUiVisible.add(filterIdToActivate);
 				filterIdsToActivate = nonUiVisible.toArray(new String[]{});
 			}
 

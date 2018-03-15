@@ -73,9 +73,7 @@ public class CommonFilterDescriptorManager {
 	public CommonFilterDescriptor[] findVisibleFilters(INavigatorContentService contentService, boolean forUI) {
 
 		List<CommonFilterDescriptor> visibleFilters = new ArrayList<CommonFilterDescriptor>();
-		CommonFilterDescriptor descriptor;
-		for (Object element : filters.entrySet()) {
-			descriptor = (CommonFilterDescriptor) ((Map.Entry)element).getValue();
+		for (CommonFilterDescriptor descriptor : filters.values()) {
 			if (forUI && !descriptor.isVisibleInUi())
 				continue;
 			if (contentService.isVisible(descriptor.getId())) {

@@ -157,8 +157,8 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 				String[] compositePropertiesNames = engine
 						.getCSSCompositePropertiesNames(propertyName);
 				if (compositePropertiesNames != null) {
-					for (String compositePropertiesName : compositePropertiesNames) {
-						propertyName = compositePropertiesName;
+					for (String compositePropertyName : compositePropertiesNames) {
+						propertyName = compositePropertyName;
 						String s = getCSSPropertyStyle(engine, stylableElement,
 								propertyName, pseudoE);
 						if (s != null) {

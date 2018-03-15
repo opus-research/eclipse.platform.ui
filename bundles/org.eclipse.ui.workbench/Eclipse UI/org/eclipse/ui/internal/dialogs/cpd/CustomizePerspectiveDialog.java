@@ -1492,8 +1492,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			category.addShortcutItem(item);
 		}
 		// @issue should not pass in null
-		IWizardCategory[] children = element.getCategories();
-		for (IWizardCategory child : children) {
+		for (IWizardCategory child : element.getCategories()) {
 			initializeNewWizardsMenu(menu, category, child, activeIds);
 		}
 	}

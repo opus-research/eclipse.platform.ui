@@ -473,8 +473,7 @@ public class FilteredTree extends Composite {
 					redrawFalseControl.setRedraw(false);
 					if (!narrowingDown) {
 						// collapse all
-						TreeItem[] is = treeViewer.getTree().getItems();
-						for (TreeItem item : is) {
+						for (TreeItem item : treeViewer.getTree().getItems()) {
 							if (item.getExpanded()) {
 								treeViewer.setExpandedState(item.getData(),
 										false);

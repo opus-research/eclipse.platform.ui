@@ -11,7 +11,6 @@
 package org.eclipse.ui.internal.dialogs;
 
 import java.util.ArrayList;
-
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.model.AdaptableList;
@@ -36,13 +35,11 @@ public class WizardContentProvider implements ITreeContentProvider {
             ArrayList list = new ArrayList();
             WizardCollectionElement element = (WizardCollectionElement) parentElement;
 
-            Object[] childCollections = element.getChildren();
-            for (Object childCollection : childCollections) {
+			for (Object childCollection : element.getChildren()) {
                 handleChild(childCollection, list);
             }
 
-            Object[] childWizards = element.getWizards();
-            for (Object childWizard : childWizards) {
+			for (Object childWizard : element.getWizards()) {
                 handleChild(childWizard, list);
             }
 
@@ -80,8 +77,7 @@ public class WizardContentProvider implements ITreeContentProvider {
     @Override
 	public Object getParent(Object element) {
         if (element instanceof WizardCollectionElement) {
-            Object[] children = input.getChildren();
-            for (Object child : children) {
+			for (Object child : input.getChildren()) {
                 if (child.equals(element)) {
 					return input;
 				}

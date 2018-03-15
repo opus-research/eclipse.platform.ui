@@ -167,8 +167,8 @@ public abstract class AbstractMultiEditor extends EditorPart {
         innerEditors = children;
         activeEditorIndex = 0;
 
-		for (IEditorPart element : children) {
-			element.addPropertyListener( (source, propId) -> handlePropertyChange(propId));
+		for (IEditorPart child : children) {
+			child.addPropertyListener( (source, propId) -> handlePropertyChange(propId));
 		}
 
         innerEditorsCreated();

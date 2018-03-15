@@ -15,7 +15,6 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Deque;
-import java.util.Set;
 
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -212,25 +211,22 @@ public class CommonFiltersTab extends CustomizationTab {
 		patternFilter.setPattern(filterText.getText());
 		getTableViewer().refresh();
 
-		Set<Object> checkedItems = getCheckedItems();
-		for (Object object : checkedItems) {
-			getTableViewer().setChecked(object, true);
+		for (Object checkedItem : getCheckedItems()) {
+			getTableViewer().setChecked(checkedItem, true);
 		}
 	}
 
 	private void updateFiltersCheckState() {
-		Object[] children = filterContentProvider
-				.getElements(getContentService());
 		ICommonFilterDescriptor filterDescriptor;
 		INavigatorFilterService filterService = getContentService()
 				.getFilterService();
-		for (Object element : children) {
-			filterDescriptor = (ICommonFilterDescriptor) element;
+		for (Object child : filterContentProvider.getElements(getContentService())) {
+			filterDescriptor = (ICommonFilterDescriptor) child;
 			if(filterService.isActive(filterDescriptor.getId())) {
-				getTableViewer().setChecked(element, true);
-				getCheckedItems().add(element);
+				getTableViewer().setChecked(child, true);
+				getCheckedItems().add(child);
 			} else {
-				getTableViewer().setChecked(element, false);
+				getTableViewer().setChecked(child, false);
 			}
 		}
 	}

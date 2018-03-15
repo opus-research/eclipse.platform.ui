@@ -462,8 +462,7 @@ public abstract class AbstractTableInformationControl {
 	}
 
 	private Object findElement(TableItem[] items) {
-		ILabelProvider labelProvider = (ILabelProvider) fTableViewer
-				.getLabelProvider();
+		ILabelProvider labelProvider = (ILabelProvider) fTableViewer.getLabelProvider();
 		for (TableItem item : items) {
 			Object element = item.getData();
 			if (fSearchPattern == null) {

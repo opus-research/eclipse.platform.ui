@@ -127,9 +127,8 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
      * @return WizardCollectionElement
      */
     public WizardCollectionElement findChildCollection(IPath searchPath) {
-        Object[] children = getChildren(null);
         String searchString = searchPath.segment(0);
-        for (Object element : children) {
+		for (Object element : getChildren(null)) {
             WizardCollectionElement currentCategory = (WizardCollectionElement) element;
             if (currentCategory.getId().equals(searchString)) {
                 if (searchPath.segmentCount() == 1) {
@@ -154,8 +153,7 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
      * @since 3.1
      */
     public WizardCollectionElement findCategory(String id) {
-        Object[] children = getChildren(null);
-        for (Object element : children) {
+		for (Object element : getChildren(null)) {
             WizardCollectionElement currentCategory = (WizardCollectionElement) element;
             if (id.equals(currentCategory.getId())) {
                     return currentCategory;
@@ -177,8 +175,7 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
      * @return the element
      */
     public WorkbenchWizardElement findWizard(String searchId, boolean recursive) {
-        Object[] wizards = getWizards();
-        for (Object wizard : wizards) {
+		for (Object wizard : getWizards()) {
             WorkbenchWizardElement currentWizard = (WorkbenchWizardElement) wizard;
             if (currentWizard.getId().equals(searchId)) {
 				return currentWizard;
