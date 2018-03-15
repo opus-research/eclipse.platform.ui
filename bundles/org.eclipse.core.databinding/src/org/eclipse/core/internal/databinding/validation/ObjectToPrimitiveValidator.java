@@ -60,9 +60,9 @@ public class ObjectToPrimitiveValidator implements IValidator {
 	}
 
 	private boolean mapContainsValues(Class toType, Class fromType) {
-		for (int i = 0; i < primitiveMap.length; i++) {
-			if ((primitiveMap[i][0].equals(toType))
-					&& (primitiveMap[i][1].equals(fromType))) {
+		for (Class[] element : primitiveMap) {
+			if ((element[0].equals(toType))
+					&& (element[1].equals(fromType))) {
 				return true;
 			}
 		}
