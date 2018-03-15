@@ -12,7 +12,6 @@
 
 package org.eclipse.ui.tests.forms.util;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -20,6 +19,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.forms.widgets.FormFonts;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class FormFontsTest {
@@ -28,12 +28,11 @@ public class FormFontsTest {
 		Display display = Display.getCurrent();
 		FormFonts instance = FormFonts.getInstance();
 		// ensure the singleton is returning the same instance
-		assertTrue("getInstance() returned a different FormFonts instance", instance.equals(FormFonts.getInstance()));
+		Assert.assertTrue("getInstance() returned a different FormFonts instance", instance.equals(FormFonts.getInstance()));
 		Font boldSystemFont = instance.getBoldFont(display, display.getSystemFont());
 		instance.markFinished(boldSystemFont, display);
 		// ensure the singleton is returning the same instance after creating and disposing one gradient
-		assertTrue("getInstance() returned a different FormFonts instance after creation and disposal of one bold font",
-				instance.equals(FormFonts.getInstance()));
+		Assert.assertTrue("getInstance() returned a different FormFonts instance after creation and disposal of one bold font", instance.equals(FormFonts.getInstance()));
 	}
 
 	@Test
@@ -42,8 +41,7 @@ public class FormFontsTest {
 		Font boldSystemFont = FormFonts.getInstance().getBoldFont(display, display.getSystemFont());
 		FormFonts.getInstance().markFinished(boldSystemFont, display);
 		// ensure that getting a single gradient and marking it as finished disposed it
-		assertTrue("markFinished(...) did not dispose a font after a single getBoldFont()",
-				boldSystemFont.isDisposed());
+		Assert.assertTrue("markFinished(...) did not dispose a font after a single getBoldFont()", boldSystemFont.isDisposed());
 	}
 
 	@Test
@@ -53,18 +51,16 @@ public class FormFontsTest {
 		int count;
 		// ensure that the same image is returned for many calls with the same parameter
 		for (count = 1; count < 20; count ++)
-			assertEquals("getBoldFont(...) returned a different font for the same params on iteration " + count,
+			Assert.assertEquals("getBoldFont(...) returned a different font for the same params on iteration "+count,
 					boldSystemFont, FormFonts.getInstance().getBoldFont(display, display.getSystemFont()));
 		for ( ;count > 0; count--) {
 			FormFonts.getInstance().markFinished(boldSystemFont, display);
 			if (count != 1)
 				// ensure that the gradient is not disposed early
-				assertFalse("markFinished(...) disposed a shared font early on iteration " + count,
-						boldSystemFont.isDisposed());
+				Assert.assertFalse("markFinished(...) disposed a shared font early on iteration "+count,boldSystemFont.isDisposed());
 			else
 				// ensure that the gradient is disposed on the last markFinished
-				assertTrue("markFinished(...) did not dispose a shared font on the last call",
-						boldSystemFont.isDisposed());
+				Assert.assertTrue("markFinished(...) did not dispose a shared font on the last call",boldSystemFont.isDisposed());
 		}
 	}
 
@@ -90,6 +86,6 @@ public class FormFontsTest {
 		Display display = Display.getCurrent();
 		Font system = new Font(display, display.getSystemFont().getFontData());
 		FormFonts.getInstance().markFinished(system, display);
-		assertTrue("markFinished(...) did not dispose of an unknown font", system.isDisposed());
+		Assert.assertTrue("markFinished(...) did not dispose of an unknown font", system.isDisposed());
 	}
 }
