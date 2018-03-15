@@ -114,6 +114,15 @@ public class Section extends ExpandableComposite {
 	}
 
 	/**
+	 * Reflows this section and all the parents up the hierarchy until a
+	 * SharedScrolledComposite is reached.
+	 */
+	@Override
+	protected void reflow() {
+		super.reflow();
+	}
+
+	/**
 	 * Sets the description text. Has no effect if DESCRIPTION style was not
 	 * used to create the control.
 	 *
