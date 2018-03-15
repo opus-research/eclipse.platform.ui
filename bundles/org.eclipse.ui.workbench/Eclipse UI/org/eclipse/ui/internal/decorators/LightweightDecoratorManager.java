@@ -143,9 +143,11 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 * can occur.
 	 */
 	private void buildContributors() {
-		for (LightweightDecoratorDefinition decorator : lightweightDefinitions) {
-			for (String type : getTargetTypes(decorator)) {
-				registerContributor(decorator, type);
+		for (int i = 0; i < lightweightDefinitions.length; i++) {
+			LightweightDecoratorDefinition decorator = lightweightDefinitions[i];
+			String[] types = getTargetTypes(decorator);
+			for (int j = 0; j < types.length; j++) {
+				registerContributor(decorator, types[j]);
 			}
 		}
 	}
@@ -167,8 +169,8 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 			lightweightDefinitions[oldDefs.length] = decorator;
 			// no reset - handled in the DecoratorManager
 			String[] types = getTargetTypes(decorator);
-			for (String type : types) {
-				registerContributor(decorator, type);
+			for (int i = 0; i < types.length; i++) {
+				registerContributor(decorator, types[i]);
 			}
 			return true;
 		}
@@ -197,13 +199,15 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		int idx = getLightweightDecoratorDefinitionIdx(decorator.getId());
 		if (idx != -1) {
 			LightweightDecoratorDefinition[] oldDefs = lightweightDefinitions;
-			Util.arrayCopyWithRemoval(
+			Util
+					.arrayCopyWithRemoval(
 							oldDefs,
 							lightweightDefinitions = new LightweightDecoratorDefinition[lightweightDefinitions.length - 1],
 							idx);
 			// no reset - handled in the DecoratorManager
-			for (String type : getTargetTypes(decorator)) {
-				unregisterContributor(decorator, type);
+			String[] types = getTargetTypes(decorator);
+			for (int i = 0; i < types.length; i++) {
+				unregisterContributor(decorator, types[i]);
 
 			}
 			return true;
@@ -253,9 +257,9 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 */
 	LightweightDecoratorDefinition[] enabledDefinitions() {
 		ArrayList result = new ArrayList();
-		for (LightweightDecoratorDefinition lightweightDefinition : lightweightDefinitions) {
-			if (lightweightDefinition.isEnabled()) {
-				result.add(lightweightDefinition);
+		for (int i = 0; i < lightweightDefinitions.length; i++) {
+			if (lightweightDefinitions[i].isEnabled()) {
+				result.add(lightweightDefinitions[i]);
 			}
 		}
 		LightweightDecoratorDefinition[] returnArray = new LightweightDecoratorDefinition[result
@@ -270,8 +274,8 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 * @return boolean
 	 */
 	boolean hasEnabledDefinitions() {
-		for (LightweightDecoratorDefinition lightweightDefinition : lightweightDefinitions) {
-			if (lightweightDefinition.isEnabled()) {
+		for (int i = 0; i < lightweightDefinitions.length; i++) {
+			if (lightweightDefinitions[i].isEnabled()) {
 				return true;
 			}
 		}
@@ -292,9 +296,9 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	void shutdown() {
 		// Disable all fo the enabled decorators
 		// so as to force a dispose of thier decorators
-		for (LightweightDecoratorDefinition lightweightDefinition : lightweightDefinitions) {
-			if (lightweightDefinition.isEnabled()) {
-				lightweightDefinition.setEnabled(false);
+		for (int i = 0; i < lightweightDefinitions.length; i++) {
+			if (lightweightDefinitions[i].isEnabled()) {
+				lightweightDefinitions[i].setEnabled(false);
 			}
 		}
 	}
@@ -308,9 +312,9 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 *            String
 	 */
 	LightweightDecoratorDefinition getDecoratorDefinition(String decoratorId) {
-		for (LightweightDecoratorDefinition lightweightDefinition : lightweightDefinitions) {
-			if (lightweightDefinition.getId().equals(decoratorId)) {
-				return lightweightDefinition;
+		for (int i = 0; i < lightweightDefinitions.length; i++) {
+			if (lightweightDefinitions[i].getId().equals(decoratorId)) {
+				return lightweightDefinitions[i];
 			}
 		}
 		return null;
@@ -354,9 +358,15 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 *            true.
 	 */
 	public void getDecorations(Object element, DecorationBuilder decoration) {
-		for (LightweightDecoratorDefinition decorator : getDecoratorsFor(element)) {
-			decoration.setCurrentDefinition(decorator);
-			decorate(element, decoration, decorator);
+
+		LightweightDecoratorDefinition[] decorators = getDecoratorsFor(element);
+
+		for (int i = 0; i < decorators.length; i++) {
+			// If we are doing the adaptable one make sure we are
+			// only applying the adaptable decorations
+			LightweightDecoratorDefinition dd = decorators[i];
+			decoration.setCurrentDefinition(dd);
+			decorate(element, decoration, dd);
 		}
 	}
 
