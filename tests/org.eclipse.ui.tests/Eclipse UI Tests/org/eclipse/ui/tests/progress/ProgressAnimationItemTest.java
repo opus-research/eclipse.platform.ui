@@ -18,9 +18,6 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.Accessible;
 import org.eclipse.swt.layout.FillLayout;
@@ -42,15 +39,6 @@ import org.junit.Test;
 public class ProgressAnimationItemTest {
 	private Shell shell;
 	private ProgressAnimationItem animationItem;
-	private JobChangeAdapter consumeEventLoopOnJobDone = new JobChangeAdapter() {
-		@Override
-		public void done(IJobChangeEvent event) {
-			PlatformUI.getWorkbench().getDisplay().syncExec(() -> {
-				while (PlatformUI.getWorkbench().getDisplay().readAndDispatch()) {
-				}
-			});
-		}
-	};
 
 	@Before
 	public void setUp() {
@@ -71,23 +59,21 @@ public class ProgressAnimationItemTest {
 
 	@Test
 	public void testSingleJobRefreshOnce() throws Exception {
-		try {
-			Job.getJobManager().addJobChangeListener(consumeEventLoopOnJobDone);
+		createAndScheduleJob();
 
-			createAndScheduleJob();
+		waitAndReadAndDispatch();
 
-			refresh();
+		refresh();
 
-			assertSingleAccessibleListener();
-		} finally {
-			Job.getJobManager().removeJobChangeListener(consumeEventLoopOnJobDone);
-		}
+		assertSingleAccessibleListener();
 	}
 
 	@Test
 	public void testTwoJobsRefreshOnce() throws Exception {
 		createAndScheduleJob();
 		createAndScheduleJob();
+
+		waitAndReadAndDispatch();
 
 		refresh();
 
@@ -96,17 +82,18 @@ public class ProgressAnimationItemTest {
 
 	@Test
 	public void testSingleJobRefreshTwice() throws Exception {
-		try {
-			Job.getJobManager().addJobChangeListener(consumeEventLoopOnJobDone);
+		createAndScheduleJob();
 
-			createAndScheduleJob();
+		waitAndReadAndDispatch();
 
-			refresh();
-			refresh();
+		refresh();
+		refresh();
 
-			assertSingleAccessibleListener();
-		} finally {
-			Job.getJobManager().removeJobChangeListener(consumeEventLoopOnJobDone);
+		assertSingleAccessibleListener();
+	}
+
+	private void waitAndReadAndDispatch() throws InterruptedException {
+		while (PlatformUI.getWorkbench().getDisplay().readAndDispatch()) {
 		}
 	}
 
@@ -132,20 +119,7 @@ public class ProgressAnimationItemTest {
 	}
 
 	private void assertSingleAccessibleListener() throws Exception {
-		Display display = PlatformUI.getWorkbench().getDisplay();
-		// ProgressManager has enqueued some runnables for the refresh to
-		// happen. The assert will be wrong before these runnables have
-		// completed. We call asynchExec here to ensure that the assert will be
-		// executed after the PM runnables.
-		display.asyncExec(() -> {
-			try {
-				assertEquals(1, getAccessibleListenersSize(getToolBar(animationItem).getAccessible()));
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		});
-		while (display.readAndDispatch()) {
-		}
+		assertEquals(1, getAccessibleListenersSize(getToolBar(animationItem).getAccessible()));
 	}
 
 	private ToolBar getToolBar(ProgressAnimationItem animationItem) {
