@@ -105,12 +105,23 @@ public class ImageBasedFrame extends Canvas {
 
 			@Override
 			public void controlMoved(ControlEvent e) {
+				// Bug 463245 - The framed control should always stay at the same location
+				setFramedControlLocation();
 			}
 		});
+		setFramedControlLocation();
 		setSize(computeSize(-1, -1));
 
 		if (toWrap instanceof ToolBar) {
 			id = "TB";// ((ToolBar) toWrap).getItem(0).getToolTipText(); //$NON-NLS-1$
+		}
+	}
+
+	private void setFramedControlLocation() {
+		if (vertical) {
+			framedControl.setLocation(w1, h1 + handleHeight);
+		} else {
+			framedControl.setLocation(w1 + handleWidth, h1);
 		}
 	}
 
