@@ -11,7 +11,6 @@
  *     Carsten Pfeiffer, Gebit Solutions GmbH - bug 259536
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *     Mickael Istria, Red Hat Inc. - [91965] Add ct/editor mapping in user space
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 527069
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -298,16 +297,12 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
      */
     private void addExternalEditorsToEditorMap() {
         // Add registered editors (may include external editors).
-	for (FileEditorMapping map : typeEditorMappings.allMappings()) {
+		for (FileEditorMapping map : typeEditorMappings.allMappings()) {
             IEditorDescriptor[] descArray = map.getEditors();
             for (IEditorDescriptor desc : descArray) {
 				mapIDtoEditor.put(desc.getId(), desc);
             }
         }
-	// Add external editors from OS
-	for (IEditorDescriptor desc : getSortedEditorsFromOS()) {
-		mapIDtoEditor.put(desc.getId(), desc);
-	}
     }
 
     @Override
@@ -604,7 +599,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 		}
 
         StringTokenizer extEditors = new StringTokenizer(defaultEditors,
-				Character.valueOf(IPreferenceConstants.SEPARATOR).toString());
+				new Character(IPreferenceConstants.SEPARATOR).toString());
         while (extEditors.hasMoreTokens()) {
             String extEditor = extEditors.nextToken().trim();
             int index = extEditor.indexOf(':');
