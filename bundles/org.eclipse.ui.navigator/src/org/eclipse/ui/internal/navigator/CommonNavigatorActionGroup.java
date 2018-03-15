@@ -19,7 +19,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ActionGroup;
@@ -34,14 +33,13 @@ import org.eclipse.ui.internal.navigator.framelist.FrameList;
 import org.eclipse.ui.internal.navigator.framelist.UpAction;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
-import org.eclipse.ui.navigator.IMementoAware;
 import org.eclipse.ui.navigator.INavigatorViewerDescriptor;
 import org.eclipse.ui.navigator.LinkHelperService;
 
 /**
  * @since 3.2
  */
-public class CommonNavigatorActionGroup extends ActionGroup implements IMementoAware {
+public class CommonNavigatorActionGroup extends ActionGroup {
 
 	private static final String FRAME_ACTION_SEPARATOR_ID= "FRAME_ACTION_SEPARATOR_ID"; //$NON-NLS-1$
 	private static final String FRAME_ACTION_GROUP_ID= "FRAME_ACTION_GROUP_ID"; //$NON-NLS-1$
@@ -118,7 +116,7 @@ public class CommonNavigatorActionGroup extends ActionGroup implements IMementoA
 			}
 		});
 
-        IHandlerService service = commonNavigator.getSite()
+        IHandlerService service = (IHandlerService) commonNavigator.getSite()
 				.getService(IHandlerService.class);
 
 		INavigatorViewerDescriptor viewerDescriptor = commonViewer
@@ -128,7 +126,7 @@ public class CommonNavigatorActionGroup extends ActionGroup implements IMementoA
 		if (!hideLinkWithEditorAction) {
 			toggleLinkingAction = new LinkEditorAction(commonNavigator,
 					commonViewer, linkHelperService);
-			ImageDescriptor syncIcon = getImageDescriptor("elcl16/synced.gif"); //$NON-NLS-1$
+			ImageDescriptor syncIcon = getImageDescriptor("elcl16/synced.png"); //$NON-NLS-1$
 			toggleLinkingAction.setImageDescriptor(syncIcon);
 			toggleLinkingAction.setHoverImageDescriptor(syncIcon);
 			service.activateHandler(toggleLinkingAction.getActionDefinitionId(),
@@ -139,7 +137,7 @@ public class CommonNavigatorActionGroup extends ActionGroup implements IMementoA
 				.getBooleanConfigProperty(INavigatorViewerDescriptor.PROP_HIDE_COLLAPSE_ALL_ACTION);
 		if (!hideCollapseAllAction) {
 			collapseAllAction = new CollapseAllAction(commonViewer);
-			ImageDescriptor collapseAllIcon = getImageDescriptor("elcl16/collapseall.gif"); //$NON-NLS-1$
+			ImageDescriptor collapseAllIcon = getImageDescriptor("elcl16/collapseall.png"); //$NON-NLS-1$
 			collapseAllAction.setImageDescriptor(collapseAllIcon);
 			collapseAllAction.setHoverImageDescriptor(collapseAllIcon);
 			collapseAllHandler = new CollapseAllHandler(commonViewer);
@@ -229,13 +227,4 @@ public class CommonNavigatorActionGroup extends ActionGroup implements IMementoA
 		}
 	}
 
-	@Override
-	public void restoreState(IMemento aMemento) {
-		filterGroup.restoreState(aMemento);
-	}
-
-	@Override
-	public void saveState(IMemento aMemento) {
-		filterGroup.saveState(aMemento);
-	}
 }
