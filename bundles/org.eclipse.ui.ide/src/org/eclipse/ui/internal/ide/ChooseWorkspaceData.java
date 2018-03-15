@@ -127,13 +127,21 @@ public class ChooseWorkspaceData {
     }
 
     /**
-     * Return the folder to be used as a default if no other information
-     * exists. Does not return null.
-     */
+	 * @return the folder to be used as a default if no other information
+	 *         exists. Does not return null.
+	 */
     public String getInitialDefault() {
         if (initialDefault == null) {
-			setInitialDefault(System.getProperty("user.dir") //$NON-NLS-1$
-                    + File.separator + "workspace"); //$NON-NLS-1$
+			StringBuilder defaultBuilder = new StringBuilder();
+			defaultBuilder.append(System.getProperty("user.dir")); //$NON-NLS-1$
+			defaultBuilder.append(File.separator);
+			String launcherPath = System.getProperty("eclipse.launcher"); //$NON-NLS-1$
+			if (launcherPath != null) {
+				defaultBuilder.append(new File(launcherPath).getName());
+				defaultBuilder.append('-');
+			}
+			defaultBuilder.append("workspace"); //$NON-NLS-1$
+			setInitialDefault(defaultBuilder.toString());
 		}
         return initialDefault;
     }
