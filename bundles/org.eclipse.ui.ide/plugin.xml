@@ -1200,14 +1200,14 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
       <key
             commandId="org.eclipse.ui.window.fullscreenmode"
-            contextId="org.eclipse.ui.contexts.window"
+            contextId="org.eclipse.ui.contexts.dialogAndWindow"
             platform="win32"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+F11">
       </key>
       <key
             commandId="org.eclipse.ui.window.fullscreenmode"
-            contextId="org.eclipse.ui.contexts.window"
+            contextId="org.eclipse.ui.contexts.dialogAndWindow"
             platform="gtk"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+F11">
@@ -2526,19 +2526,19 @@
    <extension
          point="org.eclipse.ui.ide.unassociatedEditorStrategy">
       <strategy
-            class="org.eclipse.ui.internal.ide.SystemEditorOrTextEditorStrategy"
+            class="org.eclipse.ui.internal.ide.registry.SystemEditorOrTextEditorStrategy"
             id="org.eclipse.ui.ide.systemEditorThenTextEditor"
             interactive="false"
             label="%systemEditorThenTextEditor">
       </strategy>
       <strategy
-            class="org.eclipse.ui.internal.ide.TextEditorStrategy"
+            class="org.eclipse.ui.internal.ide.registry.TextEditorStrategy"
             id="org.eclipse.ui.ide.textEditor"
             interactive="false"
             label="%textEditor">
       </strategy>
       <strategy
-            class="org.eclipse.ui.internal.ide.AskUserViaPopupUnassociatedEditorStrategy"
+            class="org.eclipse.ui.internal.ide.registry.AskUserViaPopupUnassociatedEditorStrategy"
             id="org.eclipse.ui.ide.askUserForUnassociatedEditor"
             interactive="true"
             label="%askUserViaPopup">
