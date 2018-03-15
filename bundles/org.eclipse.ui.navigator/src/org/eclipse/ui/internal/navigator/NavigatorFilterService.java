@@ -74,6 +74,9 @@ public class NavigatorFilterService implements INavigatorFilterService {
 							getFilterActivationPreferenceKey(), null);
 					String[] activeFilterIds = activatedFiltersPreferenceValue.split(DELIM);
 					for (String activeFilterId : activeFilterIds) {
+						if (activeFilterId.isEmpty()) {
+							continue;
+						}
 						activeFilters.add(activeFilterId);
 					}
 
@@ -97,14 +100,16 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			.getInstance();
 
 			/*
-			 * by creating a StringBuffer with DELIM, we ensure the string is
-			 * not empty when persisted.
+			 * by creating a StringBuilder with DELIM, we ensure the string is not empty
+			 * when persisted.
 			 */
-			StringBuffer activatedFiltersPreferenceValue = new StringBuffer(DELIM);
+			StringBuilder activatedFiltersPreferenceValue = new StringBuilder(DELIM);
 
 			for (String id : activeFilters) {
-				if (!dm.getFilterById(id).isVisibleInUi())
+				CommonFilterDescriptor filterDescriptor = dm.getFilterById(id);
+				if (filterDescriptor == null || !filterDescriptor.isVisibleInUi()) {
 					continue;
+				}
 				activatedFiltersPreferenceValue.append(id).append(DELIM);
 			}
 

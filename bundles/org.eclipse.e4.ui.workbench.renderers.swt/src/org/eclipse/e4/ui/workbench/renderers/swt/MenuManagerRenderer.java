@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -860,7 +860,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		String iconURI = element.getIconURI();
 		if (iconURI != null && iconURI.length() > 0) {
 			ISWTResourceUtilities resUtils = (ISWTResourceUtilities) localContext
-					.get(IResourceUtilities.class.getName());
+					.get(IResourceUtilities.class);
 			return resUtils.imageDescriptorFromURI(URI.createURI(iconURI));
 		}
 		return null;
@@ -891,8 +891,13 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			IContributionItem ici = getContribution(element);
 			clearModelToContribution(element, ici);
 		}
-		modelToManager.remove(model);
-		managerToModel.remove(manager);
+		MenuManager remove = modelToManager.remove(model);
+		if (manager == null) {
+			managerToModel.remove(remove);
+		} else {
+			managerToModel.remove(manager);
+		}
+
 		if (Policy.DEBUG_RENDERER) {
 			logger.debug("\nMMR:clearModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
@@ -1146,7 +1151,9 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 				ici = getManager(menuElement);
 				clearModelToManager(menuElement, (MenuManager) ici);
 			} else {
-				clearModelToContribution(menuModel, ici);
+				// Bug 518036: the call below removes too much.
+				// clearModelToContribution(menuModel, ici);
+				contributionToModel.remove(ici);
 			}
 			menuManager.remove(ici);
 			clearModelToContribution(mMenuElement, ici);
