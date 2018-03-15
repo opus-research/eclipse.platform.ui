@@ -480,20 +480,13 @@ public class PartServiceImpl implements EPartService {
 				}
 			}
 
-			if (parent instanceof MPartStack) {
-				boolean isSelected = parent.getSelectedElement() == element;
-				if (!isSelected) {
-					return false;
-				}
-				if (isMinimized(parent) || isMinimized(part)) {
-					return false;
-				}
-				return true;
+			if (parent instanceof MPartStack && parent.getSelectedElement() != element) {
+				return false;
 			}
 			if (!element.isVisible()) {
 				return false;
 			}
-			if (isMinimized(parent) || isMinimized(part)) {
+			if (isMinimized(parent) || isMinimized(element)) {
 				return false;
 			}
 			return true;
