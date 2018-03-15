@@ -11,7 +11,6 @@
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431, 462760
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *     Mickael Istria (Red Hat Inc.) - Bug 486901
- *     Philip langer <planger@eclipsesource.com> - Bug 427997
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -295,11 +294,10 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		if (resources.isEmpty()) {
 			return false;
 		}
-		// Return true if everything in the selection exists and if the
-		// selection does not contain the workspace root.
+		// Return true if everything in the selection exists.
 		for (int i = 0; i < resources.size(); i++) {
 			IResource resource = resources.get(i);
-			if (resource.isPhantom() || resource.getType() == IResource.ROOT) {
+			if (resource.isPhantom()) {
 				return false;
 			}
 		}
