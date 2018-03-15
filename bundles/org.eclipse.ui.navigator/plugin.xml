@@ -12,51 +12,6 @@
             class="org.eclipse.ui.internal.navigator.dnd.NavigatorPluginDropAction"
             id="org.eclipse.ui.navigator.PluginDropAction">
       </action>
-   </extension>
-    <extension
-         point="org.eclipse.ui.commands">
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="org.eclipse.ui.navigator.filterIncremental"
-            name="%IncrementalFilterActivate">
-      </command>
-      <command
-            id="org.eclipse.ui.navigator.cancelFilterIncremental"
-            name="%IncrementalFilterCancel">
-      </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            class="org.eclipse.ui.internal.navigator.filters.incremental.ActivateIncrementalResourceFilterHandler"
-            commandId="org.eclipse.ui.navigator.filterIncremental">
-         <activeWhen>
-            <with
-                  variable="activePart">
-               <instanceof
-                     value="org.eclipse.ui.navigator.CommonNavigator">
-               </instanceof>
-            </with>
-         </activeWhen>
-      </handler>
-      <handler
-            class="org.eclipse.ui.internal.navigator.filters.incremental.CancelIncrementalResourceFilterHandler"
-            commandId="org.eclipse.ui.navigator.cancelFilterIncremental">
-      </handler>
-   </extension>
-   <extension
-         point="org.eclipse.ui.bindings">
-      <key
-            commandId="org.eclipse.ui.navigator.filterIncremental"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+J">
-      </key>
-      <key
-            commandId="org.eclipse.ui.navigator.cancelFilterIncremental"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+ESC">
-      </key>
-   </extension>
+   </extension> 
+   
 </plugin>
