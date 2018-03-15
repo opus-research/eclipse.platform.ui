@@ -43,6 +43,7 @@ ViewForm > ToolBar, /* SWT-BUG: ToolBar do not inherit rules from ViewForm */
    element without a CSS id, a CSS class and a seekable Widget name, cannot be overridden
    by a subsequent more specific rule used to correct the style for seekable elements (<1>): */
 TabFolder > Composite > *, /* Composite > CommitSearchPage$... */
+CTabFolder > Composite > *, /* Composite > CommitSearchPage$... */
 TabFolder > Composite > * > * /* [style~='SWT.NO_BACKGROUND'] <- generate E4 non-sense bugs in apparently not related other rules */, /* Composite > ContentMergeViewer$... > TextMergeViewer$... */
 DocCommentOwnerComposite > Group > *, /* Group > DocCommentOwnerComposite$... */
 TabFolder > Composite > ScrolledComposite > *, /* ScrolledComposite > ControlListViewer$... */
@@ -53,7 +54,8 @@ Shell > Composite > Composite > Composite > *, /* Composite > FilteredPreference
 ScrolledComposite > Composite > Composite > Composite > *, /* Composite > NewKeysPreferencePage$... */
 Shell > Composite > Composite > Composite > Composite > Composite > *, /* Composite > ShowRefactoringHistoryWizardPage$... */
 Shell[style~='SWT.RADIO'][style~='SWT.CASCADE'][style~='SWT.SHADOW_ETCHED_IN'][style~='SWT.SHADOW_ETCHED_OUT'][style~='SWT.RESIZE'][style~='SWT.MENU'][style~='SWT.FULL_SELECTION'][style~='SWT.DATE'] > Composite > *, /* Composite > RefactoringWizardDialog$... */
-Shell[style~='SWT.RADIO'][style~='SWT.CASCADE'][style~='SWT.SHADOW_ETCHED_IN'][style~='SWT.SHADOW_ETCHED_OUT'][style~='SWT.RESIZE'][style~='SWT.MENU'][style~='SWT.FULL_SELECTION'][style~='SWT.DATE'] > Composite > * > * /* Composite > RefactoringWizardDialog$... */ {
+Shell[style~='SWT.RADIO'][style~='SWT.CASCADE'][style~='SWT.SHADOW_ETCHED_IN'][style~='SWT.SHADOW_ETCHED_OUT'][style~='SWT.RESIZE'][style~='SWT.MENU'][style~='SWT.FULL_SELECTION'][style~='SWT.DATE'] > Composite > * > *, /* Composite > RefactoringWizardDialog$... */ 
+Group > StyledText {
     background-color:#515658;
     color:#eeeeee;
 }
@@ -94,7 +96,6 @@ Text {
     background-color: #515658;
     color: #cccccc;
 }
-
 
 SashForm > StyledText {
 	/*	Fix StyledText inside a SashForm */
@@ -248,9 +249,10 @@ DrillDownComposite > ToolBar {
 }
 
 ProgressInfoItem,
+ProgressInfoItem > *,
 CompareViewerPane,
 CompareViewerPane > * {
-    background-color: #333;
+    background-color: #262626;
     color: #eeeeee;
 }
 
@@ -395,6 +397,12 @@ HeapStatus {
  	color: black;
 }
 
+Table,
+Tree {
+	swt-header-color: #CCC;
+	swt-header-background-color: #383D3F;
+}
+
 Twistie {
     color: #E8E4DF;
 }
@@ -428,6 +436,11 @@ Twistie {
 .MPartSashContainer {
     background-color: #515658;
     color: #EEEEEE;
+}
+
+HeapStatus {
+	background-color: #4F5355;
+	color: #EEEEEE;
 }
 
 PageSiteComposite, PageSiteComposite > CImageLabel {

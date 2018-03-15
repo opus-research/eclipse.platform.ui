@@ -10,21 +10,25 @@
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 491272, 491398
  *     Leung Wang Hei <gemaspecial@yahoo.com.hk> - Bug 483343
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, 491529, 491293
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, 491529, 491293, 492434, 492452, 459989, 507322
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.resource.FontDescriptor;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.Util;
@@ -33,12 +37,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -53,7 +53,6 @@ import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -81,6 +80,8 @@ public abstract class QuickAccessContents {
 	private static final String QUICK_ACCESS_COMMAND_ID = "org.eclipse.ui.window.quickAccess"; //$NON-NLS-1$
 	private static final int INITIAL_COUNT_PER_PROVIDER = 5;
 	private static final int MAX_COUNT_TOTAL = 20;
+	/** Minumum length to suggest the user to search typed text in the Help */
+	private static final int MIN_SEARCH_LENGTH = 3;
 
 	protected Text filterText;
 
@@ -129,10 +130,18 @@ public abstract class QuickAccessContents {
 		if (table != null) {
 			boolean filterTextEmpty = filter.length() == 0;
 
+			// extra entry added when the user activates help search
+			// (extensible)
+			List<QuickAccessEntry> extraEntries = new ArrayList<>();
+			if (filter.length() > MIN_SEARCH_LENGTH) {
+				extraEntries.add(makeHelpSearchEntry(filter));
+			}
+
 			// perfect match, to be selected in the table if not null
 			QuickAccessElement perfectMatch = getPerfectMatch(filter);
-			List<QuickAccessEntry>[] entries = computeMatchingEntries(filter, perfectMatch);
-			int selectionIndex = refreshTable(perfectMatch, entries);
+
+			List<QuickAccessEntry>[] entries = computeMatchingEntries(filter, perfectMatch, extraEntries);
+			int selectionIndex = refreshTable(perfectMatch, entries, extraEntries);
 
 			if (table.getItemCount() > 0) {
 				table.setSelection(selectionIndex);
@@ -148,6 +157,66 @@ public abstract class QuickAccessContents {
 
 			updateFeedback(filterTextEmpty, showAllMatches);
 		}
+	}
+
+	QuickAccessEntry searchHelpEntry = null;
+	QuickAccessProvider searchHelpProvider = null;
+	QuickAccessSearchElement searchHelpElement = null;
+
+	/**
+	 * Instantiate a new {@link QuickAccessEntry} to search the given text in
+	 * the eclipse help
+	 *
+	 * @param text
+	 *            String to search in the Eclipse Help
+	 *
+	 * @return the {@link QuickAccessEntry} to perform the action
+	 */
+	private QuickAccessEntry makeHelpSearchEntry(String text) {
+		if (searchHelpEntry == null) {
+			searchHelpProvider = Stream.of(providers).filter(p -> p instanceof ActionProvider).findFirst().get();
+			searchHelpElement = new QuickAccessSearchElement(searchHelpProvider);
+			searchHelpEntry = new QuickAccessEntry(searchHelpElement, searchHelpProvider, new int[][] {},
+					new int[][] {}, QuickAccessEntry.MATCH_PERFECT);
+		}
+		searchHelpElement.searchText = text;
+		return searchHelpEntry;
+	}
+
+	static class QuickAccessSearchElement extends QuickAccessElement {
+
+		/** identifier */
+		private static final String SEARCH_IN_HELP_ID = "search.in.help"; //$NON-NLS-1$
+
+		String searchText;
+
+		/**
+		 * @param provider
+		 */
+		public QuickAccessSearchElement(QuickAccessProvider provider) {
+			super(provider);
+		}
+
+		@Override
+		public String getLabel() {
+			return NLS.bind(QuickAccessMessages.QuickAccessContents_SearchInHelpLabel, searchText);
+		}
+
+		@Override
+		public String getId() {
+			return SEARCH_IN_HELP_ID;
+		}
+
+		@Override
+		public void execute() {
+			PlatformUI.getWorkbench().getHelpSystem().search(searchText);
+		}
+
+		@Override
+		public ImageDescriptor getImageDescriptor() {
+			return null;
+		}
+
 	}
 
 	/**
@@ -232,9 +301,12 @@ public abstract class QuickAccessContents {
 		return showAllMatches;
 	}
 
-	private int refreshTable(QuickAccessElement perfectMatch, List<QuickAccessEntry>[] entries) {
-		if (table.getItemCount() > entries.length
-				&& table.getItemCount() - entries.length > 20) {
+	private int refreshTable(QuickAccessElement perfectMatch, List<QuickAccessEntry>[] entries,
+			List<QuickAccessEntry> extraEntries) {
+		// search help extra entry: not from search or previous picks.
+		int nExtraEntries = (extraEntries == null) ? 0 : extraEntries.size();
+		if (table.getItemCount() > (entries.length + nExtraEntries)
+				&& table.getItemCount() - (entries.length + nExtraEntries) > 20) {
 			table.removeAll();
 		}
 		TableItem[] items = table.getItems();
@@ -271,6 +343,11 @@ public abstract class QuickAccessContents {
 				}
 			}
 		}
+		// add extra entry
+		for (QuickAccessEntry entry : extraEntries) {
+			TableItem item = new TableItem(table, SWT.NONE);
+			item.setData(entry);
+		}
 		if (index < items.length) {
 			table.remove(index, items.length - 1);
 		}
@@ -305,18 +382,21 @@ public abstract class QuickAccessContents {
 	 * @param perfectMatch
 	 *            a quick access element that should be given priority or
 	 *            <code>null</code>
-	 * @return the array of lists (one per provider) containg the quick access
+	 * @param extraEntries
+	 *            extra entries that will be added to the tabular visualization
+	 *            after computing matching entries, i.e. Search in Help
+	 * @return the array of lists (one per provider) contains the quick access
 	 *         entries that should be added to the table, possibly empty
 	 */
 	private List<QuickAccessEntry>[] computeMatchingEntries(String filter,
-			QuickAccessElement perfectMatch) {
+			QuickAccessElement perfectMatch, List<QuickAccessEntry> extraEntries) {
 		// collect matches in an array of lists
 		@SuppressWarnings("unchecked")
 		List<QuickAccessEntry>[] entries = new List[providers.length];
-
-		int maxCount = computeNumberOfItems();
+		// extra entries are limiting the number of items for search results
+		int maxCount = computeNumberOfItems() - extraEntries.size();
 		int[] indexPerProvider = new int[providers.length];
-		int countPerProvider = INITIAL_COUNT_PER_PROVIDER;
+		int countPerProvider = Math.min(maxCount / 4, INITIAL_COUNT_PER_PROVIDER);
 		int prevPick = 0;
 		int countTotal = 0;
 		boolean perfectMatchAdded = true;
@@ -327,6 +407,7 @@ public abstract class QuickAccessContents {
 		}
 		boolean done;
 		String category = null;
+		Set<String> prevPickIds = new HashSet<>();
 		do {
 			// will be set to false if we find a provider with remaining
 			// elements
@@ -353,17 +434,25 @@ public abstract class QuickAccessContents {
 				}
 				if (filter.length() > 0 || provider.isAlwaysPresent() || showAllMatches) {
 					QuickAccessElement[] sortedElements = provider.getElementsSorted();
-					List<QuickAccessEntry> poorFilterMatches = new ArrayList<>();
 
-					// count number or previous picks
-					if ((provider instanceof PreviousPicksProvider)) {
+					// count previous picks and store ids
+					if (isPreviousPickProvider) {
 						prevPick = sortedElements.length;
+						Stream.of(sortedElements).forEach(e -> prevPickIds.add(e.getId()));
 					}
 
 					int j = indexPerProvider[i];
+					// loops on all the elements of a provider
 					while (j < sortedElements.length
 							&& (showAllMatches || (count < countPerProvider && countTotal < maxCount))) {
 						QuickAccessElement element = sortedElements[j];
+
+						// Skip element if already in contained amid previous picks
+						if (!isPreviousPickProvider && prevPickIds.contains(element.getId())) {
+							j++;
+							continue;
+						}
+
 						QuickAccessEntry entry = null;
 						if (filter.length() == 0) {
 							if (i == 0 || showAllMatches) {
@@ -374,14 +463,8 @@ public abstract class QuickAccessContents {
 							}
 						} else {
 							QuickAccessEntry possibleMatch = element.match(filter, provider);
-							// We only have limited space so only display
-							// excellent filter matches (Bug 398455)
 							if (possibleMatch != null) {
-								if (possibleMatch.getMatchQuality() <= QuickAccessEntry.MATCH_EXCELLENT) {
-									entry = possibleMatch;
-								} else {
-									poorFilterMatches.add(possibleMatch);
-								}
+								entry = possibleMatch;
 							}
 
 						}
@@ -399,28 +482,18 @@ public abstract class QuickAccessContents {
 					}
 
 					indexPerProvider[i] = j;
-					// If there were low quality matches and there is still
-					// room, add them (Bug 398455)
-					for (Iterator<QuickAccessEntry> iterator = poorFilterMatches.iterator(); iterator
-							.hasNext()
-							&& (showAllMatches || (count < countPerProvider && countTotal < maxCount));) {
-						QuickAccessEntry quickAccessEntry = iterator.next();
-						entries[i].add(quickAccessEntry);
-						count++;
-						countTotal++;
-						if (i == 0 && quickAccessEntry.element == perfectMatch) {
-							perfectMatchAdded = true;
-							maxCount = MAX_COUNT_TOTAL;
-						}
-					}
+
 					if (j < sortedElements.length) {
 						done = false;
 					}
 				}
 			}
+
 			// from now on, add one element per provider
 			countPerProvider = 1;
+
 		} while ((showAllMatches || countTotal < maxCount) && !done);
+
 		if (!perfectMatchAdded) {
 			QuickAccessEntry entry = perfectMatch.match(filter, providers[0]);
 			if (entryEnabled(providers[0], entry)) {
@@ -431,6 +504,7 @@ public abstract class QuickAccessContents {
 				entries[0].add(entry);
 			}
 		}
+
 		// number of items matching the filtered search
 		numberOfFilteredResults = countTotal - prevPick;
 		return entries;
@@ -580,12 +654,9 @@ public abstract class QuickAccessContents {
 				// do nothing
 			}
 		});
-		filterText.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				String text = ((Text) e.widget).getText().toLowerCase();
-				refresh(text);
-			}
+		filterText.addModifyListener(e -> {
+			String text = ((Text) e.widget).getText().toLowerCase();
+			refresh(text);
 		});
 	}
 
@@ -609,6 +680,10 @@ public abstract class QuickAccessContents {
 
 	/** Show the hint text with the given color */
 	void showHintText(String text, Color color) {
+		if (hintText == null) {
+			// toolbar hidden
+			return;
+		}
 		hintText.setText(text);
 		if (color != null) {
 			hintText.setForeground(color);
@@ -639,12 +714,7 @@ public abstract class QuickAccessContents {
 	 * @return the created table
 	 */
 	public Table createTable(Composite composite, int defaultOrientation) {
-		composite.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				doDispose();
-			}
-		});
+		composite.addDisposeListener(e -> doDispose());
 		Composite tableComposite = new Composite(composite, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tableComposite);
 		TableColumnLayout tableColumnLayout = new TableColumnLayout();
@@ -653,13 +723,12 @@ public abstract class QuickAccessContents {
 		textLayout = new TextLayout(table.getDisplay());
 		textLayout.setOrientation(defaultOrientation);
 		Font boldFont = resourceManager.createFont(FontDescriptor.createFrom(
-				JFaceResources.getDialogFont()).setStyle(SWT.BOLD));
+				table.getFont()).setStyle(SWT.BOLD));
 		textLayout.setFont(table.getFont());
 		textLayout.setText(QuickAccessMessages.QuickAccess_AvailableCategories);
 		int maxProviderWidth = (textLayout.getBounds().width);
 		textLayout.setFont(boldFont);
-		for (int i = 0; i < providers.length; i++) {
-			QuickAccessProvider provider = providers[i];
+		for (QuickAccessProvider provider : providers) {
 			textLayout.setText(provider.getName());
 			int width = (textLayout.getBounds().width);
 			if (width > maxProviderWidth) {
@@ -674,14 +743,11 @@ public abstract class QuickAccessContents {
 				if (!showAllMatches) {
 					if (!resized) {
 						resized = true;
-						e.display.timerExec(100, new Runnable() {
-							@Override
-							public void run() {
-								if (table != null && !table.isDisposed() && filterText !=null && !filterText.isDisposed()) {
-									refresh(filterText.getText().toLowerCase());
-								}
-								resized = false;
+						e.display.timerExec(100, () -> {
+							if (table != null && !table.isDisposed() && filterText !=null && !filterText.isDisposed()) {
+								refresh(filterText.getText().toLowerCase());
 							}
+							resized = false;
 						});
 					}
 				}
@@ -766,22 +832,19 @@ public abstract class QuickAccessContents {
 		} else {
 			boldStyle = null;
 		}
-		Listener listener = new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				QuickAccessEntry entry = (QuickAccessEntry) event.item.getData();
-				if (entry != null) {
-					switch (event.type) {
-					case SWT.MeasureItem:
-						entry.measure(event, textLayout, resourceManager, boldStyle);
-						break;
-					case SWT.PaintItem:
-						entry.paint(event, textLayout, resourceManager, boldStyle, grayColor);
-						break;
-					case SWT.EraseItem:
-						entry.erase(event);
-						break;
-					}
+		Listener listener = event -> {
+			QuickAccessEntry entry = (QuickAccessEntry) event.item.getData();
+			if (entry != null) {
+				switch (event.type) {
+				case SWT.MeasureItem:
+					entry.measure(event, textLayout, resourceManager, boldStyle);
+					break;
+				case SWT.PaintItem:
+					entry.paint(event, textLayout, resourceManager, boldStyle, grayColor);
+					break;
+				case SWT.EraseItem:
+					entry.erase(event);
+					break;
 				}
 			}
 		};

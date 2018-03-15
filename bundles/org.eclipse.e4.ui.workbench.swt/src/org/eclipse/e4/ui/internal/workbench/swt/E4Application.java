@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -429,8 +430,8 @@ public class E4Application implements IApplication {
 			return Optional.empty();
 
 		if (singledCmdArgValue) {
-			for (int i = 0; i < args.length; i++) {
-				if (("-" + argName).equals(args[i]))
+			for (String arg : args) {
+				if (("-" + argName).equals(arg))
 					return Optional.of("true");
 			}
 		} else {
@@ -711,7 +712,7 @@ public class E4Application implements IApplication {
 			String versionLine = WORKSPACE_VERSION_KEY + '=' + WORKSPACE_VERSION_VALUE;
 
 			output = new FileOutputStream(versionFile);
-			output.write(versionLine.getBytes("UTF-8")); //$NON-NLS-1$
+			output.write(versionLine.getBytes(StandardCharsets.UTF_8));
 		} catch (IOException e) {
 			Logger logger = new WorkbenchLogger(PLUGIN_ID);
 			logger.error(e);

@@ -51,8 +51,8 @@ import org.eclipse.ui.navigator.INavigatorViewerDescriptor;
  */
 public class CommonFilterSelectionDialog extends TrayDialog {
 
-	private static final String FILTER_ICON = "icons/full/elcl16/filter_ps.gif"; //$NON-NLS-1$
-	private static final String CONTENT_ICON = "icons/full/elcl16/content.gif"; //$NON-NLS-1$
+	private static final String FILTER_ICON = "icons/full/elcl16/filter_ps.png"; //$NON-NLS-1$
+	private static final String CONTENT_ICON = "icons/full/elcl16/content.png"; //$NON-NLS-1$
 
 	private static final int TAB_WIDTH_IN_DLUS = 300;
 
@@ -227,11 +227,11 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 			List<String> checkedExtensions = new ArrayList<String>();
 			TableItem[] tableItems = contentExtensionsTab.getTable().getItems();
 			INavigatorContentDescriptor descriptor;
-			for (int i = 0; i < tableItems.length; i++) {
-				descriptor = (INavigatorContentDescriptor) tableItems[i]
+			for (TableItem tableItem : tableItems) {
+				descriptor = (INavigatorContentDescriptor) tableItem
 						.getData();
 
-				if (tableItems[i].getChecked()) {
+				if (tableItem.getChecked()) {
 					checkedExtensions.add(descriptor.getId());
 				}
 			}
@@ -261,5 +261,12 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 		}
 
 		super.okPressed();
+	}
+
+	protected ICommonFilterDescriptor[] getFilterDescriptorChangeHistory() {
+		if (commonFiltersTab != null) {
+			return commonFiltersTab.getFilterDescriptorChangeHistory();
+		}
+		return new ICommonFilterDescriptor[0];
 	}
 }

@@ -6,15 +6,18 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Axel Richard <axel.richard@obeo.fr> - initial API and implementation
+ *     Axel Richard <axel.richard@obeo.fr> - initial API and implementation, Bug 492401
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 498760
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -91,6 +94,9 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 		createAutoSaveGroup(composite);
 		createIntervalPart();
 		createMessagesPart();
+		updateEnablement();
+
+		Dialog.applyDialogFont(composite);
 		return composite;
 	}
 
@@ -267,29 +273,7 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 		autoSaveButton.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				boolean autoSave = autoSaveButton.getSelection();
-				getPreferenceStore().setValue(IPreferenceConstants.SAVE_AUTOMATICALLY, autoSave);
-				final Display display = autoSaveButton.getDisplay();
-				noteMessage.setEnabled(autoSave);
-				noteLabel.setEnabled(autoSave);
-				resetMessage.setEnabled(autoSave);
-				intervalField.getTextControl(intervalComposite).setEnabled(autoSave);
-				intervalField.getLabelControl(intervalComposite).setEnabled(autoSave);
-				intervalComposite.setEnabled(autoSave);
-				autoSaveGroup.setEnabled(autoSave);
-				if (autoSave) {
-					noteMessage.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
-					noteLabel.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
-					resetMessage.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
-					intervalField.getLabelControl(intervalComposite)
-							.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
-				} else {
-					noteMessage.setForeground(display.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-					noteLabel.setForeground(display.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-					resetMessage.setForeground(display.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-					intervalField.getLabelControl(intervalComposite)
-							.setForeground(display.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-				}
+				updateEnablement();
 			}
 
 			@Override
@@ -297,6 +281,31 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 				// Nothing to do here
 			}
 		});
+	}
+
+	private void updateEnablement() {
+		boolean autoSave = autoSaveButton.getSelection();
+		final Display display = autoSaveButton.getDisplay();
+		noteMessage.setEnabled(autoSave);
+		noteLabel.setEnabled(autoSave);
+		resetMessage.setEnabled(autoSave);
+		intervalField.getTextControl(intervalComposite).setEnabled(autoSave);
+		intervalField.getLabelControl(intervalComposite).setEnabled(autoSave);
+		intervalComposite.setEnabled(autoSave);
+		autoSaveGroup.setEnabled(autoSave);
+		if (autoSave) {
+			noteMessage.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+			noteLabel.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+			resetMessage.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+			intervalField.getLabelControl(intervalComposite)
+					.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+		} else {
+			noteMessage.setForeground(display.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			noteLabel.setForeground(display.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			resetMessage.setForeground(display.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			intervalField.getLabelControl(intervalComposite)
+					.setForeground(display.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		}
 	}
 
 	/**
@@ -310,8 +319,8 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 		autoSaveGroup = new Group(composite, SWT.NONE);
 		final GridLayout autoSaveGroupLayout = new GridLayout();
 		autoSaveGroupLayout.numColumns = 1;
-		autoSaveGroupLayout.marginWidth = 0;
-		autoSaveGroupLayout.marginHeight = 0;
+		autoSaveGroupLayout.marginWidth = 6;
+		autoSaveGroupLayout.marginHeight = 2;
 		autoSaveGroup.setLayout(autoSaveGroupLayout);
 		final GridData autoSaveGroupLayoutData = new GridData();
 		autoSaveGroupLayoutData.horizontalAlignment = GridData.FILL;
@@ -331,8 +340,7 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 		intervalCompositeLayout.marginWidth = 0;
 		intervalCompositeLayout.marginHeight = 10;
 		intervalComposite.setLayout(intervalCompositeLayout);
-		final GridData intervalCompositeLayoutData = new GridData(SWT.FILL, SWT.FILL, true, false);
-		intervalComposite.setLayoutData(intervalCompositeLayoutData);
+		intervalComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		intervalComposite.setEnabled(autoSaveButton.getSelection());
 
 		intervalField = new IntegerFieldEditor(IPreferenceConstants.SAVE_AUTOMATICALLY_INTERVAL, "", //$NON-NLS-1$
@@ -367,11 +375,11 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 		messageLayout.marginWidth = 0;
 		messageLayout.marginHeight = 0;
 		noteComposite.setLayout(messageLayout);
-		final GridData noteCompositeData = new GridData(SWT.FILL, SWT.FILL, true, false);
-		noteComposite.setLayoutData(noteCompositeData);
+		noteComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		noteLabel = new Label(noteComposite, SWT.NONE);
 		noteLabel.setText(IDEWorkbenchMessages.AutoSavePreferencPage_noteLabel);
+		noteLabel.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
 		noteLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
 		noteMessage = new Label(noteComposite, SWT.WRAP);

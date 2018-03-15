@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,7 +57,7 @@ public final class EvaluationService implements IEvaluationService {
 	private IEclipseContext ratContext;
 	private int notifying = 0;
 
-	private ListenerList serviceListeners = new ListenerList(ListenerList.IDENTITY);
+	private ListenerList<IPropertyChangeListener> serviceListeners = new ListenerList<>(ListenerList.IDENTITY);
 	ArrayList<ISourceProvider> sourceProviders = new ArrayList<>();
 	LinkedList<EvaluationReference> refs = new LinkedList<>();
 	private ISourceProviderListener contextUpdater;
@@ -78,8 +78,7 @@ public final class EvaluationService implements IEvaluationService {
 			}
 			// This ties tool item enablement to variable changes that can
 			// effect the enablement.
-			getEventBroker()
-					.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
+			getEventBroker().send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
 			return true;
 		}
 	};
@@ -299,7 +298,7 @@ public final class EvaluationService implements IEvaluationService {
 			}
 		}
 		endSourceChange(sourceNames);
-		eventBroker.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
+		eventBroker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
 	}
 
 	/**
@@ -324,9 +323,7 @@ public final class EvaluationService implements IEvaluationService {
 
 	private void fireServiceChange(final String property, final Object oldValue,
 			final Object newValue) {
-		Object[] listeners = serviceListeners.getListeners();
-		for (int i = 0; i < listeners.length; i++) {
-			final IPropertyChangeListener listener = (IPropertyChangeListener) listeners[i];
+		for (final IPropertyChangeListener listener : serviceListeners) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void handleException(Throwable exception) {
