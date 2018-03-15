@@ -14,6 +14,7 @@ package org.eclipse.ui.internal.navigator.workingsets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -57,6 +58,12 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 
 
 	private static final Object[] NO_CHILDREN = new Object[0];
+
+	/**
+	 * A key used by the Extension State Model to keep track of whether the
+	 * "Others" working set
+	 */
+	public static final String SHOW_OTHERS_WORKING_SET = EXTENSION_ID + ".showOthersWorkingSet"; //$NON-NLS-1$
 
 	/**
 	 * An object representing the "Others" working set, showing unassigned
@@ -111,15 +118,16 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 				switch (projectExplorer.getRootMode()) {
 					case ProjectExplorer.WORKING_SETS :
 						IWorkingSet[] activeWorkingSets = ((IAggregateWorkingSet) workingSet).getComponents();
-						if (helper.getUnassignedProjects().isEmpty()) {
-							return activeWorkingSets;
+					Object[] res;
+					if (extensionStateModel.getBooleanProperty(SHOW_OTHERS_WORKING_SET)) {
+							res = new Object[activeWorkingSets.length + 1];
+							System.arraycopy(activeWorkingSets, 0, res, 0, activeWorkingSets.length);
+							res[activeWorkingSets.length] = OTHERS_WORKING_SET;
+						} else {
+							res = activeWorkingSets;
 						}
-						Object[] res;
-						res = new Object[activeWorkingSets.length + 1];
-						System.arraycopy(activeWorkingSets, 0, res, 0, activeWorkingSets.length);
-						res[activeWorkingSets.length] = OTHERS_WORKING_SET;
-						return res;
-					case ProjectExplorer.PROJECTS:
+					return res;
+				case ProjectExplorer.PROJECTS:
 						return getWorkingSetElements(workingSet);
 				}
 			}
@@ -158,7 +166,6 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		helper.refreshWorkingSetTreeState();
 		return getChildren(inputElement);
 	}
 
@@ -189,7 +196,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	protected class WorkingSetHelper {
 
 		private final IWorkingSet workingSet;
-		private Map<IAdaptable, IAdaptable> parents;
+		private final Map<IAdaptable, IAdaptable> parents = new WeakHashMap<IAdaptable, IAdaptable>();
 		private Set<IProject> unassignedProjects;
 
 		/**
@@ -200,11 +207,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		 */
 		public WorkingSetHelper(IWorkingSet set) {
 			workingSet = set;
-			refreshWorkingSetTreeState();
-		}
 
-		void refreshWorkingSetTreeState() {
-			parents = new WeakHashMap<IAdaptable, IAdaptable>();
 			if (workingSet.isAggregateWorkingSet()) {
 				IAggregateWorkingSet aggregateSet = (IAggregateWorkingSet) workingSet;
 				if (workingSetRoot == null)
@@ -228,8 +231,8 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 			}
 
 			unassignedProjects = new HashSet<>(Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects()));
-			for (IAdaptable node : parents.keySet()) {
-				unassignedProjects.remove(node.getAdapter(IProject.class));
+			for (Entry<IAdaptable, IAdaptable> tree : parents.entrySet()) {
+				unassignedProjects.remove(tree.getKey().getAdapter(IProject.class));
 			}
 		}
 
@@ -249,14 +252,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		public Object getParent(Object element) {
 			if (element instanceof IWorkingSet && element != workingSetRoot)
 				return workingSetRoot;
-			Object res = parents.get(element);
-			if (res != null) {
-				return res;
-			}
-			if (unassignedProjects.contains(res)) {
-				return OTHERS_WORKING_SET;
-			}
-			return null;
+			return parents.get(element);
 		}
 	}
 
