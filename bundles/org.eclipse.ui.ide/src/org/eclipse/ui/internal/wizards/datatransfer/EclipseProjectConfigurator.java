@@ -48,9 +48,12 @@ public class EclipseProjectConfigurator implements ProjectConfigurator {
 			res.add(root);
 		}
 		if (!monitor.isCanceled()) {
-			for (File child : root.listFiles()) {
-				if (child.isDirectory()) {
-					collectProjectDirectories(res, child, monitor);
+			File[] children = root.listFiles();
+			if (children != null) {
+				for (File child : children) {
+					if (child.isDirectory()) {
+						collectProjectDirectories(res, child, monitor);
+					}
 				}
 			}
 		}
