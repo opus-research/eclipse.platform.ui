@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143, 461063
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -99,24 +98,25 @@ public class CycleViewHandler extends CycleBaseHandler {
 
 	@Override
 	protected ParameterizedCommand getBackwardCommand() {
-		return getParametrizedCommand(IWorkbenchCommandConstants.WINDOW_PREVIOUS_VIEW);
+		// TODO Auto-generated method stub
+		final ICommandService commandService = window.getWorkbench().getService(ICommandService.class);
+		final Command command = commandService.getCommand(IWorkbenchCommandConstants.WINDOW_PREVIOUS_VIEW);
+		ParameterizedCommand commandBack = new ParameterizedCommand(command, null);
+		return commandBack;
 	}
 
 	@Override
 	protected ParameterizedCommand getForwardCommand() {
-		return getParametrizedCommand(IWorkbenchCommandConstants.WINDOW_NEXT_VIEW);
-	}
-
-    private ParameterizedCommand getParametrizedCommand(String workbenchCommand)
-	{
+		// TODO Auto-generated method stub
 		final ICommandService commandService = window.getWorkbench().getService(ICommandService.class);
-		final Command command = commandService.getCommand(workbenchCommand);
-		ParameterizedCommand parameterizedCommand = new ParameterizedCommand(command, null);
-		return parameterizedCommand;
+		final Command command = commandService.getCommand(IWorkbenchCommandConstants.WINDOW_NEXT_VIEW);
+		ParameterizedCommand commandF = new ParameterizedCommand(command, null);
+		return commandF;
 	}
 
 	@Override
 	protected String getTableHeader(IWorkbenchPart activePart) {
+		// TODO Auto-generated method stub
 		return WorkbenchMessages.CyclePartAction_header;
 	}
 
