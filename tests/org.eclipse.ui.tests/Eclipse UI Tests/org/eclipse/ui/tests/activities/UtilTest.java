@@ -567,7 +567,7 @@ public class UtilTest extends TestCase {
     	// Check Binding -> Activity connection.
     	final String IDENTIFIER = "org.eclipse.ui.tests.activity{No{Reg(Exp[^d]";
     	IIdentifier identifier = manager.getIdentifier(IDENTIFIER);
-		Set<IActivityPatternBinding> boundActivities = identifier.getActivityIds();
+		Set<String> boundActivities = identifier.getActivityIds();
     	assertTrue(boundActivities.size() == 1);
     	String id = boundActivities.iterator().next().toString();
     	assertTrue(id.equals(ACTIVITY_NON_REG_EXP));
