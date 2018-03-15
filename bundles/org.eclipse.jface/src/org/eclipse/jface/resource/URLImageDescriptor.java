@@ -39,34 +39,38 @@ import org.eclipse.swt.graphics.ImageFileNameProvider;
 class URLImageDescriptor extends ImageDescriptor {
 
 	private static class URLImageFileNameProvider implements ImageFileNameProvider {
-		private URL url;
+		private String url;
 
-		public URLImageFileNameProvider(URL url) {
+		public URLImageFileNameProvider(String url) {
 			this.url = url;
 		}
 
 		@Override
 		public String getImagePath(int zoom) {
-			URL xUrl = getxURL(url, zoom);
-			if (xUrl == null)
-				return null;
-			return getFilePath(xUrl, zoom == 100); // can be null!
+			URL tempURL = getURL(url);
+			if (tempURL != null) {
+				URL xUrl = getxURL(tempURL, zoom);
+				return getFilePath(xUrl, zoom == 100); // can be null!
+			}
+			return null;
 		}
 	}
 
 	private static class URLImageDataProvider implements ImageDataProvider {
-		private URL url;
+		private String url;
 
-		public URLImageDataProvider(URL url) {
+		public URLImageDataProvider(String url) {
 			this.url = url;
 		}
 
 		@Override
 		public ImageData getImageData(int zoom) {
-			URL xUrl = getxURL(url, zoom);
-			if (xUrl == null)
-				return null;
-			return URLImageDescriptor.getImageData(xUrl);
+			URL tempURL = getURL(url);
+			if (tempURL != null) {
+				URL xUrl = getxURL(tempURL, zoom);
+				return URLImageDescriptor.getImageData(xUrl);
+			}
+			return null;
 		}
 	}
 
@@ -76,7 +80,7 @@ class URLImageDescriptor extends ImageDescriptor {
 	 * Constant for the file protocol for optimized loading
 	 */
 	private static final String FILE_PROTOCOL = "file";  //$NON-NLS-1$
-	private URL url;
+	private String url;
 
 	/**
 	 * Creates a new URLImageDescriptor.
@@ -85,7 +89,7 @@ class URLImageDescriptor extends ImageDescriptor {
 	 *            The URL to load the image from. Must be non-null.
 	 */
 	URLImageDescriptor(URL url) {
-		this.url = url;
+		this.url = url.toExternalForm();
 	}
 
 	@Override
@@ -93,12 +97,12 @@ class URLImageDescriptor extends ImageDescriptor {
 		if (!(o instanceof URLImageDescriptor)) {
 			return false;
 		}
-		return ((URLImageDescriptor) o).url.toExternalForm().equals(this.url.toExternalForm());
+		return ((URLImageDescriptor) o).url.equals(this.url);
 	}
 
 	@Override
 	public ImageData getImageData() {
-		return getImageData(url);
+		return getImageData(getURL(url));
 	}
 
 	private static ImageData getImageData(URL url) {
@@ -125,33 +129,35 @@ class URLImageDescriptor extends ImageDescriptor {
 	 * @return the stream for loading the data
 	 */
 	protected InputStream getStream() {
-		return getStream(url);
+		return getStream(getURL(url));
 	}
 
 	private static InputStream getStream(URL url) {
-		try {
-			if (InternalPolicy.OSGI_AVAILABLE) {
-				URL platformURL = FileLocator.find(url);
-				if (platformURL != null) {
-					url = platformURL;
+		if (url != null) {
+			try {
+				if (InternalPolicy.OSGI_AVAILABLE) {
+					URL platformURL = FileLocator.find(url);
+					if (platformURL != null) {
+						url = platformURL;
+					}
+				}
+				return new BufferedInputStream(url.openStream());
+			} catch (IOException e) {
+				if (InternalPolicy.DEBUG_LOG_URL_IMAGE_DESCRIPTOR_MISSING_2x) {
+					String path = url.getPath();
+					if (path.endsWith("@2x.png") || path.endsWith("@1.5x.png")) { //$NON-NLS-1$ //$NON-NLS-2$
+						String message = "High-resolution image missing: " + url; //$NON-NLS-1$
+						Policy.getLog().log(new Status(IStatus.WARNING, Policy.JFACE, message, e));
+					}
 				}
 			}
-			return new BufferedInputStream(url.openStream());
-		} catch (IOException e) {
-			if (InternalPolicy.DEBUG_LOG_URL_IMAGE_DESCRIPTOR_MISSING_2x) {
-				String path = url.getPath();
-				if (path.endsWith("@2x.png") || path.endsWith("@1.5x.png")) { //$NON-NLS-1$ //$NON-NLS-2$
-					String message = "High-resolution image missing: " + url; //$NON-NLS-1$
-					Policy.getLog().log(new Status(IStatus.WARNING, Policy.JFACE, message, e));
-				}
-			}
-			return null;
 		}
+		return null;
 	}
 
 	@Override
 	public int hashCode() {
-		return url.toExternalForm().hashCode();
+		return url.hashCode();
 	}
 
 	/**
@@ -198,7 +204,6 @@ class URLImageDescriptor extends ImageDescriptor {
 	 * @return {@link String} or <code>null</code> if the file cannot be found
 	 */
 	private static String getFilePath(URL url, boolean logIOException) {
-
 		try {
 			if (!InternalPolicy.OSGI_AVAILABLE) {
 				if (FILE_PROTOCOL.equalsIgnoreCase(url.getProtocol()))
@@ -274,16 +279,19 @@ class URLImageDescriptor extends ImageDescriptor {
 			}
 
 			// Try to see if we can optimize using SWTs file based image support.
-			String path = getFilePath(url, true);
-			if (path != null) {
-				try {
-					return new Image(device, path);
-				} catch (SWTException exception) {
-					// If we fail fall back to the slower input stream method.
+			URL pathURL = getURL(url);
+			if (pathURL != null) {
+				String path = getFilePath(pathURL, true);
+				if (path != null) {
+					try {
+						return new Image(device, path);
+					} catch (SWTException exception) {
+						// If we fail fall back to the slower input stream
+						// method.
+					}
 				}
 			}
 			return super.createImage(returnMissingImageOnError, device);
-
 		} finally {
 			if (InternalPolicy.DEBUG_TRACE_URL_IMAGE_DESCRIPTOR) {
 				long time = System.nanoTime() - start;
@@ -293,4 +301,13 @@ class URLImageDescriptor extends ImageDescriptor {
 		}
 	}
 
+	private static URL getURL(String urlString) {
+		URL result = null;
+		try {
+			result = new URL(urlString);
+		} catch (MalformedURLException e) {
+			Policy.getLog().log(new Status(IStatus.ERROR, Policy.JFACE, e.getLocalizedMessage(), e));
+		}
+		return result;
+	}
 }
