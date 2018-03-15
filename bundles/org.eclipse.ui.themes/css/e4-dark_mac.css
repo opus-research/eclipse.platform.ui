@@ -339,7 +339,3 @@ Form > LayoutComposite > LayoutComposite > Text[style~='SWT.SEARCH'],
     background-color: #949da5; /* background-color is hard-coded */
     color: #333;
 }
-
-StyledText {
-	swt-scrollbar-themed: false;
-}

@@ -9,7 +9,7 @@
  *     Andrea Guarinoni <andrea.guarinoni.dev@outlook.com> - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - initial API and implementation
  *     Stefan Winkler <stefan@winklerweb.net> - Bug 431845
- *     Fabio Zadrozny <fabiofz@gmail.com> - Bug 434201, 434309, 430278
+ *     Fabio Zadrozny <fabiofz@gmail.com> - Bug 434201, 434309
  *******************************************************************************/
 
 /*******************************************************************************
@@ -333,13 +333,4 @@ StatusLine, ImageBasedFrame{
 .MPartStack.active .MPart Form FormHeading ImageHyperlink {
     background-color: #415062;
     color: #9ac9d8;
-}
-
-StyledText {
-	swt-scrollbar-themed: true;
-	swt-scrollbar-background-color: #383838;
-	swt-scrollbar-foreground-color: #494949;
-	swt-scrollbar-width: 8px;
-	swt-scrollbar-border-radius: 8px;
-	swt-scrollbar-mouse-near-scroll-width: 15px;
 }

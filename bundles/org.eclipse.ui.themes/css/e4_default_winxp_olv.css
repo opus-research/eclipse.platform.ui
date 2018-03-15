@@ -70,7 +70,3 @@ ColorDefinition#org-eclipse-ui-workbench-ACTIVE_TAB_OUTER_KEYLINE_COLOR {
 .MToolControl.Draggable {
 	handle-image:  url(./dragHandle.png);
 }
-
-StyledText {
-	swt-scrollbar-themed: false;
-}

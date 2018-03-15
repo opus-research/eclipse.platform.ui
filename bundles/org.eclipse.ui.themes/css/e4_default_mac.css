@@ -88,7 +88,3 @@ CTabFolder.MArea .MPartStack, CTabFolder.MArea .MPartStack.active {
 CTabFolder Canvas {
 	background-color: #FFFFFF;
 }
-
-StyledText {
-	swt-scrollbar-themed: false;
-}

@@ -177,7 +177,3 @@ CTabFolder Tree, CTabFolder Canvas {
 StatusLine, ImageBasedFrame{
     color: #BDBAB7;
 }
-
-StyledText {
-	swt-scrollbar-themed: false;
-}
