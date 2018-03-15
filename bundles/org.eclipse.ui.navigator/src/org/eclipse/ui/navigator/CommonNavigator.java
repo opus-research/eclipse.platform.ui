@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     anton.leherbauer@windriver.com - bug 220599 make CommonNavigator a ShowInSource
  *     rob.stryker@jboss.com - bug 250198 Slight changes for easier subclassing
- *     stefan@winklerweb.net - bug 506931 [CommonNavigator] A quick filter possibility
  *******************************************************************************/
 package org.eclipse.ui.navigator;
 
@@ -28,9 +27,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IMemento;
@@ -47,7 +43,6 @@ import org.eclipse.ui.internal.navigator.CommonNavigatorActionGroup;
 import org.eclipse.ui.internal.navigator.NavigatorContentService;
 import org.eclipse.ui.internal.navigator.NavigatorPlugin;
 import org.eclipse.ui.internal.navigator.NavigatorSafeRunnable;
-import org.eclipse.ui.internal.navigator.filters.search.CommonNavigatorSearchFilterHelper;
 import org.eclipse.ui.part.ISetSelectionTarget;
 import org.eclipse.ui.part.IShowInSource;
 import org.eclipse.ui.part.IShowInTarget;
@@ -167,8 +162,6 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 
 	private LinkHelperService linkService;
 
-	private Composite contentComposite;
-
 	/**
 	 *
 	 */
@@ -191,11 +184,7 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 		final PerformanceStats stats= PerformanceStats.getStats(PERF_CREATE_PART_CONTROL, this);
 		stats.startRun();
 
-		contentComposite = createContentComposite(aParent);
-		CommonNavigatorSearchFilterHelper.getInstance().createFilterTextField(contentComposite, this);
-		Composite commonViewerComposite = createCommonViewerComposite(contentComposite);
-
-		commonViewer = createCommonViewer(commonViewerComposite);
+		commonViewer = createCommonViewer(aParent);
 		commonViewer.setCommonNavigator(this);
 
 		try {
@@ -270,33 +259,6 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(commonViewer.getControl(), helpContext);
 
 		stats.endRun();
-	}
-
-	/**
-	 * @param aParent
-	 * @return
-	 */
-	private Composite createContentComposite(Composite parent) {
-		Composite content = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.horizontalSpacing = 0;
-		layout.verticalSpacing = 0;
-		layout.marginWidth = 0;
-		layout.marginHeight = 0;
-		content.setLayout(layout);
-		return content;
-	}
-
-	/**
-	 * @param contentComposite2
-	 * @return
-	 */
-	private Composite createCommonViewerComposite(Composite parent) {
-		Composite commonViewerParent = new Composite(parent, SWT.NONE);
-		commonViewerParent.setLayout(new FillLayout());
-		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		commonViewerParent.setLayoutData(layoutData);
-		return commonViewerParent;
 	}
 
 	/**

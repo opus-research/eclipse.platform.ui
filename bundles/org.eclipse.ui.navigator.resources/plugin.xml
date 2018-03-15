@@ -53,10 +53,6 @@
                    name="org.eclipse.ui.navigator.customizeViewDialogHelpContext"
                    value="org.eclipse.ui.project_explorer_customization_dialog">
              </property>
-             <property
-                   name="org.eclipse.ui.navigator.searchFilterAllowedClasses"
-                   value="org.eclipse.core.resources.IResource,org.eclipse.ui.IWorkingSet,org.eclipse.jdt.core.IPackageFragment,org.eclipse.jdt.core.IPackageFragmentRoot,org.eclipse.jdt.core.ICompilationUnit">
-             </property>
           </options>
        </viewer>
        <viewerContentBinding
