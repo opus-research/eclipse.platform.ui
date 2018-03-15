@@ -236,7 +236,7 @@ public class ToolBarContributionImpl extends ElementContainerImpl<MToolBarElemen
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuilder result = new StringBuilder(super.toString());
+		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (parentId: "); //$NON-NLS-1$
 		result.append(parentId);
 		result.append(", positionInParent: "); //$NON-NLS-1$
