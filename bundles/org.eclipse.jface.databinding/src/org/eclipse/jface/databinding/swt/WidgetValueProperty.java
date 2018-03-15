@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2016 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 194734)
  *     Matthew Hall - bugs 263413, 264286, 265561, 262287, 281723
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 475704
  ******************************************************************************/
 
 package org.eclipse.jface.databinding.swt;
@@ -123,6 +124,6 @@ public abstract class WidgetValueProperty extends SimpleValueProperty implements
 
 	@Override
 	public ISWTObservableValue observeDelayed(int delay, Widget widget) {
-		return SWTObservables.observeDelayedValue(delay, observe(widget));
+		return observeDelayed(delay, widget);
 	}
 }
