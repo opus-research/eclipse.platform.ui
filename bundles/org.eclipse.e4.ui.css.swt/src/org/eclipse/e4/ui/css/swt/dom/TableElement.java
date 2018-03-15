@@ -19,8 +19,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Table;
 
-public class TableElement extends ControlElement
-implements ISelectionBackgroundCustomizationElement, IHeaderCustomizationElement {
+public class TableElement extends ControlElement implements ISelectionBackgroundCustomizationElement {
 
 	private final ControlSelectedColorCustomization fControlSelectedColorCustomization;
 
@@ -109,13 +108,11 @@ implements ISelectionBackgroundCustomizationElement, IHeaderCustomizationElement
 		this.fControlSelectedColorCustomization.setSelectionForegroundColor(color);
 	}
 
-	@Override
-	public void setHeaderColor(Color color) {
+	public void setTableHeaderColor(Color color) {
 		getTable().setHeaderForeground(color);
 	}
 
-	@Override
-	public void setHeaderBackgroundColor(Color color) {
+	public void setTableHeaderBackgroundColor(Color color) {
 		getTable().setHeaderBackground(color);
 	}
 
