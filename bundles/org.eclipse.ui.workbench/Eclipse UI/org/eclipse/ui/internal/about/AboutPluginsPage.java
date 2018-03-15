@@ -344,9 +344,9 @@ public class AboutPluginsPage extends ProductInfoPage {
 			// include only resolved bundles (bug 65548)
 			SubMonitor subMonitor = SubMonitor.convert(monitor, bundles.length + 1);
 			Map<String, AboutBundleData> map = new HashMap<>();
-			for (Bundle bundle : bundles) {
+			for (int i = 0; i < bundles.length; ++i) {
 				subMonitor.split(1);
-				AboutBundleData data = new AboutBundleData(bundle);
+				AboutBundleData data = new AboutBundleData(bundles[i]);
 				if (BundleUtility.isReady(data.getState()) && !map.containsKey(data.getVersionedId())) {
 					map.put(data.getVersionedId(), data);
 				}
