@@ -109,16 +109,16 @@ public class SlaveSelectionService implements ISelectionService, IDisposable {
 	public void dispose() {
 		Object list[] = listeners.getListeners();
 
-		for (Object element : list) {
+		for (int i = 0; i < list.length; i++) {
 			parentSelectionService
-					.removeSelectionListener((ISelectionListener) element);
+					.removeSelectionListener((ISelectionListener) list[i]);
 		}
 		listeners.clear();
 
 		list = postListeners.getListeners();
-		for (Object element : list) {
+		for (int i = 0; i < list.length; i++) {
 			parentSelectionService
-					.removePostSelectionListener((ISelectionListener) element);
+					.removePostSelectionListener((ISelectionListener) list[i]);
 		}
 		postListeners.clear();
 
