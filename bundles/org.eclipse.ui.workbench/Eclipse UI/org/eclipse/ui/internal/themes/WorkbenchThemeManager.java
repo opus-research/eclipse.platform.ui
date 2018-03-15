@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,6 +33,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.Workbench;
@@ -84,14 +86,18 @@ public class WorkbenchThemeManager extends EventManager implements
 
 	private ITheme currentTheme;
 
-	private IPropertyChangeListener currentThemeListener = event -> {
-		firePropertyChange(event);
-		if (event.getSource() instanceof FontRegistry) {
-			JFaceResources.getFontRegistry().put(event.getProperty(),
-					(FontData[]) event.getNewValue());
-		} else if (event.getSource() instanceof ColorRegistry) {
-			JFaceResources.getColorRegistry().put(event.getProperty(),
-					(RGB) event.getNewValue());
+	private IPropertyChangeListener currentThemeListener = new IPropertyChangeListener() {
+
+		@Override
+		public void propertyChange(PropertyChangeEvent event) {
+			firePropertyChange(event);
+			if (event.getSource() instanceof FontRegistry) {
+				JFaceResources.getFontRegistry().put(event.getProperty(),
+						(FontData[]) event.getNewValue());
+			} else if (event.getSource() instanceof ColorRegistry) {
+				JFaceResources.getColorRegistry().put(event.getProperty(),
+						(RGB) event.getNewValue());
+			}
 		}
 	};
 
@@ -147,7 +153,12 @@ public class WorkbenchThemeManager extends EventManager implements
 
 		final boolean highContrast = Display.getCurrent().getHighContrast();
 
-		Display.getCurrent().addListener(SWT.Settings, event -> updateThemes());
+		Display.getCurrent().addListener(SWT.Settings, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				updateThemes();
+			}
+		});
 
 		// If in HC, *always* use the system default.
 		// This ignores any default theme set via plugin_customization.ini
@@ -157,8 +168,8 @@ public class WorkbenchThemeManager extends EventManager implements
 		PrefUtil.getAPIPreferenceStore().setDefault(
 				IWorkbenchPreferenceConstants.CURRENT_THEME_ID, themeId);
 
-		context = Workbench.getInstance().getService(IEclipseContext.class);
-		eventBroker = Workbench.getInstance().getService(IEventBroker.class);
+		context = (IEclipseContext) Workbench.getInstance().getService(IEclipseContext.class);
+		eventBroker = (IEventBroker) Workbench.getInstance().getService(IEventBroker.class);
 		if (eventBroker != null) {
 			eventBroker.subscribe(UIEvents.UILifeCycle.THEME_CHANGED, themeChangedHandler);
 			eventBroker.subscribe(IThemeEngine.Events.THEME_CHANGED, themeChangedHandler);
