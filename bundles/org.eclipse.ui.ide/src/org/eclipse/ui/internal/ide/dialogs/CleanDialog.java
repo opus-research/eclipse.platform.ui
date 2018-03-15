@@ -30,20 +30,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -51,12 +45,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.BuildAction;
 import org.eclipse.ui.actions.GlobalBuildAction;
-import org.eclipse.ui.dialogs.SearchPattern;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.actions.BuildUtilities;
@@ -97,7 +91,7 @@ public class CleanDialog extends MessageDialog {
     private static final String BUILD_NOW = "BUILD_NOW"; //$NON-NLS-1$
     private static final String BUILD_ALL = "BUILD_ALL"; //$NON-NLS-1$
 
-	private Button alwaysCleanButton, buildNowButton, globalBuildButton,
+	private Button selectAllButton, deselectAllButton, alwaysCleanButton, buildNowButton, globalBuildButton,
 			projectBuildButton;
 
     private CheckboxTableViewer projectNames;
@@ -107,8 +101,7 @@ public class CleanDialog extends MessageDialog {
     private IWorkbenchWindow window;
 
 	private Text filterText;
-	private SearchPattern searchPattern = new SearchPattern();
-	private ToolBarManager filterToolBar;
+	private String filterRegexPattern = ".*"; //$NON-NLS-1$
 
     /**
      * Gets the text of the clean dialog, depending on whether the
@@ -137,7 +130,6 @@ public class CleanDialog extends MessageDialog {
         if (this.selection == null) {
             this.selection = new Object[0];
         }
-		searchPattern.setPattern(""); //$NON-NLS-1$
     }
 
     @Override
@@ -199,80 +191,55 @@ public class CleanDialog extends MessageDialog {
         Composite area = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout();
         layout.marginWidth = layout.marginHeight = 0;
-		layout.numColumns = 1;
+        layout.numColumns = 2;
 		layout.makeColumnsEqualWidth = false;
         area.setLayout(layout);
         area.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		IDialogSettings settings = getDialogSettings(DIALOG_SETTINGS_SECTION);
 
-		alwaysCleanButton = new Button(area, SWT.CHECK);
-		alwaysCleanButton.setText(IDEWorkbenchMessages.CleanDialog_alwaysCleanAllButton);
-		alwaysCleanButton.setSelection(!settings.getBoolean(TOGGLE_SELECTED));
-		alwaysCleanButton.addSelectionListener(widgetSelectedAdapter(e -> {
-			updateEnablement();
-			if (!alwaysCleanButton.getSelection()) {
-				setInitialFilterText();
-			} else {
-				filterText.setText(""); //$NON-NLS-1$
-			}
-		}));
-
-		Composite filterTextArea = new Composite(area, SWT.NONE);
-		layout = new GridLayout();
-		layout.marginWidth = layout.marginHeight = 0;
-		layout.numColumns = 2;
-		layout.makeColumnsEqualWidth = false;
-		filterTextArea.setLayout(layout);
-		filterTextArea.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-		filterText = new Text(filterTextArea, SWT.SEARCH | SWT.ICON_CANCEL);
-		filterText.setMessage(IDEWorkbenchMessages.CleanDialog_typeFilterText);
+        //first row
+		filterText = new Text(area, SWT.SEARCH | SWT.ICON_CANCEL);
 		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		filterText.setLayoutData(gd);
+		filterText.setFocus();
 		filterText.addModifyListener(e -> {
-			String filter = filterText.getText();
-			if (filter.startsWith("*") || filter.startsWith("?") || filter.startsWith("?")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				searchPattern.setPattern(filter);
-			} else {
-				searchPattern.setPattern("*" + filter); //$NON-NLS-1$
-			}
-
-			if (filter.isEmpty()) {
-				filterText.setMessage(IDEWorkbenchMessages.CleanDialog_typeFilterText);
-			}
-
-			updateToolbar(!filter.isEmpty() && !filter.equals(IDEWorkbenchMessages.CleanDialog_typeFilterText));
-
-
+			filterRegexPattern = ".*" + filterText.getText() + ".*"; //$NON-NLS-1$ //$NON-NLS-2$
 			projectNames.refresh();
 		});
 
-		filterText.addFocusListener(new FocusListener() {
-			@Override
-			public void focusLost(FocusEvent e) {
-				if (filterText.getText().equals(IDEWorkbenchMessages.CleanDialog_typeFilterText)) {
-					filterText.setText(""); //$NON-NLS-1$
-				}
-			}
+		selectAllButton = new Button(area, SWT.PUSH);
+		gd = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		selectAllButton.setLayoutData(gd);
+		selectAllButton.setText(IDEWorkbenchMessages.CleanDialog_selectAllButton);
+		selectAllButton.addSelectionListener(widgetSelectedAdapter(e -> {
+			projectNames.setAllChecked(true);
+			selection = projectNames.getCheckedElements();
+			updateEnablement();
+		}));
 
-			@Override
-			public void focusGained(FocusEvent e) {
-			}
-		});
-
-		createClearTextOld(filterTextArea);
-		if (filterToolBar != null) {
-			filterToolBar.update(false);
-			// initially there is no text to clear
-			filterToolBar.getControl().setVisible(false);
-		}
-
+		// third row
 		createProjectSelectionTable(area);
-		if (!alwaysCleanButton.getSelection()) {
-			setInitialFilterText();
-		}
 
+		deselectAllButton = new Button(area, SWT.PUSH);
+		gd = new GridData(SWT.FILL, SWT.TOP, false, false);
+		deselectAllButton.setLayoutData(gd);
+		deselectAllButton.setText(IDEWorkbenchMessages.CleanDialog_deselectedAllButton);
+		deselectAllButton.addSelectionListener(widgetSelectedAdapter(e -> {
+			projectNames.setAllChecked(false);
+			selection = projectNames.getCheckedElements();
+			updateEnablement();
+		}));
+
+		// fourth row
+		alwaysCleanButton = new Button(area, SWT.CHECK);
+		alwaysCleanButton.setText(IDEWorkbenchMessages.CleanDialog_alwaysCleanAllButton);
+		alwaysCleanButton.setSelection(settings.getBoolean(TOGGLE_SELECTED));
+		alwaysCleanButton.addSelectionListener(widgetSelectedAdapter(e -> updateEnablement()));
+
+		new Label(area, SWT.NONE);
+
+		// fifth row
         //only prompt for immediate build if autobuild is off
         if (!ResourcesPlugin.getWorkspace().isAutoBuilding()) {
 			SelectionListener updateEnablement = widgetSelectedAdapter(e -> updateEnablement());
@@ -310,18 +277,6 @@ public class CleanDialog extends MessageDialog {
         return area;
     }
 
-	private void setInitialFilterText() {
-		filterText.setText(IDEWorkbenchMessages.CleanDialog_typeFilterText);
-		filterText.selectAll();
-		filterText.setFocus();
-	}
-
-	protected void updateToolbar(boolean visible) {
-		if (filterToolBar != null) {
-			filterToolBar.getControl().setVisible(visible);
-		}
-	}
-
     @Override
 	protected Control createContents(Composite parent) {
     	Control contents= super.createContents(parent);
@@ -342,11 +297,9 @@ public class CleanDialog extends MessageDialog {
                     return false;
                 }
                 IProject project = (IProject) element;
-				boolean isProjectNameMatchingPattern = searchPattern.matches(project.getName());
+				boolean isProjectNameMatchingPattern = project.getName().matches(filterRegexPattern);
 				if (!project.isAccessible() || !isProjectNameMatchingPattern) {
-					if (!filterText.getText().equals(IDEWorkbenchMessages.CleanDialog_typeFilterText)) {
-						return false;
-					}
+                    return false;
                 }
                 projectHolder[0] = project;
                 return BuildUtilities.isEnabled(projectHolder, IncrementalProjectBuilder.CLEAN_BUILD);
@@ -396,6 +349,8 @@ public class CleanDialog extends MessageDialog {
 	 */
     protected void updateEnablement() {
 		projectNames.getTable().setEnabled(!alwaysCleanButton.getSelection());
+		selectAllButton.setEnabled(!alwaysCleanButton.getSelection());
+		deselectAllButton.setEnabled(!alwaysCleanButton.getSelection());
 		filterText.setEnabled(!alwaysCleanButton.getSelection());
 
 		boolean enabled = selection.length > 0 || alwaysCleanButton.getSelection();
@@ -485,7 +440,7 @@ public class CleanDialog extends MessageDialog {
             settings.put(BUILD_ALL, globalBuildButton.getSelection());
         }
 
-		settings.put(TOGGLE_SELECTED, !alwaysCleanButton.getSelection());
+		settings.put(TOGGLE_SELECTED, alwaysCleanButton.getSelection());
     }
 
     /**
@@ -513,39 +468,4 @@ public class CleanDialog extends MessageDialog {
 	protected boolean isResizable() {
         return true;
     }
-
-	/**
-	 * Create the button that clears the text or removes the not needed column.
-	 *
-	 * @param parent
-	 *            parent <code>Composite</code> of toolbar button
-	 */
-	private void createClearTextOld(Composite parent) {
-		// only create the button if the text widget doesn't support one
-		// natively
-		if ((filterText.getStyle() & SWT.ICON_CANCEL) == 0) {
-			filterToolBar = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
-			filterToolBar.createControl(parent);
-
-			IAction clearTextAction = new Action("", IAction.AS_PUSH_BUTTON) {//$NON-NLS-1$
-				@Override
-				public void run() {
-					filterText.setText(""); //$NON-NLS-1$
-					filterText.selectAll();
-				}
-			};
-
-			clearTextAction.setToolTipText(IDEWorkbenchMessages.CleanDialog_clearToolTip);
-			clearTextAction.setImageDescriptor(
-					JFaceResources.getImageRegistry().getDescriptor("org.eclipse.ui.internal.dialogs.CLEAR_ICON")); //$NON-NLS-1$
-			clearTextAction
-					.setDisabledImageDescriptor(JFaceResources.getImageRegistry()
-							.getDescriptor("org.eclipse.ui.internal.dialogs.DCLEAR_ICON")); //$NON-NLS-1$
-
-			filterToolBar.add(clearTextAction);
-		} else {
-			// remove the not needed column
-			((GridLayout) parent.getLayout()).numColumns = 1;
-		}
-	}
 }
