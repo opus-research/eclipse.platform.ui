@@ -671,14 +671,8 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
                     // editor
                     ImageDescriptor descriptor;
                     if (editor.getProgram() == null) {
-						String fileName = editor.getFileName();
-						if (fileName == null) {
-							String error = "Both editor program and path are null for descriptor id: "; //$NON-NLS-1$
-							error += editor.getId() + " with name: " + editor.getLabel(); //$NON-NLS-1$
-							WorkbenchPlugin.log(error, new IllegalStateException());
-							continue;
-						}
-						descriptor = new ProgramImageDescriptor(fileName, 0);
+						descriptor = new ProgramImageDescriptor(editor
+                                .getFileName(), 0);
 					} else {
 						descriptor = new ExternalProgramImageDescriptor(editor
                                 .getProgram());
