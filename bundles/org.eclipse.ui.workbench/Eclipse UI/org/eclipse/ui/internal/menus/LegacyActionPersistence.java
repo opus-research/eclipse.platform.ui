@@ -432,7 +432,8 @@ public final class LegacyActionPersistence extends RegistryPersistence {
 		// Sort the actionSets extension point.
 		final IConfigurationElement[] actionSetsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_ACTION_SETS);
-		for (final IConfigurationElement element : actionSetsExtensionPoint) {
+		for (int i = 0; i < actionSetsExtensionPoint.length; i++) {
+			final IConfigurationElement element = actionSetsExtensionPoint[i];
 			final String name = element.getName();
 			if (TAG_ACTION_SET.equals(name)) {
 				addElementToIndexedArray(element, indexedConfigurationElements,
@@ -443,7 +444,8 @@ public final class LegacyActionPersistence extends RegistryPersistence {
 		// Sort the editorActions extension point.
 		final IConfigurationElement[] editorActionsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_EDITOR_ACTIONS);
-		for (final IConfigurationElement element : editorActionsExtensionPoint) {
+		for (int i = 0; i < editorActionsExtensionPoint.length; i++) {
+			final IConfigurationElement element = editorActionsExtensionPoint[i];
 			final String name = element.getName();
 			if (TAG_EDITOR_CONTRIBUTION.equals(name)) {
 				addElementToIndexedArray(element, indexedConfigurationElements,
@@ -454,7 +456,8 @@ public final class LegacyActionPersistence extends RegistryPersistence {
 		// Sort the viewActions extension point.
 		final IConfigurationElement[] viewActionsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_VIEW_ACTIONS);
-		for (final IConfigurationElement element : viewActionsExtensionPoint) {
+		for (int i = 0; i < viewActionsExtensionPoint.length; i++) {
+			final IConfigurationElement element = viewActionsExtensionPoint[i];
 			final String name = element.getName();
 			if (TAG_VIEW_CONTRIBUTION.equals(name)) {
 				addElementToIndexedArray(element, indexedConfigurationElements,
@@ -501,7 +504,9 @@ public final class LegacyActionPersistence extends RegistryPersistence {
 	private final void readActions(final String primaryId,
 			final IConfigurationElement[] elements, final List warningsToLog,
 			final Expression visibleWhenExpression, final String viewId) {
-		for (final IConfigurationElement element : elements) {
+		for (int i = 0; i < elements.length; i++) {
+			final IConfigurationElement element = elements[i];
+
 			/*
 			 * We might need the identifier to generate the command, so we'll
 			 * read it out now.

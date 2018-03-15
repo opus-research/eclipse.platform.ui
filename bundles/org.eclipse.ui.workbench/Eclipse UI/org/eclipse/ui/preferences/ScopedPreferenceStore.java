@@ -331,21 +331,19 @@ public class ScopedPreferenceStore extends EventManager implements
 			Object newValue) {
 		// important: create intermediate array to protect against listeners
 		// being added/removed during the notification
-		final Object[] list = getListeners();
-		if (list.length == 0) {
+		final Object[] listeners = getListeners();
+		if (listeners.length == 0) {
 			return;
 		}
-		final PropertyChangeEvent event = new PropertyChangeEvent(this, name,
-				oldValue, newValue);
-		for (Object element : list) {
-			final IPropertyChangeListener listener = (IPropertyChangeListener) element;
-			SafeRunner.run(new SafeRunnable(JFaceResources
-					.getString("PreferenceStore.changeError")) { //$NON-NLS-1$
-						@Override
-						public void run() {
-							listener.propertyChange(event);
-						}
-					});
+		final PropertyChangeEvent event = new PropertyChangeEvent(this, name, oldValue, newValue);
+		for (Object listener : listeners) {
+			final IPropertyChangeListener propertyChangeListener = (IPropertyChangeListener) listener;
+			SafeRunner.run(new SafeRunnable(JFaceResources.getString("PreferenceStore.changeError")) { //$NON-NLS-1$
+				@Override
+				public void run() {
+					propertyChangeListener.propertyChange(event);
+				}
+			});
 		}
 	}
 

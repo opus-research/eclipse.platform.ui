@@ -136,8 +136,8 @@ public class WorkbenchServiceRegistry implements IExtensionChangeHandler {
 							handle, IExtensionTracker.REF_WEAK);
 
 			    	List serviceNames = new ArrayList();
-					for (IConfigurationElement serviceNameElement : serviceNameElements) {
-						String serviceName = serviceNameElement.getAttribute(IWorkbenchRegistryConstants.ATTR_SERVICE_CLASS);
+					for (int j = 0; j < serviceNameElements.length; j++) {
+						String serviceName = serviceNameElements[j].getAttribute(IWorkbenchRegistryConstants.ATTR_SERVICE_CLASS);
 						if (factories.containsKey(serviceName)) {
 							WorkbenchPlugin.log("Factory already exists for " //$NON-NLS-1$
 									+ serviceName);
@@ -167,14 +167,14 @@ public class WorkbenchServiceRegistry implements IExtensionChangeHandler {
 		ArrayList providers = new ArrayList();
 		IExtensionPoint ep = getExtensionPoint();
 		IConfigurationElement[] elements = ep.getConfigurationElements();
-		for (IConfigurationElement element : elements) {
-			if (element.getName().equals(
+		for (int i = 0; i < elements.length; i++) {
+			if (elements[i].getName().equals(
 					IWorkbenchRegistryConstants.TAG_SOURCE_PROVIDER)) {
 				try {
-					Object sourceProvider = element
+					Object sourceProvider = elements[i]
 							.createExecutableExtension(IWorkbenchRegistryConstants.ATTR_PROVIDER);
 					if (!(sourceProvider instanceof AbstractSourceProvider)) {
-						String attributeName = element
+						String attributeName = elements[i]
 								.getAttribute(IWorkbenchRegistryConstants.ATTR_PROVIDER);
 						final String message = "Source Provider '" + //$NON-NLS-1$
 								attributeName
@@ -185,7 +185,7 @@ public class WorkbenchServiceRegistry implements IExtensionChangeHandler {
 						continue;
 					}
 					providers.add(sourceProvider);
-					processVariables(element
+					processVariables(elements[i]
 							.getChildren(IWorkbenchRegistryConstants.TAG_VARIABLE));
 				} catch (CoreException e) {
 					StatusManager.getManager().handle(e.getStatus());
@@ -205,13 +205,13 @@ public class WorkbenchServiceRegistry implements IExtensionChangeHandler {
 	};
 
 	private void processVariables(IConfigurationElement[] children) {
-		for (IConfigurationElement element : children) {
-			String name = element
+		for (int i = 0; i < children.length; i++) {
+			String name = children[i]
 					.getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
 			if (name == null || name.length() == 0) {
 				continue;
 			}
-			String level = element
+			String level = children[i]
 					.getAttribute(IWorkbenchRegistryConstants.ATT_PRIORITY_LEVEL);
 			if (level == null || level.length() == 0) {
 				level = WORKBENCH_LEVEL;
@@ -241,7 +241,8 @@ public class WorkbenchServiceRegistry implements IExtensionChangeHandler {
 
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (Object object : objects) {
+		for (int i = 0; i < objects.length; i++) {
+			Object object = objects[i];
 			if (object instanceof ServiceFactoryHandle) {
 				ServiceFactoryHandle handle = (ServiceFactoryHandle) object;
 				Set locatorSet = handle.serviceLocators.keySet();
@@ -251,14 +252,15 @@ public class WorkbenchServiceRegistry implements IExtensionChangeHandler {
 					int l2 = loc2.getService(IWorkbenchLocationService.class).getServiceLevel();
 					return l1 < l2 ? -1 : (l1 > l2 ? 1 : 0);
 				});
-				for (ServiceLocator locator : locators) {
-					ServiceLocator serviceLocator = locator;
+				for (int j = 0; j < locators.length; j++) {
+					ServiceLocator serviceLocator = locators[j];
 					if (!serviceLocator.isDisposed()) {
 						serviceLocator.unregisterServices(handle.serviceNames);
 					}
 				}
 				handle.factory = null;
-				for (String serviceName : handle.serviceNames) {
+				for (int j = 0; j < handle.serviceNames.length; j++) {
+					String serviceName = handle.serviceNames[j];
 					if (factories.get(serviceName) == handle) {
 						factories.remove(serviceName);
 					}

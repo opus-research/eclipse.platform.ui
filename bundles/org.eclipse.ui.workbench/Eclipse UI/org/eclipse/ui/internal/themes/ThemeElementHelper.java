@@ -64,13 +64,14 @@ public final class ThemeElementHelper {
         Arrays.sort(copyOfDefinitions, new IThemeRegistry.HierarchyComparator(
                 definitions));
 
-        for (FontDefinition definition : copyOfDefinitions) {
+        for (int i = 0; i < copyOfDefinitions.length; i++) {
+            FontDefinition definition = copyOfDefinitions[i];
             installFont(definition, theme, store, true);
         }
 
         if (defaults != null) {
-            for (FontDefinition default1 : defaults) {
-                installFont(default1, theme, store, false);
+            for (int i = 0; i < defaults.length; i++) {
+                installFont(defaults[i], theme, store, false);
             }
         }
     }
@@ -187,13 +188,14 @@ public final class ThemeElementHelper {
         Arrays.sort(copyOfDefinitions, new IThemeRegistry.HierarchyComparator(
                 definitions));
 
-        for (ColorDefinition definition : copyOfDefinitions) {
+        for (int i = 0; i < copyOfDefinitions.length; i++) {
+            ColorDefinition definition = copyOfDefinitions[i];
             installColor(definition, theme, store, true);
         }
 
         if (defaults != null) {
-            for (ColorDefinition default1 : defaults) {
-                installColor(default1, theme, store, false);
+            for (int i = 0; i < defaults.length; i++) {
+                installColor(defaults[i], theme, store, false);
             }
         }
     }
@@ -262,7 +264,8 @@ public final class ThemeElementHelper {
 		System.arraycopy(allDefs, 0, copy, 0, allDefs.length);
 
         Arrays.sort(allDefs, new IThemeRegistry.HierarchyComparator(copy));
-        for (IHierarchalThemeElementDefinition def : allDefs) {
+        for (int i = 0; i < allDefs.length; i++) {
+            IHierarchalThemeElementDefinition def = allDefs[i];
             if (def.getDefaultsTo() != null) {
                 if (set.contains(def.getDefaultsTo())) {
 					set.add(def);
@@ -364,7 +367,8 @@ public final class ThemeElementHelper {
     public static String[] splitPropertyName(Theme theme, String property) {
     	IThemeDescriptor[] descriptors = WorkbenchPlugin.getDefault()
 				.getThemeRegistry().getThemes();
-		for (IThemeDescriptor themeDescriptor : descriptors) {
+		for (int i = 0; i < descriptors.length; i++) {
+			IThemeDescriptor themeDescriptor = descriptors[i];
 			String id = themeDescriptor.getId();
 			if (property.startsWith(id + '.')) { // the property starts with
 													// a known theme ID -

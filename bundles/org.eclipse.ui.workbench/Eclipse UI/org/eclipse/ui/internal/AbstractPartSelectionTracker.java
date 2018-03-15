@@ -94,9 +94,9 @@ public abstract class AbstractPartSelectionTracker {
     public void dispose() {
         synchronized (fListeners) {
             Object[] listeners = fListeners.getListeners();
-            for (Object listener : listeners) {
-                fListeners.remove(listener);
-                postListeners.remove(listener);
+            for (int i = 0; i < listeners.length; i++) {
+                fListeners.remove(listeners[i]);
+                postListeners.remove(listeners[i]);
             }
         }
     }

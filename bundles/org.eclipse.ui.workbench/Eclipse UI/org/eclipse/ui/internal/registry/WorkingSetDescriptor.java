@@ -91,7 +91,8 @@ public class WorkingSetDescriptor implements IPluginContribution {
 		if (containsChildren.length > 0) {
 			List byClassList = new ArrayList(containsChildren.length);
 			List byAdapterList = new ArrayList(containsChildren.length);
-			for (IConfigurationElement child : containsChildren) {
+			for (int i = 0; i < containsChildren.length; i++) {
+				IConfigurationElement child = containsChildren[i];
 				String className = child
 						.getAttribute(IWorkbenchRegistryConstants.ATT_CLASS);
 				if (className != null)

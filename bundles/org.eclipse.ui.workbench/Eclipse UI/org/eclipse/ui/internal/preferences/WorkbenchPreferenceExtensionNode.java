@@ -72,7 +72,8 @@ public abstract class WorkbenchPreferenceExtensionNode extends WorkbenchPreferen
 			IConfigurationElement[] references = getConfigurationElement()
 					.getChildren(IWorkbenchRegistryConstants.TAG_KEYWORD_REFERENCE);
 			HashSet list = new HashSet(references.length);
-			for (IConfigurationElement page : references) {
+			for (int i = 0; i < references.length; i++) {
+				IConfigurationElement page = references[i];
 				String id = page.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
 				if (id != null) {
 					list.add(id);

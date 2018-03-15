@@ -123,9 +123,8 @@ public abstract class ImportExportPage extends WorkbenchWizardSelectionPage{
 
 	        if (wizardCategories != null) {
 	            if (wizardCategories.getParent() == null) {
-	                IWizardCategory [] children = wizardCategories.getCategories();
-	                for (IWizardCategory element : children) {
-                		inputArray.add(element);
+					for (IWizardCategory wizardCategory : wizardCategories.getCategories()) {
+						inputArray.add(wizardCategory);
 	                }
 	            } else {
 	                expandTop = true;

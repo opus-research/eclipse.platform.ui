@@ -194,8 +194,7 @@ public class PropertyPageContributorManager extends ObjectContributorManager {
 
     @Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
-        IConfigurationElement[] addedElements = extension.getConfigurationElements();
-        for (IConfigurationElement addedElement : addedElements) {
+		for (IConfigurationElement addedElement : extension.getConfigurationElements()) {
             PropertyPagesRegistryReader reader = new PropertyPagesRegistryReader(this);
             reader.readElement(addedElement);
         }

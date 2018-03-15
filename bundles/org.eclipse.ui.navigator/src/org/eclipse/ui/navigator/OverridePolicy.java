@@ -80,9 +80,9 @@ public final class OverridePolicy {
 	 *         InvokeAlwaysRegardlessOfSuppressedExt if aLiteral is invalid
 	 */
 	public static OverridePolicy get(String aLiteral) {
-		for (OverridePolicy element : ENUM_ARRAY) {
-			if (element.getLiteral().equals(aLiteral)) {
-				return element;
+		for (OverridePolicy policy : ENUM_ARRAY) {
+			if (policy.getLiteral().equals(aLiteral)) {
+				return policy;
 			}
 		}
 		return InvokeAlwaysRegardlessOfSuppressedExt;

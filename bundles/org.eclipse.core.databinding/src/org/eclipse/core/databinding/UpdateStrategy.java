@@ -144,8 +144,7 @@ import com.ibm.icu.text.NumberFormat;
 				// converting to toType is just a widening
 				return new IdentityConverter(fromClass, toClass);
 			}
-			Pair key = new Pair(getKeyForClass(fromType, currentFromClass),
-					getKeyForClass(toType, toClass));
+			Pair key = new Pair(getKeyForClass(fromType, currentFromClass), getKeyForClass(toType, toClass));
 			Object converterOrClassname = converterMap.get(key);
 			if (converterOrClassname instanceof IConverter) {
 				return (IConverter) converterOrClassname;

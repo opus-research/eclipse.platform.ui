@@ -151,16 +151,16 @@ public class Theme extends EventManager implements ITheme {
                 private void processDefaultsTo(String key, FontData[] fd) {
                     FontDefinition[] defs = WorkbenchPlugin.getDefault()
                             .getThemeRegistry().getFontsFor(getId());
-                    for (FontDefinition def : defs) {
-                        String defaultsTo = def.getDefaultsTo();
+                    for (int i = 0; i < defs.length; i++) {
+                        String defaultsTo = defs[i].getDefaultsTo();
                         if (defaultsTo != null && defaultsTo.equals(key)) {
                             IPreferenceStore store = WorkbenchPlugin
                                     .getDefault().getPreferenceStore();
                             if (store.isDefault(ThemeElementHelper
-                                    .createPreferenceKey(Theme.this, def
+                                    .createPreferenceKey(Theme.this, defs[i]
                                             .getId()))) {
-                                getFontRegistry().put(def.getId(), fd);
-                                processDefaultsTo(def.getId(), fd);
+                                getFontRegistry().put(defs[i].getId(), fd);
+                                processDefaultsTo(defs[i].getId(), fd);
                             }
                         }
                     }
@@ -175,16 +175,16 @@ public class Theme extends EventManager implements ITheme {
                 private void processDefaultsTo(String key, RGB rgb) {
                     ColorDefinition[] defs = WorkbenchPlugin.getDefault()
                             .getThemeRegistry().getColorsFor(getId());
-                    for (ColorDefinition def : defs) {
-                        String defaultsTo = def.getDefaultsTo();
+                    for (int i = 0; i < defs.length; i++) {
+                        String defaultsTo = defs[i].getDefaultsTo();
                         if (defaultsTo != null && defaultsTo.equals(key)) {
                             IPreferenceStore store = WorkbenchPlugin
                                     .getDefault().getPreferenceStore();
                             if (store.isDefault(ThemeElementHelper
-                                    .createPreferenceKey(Theme.this, def
+                                    .createPreferenceKey(Theme.this, defs[i]
                                             .getId()))) {
-                                getColorRegistry().put(def.getId(), rgb);
-                                processDefaultsTo(def.getId(), rgb);
+                                getColorRegistry().put(defs[i].getId(), rgb);
+                                processDefaultsTo(defs[i].getId(), rgb);
                             }
                         }
                     }
@@ -256,8 +256,8 @@ public class Theme extends EventManager implements ITheme {
 
     private void firePropertyChange(PropertyChangeEvent event) {
         Object[] listeners = getListeners();
-        for (Object listener : listeners) {
-            ((IPropertyChangeListener) listener).propertyChange(event);
+        for (int i = 0; i < listeners.length; i++) {
+            ((IPropertyChangeListener) listeners[i]).propertyChange(event);
         }
     }
 

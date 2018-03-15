@@ -384,8 +384,7 @@ public class TabbedPropertyList
 
 			/* Draw dynamic images, if any */
 			boolean hasDynamicImage = false;
-			for (Image dynamicImage2 : dynamicImages) {
-				Image dynamicImage = dynamicImage2;
+			for (Image dynamicImage : dynamicImages) {
 				if (dynamicImage != null && !dynamicImage.isDisposed()) {
 					hasDynamicImage = true;
 					break;
@@ -395,8 +394,7 @@ public class TabbedPropertyList
 				int drawPosition = textIndent
 						+ e.gc.textExtent(tab.getText()).x + 4;
 				boolean addSpace = false;
-				for (Image dynamicImage2 : dynamicImages) {
-					Image dynamicImage = dynamicImage2;
+				for (Image dynamicImage : dynamicImages) {
 					if (dynamicImage != null && !dynamicImage.isDisposed()) {
 						if (addSpace) {
 							drawPosition = drawPosition + 3;
