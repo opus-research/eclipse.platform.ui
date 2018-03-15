@@ -20,7 +20,6 @@ import org.eclipse.e4.ui.tests.application.ModelRobustnessTest;
 import org.eclipse.e4.ui.tests.application.ResourceHandlerTest;
 import org.eclipse.e4.ui.tests.application.StartupTestSuite;
 import org.eclipse.e4.ui.tests.application.UIEventTypesTest;
-import org.eclipse.e4.ui.tests.reconciler.ModelReconcilerTestSuite;
 import org.eclipse.e4.ui.tests.workbench.Bug308317Test;
 import org.eclipse.e4.ui.tests.workbench.ContextTest;
 import org.eclipse.e4.ui.tests.workbench.ExtensionsSortTests;
@@ -70,7 +69,6 @@ import org.junit.runners.Suite;
 		MSashTest.class,
 		HandlerTest.class,
 		ContextTest.class,
-		ModelReconcilerTestSuite.class,
 		Bug308317Test.class,
 		ModelRobustnessTest.class,
 		ResourceHandlerTest.class,
