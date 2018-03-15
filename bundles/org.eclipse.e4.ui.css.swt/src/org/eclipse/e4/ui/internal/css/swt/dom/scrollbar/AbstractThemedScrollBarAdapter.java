@@ -184,7 +184,6 @@ implements ControlListener, Listener, DisposeListener, KeyListener, MouseWheelLi
 		fDisplay.addFilter(SWT.MouseDown, this);
 		fDisplay.addFilter(SWT.MouseUp, this);
 		fDisplay.addFilter(SWT.MouseMove, this);
-		fDisplay.addFilter(SWT.MenuDetect, this);
 
 		fScrollable.addControlListener(this);
 		fScrollable.addKeyListener(this);
@@ -214,7 +213,6 @@ implements ControlListener, Listener, DisposeListener, KeyListener, MouseWheelLi
 			fDisplay.removeFilter(SWT.MouseDown, this);
 			fDisplay.removeFilter(SWT.MouseUp, this);
 			fDisplay.removeFilter(SWT.MouseMove, this);
-			fDisplay.removeFilter(SWT.MenuDetect, this);
 		}
 
 		fHorizontalScrollHandler.uninstall(this, disposing);
@@ -302,15 +300,7 @@ implements ControlListener, Listener, DisposeListener, KeyListener, MouseWheelLi
 			return;
 		}
 		Control control = (Control) event.widget;
-
-		Point displayPos;
-		if (event.type == SWT.MenuDetect) {
-			// a MenuDetect is already in display coordinates
-			displayPos = new Point(event.x, event.y);
-		} else {
-			// MouseUp/Down/Move is in control coordinates
-			displayPos = control.toDisplay(event.x, event.y);
-		}
+		Point displayPos = control.toDisplay(event.x, event.y);
 		Point controlPos = fScrollable.toControl(displayPos);
 
 		if (event.type == SWT.MouseDown) {
@@ -338,13 +328,9 @@ implements ControlListener, Listener, DisposeListener, KeyListener, MouseWheelLi
 
 		} else if (event.type == SWT.MouseUp) {
 			this.fScrollOnMouseDownTimer.stop();
-			boolean handled = this.fHorizontalScrollHandler.stopDragOnMouseUp(fScrollable);
-			handled |= this.fVerticalScrollHandler.stopDragOnMouseUp(fScrollable);
+			this.fHorizontalScrollHandler.stopDragOnMouseUp(fScrollable);
+			this.fVerticalScrollHandler.stopDragOnMouseUp(fScrollable);
 			checkChangedHorizontalAndTopPixel();
-			if (handled) {
-				this.stopEventPropagation(event);
-			}
-
 
 		} else if (event.type == SWT.MouseMove) {
 			if (!fHorizontalScrollHandler.isDragging() && !fVerticalScrollHandler.isDragging()) {
@@ -378,12 +364,6 @@ implements ControlListener, Listener, DisposeListener, KeyListener, MouseWheelLi
 				return;
 			}
 			checkChangedHorizontalAndTopPixel();
-
-		} else if (event.type == SWT.MenuDetect) {
-			if (this.fHorizontalScrollHandler.mousePosOverScroll(fScrollable, controlPos)
-					|| this.fVerticalScrollHandler.mousePosOverScroll(fScrollable, controlPos)) {
-				this.stopEventPropagation(event);
-			}
 		}
 	}
 
