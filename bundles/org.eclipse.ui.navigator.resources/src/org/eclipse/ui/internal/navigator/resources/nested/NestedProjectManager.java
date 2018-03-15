@@ -24,7 +24,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
@@ -50,27 +49,34 @@ public class NestedProjectManager {
 	private SortedMap<IPath, IProject> locationsToProjects = Collections
 			.synchronizedSortedMap(new TreeMap<IPath, IProject>(new PathComparator()));
 
+	private int knownProjectsCount;
+
 	private NestedProjectManager() {
 		refreshProjectsList();
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(new IResourceChangeListener() {
 			@Override
 			public void resourceChanged(IResourceChangeEvent event) {
-				IResourceDelta delta = event.getDelta();
-				IResource resource = null;
-				if (delta != null) {
-					resource = delta.getResource();
-				}
-				if (resource != null
-						&& (resource.getType() == IResource.PROJECT || resource.getType() == IResource.ROOT)) {
+				if (event.getType() == IResourceChangeEvent.POST_CHANGE
+						&& event.getDelta().getResource().getType() == IResource.PROJECT) {
 					refreshProjectsList();
 				}
 			}
-		}, IResourceChangeEvent.POST_CHANGE);
+		});
+	}
+
+	private void refreshProjectsListIfNeeded() {
+		if (knownProjectsCount != ResourcesPlugin.getWorkspace().getRoot().getProjects().length) {
+			// TODO: find other cheap checks to try in condition
+			// Need to find a cheap way to react to project refactoring (moved
+			// or renamed...)
+			refreshProjectsList();
+		}
 	}
 
 	private void refreshProjectsList() {
 		locationsToProjects.clear();
 		IProject[] knownProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		knownProjectsCount = knownProjects.length;
 		for (IProject project : knownProjects) {
 			IPath location = project.getLocation();
 			if (location != null) {
@@ -91,6 +97,7 @@ public class NestedProjectManager {
 		if (folder == null) {
 			return null;
 		}
+		refreshProjectsListIfNeeded();
 		IPath location = folder.getLocation();
 		if (location == null) {
 			return null;
