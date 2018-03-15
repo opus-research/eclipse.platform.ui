@@ -11,6 +11,9 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
+import java.time.Duration;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
@@ -26,13 +29,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.accessibility.AccessibleListener;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -78,6 +77,9 @@ public class ProgressAnimationItem extends AnimationItem implements
 	private int flags;
 
 	private AccessibleListener currentAccessibleListener;
+
+	private Throttler throttledRefresh = new Throttler(PlatformUI.getWorkbench().getDisplay(), Duration.ofMillis(100),
+			this::refresh);
 
 	/**
 	 * Create an instance of the receiver in the supplied region.
@@ -292,15 +294,12 @@ public class ProgressAnimationItem extends AnimationItem implements
 		}
 
 		top = new Composite(parent, SWT.NULL);
-		top.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				FinishedJobs.getInstance().removeListener(
-						ProgressAnimationItem.this);
-				noneImage.dispose();
-				okImage.dispose();
-				errorImage.dispose();
-			}
+		top.addDisposeListener(e -> {
+			FinishedJobs.getInstance().removeListener(
+					ProgressAnimationItem.this);
+			noneImage.dispose();
+			okImage.dispose();
+			errorImage.dispose();
 		});
 
 		boolean isCarbon = Util.isMac();
@@ -337,12 +336,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 		toolbar.setVisible(false);
 
 		toolButton = new ToolItem(toolbar, SWT.NONE);
-		toolButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				doAction();
-			}
-		});
+		toolButton.addSelectionListener(widgetSelectedAdapter(e -> doAction()));
 
 		if (isCarbon) {
 			new Label(top, SWT.NONE).setLayoutData(new GridData(4, 4));
@@ -396,24 +390,12 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	@Override
 	public void removed(JobTreeElement info) {
-		final Display display = Display.getDefault();
-		display.asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				refresh();
-			}
-		});
+		throttledRefresh.throttledExec();
 	}
 
 	@Override
 	public void finished(final JobTreeElement jte) {
-		final Display display = Display.getDefault();
-		display.asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				refresh();
-			}
-		});
+		throttledRefresh.throttledExec();
 	}
 
 }

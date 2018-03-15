@@ -309,15 +309,15 @@ public class FormToolkit {
 	 * @return the composite widget
 	 */
 	public Composite createComposite(Composite parent, int style) {
-		Composite composite = new LayoutComposite(parent, style | orientation);
+		Composite composite = new Composite(parent, style | orientation);
 		adapt(composite);
 		return composite;
 	}
 
 	/**
-	 * Creats the composite that can server as a separator between various parts
-	 * of a form. Separator height should be controlled by setting the height
-	 * hint on the layout data for the composite.
+	 * Creates the composite that can server as a separator between various
+	 * parts of a form. Separator height should be controlled by setting the
+	 * height hint on the layout data for the composite.
 	 *
 	 * @param parent
 	 *            the separator parent
