@@ -541,7 +541,7 @@
             adapter="org.eclipse.e4.ui.css.swt.dom.TableElement"
             handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertyTableHeaderHandler">
          <property-name
-               name="swt-table-header-color">
+               name="swt-table-header-foreground-color">
          </property-name>
          <property-name
                name="swt-table-header-background-color">
