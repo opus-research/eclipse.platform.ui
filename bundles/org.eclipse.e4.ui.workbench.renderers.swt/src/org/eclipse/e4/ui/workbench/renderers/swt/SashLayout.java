@@ -93,12 +93,7 @@ public class SashLayout extends Layout {
 				try {
 					layoutUpdateInProgress = true;
 				adjustWeights(sashesToDrag, e.x, e.y);
-					try {
-						host.setRedraw(false);
-						host.layout();
-					} finally {
-						host.setRedraw(true);
-					}
+					host.layout();
 					host.update();
 				} finally {
 					layoutUpdateInProgress = false;
