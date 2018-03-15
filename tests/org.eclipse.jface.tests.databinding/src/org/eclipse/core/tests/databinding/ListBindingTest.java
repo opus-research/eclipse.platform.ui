@@ -13,6 +13,10 @@
 
 package org.eclipse.core.tests.databinding;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +35,8 @@ import org.eclipse.core.internal.databinding.BindingStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @since 1.1
@@ -40,8 +46,8 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 	private IObservableList model;
 	private DataBindingContext dbc;
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		super.setUp();
 
 		target = new WritableList(new ArrayList(), String.class);
@@ -49,6 +55,7 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 		dbc = new DataBindingContext();
 	}
 
+	@Test
 	public void testUpdateModelFromTarget() throws Exception {
 		Binding binding = dbc.bindList(target, model,
 				new UpdateListStrategy(UpdateListStrategy.POLICY_ON_REQUEST),
@@ -66,6 +73,7 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 		assertEquals("target != model", target, model);
 	}
 
+	@Test
 	public void testUpdateTargetFromModel() throws Exception {
 		Binding binding = dbc.bindList(target, model,
 				new UpdateListStrategy(UpdateListStrategy.POLICY_ON_REQUEST),
@@ -84,21 +92,25 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 		assertEquals("model != target", model, target);
 	}
 
+	@Test
 	public void testGetTarget() throws Exception {
 		Binding binding = dbc.bindList(target, model);
 		assertEquals(target, binding.getTarget());
 	}
 
+	@Test
 	public void testGetModel() throws Exception {
 		Binding binding = dbc.bindList(target, model);
 		assertEquals(model, binding.getModel());
 	}
 
+	@Test
 	public void testStatusIsInstanceOfBindingStatus() throws Exception {
 		Binding binding = dbc.bindList(target, model);
 		assertTrue(binding.getValidationStatus().getValue() instanceof BindingStatus);
 	}
 
+	@Test
 	public void testAddValidationStatusContainsMultipleStatuses() throws Exception {
 		UpdateListStrategy strategy = new UpdateListStrategy() {
 			@Override
@@ -130,6 +142,7 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 		assertEquals("second status severity", IStatus.INFO, children[1].getSeverity());
 	}
 
+	@Test
 	public void testRemoveValidationStatusContainsMultipleStatuses() throws Exception {
 		List items = Arrays.asList(new String[] {"1", "2"});
 		model.addAll(items);
@@ -164,6 +177,7 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 		assertEquals("second status severity", IStatus.INFO, children[1].getSeverity());
 	}
 
+	@Test
 	public void testAddOKValidationStatus() throws Exception {
 		Binding binding = dbc.bindList(target, model);
 		target.add("1");
@@ -173,6 +187,7 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 		assertEquals(0, status.getChildren().length);
 	}
 
+	@Test
 	public void testRemoveOKValidationStatus() throws Exception {
 		model.add("1");
 		Binding binding = dbc.bindList(target, model);
@@ -187,6 +202,7 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 	 * we test common functionality from UpdateStrategy here, because that base
 	 * class would need much more stubbing and mocking to test it.
 	 */
+	@Test
 	public void testErrorDuringConversionIsLogged() {
 		UpdateListStrategy modelToTarget = new UpdateListStrategy();
 		modelToTarget.setConverter(new IConverter() {
@@ -232,6 +248,7 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 	 * we test common functionality from UpdateStrategy here, because that base
 	 * class would need much more stubbing and mocking to test it.
 	 */
+	@Test
 	public void testErrorDuringRemoveIsLogged() {
 		IObservableList<String> target = new WritableList<String>() {
 			@Override
@@ -262,6 +279,7 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 	 * we test common functionality from UpdateStrategy here, because that base
 	 * class would need much more stubbing and mocking to test it.
 	 */
+	@Test
 	public void testErrorDuringMoveIsLogged() {
 		IObservableList<String> target = new WritableList<String>() {
 			@Override
@@ -293,6 +311,7 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 	 * we test common functionality from UpdateStrategy here, because that base
 	 * class would need much more stubbing and mocking to test it.
 	 */
+	@Test
 	public void testErrorDuringReplaceIsLogged() {
 		IObservableList<String> target = new WritableList<String>() {
 			@Override
