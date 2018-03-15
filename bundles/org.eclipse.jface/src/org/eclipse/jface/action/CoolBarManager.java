@@ -985,7 +985,8 @@ public class CoolBarManager extends ContributionManager implements
         int j = 0;
         CoolItem[] coolItems = (coolBar == null) ? null : coolBar.getItems();
 
-		for (IContributionItem item : items) {
+        for (IContributionItem item2 : items) {
+            IContributionItem item = item2;
             CoolItem coolItem = findCoolItem(coolItems, item);
             if (item.isSeparator()) {
                 foundSeparator = true;
