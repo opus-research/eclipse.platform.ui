@@ -192,8 +192,8 @@ public class StringFieldEditor extends FieldEditor {
 		}
 
 		// call hook for subclasses and the validator
-		result &= doCheckState();
-		result &= validator == null || validator.test(getStringValue());
+		result = result && doCheckState();
+		result = result && (validator == null || validator.test(getStringValue()));
 
 		if (result) {
 			clearErrorMessage();
@@ -361,6 +361,7 @@ public class StringFieldEditor extends FieldEditor {
                     @Override
 					public void focusLost(FocusEvent e) {
                         valueChanged();
+                        clearErrorMessage();
                     }
                 });
                 break;
