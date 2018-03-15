@@ -170,8 +170,6 @@ import org.eclipse.ui.internal.e4.compatibility.SelectionService;
 import org.eclipse.ui.internal.handlers.ActionCommandMappingService;
 import org.eclipse.ui.internal.handlers.IActionCommandMappingService;
 import org.eclipse.ui.internal.handlers.LegacyHandlerService;
-import org.eclipse.ui.internal.layout.ITrimManager;
-import org.eclipse.ui.internal.layout.IWindowTrim;
 import org.eclipse.ui.internal.menus.ActionSet;
 import org.eclipse.ui.internal.menus.IActionSetsListener;
 import org.eclipse.ui.internal.menus.LegacyActionPersistence;
@@ -1903,7 +1901,8 @@ STATUS_LINE_ID, model);
 				// We need to do our own cleanup here...
 				int vc = modelService.countRenderableChildren(phParent);
 				if (vc == 0) {
-					phParent.setToBeRendered(false);
+					if (!isLastEditorStack(phParent))
+						phParent.setToBeRendered(false);
 				}
 			}
 		}
@@ -1913,6 +1912,10 @@ STATUS_LINE_ID, model);
 		for (MPart partToRemove : sharedPartsToRemove) {
 			seList.remove(partToRemove);
 		}
+	}
+
+	private boolean isLastEditorStack(MUIElement element) {
+		return modelService.isLastEditorStack(element);
 	}
 
 	/**
@@ -2427,8 +2430,6 @@ STATUS_LINE_ID, model);
 
 	private SelectionService selectionService;
 
-	private ITrimManager trimManager;
-
 	private ActionPresentation actionPresentation;
 
 	private final void fireActionSetsChanged() {
@@ -2733,60 +2734,6 @@ STATUS_LINE_ID, model);
 	 */
 	IAdaptable getDefaultPageInput() {
 		return getWorkbenchImpl().getDefaultPageInput();
-	}
-
-	public ITrimManager getTrimManager() {
-		if (trimManager == null) {
-			// HACK !! Add a 'null' trim manager...this is specifically in place
-			// to prevent an NPE when using Intro's 'Go to Workbench' handling
-			// See Bug 365625 for details...
-			trimManager = new ITrimManager() {
-				@Override
-				public void addTrim(int areaId, IWindowTrim trim) {
-				}
-
-				@Override
-				public void addTrim(int areaId, IWindowTrim trim, IWindowTrim beforeMe) {
-				}
-
-				@Override
-				public void removeTrim(IWindowTrim toRemove) {
-				}
-
-				@Override
-				public IWindowTrim getTrim(String id) {
-					return null;
-				}
-
-				@Override
-				public int[] getAreaIds() {
-					return null;
-				}
-
-				@Override
-				public List getAreaTrim(int areaId) {
-					return null;
-				}
-
-				@Override
-				public void updateAreaTrim(int id, List trim, boolean removeExtra) {
-				}
-
-				@Override
-				public List getAllTrim() {
-					return null;
-				}
-
-				@Override
-				public void setTrimVisible(IWindowTrim trim, boolean visible) {
-				}
-
-				@Override
-				public void forceLayout() {
-				}
-			};
-		}
-		return trimManager;
 	}
 
 	/**
