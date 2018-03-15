@@ -16,7 +16,6 @@ import java.util.ArrayList;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
@@ -167,7 +166,7 @@ public class ProjectReferencePage extends PropertyPage {
      * Initializes a ProjectReferencePage.
      */
     private void initialize() {
-		project = (IProject) Adapters.adapt(getElement(), IResource.class);
+		project = Adapters.adapt(getElement(), IProject.class);
         noDefaultAndApplyButton();
         setDescription(NLS.bind(IDEWorkbenchMessages.ProjectReferencesPage_label, project.getName()));
     }
