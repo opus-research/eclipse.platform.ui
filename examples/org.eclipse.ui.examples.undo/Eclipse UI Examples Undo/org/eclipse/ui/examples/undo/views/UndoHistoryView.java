@@ -334,9 +334,10 @@ public class UndoHistoryView extends ViewPart implements
 		manager.add(filterAction);
 		manager.add(refreshListAction);
 
-		IStructuredSelection selection = viewer.getStructuredSelection();
+		ISelection selection = viewer.getSelection();
 		if (!selection.isEmpty()) {
-			IUndoableOperation operation = (IUndoableOperation) selection.getFirstElement();
+			IUndoableOperation operation = (IUndoableOperation) ((IStructuredSelection) selection)
+					.getFirstElement();
 			selectiveUndoAction.setEnabled(operation.canUndo());
 		} else {
 			selectiveUndoAction.setEnabled(false);
@@ -368,8 +369,8 @@ public class UndoHistoryView extends ViewPart implements
 		selectiveUndoAction = new Action() {
 			@Override
 			public void run() {
-				IStructuredSelection selection = viewer.getStructuredSelection();
-				IUndoableOperation operation = (IUndoableOperation) selection
+				ISelection selection = viewer.getSelection();
+				IUndoableOperation operation = (IUndoableOperation) ((IStructuredSelection) selection)
 						.getFirstElement();
 				if (operation.canUndo()) {
 					try {
@@ -402,8 +403,9 @@ public class UndoHistoryView extends ViewPart implements
 		doubleClickAction = new Action() {
 			@Override
 			public void run() {
-				IStructuredSelection selection = viewer.getStructuredSelection();
-				IUndoableOperation operation = (IUndoableOperation) selection.getFirstElement();
+				ISelection selection = viewer.getSelection();
+				IUndoableOperation operation = (IUndoableOperation) ((IStructuredSelection) selection)
+						.getFirstElement();
 				StringBuffer buf = new StringBuffer(operation.getLabel());
 				buf.append("\n");
 				buf.append("Enabled=");	//$NON-NLS-1$

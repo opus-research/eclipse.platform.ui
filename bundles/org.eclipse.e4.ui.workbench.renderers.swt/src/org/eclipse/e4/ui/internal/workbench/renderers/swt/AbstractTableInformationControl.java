@@ -14,6 +14,7 @@ import org.eclipse.e4.ui.workbench.swt.internal.copy.SearchPattern;
 import org.eclipse.e4.ui.workbench.swt.internal.copy.WorkbenchSWTMessages;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -433,7 +434,8 @@ public abstract class AbstractTableInformationControl {
 	 * Implementers can modify
 	 */
 	protected Object getSelectedElement() {
-		return fTableViewer.getStructuredSelection().getFirstElement();
+		return ((IStructuredSelection) fTableViewer.getSelection())
+				.getFirstElement();
 	}
 
 	protected abstract void gotoSelectedElement();
