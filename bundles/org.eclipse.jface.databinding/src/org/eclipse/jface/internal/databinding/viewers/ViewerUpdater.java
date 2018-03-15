@@ -12,12 +12,15 @@
 
 package org.eclipse.jface.internal.databinding.viewers;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.jface.databinding.viewers.IViewerUpdater;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 
 /**
@@ -45,9 +48,22 @@ public abstract class ViewerUpdater implements IViewerUpdater {
 	public abstract void remove(Object element, int position);
 
 	@Override
-	public void replace(Object oldElement, Object newElement, int position) {
+	public void replace(final Object oldElement, final Object newElement, final int position) {
+		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		remove(oldElement, position);
 		insert(newElement, position);
+
+		if (selectionContains(selection, oldElement)) {
+			addNewElementToSelection(oldElement, newElement, selection);
+		}
+	}
+
+	private void addNewElementToSelection(final Object oldElement, final Object newElement,
+			final IStructuredSelection selection) {
+		final List selections = new ArrayList(selection.toList());
+		selections.remove(oldElement);
+		selections.add(newElement);
+		viewer.setSelection(new StructuredSelection(selections));
 	}
 
 	@Override
