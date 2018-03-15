@@ -19,6 +19,7 @@ import org.eclipse.ui.internal.StartupThreading.StartupRunnable;
 
 public class UISynchronizer extends Synchronizer {
     protected UILockListener lockListener;
+
     /**
 	 * Indicates that the UI is in startup mode and that no non-workbench
 	 * runnables should be invoked.
