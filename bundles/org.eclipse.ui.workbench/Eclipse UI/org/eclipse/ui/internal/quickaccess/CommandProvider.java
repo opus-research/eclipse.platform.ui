@@ -30,7 +30,6 @@ import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.WorkbenchImages;
-import org.eclipse.ui.internal.commands.CommandImageService;
 
 /**
  * @since 3.3
@@ -50,8 +49,14 @@ public class CommandProvider extends QuickAccessProvider {
 	private ICommandService commandService;
 	private EHandlerService ehandlerService;
 	private ICommandImageService commandImageService;
+	private IEclipseContext context = null;
 
-	public CommandProvider() {
+	/**
+	 * Construct a CommandProvider passing an instance of
+	 * {@code IEclipseContext}.
+	 */
+	public CommandProvider(IEclipseContext context) {
+		this.context = context;
 	}
 
 	@Override
@@ -149,14 +154,12 @@ public class CommandProvider extends QuickAccessProvider {
 		return handlerService;
 	}
 
-	ICommandImageService getCommandImageService() {
+	/**
+	 * @return Returns the commandImageService.
+	 */
+	public ICommandImageService getCommandImageService() {
 		if (commandImageService == null) {
-			if (currentSnapshot instanceof ExpressionContext) {
-				IEclipseContext ctx = ((ExpressionContext) currentSnapshot).eclipseContext;
-				commandImageService = ctx.get(CommandImageService.class);
-			} else {
-				commandImageService = PlatformUI.getWorkbench().getService(CommandImageService.class);
-			}
+			commandImageService = context.get(ICommandImageService.class);
 		}
 		return commandImageService;
 	}
