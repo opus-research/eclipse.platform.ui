@@ -23,7 +23,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
@@ -36,6 +38,8 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.bindings.Binding;
+import org.eclipse.jface.bindings.IBindingManagerListener;
+import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -75,6 +79,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchCommandConstants;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.keys.IBindingService;
@@ -82,6 +87,8 @@ import org.eclipse.ui.swt.IFocusService;
 
 
 public class SearchField {
+
+	private static final String QUICK_ACCESS_COMMAND_ID = "org.eclipse.ui.window.quickAccess"; //$NON-NLS-1$
 
 	private static final String TEXT_ARRAY = "textArray"; //$NON-NLS-1$
 	private static final String TEXT_ENTRIES = "textEntries"; //$NON-NLS-1$
@@ -119,9 +126,26 @@ public class SearchField {
 	private AccessibleAdapter accessibleListener;
 	private Font font;
 
+	@Inject
+	private ICommandService commandService;
+	@Inject
+	private IBindingService bindingService;
+
+	private IBindingManagerListener bindingManagerListener;
+
+	private String quickAccessTriggerSequenceFormat;
+
 	@PostConstruct
 	void createControls(final Composite parent, MApplication application, MWindow window) {
 		this.window = window;
+		this.bindingManagerListener = (event) -> {
+			Command command = commandService.getCommand(QUICK_ACCESS_COMMAND_ID);
+			ParameterizedCommand parameterizedCommand = new ParameterizedCommand(command, null);
+			if (event.isActiveBindingsChanged() && event.isActiveBindingsChangedFor(parameterizedCommand)) {
+				updateKeyBindingText();
+			}
+		};
+		bindingService.addBindingManagerListener(bindingManagerListener);
 		final Composite comp = new Composite(parent, SWT.NONE);
 		comp.setLayout(new GridLayout());
 		txtQuickAcesss = createText(comp);
@@ -303,40 +327,62 @@ public class SearchField {
 		shell.setVisible(nowVisible);
 	}
 
-	private static final String QUICK_ACCESS_COMMAND_ID = "org.eclipse.ui.window.quickAccess"; //$NON-NLS-1$
-
-	private String triggerSequenceFormat = null;
+	/** recompute key binding and update the QuickAccess Text */
+	private void updateKeyBindingText() {
+		updateQuickAccessTriggerSequenceFormat();
+		updateText(txtQuickAcesss);
+		txtQuickAcesss.requestLayout();
+	}
 
 	/**
-	 * FIXME this returns the correct binding, but we should get it using
-	 * {@code bindingService.getBestActiveBindingFormattedFor(QUICK_ACCESS_COMMAND_ID)}
+	 * @return Returns the quickAccessTriggerSequenceFormat.
+	 */
+	public String getQuickAccessTriggerSequenceFormat() {
+		if (quickAccessTriggerSequenceFormat == null) {
+			updateQuickAccessTriggerSequenceFormat();
+		}
+		return quickAccessTriggerSequenceFormat;
+	}
+
+	/**
+	 * FIXME this compute the correct binding, but we should get it using
+	 * {@code bindingService.getBestActiveBindingFor(QUICK_ACCESS_COMMAND_ID)}
 	 *
 	 * @return the trigger
 	 */
-	protected String getQuickAccessTriggerSequenceFormat() {
-		if (triggerSequenceFormat == null) {
-			IBindingService bindingService = SearchField.this.window.getContext().get(IBindingService.class);
+	protected void updateQuickAccessTriggerSequenceFormat() {
+		TriggerSequence triggerSequence = bindingService.getBestActiveBindingFor(QUICK_ACCESS_COMMAND_ID);
+		// FIXME: workaround for QuickSearch command is active but
+		// getActiveBinding returns null
+		if (triggerSequence == null) {
 			for (Binding b : bindingService.getBindings()) {
 				if (b.getParameterizedCommand() != null
 						&& QUICK_ACCESS_COMMAND_ID.equalsIgnoreCase(b.getParameterizedCommand().getId())) {
-					this.triggerSequenceFormat = b.getTriggerSequence().format();
+					triggerSequence = b.getTriggerSequence();
 					break;
 				}
 			}
 		}
-		return triggerSequenceFormat;
+		//
+		this.quickAccessTriggerSequenceFormat = triggerSequence.format();
 	}
 
 	private Text createText(Composite parent) {
 		Text text = new Text(parent, SWT.SEARCH);
-		text.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription);
-		text.setMessage(NLS.bind(QuickAccessMessages.QuickAccess_EnterSearch, getQuickAccessTriggerSequenceFormat()));
 
 		FontData[] fD = text.getFont().getFontData();
 		int round = (int) Math.round(fD[0].getHeight() * 0.8);
 		fD[0].setHeight(round);
 		font = new Font(text.getDisplay(), fD[0]);
 		text.setFont(font);
+
+		updateText(text);
+		return text;
+	}
+
+	private void updateText(Text text) {
+		text.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription);
+		text.setMessage(NLS.bind(QuickAccessMessages.QuickAccess_EnterSearch, getQuickAccessTriggerSequenceFormat()));
 
 		GC gc = new GC(text);
 
@@ -356,7 +402,6 @@ public class SearchField {
 			GridDataFactory.fillDefaults().hint(r.width - r.x, SWT.DEFAULT).applyTo(text);
 		}
 
-		return text;
 	}
 
 	private void hookUpSelectAll() {
@@ -611,6 +656,7 @@ public class SearchField {
 	@PreDestroy
 	void dispose() {
 		storeDialog();
+		bindingService.removeBindingManagerListener(bindingManagerListener);
 	}
 
 	private void storeDialog() {
