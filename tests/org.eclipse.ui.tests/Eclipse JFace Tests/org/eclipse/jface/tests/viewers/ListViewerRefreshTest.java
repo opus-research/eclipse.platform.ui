@@ -38,7 +38,7 @@ public class ListViewerRefreshTest extends TestCase {
 
 	private ListViewer viewer = null;
 
-	private ArrayList input = null;
+	private ArrayList<String> input = null;
 
 	protected boolean disableTestsBug493357 = false;
 
@@ -51,7 +51,7 @@ public class ListViewerRefreshTest extends TestCase {
 		shell.setLayout(new FillLayout());
 		label = new Label(shell, SWT.WRAP);
 		viewer = new ListViewer(shell);
-		input = new ArrayList();
+		input = new ArrayList<>();
 
 		for (int i = 0; i < 50; i++) {
 			input.add("item " + i); //$NON-NLS-1$
@@ -140,7 +140,6 @@ public class ListViewerRefreshTest extends TestCase {
 	private void readAndDispatch() {
 		Display display = Display.getCurrent();
 		while(display.readAndDispatch()) {
-			;
 		}
 
 		try {
@@ -154,7 +153,7 @@ public class ListViewerRefreshTest extends TestCase {
 
 		@Override
 		public Object[] getElements(Object inputElement) {
-			return ((List) inputElement).toArray();
+			return ((List<?>) inputElement).toArray();
 		}
 
 		@Override

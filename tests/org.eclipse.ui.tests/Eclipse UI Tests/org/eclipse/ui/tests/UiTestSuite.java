@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2016, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Red Hat Inc. - Bug 474132
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 504029
+ *     Lucas Bullen (Red Hat Inc.) - Bugs 519525, 520250, and 520251
  *******************************************************************************/
 package org.eclipse.ui.tests;
 
@@ -19,6 +21,7 @@ import org.eclipse.ui.tests.concurrency.ConcurrencyTestSuite;
 import org.eclipse.ui.tests.contexts.ContextsTestSuite;
 import org.eclipse.ui.tests.datatransfer.DataTransferTestSuite;
 import org.eclipse.ui.tests.decorators.DecoratorsTestSuite;
+import org.eclipse.ui.tests.dialogs.FilteredResourcesSelectionDialogTestSuite;
 import org.eclipse.ui.tests.dialogs.UIAutomatedSuite;
 import org.eclipse.ui.tests.encoding.EncodingTestSuite;
 import org.eclipse.ui.tests.fieldassist.FieldAssistTestSuite;
@@ -31,6 +34,7 @@ import org.eclipse.ui.tests.operations.OperationsTestSuite;
 import org.eclipse.ui.tests.preferences.PreferencesTestSuite;
 import org.eclipse.ui.tests.progress.ProgressTestSuite;
 import org.eclipse.ui.tests.propertysheet.PropertySheetTestSuite;
+import org.eclipse.ui.tests.quickaccess.QuickAccessTestSuite;
 import org.eclipse.ui.tests.releng.PluginActivationTests;
 import org.eclipse.ui.tests.services.ServicesTestSuite;
 import org.eclipse.ui.tests.statushandlers.StatusHandlingTestSuite;
@@ -66,12 +70,13 @@ import org.junit.runners.Suite;
 	ConcurrencyTestSuite.class,
 	FilteredTreeTests.class,
 	StatusHandlingTestSuite.class,
-	MenusTestSuite.class
+	MenusTestSuite.class,
+	QuickAccessTestSuite.class,
+	FilteredResourcesSelectionDialogTestSuite.class
 })
 public class UiTestSuite {
 
 	// Not enabled tests:
-	// QuickAccessTestSuite.class,
 	// InternalTestSuite.class,
 	// ZoomTestSuite.class,
 	// DynamicPluginsTestSuite.class,

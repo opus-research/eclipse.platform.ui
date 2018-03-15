@@ -13,6 +13,7 @@ package org.eclipse.jface.bindings;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.core.commands.common.NamedHandleObject;
@@ -143,14 +144,14 @@ public final class Scheme extends NamedHandleObject implements Comparable {
         final boolean definedChanged = !this.defined;
         this.defined = true;
 
-        final boolean nameChanged = !Util.equals(this.name, name);
+		final boolean nameChanged = !Objects.equals(this.name, name);
         this.name = name;
 
-        final boolean descriptionChanged = !Util.equals(this.description,
+		final boolean descriptionChanged = !Objects.equals(this.description,
                 description);
         this.description = description;
 
-        final boolean parentIdChanged = !Util.equals(this.parentId, parentId);
+		final boolean parentIdChanged = !Objects.equals(this.parentId, parentId);
         this.parentId = parentId;
 
         fireSchemeChanged(new SchemeEvent(this, definedChanged, nameChanged,
@@ -244,7 +245,7 @@ public final class Scheme extends NamedHandleObject implements Comparable {
     @Override
 	public final String toString() {
         if (string == null) {
-            final StringBuffer stringBuffer = new StringBuffer();
+            final StringBuilder stringBuffer = new StringBuilder();
             stringBuffer.append("Scheme("); //$NON-NLS-1$
             stringBuffer.append(id);
             stringBuffer.append(',');

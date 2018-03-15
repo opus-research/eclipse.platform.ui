@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -127,7 +127,7 @@ public final class BindingManagerTest extends UITestCase {
 		final Scheme scheme = bindingManager.getScheme("na");
 		scheme.define("name", "description", null);
 		bindingManager.setActiveScheme(scheme);
-		final Set activeContextIds = new HashSet();
+		final Set<String> activeContextIds = new HashSet<>();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -155,7 +155,7 @@ public final class BindingManagerTest extends UITestCase {
 	 * @see BindingInteractionsTest
 	 */
 	public final void testGetActiveBindingsDisregardingContext() {
-		final Map activeBindings = bindingManager
+		final Map<?, ?> activeBindings = bindingManager
 				.getActiveBindingsDisregardingContext();
 		assertNotNull("The active bindings should never be null",
 				activeBindings);
@@ -171,7 +171,7 @@ public final class BindingManagerTest extends UITestCase {
 	 * @see BindingInteractionsTest
 	 */
 	public final void testGetActiveBindingsDisregardingContextFlat() {
-		final Collection activeBindings = bindingManager
+		final Collection<?> activeBindings = bindingManager
 				.getActiveBindingsDisregardingContextFlat();
 		assertNotNull("The active bindings should never be null",
 				activeBindings);
@@ -204,7 +204,7 @@ public final class BindingManagerTest extends UITestCase {
 		scheme.define("name", "description", null);
 
 		bindingManager.setActiveScheme(scheme);
-		final Set activeContextIds = new HashSet();
+		final Set<String> activeContextIds = new HashSet<>();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -319,7 +319,7 @@ public final class BindingManagerTest extends UITestCase {
 		final Scheme scheme = bindingManager.getScheme("na");
 		scheme.define("name", "description", null);
 		bindingManager.setActiveScheme(scheme);
-		final Set activeContextIds = new HashSet();
+		final Set<String> activeContextIds = new HashSet<>();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -343,7 +343,7 @@ public final class BindingManagerTest extends UITestCase {
 		bindings[0] = perfectMatchBinding;
 		bindings[1] = partialMatchBinding1;
 		bindingManager.setBindings(bindings);
-		Map partialMatches = bindingManager.getPartialMatches(perfectMatch);
+		Map<?, ?> partialMatches = bindingManager.getPartialMatches(perfectMatch);
 		assertTrue("A partial match should override a perfect match",
 				!partialMatches.isEmpty());
 		assertTrue("A partial match should override a perfect match",
@@ -403,7 +403,7 @@ public final class BindingManagerTest extends UITestCase {
 		final Scheme scheme = bindingManager.getScheme("na");
 		scheme.define("name", "description", null);
 		bindingManager.setActiveScheme(scheme);
-		final Set activeContextIds = new HashSet();
+		final Set<String> activeContextIds = new HashSet<>();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -495,7 +495,7 @@ public final class BindingManagerTest extends UITestCase {
 		final Scheme scheme = bindingManager.getScheme("na");
 		scheme.define("name", "description", null);
 		bindingManager.setActiveScheme(scheme);
-		final Set activeContextIds = new HashSet();
+		final Set<String> activeContextIds = new HashSet<>();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -564,7 +564,7 @@ public final class BindingManagerTest extends UITestCase {
 		final Scheme scheme = bindingManager.getScheme("na");
 		scheme.define("name", "description", null);
 		bindingManager.setActiveScheme(scheme);
-		final Set activeContextIds = new HashSet();
+		final Set<String> activeContextIds = new HashSet<>();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -626,7 +626,7 @@ public final class BindingManagerTest extends UITestCase {
 		final Scheme scheme = bindingManager.getScheme("na");
 		scheme.define("name", "description", null);
 		bindingManager.setActiveScheme(scheme);
-		final Set activeContextIds = new HashSet();
+		final Set<String> activeContextIds = new HashSet<>();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -737,18 +737,18 @@ public final class BindingManagerTest extends UITestCase {
 		final Binding[] bindings = new Binding[] { binding1, binding2, binding3 };
 		bindingManager.setBindings(bindings);
 
-		final Set activeContextIds = new HashSet();
+		final Set<String> activeContextIds = new HashSet<>();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
-		Map activeBindingsDisregardingContext = bindingManager
+		Map<?, ?> activeBindingsDisregardingContext = bindingManager
 				.getActiveBindingsDisregardingContext();// force a recompute
 		assertNotNull(activeBindingsDisregardingContext);
 
-		Map currentConflicts = bindingManager.getCurrentConflicts();
+		Map<?, ?> currentConflicts = bindingManager.getCurrentConflicts();
 		assertEquals(1, currentConflicts.size()); // we have only one conflict
 
-		Collection conflictsCollection = bindingManager
+		Collection<?> conflictsCollection = bindingManager
 				.getConflictsFor(noConflict);
 		assertNull(conflictsCollection); // no conflict for this keybinding
 
@@ -773,7 +773,7 @@ public final class BindingManagerTest extends UITestCase {
 		final Scheme scheme = bindingManager.getScheme("na");
 		scheme.define("name", "description", null);
 		bindingManager.setActiveScheme(scheme);
-		final Set activeContextIds = new HashSet();
+		final Set<String> activeContextIds = new HashSet<>();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -813,7 +813,7 @@ public final class BindingManagerTest extends UITestCase {
 		final Scheme scheme = bindingManager.getScheme("na");
 		scheme.define("name", "description", null);
 		bindingManager.setActiveScheme(scheme);
-		final Set activeContextIds = new HashSet();
+		final Set<String> activeContextIds = new HashSet<>();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -856,7 +856,7 @@ public final class BindingManagerTest extends UITestCase {
 		final Scheme scheme = bindingManager.getScheme("na");
 		scheme.define("name", "description", null);
 		bindingManager.setActiveScheme(scheme);
-		final Set activeContextIds = new HashSet();
+		final Set<String> activeContextIds = new HashSet<>();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -910,7 +910,7 @@ public final class BindingManagerTest extends UITestCase {
 		scheme.define("name", "description", null);
 
 		bindingManager.setActiveScheme(scheme);
-		final Set activeContextIds = new HashSet();
+		final Set<String> activeContextIds = new HashSet<>();
 		activeContextIds.add("na");
 		contextManager.setActiveContextIds(activeContextIds);
 
@@ -942,11 +942,11 @@ public final class BindingManagerTest extends UITestCase {
 			}
 		};
 		cmd.define("na", "NA", cat, parms);
-		Map map = new HashMap();
+		Map<String, String> map = new HashMap<>();
 		map.put("viewId", "outline");
 		ParameterizedCommand outline = ParameterizedCommand.generateCommand(
 				cmd, map);
-		map = new HashMap();
+		map = new HashMap<>();
 		map.put("viewId", "console");
 		ParameterizedCommand console = ParameterizedCommand.generateCommand(
 				cmd, map);

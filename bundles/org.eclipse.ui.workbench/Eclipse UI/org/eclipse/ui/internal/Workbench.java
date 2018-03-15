@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1455,7 +1455,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 		// We can't return a window with no widget...it's in the process
 		// of closing...see Bug 379717
-		if (activeWindow == null || (activeWindow != null && activeWindow.getWidget() == null)) {
+		if (activeWindow == null || activeWindow.getWidget() == null) {
 			return null;
 		}
 
@@ -1561,8 +1561,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 		for (MWindow window : application.getChildren()) {
 			IEclipseContext context = window.getContext();
 			if (context != null) {
-				IWorkbenchWindow wwindow = (IWorkbenchWindow) context.get(IWorkbenchWindow.class
-						.getName());
+				IWorkbenchWindow wwindow = context.get(IWorkbenchWindow.class);
 				if (wwindow != null) {
 					windows.add(wwindow);
 				}
@@ -2622,7 +2621,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 			return null;
 		}
 
-		StringBuffer result = new StringBuffer(512);
+		StringBuilder result = new StringBuilder(512);
 		result.append(property);
 		result.append('\n');
 

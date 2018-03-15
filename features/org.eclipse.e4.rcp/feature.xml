@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.e4.rcp"
       label="%featureName"
-      version="1.6.0.qualifier"
+      version="1.6.100.qualifier"
       provider-name="%providerName"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
@@ -165,7 +165,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.apache.batik.util.gui"
+         id="org.apache.batik.i18n"
          download-size="0"
          install-size="0"
          version="0.0.0"
