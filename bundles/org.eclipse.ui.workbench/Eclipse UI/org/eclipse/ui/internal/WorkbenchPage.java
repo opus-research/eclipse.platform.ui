@@ -224,9 +224,12 @@ public class WorkbenchPage implements IWorkbenchPage {
 			Object client = part.getObject();
 			if (client instanceof CompatibilityPart) {
 				CompatibilityPart compatibilityPart = (CompatibilityPart) client;
-				IWorkbenchPartSite site = compatibilityPart.getPart().getSite();
-				// if it's an editor, we only want to disable the actions
-				((PartSite) site).deactivateActionBars(site instanceof ViewSite);
+				IWorkbenchPart workbenchPart = compatibilityPart.getPart();
+				if (workbenchPart != null) {
+					IWorkbenchPartSite site = workbenchPart.getSite();
+					// if it's an editor, we only want to disable the actions
+					((PartSite) site).deactivateActionBars(site instanceof ViewSite);
+				}
 			}
 
 			WorkbenchWindow wwindow = (WorkbenchWindow) getWorkbenchWindow();
