@@ -653,14 +653,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
                 if (!valid) {
                     continue;
                 }
-				if (isSystem(editor.getId())) {
-					// bug 502514: check if there is internal editor
-					// descriptor (they are always recreated via
-					// addSystemEditors(Map<String, IEditorDescriptor>))
-					lookupEditorFromTable(editorTable, editor);
-					continue;
-				}
-				if (editor.getPluginID() != null) {
+                if (editor.getPluginID() != null) {
                     //If the editor is from a plugin we use its ID to look it
                     // up in the mapping of editors we
                     //have obtained from plugins. This allows us to verify that
@@ -668,25 +661,24 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
                     //and allows us to get the editor description from the
                     // mapping table which has
                     //a valid config element field.
-					lookupEditorFromTable(editorTable, editor);
-					continue;
-				}
-				// This is either from a program or a user defined editor
-				ImageDescriptor descriptor;
-				if (editor.getProgram() == null) {
-					String fileName = editor.getFileName();
-					if (fileName == null) {
-						String error = "Both editor program and path are null for descriptor id: "; //$NON-NLS-1$
-						error += editor.getId() + " with name: " + editor.getLabel(); //$NON-NLS-1$
-						WorkbenchPlugin.log(error, new IllegalStateException());
-						continue;
+					IEditorDescriptor validEditorDescritor = mapIDtoEditor.get(editor.getId());
+                    if (validEditorDescritor != null) {
+                        editorTable.put(validEditorDescritor.getId(),
+                                validEditorDescritor);
+                    }
+                } else { //This is either from a program or a user defined
+                    // editor
+                    ImageDescriptor descriptor;
+                    if (editor.getProgram() == null) {
+						descriptor = new ProgramImageDescriptor(editor
+                                .getFileName(), 0);
+					} else {
+						descriptor = new ExternalProgramImageDescriptor(editor
+                                .getProgram());
 					}
-					descriptor = new ProgramImageDescriptor(fileName, 0);
-				} else {
-					descriptor = new ExternalProgramImageDescriptor(editor.getProgram());
-				}
-				editor.setImageDescriptor(descriptor);
-				editorTable.put(editor.getId(), editor);
+                    editor.setImageDescriptor(descriptor);
+                    editorTable.put(editor.getId(), editor);
+                }
             }
         } catch (IOException e) {
             //Ignore this as the workbench may not yet have saved any state
@@ -709,25 +701,6 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 
         return true;
     }
-
-    /**
-	 * @param id
-	 *            descriptor id
-	 * @return true if the id is one of the system internal id's:
-	 *         {@link IEditorRegistry#SYSTEM_EXTERNAL_EDITOR_ID} or
-	 *         {@link IEditorRegistry#SYSTEM_INPLACE_EDITOR_ID}
-	 */
-	private static boolean isSystem(String id) {
-		return IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID.equals(id)
-				|| IEditorRegistry.SYSTEM_INPLACE_EDITOR_ID.equals(id);
-	}
-
-	private void lookupEditorFromTable(Map<String, IEditorDescriptor> editorTable, EditorDescriptor editor) {
-		IEditorDescriptor validEditorDescritor = mapIDtoEditor.get(editor.getId());
-		if (validEditorDescritor != null) {
-			editorTable.put(validEditorDescritor.getId(), validEditorDescritor);
-		}
-	}
 
     /**
      * Read the file types and associate them to their defined editor(s).
@@ -1040,12 +1013,6 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 
         memento = XMLMemento.createWriteRoot(IWorkbenchConstants.TAG_EDITORS);
 		for (IEditorDescriptor editor : editors) {
-			if (isSystem(editor.getId())) {
-				// bug 502514: don't persist internal editor descriptors,
-				// they are always recreated via addSystemEditors(Map<String,
-				// IEditorDescriptor>)
-				continue;
-			}
             IMemento editorMemento = memento
                     .createChild(IWorkbenchConstants.TAG_DESCRIPTOR);
 			((EditorDescriptor) editor).saveValues(editorMemento);
