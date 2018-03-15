@@ -61,7 +61,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="persistedState" upperBound="-1"
         eType="#//StringToStringMap" containment="true">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-        <details key="documentation" value="&lt;p>&#xD;&#xA;This is a String to String map that can be used to persist information about model&#xD;&#xA;elements across program restarts. The content of the 'value' string is defined by&#xD;&#xA;the code setting the value into the map. The Information stored in this map is part of&#xD;&#xA;the model and will be persisted and restored as such.&#xD;&#xA;&lt;/p>"/>
+        <details key="documentation" value="&lt;p>&#xD;&#xA;This is a Strimg to String map that can be used to persist information avout model&#xD;&#xA;elements across program sessions. The format of the 'value' string is defined by&#xD;&#xA;the code setting the value into the map. Information stored in this map is part of&#xD;&#xA;the model and will be persisted and restored as such.&#xD;&#xA;&lt;/p>"/>
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="tags" upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
