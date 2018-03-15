@@ -39,14 +39,9 @@ public class EclipseProjectConfigurator implements ProjectConfigurator {
 
 	@Override
 	public Set<File> findConfigurableLocations(File root, IProgressMonitor monitor) {
-		Set<File> projectFiles = new HashSet<>();
-		Set<String> visitedDirectories = new HashSet<>();
-		WizardProjectsImportPage.collectProjectFilesFromDirectory(projectFiles, root, visitedDirectories, true,
-				monitor);
 		Set<File> res = new HashSet<>();
-		for (File projectFile : projectFiles) {
-			res.add(projectFile.getParentFile());
-		}
+		Set<String> visitedDirectories = new HashSet<>();
+		WizardProjectsImportPage.collectProjectFilesFromDirectory(res, root, visitedDirectories, true, monitor);
 		return res;
 	}
 
