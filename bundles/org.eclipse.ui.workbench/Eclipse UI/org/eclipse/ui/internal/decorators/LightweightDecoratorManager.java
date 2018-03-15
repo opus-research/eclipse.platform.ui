@@ -61,9 +61,9 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 		private volatile RunnableData data = new RunnableData(null, null, null);
 
-		void setValues(Object object, DecorationBuilder builder,
+		synchronized void setValues(Object object, DecorationBuilder builder,
 				LightweightDecoratorDefinition definition) {
-			data = new RunnableData(object, builder, definition);
+			this.data = new RunnableData(object, builder, definition);
 		}
 
 		/*
@@ -73,8 +73,10 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		public void handleException(Throwable exception) {
 			IStatus status = StatusUtil.newStatus(IStatus.ERROR, exception
 					.getMessage(), exception);
-			LightweightDecoratorDefinition decorator = data.decorator;
 			String message;
+			// Copy to local variables, see
+			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=300358
+			LightweightDecoratorDefinition decorator = data == null ? null : data.decorator;
 			if (decorator == null) {
 				message = WorkbenchMessages.DecoratorError;
 			} else {
@@ -96,7 +98,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 			// Copy to local variables, see
 			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=300358
 			RunnableData data = this.data;
-			if (data.isConsistent()) {
+			if (data != null && data.isConsistent()) {
 				data.decorator.decorate(data.element, data.builder);
 			}
 			clearReferences();
@@ -108,7 +110,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		 * @since 3.1
 		 */
 		void clearReferences() {
-			data = new RunnableData(null, null, null);
+			data = null;
 		}
 	}
 
