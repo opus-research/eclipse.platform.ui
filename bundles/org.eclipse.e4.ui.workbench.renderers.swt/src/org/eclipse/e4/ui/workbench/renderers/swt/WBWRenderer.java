@@ -640,7 +640,7 @@ public class WBWRenderer extends SWTPartRenderer {
 						app.setSelectedElement(w);
 						w.getContext().activate();
 					} else if (parentME == null) {
-						parentME = modelService.getContainer(w);
+						parentME = (MUIElement) ((EObject) w).eContainer();
 						if (parentME instanceof MContext) {
 							w.getContext().activate();
 						}
@@ -686,7 +686,7 @@ public class WBWRenderer extends SWTPartRenderer {
 	}
 
 	private void cleanUp(MWindow window) {
-		MUIElement parent = modelService.getContainer(window);
+		Object parent = ((EObject) window).eContainer();
 		if (parent instanceof MApplication) {
 			MApplication application = (MApplication) parent;
 			List<MWindow> children = application.getChildren();
@@ -761,7 +761,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		MUIElement parent = element.getParent();
 		if (parent == null) {
 			// might be a detached window
-			parent = modelService.getContainer(element);
+			parent = (MUIElement) ((EObject) element).eContainer();
 			return parent == null ? null : parent.getWidget();
 		}
 

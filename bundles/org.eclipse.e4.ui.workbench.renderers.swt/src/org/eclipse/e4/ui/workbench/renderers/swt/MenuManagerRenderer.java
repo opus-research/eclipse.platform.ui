@@ -66,6 +66,7 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
@@ -362,7 +363,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		boolean menuBar = false;
 
 		if (parent instanceof Decorations) {
-			MUIElement container = modelService.getContainer(element);
+			MUIElement container = (MUIElement) ((EObject) element).eContainer();
 			if (container instanceof MWindow) {
 				menuManager = getManager(menuModel);
 				if (menuManager == null) {
@@ -565,7 +566,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	private boolean isPartMenu(MMenu menuModel) {
 		// don't want popup menus as their visibility does not need to be
 		// tracked by a separate RunAndTrack
-		return !(menuModel instanceof MPopupMenu) && modelService.getContainer(menuModel) instanceof MPart;
+		return !(menuModel instanceof MPopupMenu) && ((EObject) menuModel).eContainer() instanceof MPart;
 	}
 
 	private static ArrayList<ContributionRecord> DEFAULT = new ArrayList<>();
