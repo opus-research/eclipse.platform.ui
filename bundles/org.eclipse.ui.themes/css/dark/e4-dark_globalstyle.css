@@ -503,8 +503,3 @@ Link {
 ExpandableComposite {
     titlebar-color: #cccccc;
 }
-
-TabbedPropertyTitle {
-	background-color: #505F70;
-	foreground-color: #9AC9D8;
-}
