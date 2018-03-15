@@ -214,12 +214,6 @@
             contributorClass="org.eclipse.ui.internal.ide.dialogs.WelcomeEditorActionContributor"
             id="org.eclipse.ui.internal.ide.dialogs.WelcomeEditor">
       </editor>
-      <editor
-            class="org.eclipse.ui.internal.views.PreferencesEditor"
-            default="false"
-            id="org.eclipse.ui.ide.preferencesEditor"
-            name="Preferences">
-      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.elementFactories">
