@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Lucas Bullen (Red Hat Inc.) - [Bug 500051] Add option to import/export preferences
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -25,11 +24,9 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.OpenStrategy;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -49,8 +46,6 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.util.PrefUtil;
-import org.eclipse.ui.internal.wizards.preferences.PreferencesExportWizard;
-import org.eclipse.ui.internal.wizards.preferences.PreferencesImportWizard;
 
 /**
  * Generic workbench main preference page.
@@ -78,10 +73,6 @@ public class WorkbenchPreferencePage extends PreferencePage implements
     private boolean openAfterDelay;
 
 	private Button showHeapStatusButton;
-
-	private Button importPreferencesButton;
-
-	private Button exportPreferencesButton;
 
 	protected static int MAX_SAVE_INTERVAL = 9999;
 
@@ -256,51 +247,6 @@ public class WorkbenchPreferencePage extends PreferencePage implements
         createNoteComposite(font, buttonComposite, WorkbenchMessages.Preference_note,
                 WorkbenchMessages.WorkbenchPreference_noEffectOnAllViews);
     }
-
-	protected void createImportExportGroup(Composite composite) {
-		Group buttonGroup = new Group(composite, SWT.LEFT);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		buttonGroup.setLayout(layout);
-		GridData gd = new GridData();
-		gd.horizontalAlignment = GridData.FILL;
-		gd.grabExcessHorizontalSpace = true;
-		buttonGroup.setLayoutData(gd);
-		buttonGroup.setText(WorkbenchMessages.ImportExportPreferences_title);
-
-		int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
-
-		importPreferencesButton = new Button(buttonGroup, SWT.PUSH);
-		importPreferencesButton.setText(WorkbenchMessages.ImportExportPreferences_import);
-
-		Point minImportButtonSize = importPreferencesButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-		GridData importGridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-		importGridData.widthHint = Math.max(widthHint, minImportButtonSize.x);
-		importPreferencesButton.setLayoutData(importGridData);
-
-		importPreferencesButton.addListener(SWT.Selection, e -> {
-			PreferencesImportWizard importWizard = new PreferencesImportWizard();
-			WizardDialog wizardDialog = new WizardDialog(composite.getShell(), importWizard);
-			wizardDialog.open();
-			if (wizardDialog.getReturnCode() == 0) {
-				composite.getShell().close();
-			}
-		});
-
-		exportPreferencesButton = new Button(buttonGroup, SWT.PUSH);
-		exportPreferencesButton.setText(WorkbenchMessages.ImportExportPreferences_export);
-
-		Point minExportButtonSize = exportPreferencesButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-		GridData exportGridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-		exportGridData.widthHint = Math.max(widthHint, minExportButtonSize.x);
-		exportPreferencesButton.setLayoutData(exportGridData);
-
-		exportPreferencesButton.addListener(SWT.Selection, e -> {
-			PreferencesExportWizard exportWizard = new PreferencesExportWizard();
-			WizardDialog wizardDialog = new WizardDialog(composite.getShell(), exportWizard);
-			wizardDialog.open();
-		});
-	}
 
     private void selectClickMode(boolean singleClick) {
         openOnSingleClick = singleClick;
