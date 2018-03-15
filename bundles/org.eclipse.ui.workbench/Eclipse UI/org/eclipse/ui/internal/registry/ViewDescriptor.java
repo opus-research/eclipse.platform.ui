@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Markus Alexander Kuppe, Versant Corporation - bug #215797
+ *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -100,7 +101,6 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 
 	@Override
 	public float getFastViewWidthRatio() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -120,9 +120,9 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	}
 
 	@Override
-	public Object getAdapter(Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
 		if (adapter != null && adapter.equals(IConfigurationElement.class)) {
-			return getConfigurationElement();
+			return adapter.cast(getConfigurationElement());
 		}
 		return null;
 	}
