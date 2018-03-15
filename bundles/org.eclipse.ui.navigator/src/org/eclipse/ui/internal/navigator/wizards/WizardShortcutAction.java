@@ -94,7 +94,7 @@ public class WizardShortcutAction extends Action implements IPluginContribution 
 			Shell parent = window.getShell();
 			WizardDialog dialog = new WizardDialog(parent, wizard);
 			dialog.create();
-			// PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),
+			// WorkbenchHelp.setHelp(dialog.getShell(),
 			// IWorkbenchHelpContextIds.NEW_WIZARD_SHORTCUT);
 			dialog.open();
 		}

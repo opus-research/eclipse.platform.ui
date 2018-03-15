@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 441150, 444410, 472654
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 429729, 506306
+ *     Simon Scholz <Lars.Vogel@vogella.com> - Bug 429729
  *     Mike Leneweit <mike-le@web.de> - Bug 444410
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -40,7 +41,6 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
@@ -58,7 +58,6 @@ import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -67,12 +66,14 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.layout.GridData;
@@ -80,8 +81,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.osgi.service.event.Event;
@@ -104,9 +105,8 @@ public class WBWRenderer extends SWTPartRenderer {
 			while (!windowsToUpdate.isEmpty()) {
 				MWindow window = windowsToUpdate.remove(0);
 				Shell shell = (Shell) window.getWidget();
-				if (shell == null || shell.isDisposed()) {
+				if (shell == null || shell.isDisposed())
 					continue;
-				}
 				shell.setBounds(window.getX(), window.getY(),
 						window.getWidth(), window.getHeight());
 			}
@@ -139,17 +139,14 @@ public class WBWRenderer extends SWTPartRenderer {
 	private void subscribeTopicSelectedElementChanged(
 			@UIEventTopic(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT) Event event) {
 		// Ensure that this event is for a MApplication
-		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MApplication)) {
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MApplication))
 			return;
-		}
 		MWindow win = (MWindow) event.getProperty(UIEvents.EventTags.NEW_VALUE);
-		if ((win == null) || !win.getTags().contains("topLevel")) { //$NON-NLS-1$
+		if ((win == null) || !win.getTags().contains("topLevel")) //$NON-NLS-1$
 			return;
-		}
 		win.setToBeRendered(true);
-		if (!(win.getRenderer() == WBWRenderer.this)) {
+		if (!(win.getRenderer() == WBWRenderer.this))
 			return;
-		}
 		Shell shell = (Shell) win.getWidget();
 		if (shell.getMinimized()) {
 			shell.setMinimized(false);
@@ -162,21 +159,18 @@ public class WBWRenderer extends SWTPartRenderer {
 	@Optional
 	private void subscribeTopicLabelChanged(@UIEventTopic(UIEvents.UILabel.TOPIC_ALL) Event event) {
 		Object objElement = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MWindow)) {
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MWindow))
 			return;
-		}
 
 		// Is this listener interested ?
 		MWindow windowModel = (MWindow) objElement;
-		if (windowModel.getRenderer() != WBWRenderer.this) {
+		if (windowModel.getRenderer() != WBWRenderer.this)
 			return;
-		}
 
 		// No widget == nothing to update
 		Shell theShell = (Shell) windowModel.getWidget();
-		if (theShell == null) {
+		if (theShell == null)
 			return;
-		}
 
 		String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
 
@@ -185,12 +179,6 @@ public class WBWRenderer extends SWTPartRenderer {
 			theShell.setText(newTitle);
 		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 			theShell.setImage(getImage(windowModel));
-			// child windows may take their shell icon from the parent
-			for (MWindow child : windowModel.getWindows()) {
-				if (child.getRenderer() instanceof WBWRenderer) {
-					((WBWRenderer) child.getRenderer()).handleParentChange(child);
-				}
-			}
 		} else if (UIEvents.UILabel.TOOLTIP.equals(attName) || UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
 			String newTTip = (String) event.getProperty(UIEvents.EventTags.NEW_VALUE);
 			theShell.setToolTipText(newTTip);
@@ -200,9 +188,8 @@ public class WBWRenderer extends SWTPartRenderer {
 	@Inject
 	@Optional
 	private void subscribeTopicWindowChanged(@UIEventTopic(UIEvents.Window.TOPIC_ALL) Event event) {
-		if (ignoreSizeChanges) {
+		if (ignoreSizeChanges)
 			return;
-		}
 
 		// Ensure that this event is for a MMenuItem
 		Object objElement = event.getProperty(UIEvents.EventTags.ELEMENT);
@@ -231,9 +218,8 @@ public class WBWRenderer extends SWTPartRenderer {
 				boundsJob.windowsToUpdate.add(windowModel);
 				theShell.getDisplay().asyncExec(boundsJob);
 			} else {
-				if (!boundsJob.windowsToUpdate.contains(windowModel)) {
+				if (!boundsJob.windowsToUpdate.contains(windowModel))
 					boundsJob.windowsToUpdate.add(windowModel);
-				}
 			}
 		}
 	}
@@ -243,27 +229,32 @@ public class WBWRenderer extends SWTPartRenderer {
 	private void subscribeTopicVisibleChanged(@UIEventTopic(UIEvents.UIElement.TOPIC_VISIBLE) Event event) {
 		// Ensure that this event is for a MMenuItem
 		Object objElement = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (!(objElement instanceof MWindow)) {
+		if (!(objElement instanceof MWindow))
 			return;
-		}
 
 		// Is this listener interested ?
 		MWindow windowModel = (MWindow) objElement;
-		if (windowModel.getRenderer() != WBWRenderer.this) {
+		if (windowModel.getRenderer() != WBWRenderer.this)
 			return;
-		}
 
 		// No widget == nothing to update
 		Shell theShell = (Shell) windowModel.getWidget();
-		if (theShell == null) {
+		if (theShell == null)
 			return;
-		}
 
 		String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
 
 		if (UIEvents.UIElement.VISIBLE.equals(attName)) {
 			boolean isVisible = (Boolean) event.getProperty(UIEvents.EventTags.NEW_VALUE);
+
+			Rectangle oldBounds = theShell.getBounds();
 			theShell.setVisible(isVisible);
+			// Workaround for bug 490944: Making a shell visible can change its
+			// size. This is a no-op if the bug isn't present.
+			Rectangle newBounds = theShell.getBounds();
+			if (!Objects.equals(oldBounds, newBounds)) {
+				theShell.setBounds(oldBounds);
+			}
 		}
 	}
 
@@ -272,54 +263,6 @@ public class WBWRenderer extends SWTPartRenderer {
 	private void subscribeThemeDefinitionChanged(
 			@UIEventTopic(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED) Event event) {
 		themeDefinitionChanged.handleEvent(event);
-	}
-
-	@Inject
-	@Optional
-	private void subscribeTopicDetachedChanged(@UIEventTopic(UIEvents.Window.TOPIC_WINDOWS) Event event) {
-		/*
-		 * Handle any changes required for parent changes on detached windows.
-		 * This isn't quite straightforward as we don't see TOPIC_PARENT events
-		 * parent changes are only described as ADD and REMOVE on the
-		 * Window.TOPIC_WINDOWS and Application.TOPIC_CHILDREN.
-		 */
-		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MWindow)) {
-			return;
-		}
-
-		if (UIEvents.isREMOVE(event)) {
-			for (Object removed : UIEvents.asIterable(event, UIEvents.EventTags.OLD_VALUE)) {
-				if (removed instanceof MWindow && ((MWindow) removed).getRenderer() instanceof WBWRenderer) {
-					MWindow window = (MWindow) removed;
-					((WBWRenderer) window.getRenderer()).handleParentChange(window);
-				}
-			}
-		} else if (UIEvents.isADD(event)) {
-			for (Object removed : UIEvents.asIterable(event, UIEvents.EventTags.NEW_VALUE)) {
-				if (removed instanceof MWindow && ((MWindow) removed).getRenderer() instanceof WBWRenderer) {
-					MWindow window = (MWindow) removed;
-					((WBWRenderer) window.getRenderer()).handleParentChange(window);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Update this child window with any values that may have been obtained from
-	 * the parent.
-	 *
-	 * @param child
-	 *            the child window (may now be orphaned)
-	 */
-	private void handleParentChange(MWindow child) {
-		// No widget == nothing to update
-		Shell theShell = (Shell) child.getWidget();
-		if (theShell == null) {
-			return;
-		}
-
-		// Detached windows may take their shell icon from the parent window
-		theShell.setImage(getImage(child));
 	}
 
 	/**
@@ -331,8 +274,10 @@ public class WBWRenderer extends SWTPartRenderer {
 	 *         <code>false</code> otherwise
 	 */
 	private boolean closeDetachedWindow(MWindow window) {
-		EPartService partService = window.getContext().get(EPartService.class);
-		List<MPart> parts = modelService.findElements(window, null, MPart.class, null);
+		EPartService partService = window.getContext().get(
+				EPartService.class);
+		List<MPart> parts = modelService.findElements(window, null,
+				MPart.class, null);
 		// this saves one part at a time, not ideal but better than not saving
 		// at all
 		for (MPart part : parts) {
@@ -358,38 +303,45 @@ public class WBWRenderer extends SWTPartRenderer {
 	public Object createWidget(MUIElement element, Object parent) {
 		final Widget newWidget;
 
-		if (!(element instanceof MWindow) || (parent != null && !(parent instanceof Control))) {
+		if (!(element instanceof MWindow)
+				|| (parent != null && !(parent instanceof Control)))
 			return null;
-		}
 
 		MWindow wbwModel = (MWindow) element;
 
 		MApplication appModel = wbwModel.getContext().get(MApplication.class);
-		Boolean rtlMode = (Boolean) appModel.getTransientData().get(E4Workbench.RTL_MODE);
-		int rtlStyle = (rtlMode != null && rtlMode.booleanValue()) ? SWT.RIGHT_TO_LEFT : 0;
+		Boolean rtlMode = (Boolean) appModel.getTransientData().get(
+				E4Workbench.RTL_MODE);
+		int rtlStyle = (rtlMode != null && rtlMode.booleanValue()) ? SWT.RIGHT_TO_LEFT
+				: 0;
 
-		Shell parentShell = parent == null ? null : ((Control) parent).getShell();
+		Shell parentShell = parent == null ? null : ((Control) parent)
+				.getShell();
 
 		final Shell wbwShell;
 
 		int styleOverride = getStyleOverride(wbwModel) | rtlStyle;
 		if (parentShell == null) {
-			int style = styleOverride == -1 ? SWT.SHELL_TRIM | rtlStyle : styleOverride;
+			int style = styleOverride == -1 ? SWT.SHELL_TRIM | rtlStyle
+					: styleOverride;
 			wbwShell = new Shell(display, style);
 			wbwModel.getTags().add("topLevel"); //$NON-NLS-1$
 		} else {
 			int style = SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.CLOSE | rtlStyle;
 			style = styleOverride == -1 ? style : styleOverride;
-			if (wbwModel.getTags().contains(IPresentationEngine.WINDOW_TOP_LEVEL)) {
+			if (wbwModel.getTags().contains(
+					IPresentationEngine.WINDOW_TOP_LEVEL))
 				wbwShell = new Shell(display, style);
-			} else {
+			else
 				wbwShell = new Shell(parentShell, style);
-			}
 
 			// Prevent ESC from closing the DW
-			wbwShell.addTraverseListener(e -> {
-				if (e.detail == SWT.TRAVERSE_ESCAPE) {
-					e.doit = false;
+			wbwShell.addTraverseListener(new TraverseListener() {
+				@Override
+				public void keyTraversed(TraverseEvent e) {
+					if (e.detail == SWT.TRAVERSE_ESCAPE) {
+						e.doit = false;
+					}
 				}
 			});
 		}
@@ -415,11 +367,11 @@ public class WBWRenderer extends SWTPartRenderer {
 			}
 		}
 		// Force the shell onto the display if it would be invisible otherwise
-		Display display = Display.getCurrent();
-		Monitor closestMonitor = getClosestMonitor(display, Geometry.centerPoint(modelBounds));
-		Rectangle displayBounds = closestMonitor.getClientArea();
+		Rectangle displayBounds = Display.getCurrent().getBounds();
 		if (!modelBounds.intersects(displayBounds)) {
-			Geometry.moveInside(modelBounds, displayBounds);
+			Rectangle clientArea = Display.getCurrent().getClientArea();
+			modelBounds.x = clientArea.x;
+			modelBounds.y = clientArea.y;
 		}
 		wbwShell.setBounds(modelBounds);
 
@@ -444,12 +396,19 @@ public class WBWRenderer extends SWTPartRenderer {
 		localContext.set(Shell.class, wbwShell);
 		localContext.set(E4Workbench.LOCAL_ACTIVE_SHELL, wbwShell);
 		setCloseHandler(wbwModel);
-		localContext.set(IShellProvider.class, () -> wbwShell);
+		localContext.set(IShellProvider.class, new IShellProvider() {
+			@Override
+			public Shell getShell() {
+				return wbwShell;
+			}
+		});
 		final PartServiceSaveHandler saveHandler = new PartServiceSaveHandler() {
 			@Override
 			public Save promptToSave(MPart dirtyPart) {
-				Shell shell = (Shell) context.get(IServiceConstants.ACTIVE_SHELL);
-				Object[] elements = promptForSave(shell, Collections.singleton(dirtyPart));
+				Shell shell = (Shell) context
+						.get(IServiceConstants.ACTIVE_SHELL);
+				Object[] elements = promptForSave(shell,
+						Collections.singleton(dirtyPart));
 				if (elements == null) {
 					return Save.CANCEL;
 				}
@@ -477,13 +436,11 @@ public class WBWRenderer extends SWTPartRenderer {
 		saveHandler.logger = logger;
 		localContext.set(ISaveHandler.class, saveHandler);
 
-		if (wbwModel.getLabel() != null) {
+		if (wbwModel.getLabel() != null)
 			wbwShell.setText(wbwModel.getLocalizedLabel());
-		}
 
-		Image windowImage = getImage(wbwModel);
-		if (windowImage != null) {
-			wbwShell.setImage(windowImage);
+		if (wbwModel.getIconURI() != null && wbwModel.getIconURI().length() > 0) {
+			wbwShell.setImage(getImage(wbwModel));
 		} else {
 			// TODO: This should be added to the model, see bug 308494
 			// it allows for a range of icon sizes that the platform gets to
@@ -494,72 +451,27 @@ public class WBWRenderer extends SWTPartRenderer {
 		return newWidget;
 	}
 
-	/**
-	 * TODO: Create an API for this method and delete this version. See bug
-	 * 491273
-	 *
-	 * Returns the monitor whose client area contains the given point. If no
-	 * monitor contains the point, returns the monitor that is closest to the
-	 * point. If this is ever made public, it should be moved into a separate
-	 * utility class.
-	 *
-	 * @param toSearch
-	 *            point to find (display coordinates)
-	 * @param toFind
-	 *            point to find (display coordinates)
-	 * @return the montor closest to the given point
-	 */
-	private static Monitor getClosestMonitor(Display toSearch, Point toFind) {
-		int closest = Integer.MAX_VALUE;
-
-		Monitor[] monitors = toSearch.getMonitors();
-		Monitor result = monitors[0];
-
-		for (int idx = 0; idx < monitors.length; idx++) {
-			Monitor current = monitors[idx];
-
-			Rectangle clientArea = current.getClientArea();
-
-			if (clientArea.contains(toFind)) {
-				return current;
-			}
-
-			int distance = Geometry.distanceSquared(Geometry.centerPoint(clientArea), toFind);
-			if (distance < closest) {
-				closest = distance;
-				result = current;
-			}
-		}
-
-		return result;
-	}
-
 	private void setCloseHandler(MWindow window) {
 		IEclipseContext context = window.getContext();
 		// no direct model parent, must be a detached window
 		if (window.getParent() == null) {
 			context.set(IWindowCloseHandler.class,
-					window1 -> closeDetachedWindow(window1));
+					new IWindowCloseHandler() {
+						@Override
+						public boolean close(MWindow window) {
+							return closeDetachedWindow(window);
+						}
+					});
 		} else {
 			context.set(IWindowCloseHandler.class,
-					window1 -> {
-						EPartService partService = window1.getContext().get(EPartService.class);
-						return partService.saveAll(true);
+					new IWindowCloseHandler() {
+						@Override
+						public boolean close(MWindow window) {
+							EPartService partService = window.getContext().get(EPartService.class);
+							return partService.saveAll(true);
+						}
 					});
 		}
-	}
-
-	@Override
-	public Image getImage(MUILabel element) {
-		Image image = super.getImage(element);
-		if (image == null && element instanceof MWindow) {
-			// Detached windows should take their image from parent window
-			MWindow parent = modelService.getTopLevelWindowFor((MWindow) element);
-			if (parent != null && parent != element) {
-				image = getImage(parent);
-			}
-		}
-		return image;
 	}
 
 	@Override
@@ -575,9 +487,8 @@ public class WBWRenderer extends SWTPartRenderer {
 				@Override
 				public void controlResized(ControlEvent e) {
 					// Don't store the maximized size in the model
-					if (shell.getMaximized()) {
+					if (shell.getMaximized())
 						return;
-					}
 
 					try {
 						ignoreSizeChanges = true;
@@ -591,9 +502,8 @@ public class WBWRenderer extends SWTPartRenderer {
 				@Override
 				public void controlMoved(ControlEvent e) {
 					// Don't store the maximized size in the model
-					if (shell.getMaximized()) {
+					if (shell.getMaximized())
 						return;
-					}
 
 					try {
 						ignoreSizeChanges = true;
@@ -619,22 +529,30 @@ public class WBWRenderer extends SWTPartRenderer {
 					}
 				}
 			});
-			shell.addListener(SWT.Activate, event -> {
-				MUIElement parentME = w.getParent();
-				if (parentME instanceof MApplication) {
-					MApplication app = (MApplication) parentME;
-					app.setSelectedElement(w);
-					w.getContext().activate();
-				} else if (parentME == null) {
-					parentME = modelService.getContainer(w);
-					if (parentME instanceof MContext) {
+			shell.addListener(SWT.Activate, new Listener() {
+				@Override
+				public void handleEvent(org.eclipse.swt.widgets.Event event) {
+					MUIElement parentME = w.getParent();
+					if (parentME instanceof MApplication) {
+						MApplication app = (MApplication) parentME;
+						app.setSelectedElement(w);
 						w.getContext().activate();
+					} else if (parentME == null) {
+						parentME = (MUIElement) ((EObject) w).eContainer();
+						if (parentME instanceof MContext) {
+							w.getContext().activate();
+						}
 					}
+					updateNonFocusState(SWT.Activate, w);
 				}
-				updateNonFocusState(SWT.Activate, w);
 			});
 
-			shell.addListener(SWT.Deactivate, event -> updateNonFocusState(SWT.Deactivate, w));
+			shell.addListener(SWT.Deactivate, new Listener() {
+				@Override
+				public void handleEvent(org.eclipse.swt.widgets.Event event) {
+					updateNonFocusState(SWT.Deactivate, w);
+				}
+			});
 		}
 	}
 
@@ -666,7 +584,7 @@ public class WBWRenderer extends SWTPartRenderer {
 	}
 
 	private void cleanUp(MWindow window) {
-		MUIElement parent = modelService.getContainer(window);
+		Object parent = ((EObject) window).eContainer();
 		if (parent instanceof MApplication) {
 			MApplication application = (MApplication) parent;
 			List<MWindow> children = application.getChildren();
@@ -699,9 +617,8 @@ public class WBWRenderer extends SWTPartRenderer {
 	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> me) {
-		if (!(((MUIElement) me) instanceof MWindow)) {
+		if (!(((MUIElement) me) instanceof MWindow))
 			return;
-		}
 		MWindow wbwModel = (MWindow) ((MUIElement) me);
 		super.processContents(me);
 
@@ -742,7 +659,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		MUIElement parent = element.getParent();
 		if (parent == null) {
 			// might be a detached window
-			parent = modelService.getContainer(element);
+			parent = (MUIElement) ((EObject) element).eContainer();
 			return parent == null ? null : parent.getWidget();
 		}
 
@@ -759,31 +676,39 @@ public class WBWRenderer extends SWTPartRenderer {
 
 		// Capture the max/min state
 		final MUIElement disposeME = shellME;
-		shell.addDisposeListener(e -> {
-			Shell shell1 = (Shell) e.widget;
-			if (disposeME != null) {
-				disposeME.getTags().remove(ShellMinimizedTag);
-				disposeME.getTags().remove(ShellMaximizedTag);
-				if (shell1.getMinimized()) {
-					disposeME.getTags().add(ShellMinimizedTag);
-				}
-				if (shell1.getMaximized()) {
-					disposeME.getTags().add(ShellMaximizedTag);
+		shell.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				Shell shell = (Shell) e.widget;
+				if (disposeME != null) {
+					disposeME.getTags().remove(ShellMinimizedTag);
+					disposeME.getTags().remove(ShellMaximizedTag);
+					if (shell.getMinimized())
+						disposeME.getTags().add(ShellMinimizedTag);
+					if (shell.getMaximized())
+						disposeME.getTags().add(ShellMaximizedTag);
 				}
 			}
 		});
 
 		// Apply the correct shell state
-		if (shellME.getTags().contains(ShellMaximizedTag)) {
+		if (shellME.getTags().contains(ShellMaximizedTag))
 			shell.setMaximized(true);
-		} else if (shellME.getTags().contains(ShellMinimizedTag)) {
+		else if (shellME.getTags().contains(ShellMinimizedTag))
 			shell.setMinimized(true);
-		}
 
 		shell.layout(true);
 		forceLayout(shell);
+		Rectangle oldBounds = shell.getBounds();
 		if (shellME.isVisible()) {
 			shell.open();
+
+			// Workaround for bug 490944: Making a shell visible can change its
+			// size. This is a no-op if the bug isn't present.
+			Rectangle newBounds = shell.getBounds();
+			if (!Objects.equals(oldBounds, newBounds)) {
+				shell.setBounds(oldBounds);
+			}
 		} else {
 			shell.setVisible(false);
 		}
@@ -904,8 +829,10 @@ public class WBWRenderer extends SWTPartRenderer {
 			}
 
 			for (CSSEngine engine : engines) {
-				for (Object resource : removeResources(engine.getResourcesRegistry())) {
-					if (resource instanceof Resource && !((Resource) resource).isDisposed()) {
+				for (Object resource : removeResources(engine
+						.getResourcesRegistry())) {
+					if (resource instanceof Resource
+							&& !((Resource) resource).isDisposed()) {
 						unusedResources.add((Resource) resource);
 					}
 				}
