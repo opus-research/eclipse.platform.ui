@@ -20,6 +20,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 public class OpenBrowserHandler extends AbstractHandler {
 
@@ -35,7 +36,7 @@ public class OpenBrowserHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		String urlText = event.getParameter(PARAM_ID_URL);
-		URL url;
+		final URL url;
 		if (urlText == null) {
 			url = null;
 		} else {
@@ -45,22 +46,26 @@ public class OpenBrowserHandler extends AbstractHandler {
 				throw new ExecutionException("malformed URL:" + urlText, ex); //$NON-NLS-1$
 			}
 		}
+		final String browserId = event.getParameter(PARAM_ID_BROWSER_ID);
+		final String name = event.getParameter(PARAM_ID_NAME);
+		final String tooltip = event.getParameter(PARAM_ID_TOOLTIP);
 
-		String browserId = event.getParameter(PARAM_ID_BROWSER_ID);
-		String name = event.getParameter(PARAM_ID_NAME);
-		String tooltip = event.getParameter(PARAM_ID_TOOLTIP);
+		// Can be simplified once Bug 400932 is addressed
+		HandlerUtil.getActiveShellChecked(event).getDisplay().asyncExec(new Runnable() {
 
-		try {
-			IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench()
-					.getBrowserSupport();
-			IWebBrowser browser = browserSupport.createBrowser(
-					IWorkbenchBrowserSupport.LOCATION_BAR
-							| IWorkbenchBrowserSupport.NAVIGATION_BAR,
-					browserId, name, tooltip);
-			browser.openURL(url);
-		} catch (PartInitException ex) {
-			throw new ExecutionException("error opening browser", ex); //$NON-NLS-1$
-		}
+			@Override
+			public void run() {
+				try {
+					IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
+					IWebBrowser browser = browserSupport.createBrowser(
+							IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR, browserId,
+							name, tooltip);
+					browser.openURL(url); // Must open browser on UI thread
+				} catch (PartInitException ex) {
+					WebBrowserUIPlugin.logError("error opening browser", ex); //$NON-NLS-1$
+				}
+			}
+		});
 
 		return null;
 	}
