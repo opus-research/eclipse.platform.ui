@@ -82,7 +82,7 @@ public abstract class CategorizedPageRegistryReader extends RegistryReader {
 				return;
 			}
 
-			StringBuilder sb = new StringBuilder();
+			StringBuffer sb = new StringBuffer();
 			StringTokenizer stok = new StringTokenizer(category, PREFERENCE_SEPARATOR);
 			Object immediateParent = null;
 			while (stok.hasMoreTokens()) {
