@@ -14,7 +14,6 @@
  *     Brian de Alwis (MTI) - Performance tweaks (Bug 430829)
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 479896
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 500402
- *     Daniel Raap <raap@subshell.com> - Bug 511836
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.impl.engine;
 
@@ -138,7 +137,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	/**
 	 * An ordered list of ICSSPropertyHandlerProvider
 	 */
-	protected List<ICSSPropertyHandlerProvider> propertyHandlerProviders = new ArrayList<>();
+	protected List<ICSSPropertyHandlerProvider> propertyHandlerProviders = new ArrayList<ICSSPropertyHandlerProvider>();
 
 	private Map<String, String> currentCSSPropertiesApplyed;
 
@@ -146,7 +145,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	private Map<Object, ICSSValueConverter> valueConverters = null;
 
-	private int parseImport;
+	private boolean parseImport;
 
 	private ResourceRegistryKeyFactory keyFactory;
 
@@ -220,12 +219,9 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 				InputSource tempStream = new InputSource();
 				tempStream.setURI(url.toString());
 				tempStream.setByteStream(stream);
-				parseImport++;
-				try {
-					styleSheet = (CSSStyleSheet) this.parseStyleSheet(tempStream);
-				} finally {
-					parseImport--;
-				}
+				parseImport = true;
+				styleSheet = (CSSStyleSheet) this.parseStyleSheet(tempStream);
+				parseImport = false;
 				CSSRuleList tempRules = styleSheet.getCssRules();
 				for (int j = 0; j < tempRules.getLength(); j++) {
 					masterList.add(tempRules.item(j));
@@ -245,7 +241,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		// final stylesheet
 		CSSStyleSheetImpl s = new CSSStyleSheetImpl();
 		s.setRuleList(masterList);
-		if (parseImport == 0) {
+		if (!parseImport) {
 			documentCSS.addStyleSheet(s);
 		}
 		return s;
@@ -395,7 +391,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 			 */
 			String[] pseudoInstances = getStaticPseudoInstances(elt);
 			if (pseudoInstances != null) {
-				// there are static pseudo instances defined, loop for it and
+				// there are static pseudo instances definied, loop for it and
 				// apply styles for each pseudo instance.
 				for (String pseudoInstance : pseudoInstances) {
 					CSSStyleDeclaration styleWithPseudoInstance = viewCSS
@@ -438,12 +434,12 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 				 */
 				NodeList nodes = elt instanceof ChildVisibilityAwareElement
 						? ((ChildVisibilityAwareElement) elt).getVisibleChildNodes() : elt.getChildNodes();
-						if (nodes != null) {
-							for (int k = 0; k < nodes.getLength(); k++) {
-								applyStyles(nodes.item(k), applyStylesToChildNodes);
-							}
-							onStylesAppliedToChildNodes(elt, nodes);
-						}
+				if (nodes != null) {
+					for (int k = 0; k < nodes.getLength(); k++) {
+						applyStyles(nodes.item(k), applyStylesToChildNodes);
+					}
+					onStylesAppliedToChildNodes(elt, nodes);
+				}
 			}
 		}
 
@@ -542,7 +538,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		// Apply style
 		boolean avoidanceCacheInstalled = currentCSSPropertiesApplyed == null;
 		if (avoidanceCacheInstalled) {
-			currentCSSPropertiesApplyed = new HashMap<>();
+			currentCSSPropertiesApplyed = new HashMap<String, String>();
 		}
 		List<ICSSPropertyHandler2> handlers2 = null;
 		for (int i = 0; i < style.getLength(); i++) {
@@ -562,7 +558,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 				}
 				if (propertyHandler2 != null) {
 					if (handlers2 == null) {
-						handlers2 = new ArrayList<>();
+						handlers2 = new ArrayList<ICSSPropertyHandler2>();
 					}
 					if (!handlers2.contains(propertyHandler2)) {
 						handlers2.add(propertyHandler2);
@@ -834,14 +830,14 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	protected Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			String property) throws Exception {
-		Collection<ICSSPropertyHandler> handlers = new ArrayList<>();
+		Collection<ICSSPropertyHandler> handlers = new ArrayList<ICSSPropertyHandler>();
 		for (ICSSPropertyHandlerProvider provider : propertyHandlerProviders) {
 			Collection<ICSSPropertyHandler> h = provider
 					.getCSSPropertyHandlers(property);
 			if (handlers == null) {
 				handlers = h;
 			} else {
-				handlers = new ArrayList<>(handlers);
+				handlers = new ArrayList<ICSSPropertyHandler>(handlers);
 				handlers.addAll(h);
 			}
 		}
@@ -856,7 +852,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	 */
 	@Override
 	public Collection<String> getCSSProperties(Object element) {
-		Set<String> properties = new HashSet<>();
+		Set<String> properties = new HashSet<String>();
 		for (ICSSPropertyHandlerProvider provider : propertyHandlerProviders) {
 			properties.addAll(provider.getCSSProperties(element));
 		}
@@ -885,9 +881,6 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	@Override
 	public Element getElement(Object element) {
 		Element elt = null;
-		if (element == null) {
-			return elt;
-		}
 		CSSElementContext elementContext = getCSSElementContext(element);
 		if (elementContext != null) {
 			if (!elementContext.elementMustBeRefreshed(elementProvider)) {
@@ -963,7 +956,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	protected Map<Object, CSSElementContext> getElementsContext() {
 		if (elementsContext == null) {
-			elementsContext = new HashMap<>();
+			elementsContext = new HashMap<Object, CSSElementContext>();
 		}
 		return elementsContext;
 	}
@@ -1091,7 +1084,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	@Override
 	public void registerCSSValueConverter(ICSSValueConverter converter) {
 		if (valueConverters == null) {
-			valueConverters = new HashMap<>();
+			valueConverters = new HashMap<Object, ICSSValueConverter>();
 		}
 		valueConverters.put(converter.getToType(), converter);
 	}

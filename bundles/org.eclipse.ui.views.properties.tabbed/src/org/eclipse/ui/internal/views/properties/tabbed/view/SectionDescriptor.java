@@ -17,16 +17,14 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.IFilter;
+import org.eclipse.ui.internal.views.properties.tabbed.TabbedPropertyViewPlugin;
 import org.eclipse.ui.internal.views.properties.tabbed.TabbedPropertyViewStatusCodes;
 import org.eclipse.ui.internal.views.properties.tabbed.l10n.TabbedPropertyMessages;
 import org.eclipse.ui.views.properties.tabbed.AbstractSectionDescriptor;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.ITypeMapper;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 import com.ibm.icu.text.MessageFormat;
 
@@ -119,14 +117,12 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 		}
 		IStatus status = new Status(IStatus.ERROR, pluginId,
 				TabbedPropertyViewStatusCodes.SECTION_ERROR, message, exception);
-		Bundle bundle = FrameworkUtil.getBundle(SectionDescriptor.class);
-		Platform.getLog(bundle).log(status);
+		TabbedPropertyViewPlugin.getPlugin().getLog().log(status);
 	}
 
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getId()
 	 */
-	@Override
 	public String getId() {
 		return id;
 	}
@@ -134,7 +130,6 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getFilter()
 	 */
-	@Override
 	public IFilter getFilter() {
 		if (filter == null) {
 			try {
@@ -156,7 +151,6 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	 *
 	 * @return the value for section enablement.
 	 */
-	@Override
 	public int getEnablesFor() {
 		return enablesFor;
 	}
@@ -164,7 +158,6 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getTargetTab()
 	 */
-	@Override
 	public String getTargetTab() {
 		return targetTab;
 	}
@@ -172,7 +165,6 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getAfterSection()
 	 */
-	@Override
 	public String getAfterSection() {
 		if (afterSection == null) {
 			return super.getAfterSection();
@@ -185,7 +177,6 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	 *
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getSectionClass()
 	 */
-	@Override
 	public ISection getSectionClass() {
 		ISection section = null;
 		try {
@@ -203,13 +194,13 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	 *
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getInputTypes()
 	 */
-	@Override
 	public List getInputTypes() {
 		if (inputTypes == null) {
 			inputTypes = new ArrayList();
 			IConfigurationElement[] elements = getConfigurationElement()
 					.getChildren(ELEMENT_INPUT);
-			for (IConfigurationElement element : elements) {
+			for (int i = 0; i < elements.length; i++) {
+				IConfigurationElement element = elements[i];
 				inputTypes.add(element.getAttribute(ATT_INPUT_TYPE));
 			}
 		}
@@ -217,7 +208,9 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 		return inputTypes;
 	}
 
-	@Override
+	/**
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return getId();
 	}

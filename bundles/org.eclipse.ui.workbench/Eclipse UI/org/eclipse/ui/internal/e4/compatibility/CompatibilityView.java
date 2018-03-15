@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 503387
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -26,7 +25,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
@@ -54,9 +53,6 @@ import org.eclipse.ui.testing.ContributionInfo;
 public class CompatibilityView extends CompatibilityPart {
 
 	private ViewReference reference;
-
-	@Inject
-	EModelService modelService;
 
 	@Inject
 	CompatibilityView(MPart part, ViewReference ref) {
@@ -100,7 +96,7 @@ public class CompatibilityView extends CompatibilityPart {
 		MenuManager mm = (MenuManager) actionBars.getMenuManager();
 		MMenu menu = getViewMenu();
 		if (menu == null) {
-			menu = modelService.createModelElement(MMenu.class);
+			menu = MenuFactoryImpl.eINSTANCE.createMenu();
 
 			// If the id contains a ':' use the part before it as the descriptor
 			// id
@@ -123,7 +119,7 @@ public class CompatibilityView extends CompatibilityPart {
 		// Construct the toolbar (if necessary)
 		MToolBar toolbar = part.getToolbar();
 		if (toolbar == null) {
-			toolbar = modelService.createModelElement(MToolBar.class);
+			toolbar = MenuFactoryImpl.eINSTANCE.createToolBar();
 
 			// If the id contains a ':' use the part before it as the descriptor
 			// id
@@ -183,9 +179,11 @@ public class CompatibilityView extends CompatibilityPart {
 				ActionDescriptor[] actionDescriptors = actionBuilder.getExtendedActions();
 				if (actionDescriptors != null) {
 					IHandlerService hs = partContext.get(IHandlerService.class);
-					for (ActionDescriptor actionDescriptor : actionDescriptors) {
+					for (int i = 0; i < actionDescriptors.length; i++) {
+						ActionDescriptor actionDescriptor = actionDescriptors[i];
+
 						if (actionDescriptor != null) {
-							IAction action = actionDescriptor.getAction();
+							IAction action = actionDescriptors[i].getAction();
 
 							if (action != null && action.getActionDefinitionId() != null) {
 								hs.activateHandler(action.getActionDefinitionId(),
@@ -195,7 +193,13 @@ public class CompatibilityView extends CompatibilityPart {
 					}
 				}
 				actionBars.updateActionBars();
-				final Runnable dispose = () -> actionBuilder.dispose();
+				final Runnable dispose = new Runnable() {
+
+					@Override
+					public void run() {
+						actionBuilder.dispose();
+					}
+				};
 				return dispose;
 			}
 		};

@@ -52,16 +52,16 @@ public class TabBehaviourMRU extends TabBehaviour {
 			List<IEditorReference> keep = new ArrayList<>(Arrays.asList(editors));
 			int extra = length - page.getEditorReuseThreshold();
 			// look for extra editors that should be closed
-			for (IEditorReference editor : editors) {
+			for (int i = 0; i < editors.length; i++) {
 				if (extra == 0) {
 					break;
 				}
 
-				if (editor.isPinned() || editor.isDirty()) {
+				if (editors[i].isPinned() || editors[i].isDirty()) {
 					continue;
 				}
 
-				refs.add(editor);
+				refs.add(editors[i]);
 				extra--;
 			}
 

@@ -163,9 +163,9 @@ public class ActionExpression {
 			}
 
 			list = new ArrayList(children.length);
-			for (IConfigurationElement configElement : children) {
-				String tag = configElement.getName();
-				AbstractExpression expr = createExpression(configElement);
+			for (int i = 0; i < children.length; i++) {
+				String tag = children[i].getName();
+				AbstractExpression expr = createExpression(children[i]);
 				if (EXP_TYPE_OBJECT_CLASS.equals(tag)) {
 					list.add(0, expr);
 				} else {
@@ -185,8 +185,8 @@ public class ActionExpression {
 					if (classNames == null) {
 						classNames = new ArrayList();
 					}
-					for (String objectClass : objectClasses) {
-						classNames.add(objectClass);
+					for (int i = 0; i < objectClasses.length; i++) {
+						classNames.add(objectClasses[i]);
 					}
 				}
 			}
@@ -328,8 +328,8 @@ public class ActionExpression {
 				return true;
 			}
 			Class[] superInterfaces = interfaceToCheck.getInterfaces();
-			for (Class superInterface : superInterfaces) {
-				if (checkInterfaceHierarchy(superInterface)) {
+			for (int i = 0; i < superInterfaces.length; i++) {
+				if (checkInterfaceHierarchy(superInterfaces[i])) {
 					return true;
 				}
 			}
@@ -389,8 +389,8 @@ public class ActionExpression {
 
 				// test all the interfaces the class implements
 				Class[] interfaces = clazz.getInterfaces();
-				for (Class currentInterface : interfaces) {
-					if (checkInterfaceHierarchy(currentInterface)) {
+				for (int i = 0; i < interfaces.length; i++) {
+					if (checkInterfaceHierarchy(interfaces[i])) {
 						return true;
 					}
 				}
@@ -921,7 +921,7 @@ public class ActionExpression {
 		try {
 			root = new SingleExpression(element);
 		} catch (IllegalStateException e) {
-			WorkbenchPlugin.log(e);
+			e.printStackTrace();
 			root = null;
 		}
 	}

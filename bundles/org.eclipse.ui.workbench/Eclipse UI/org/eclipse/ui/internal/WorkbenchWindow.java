@@ -1472,7 +1472,9 @@ STATUS_LINE_ID, model);
 		final Shell shell = getShell();
 		if (shell != null) {
 			final Expression expression = new ActiveShellExpression(shell);
-			for (Entry<String, ActionHandler> entry : handlersByCommandId.entrySet()) {
+			for (Iterator<Entry<String, ActionHandler>> iterator = handlersByCommandId.entrySet()
+					.iterator(); iterator.hasNext();) {
+				Entry<String, ActionHandler> entry = iterator.next();
 				String commandId = entry.getKey();
 				IHandler handler = entry.getValue();
 				newHandlers.add(handlerService.activateHandler(commandId, handler, expression));
@@ -1507,9 +1509,10 @@ STATUS_LINE_ID, model);
 	private void firePropertyChanged(final String property, final Object oldValue,
 			final Object newValue) {
 		PropertyChangeEvent event = new PropertyChangeEvent(this, property, oldValue, newValue);
-		for (Object listener : genericPropertyListeners.getListeners()) {
-			IPropertyChangeListener propertyChangeListener = (IPropertyChangeListener) listener;
-			propertyChangeListener.propertyChange(event);
+		Object[] listeners = genericPropertyListeners.getListeners();
+		for (int i = 0; i < listeners.length; i++) {
+			IPropertyChangeListener listener = (IPropertyChangeListener) listeners[i];
+			listener.propertyChange(event);
 		}
 	}
 
@@ -1688,11 +1691,12 @@ STATUS_LINE_ID, model);
 	 */
 	private void allowUpdates(IMenuManager menuManager) {
 		menuManager.markDirty();
-		for (IContributionItem item : menuManager.getItems()) {
-			if (item instanceof IMenuManager) {
-				allowUpdates((IMenuManager) item);
-			} else if (item instanceof SubContributionItem) {
-				final IContributionItem innerItem = ((SubContributionItem) item).getInnerItem();
+		final IContributionItem[] items = menuManager.getItems();
+		for (int i = 0; i < items.length; i++) {
+			if (items[i] instanceof IMenuManager) {
+				allowUpdates((IMenuManager) items[i]);
+			} else if (items[i] instanceof SubContributionItem) {
+				final IContributionItem innerItem = ((SubContributionItem) items[i]).getInnerItem();
 				if (innerItem instanceof IMenuManager) {
 					allowUpdates((IMenuManager) innerItem);
 				}
@@ -2263,7 +2267,8 @@ STATUS_LINE_ID, model);
 		IEvaluationService es = serviceLocator
 				.getService(IEvaluationService.class);
 		IEvaluationContext currentState = es.getCurrentState();
-		for (EvaluationReference reference : refs) {
+		for (int i = 0; i < refs.length; i++) {
+			EvaluationReference reference = refs[i];
 			reference.setPostingChanges(true);
 
 			boolean os = reference.evaluate(currentState);
@@ -2429,8 +2434,9 @@ STATUS_LINE_ID, model);
 
 	private final void fireActionSetsChanged() {
 		if (actionSetListeners != null) {
-			for (Object listener : actionSetListeners.getListeners()) {
-				final IActionSetsListener actionSetsListener = (IActionSetsListener) listener;
+			final Object[] listeners = actionSetListeners.getListeners();
+			for (int i = 0; i < listeners.length; i++) {
+				final IActionSetsListener listener = (IActionSetsListener) listeners[i];
 				final WorkbenchPage currentPage = (WorkbenchPage) getActivePage();
 				final IActionSetDescriptor[] newActionSets;
 				if (currentPage == null) {
@@ -2439,7 +2445,7 @@ STATUS_LINE_ID, model);
 					newActionSets = currentPage.getActionSets();
 				}
 				final ActionSetsEvent event = new ActionSetsEvent(newActionSets);
-				actionSetsListener.actionSetsChanged(event);
+				listener.actionSetsChanged(event);
 			}
 		}
 	}
@@ -2830,9 +2836,10 @@ STATUS_LINE_ID, model);
 	}
 
 	/* package */void fireBackgroundSaveStarted() {
-		for (Object listener : backgroundSaveListeners.getListeners()) {
-			IBackgroundSaveListener backgroundSaveListener = (IBackgroundSaveListener) listener;
-			backgroundSaveListener.handleBackgroundSaveStarted();
+		Object[] listeners = backgroundSaveListeners.getListeners();
+		for (int i = 0; i < listeners.length; i++) {
+			IBackgroundSaveListener listener = (IBackgroundSaveListener) listeners[i];
+			listener.handleBackgroundSaveStarted();
 		}
 	}
 
@@ -2865,7 +2872,7 @@ STATUS_LINE_ID, model);
 	}
 
 	public CoolBarManager getCoolBarManager() {
-		WorkbenchPlugin.log(new Exception("Bad call to getCoolBarManager()")); //$NON-NLS-1$
+		new Exception("Bad call to getCoolBarManager()").printStackTrace(); //$NON-NLS-1$
 		return oldCBM;
 	}
 

@@ -54,7 +54,7 @@ public abstract class AbstractCSSPropertyHandlerProvider implements
 		if (propertyValue == null) {
 			return null;
 		}
-		StringBuilder style = new StringBuilder();
+		StringBuffer style = new StringBuffer();
 		style.append(propertyName);
 		style.append(":");
 		style.append(propertyValue);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,11 @@
 
 package org.eclipse.ui.internal.navigator.filters;
 
-import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Deque;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.Viewer;
@@ -64,24 +63,10 @@ public class CommonFiltersTab extends CustomizationTab {
 
 	private TablePatternFilter patternFilter = new TablePatternFilter();
 
-	private Deque<ICommonFilterDescriptor> filterDescriptorChangeHistory = new ArrayDeque<>();
-
 	protected CommonFiltersTab(Composite parent,
 			INavigatorContentService aContentService) {
 		super(parent, aContentService);
 		createControl();
-	}
-
-	@Override
-	protected void checkStateChanged(CheckStateChangedEvent event) {
-		super.checkStateChanged(event);
-		ICommonFilterDescriptor filterDescriptor = (ICommonFilterDescriptor) event.getElement();
-		filterDescriptorChangeHistory.remove(filterDescriptor);
-		filterDescriptorChangeHistory.push(filterDescriptor);
-	}
-
-	protected ICommonFilterDescriptor[] getFilterDescriptorChangeHistory() {
-		return filterDescriptorChangeHistory.toArray(new ICommonFilterDescriptor[filterDescriptorChangeHistory.size()]);
 	}
 
 	private void createControl() {
@@ -186,9 +171,9 @@ public class CommonFiltersTab extends CustomizationTab {
 			}
 
 			private TableItem getFirstHighlightedItem(TableItem[] items) {
-				for (TableItem item : items) {
-					if (patternFilter.match(item.getText())) {
-						return item;
+				for (int i = 0; i < items.length; i++) {
+					if (patternFilter.match(items[i].getText())) {
+						return items[i];
 					}
 				}
 				return null;
@@ -211,22 +196,25 @@ public class CommonFiltersTab extends CustomizationTab {
 		patternFilter.setPattern(filterText.getText());
 		getTableViewer().refresh();
 
-		for (Object checkedItem : getCheckedItems()) {
-			getTableViewer().setChecked(checkedItem, true);
+		Set<Object> checkedItems = getCheckedItems();
+		for (Iterator<Object> iterator = checkedItems.iterator(); iterator.hasNext();) {
+			getTableViewer().setChecked(iterator.next(), true);
 		}
 	}
 
 	private void updateFiltersCheckState() {
+		Object[] children = filterContentProvider
+				.getElements(getContentService());
 		ICommonFilterDescriptor filterDescriptor;
 		INavigatorFilterService filterService = getContentService()
 				.getFilterService();
-		for (Object child : filterContentProvider.getElements(getContentService())) {
-			filterDescriptor = (ICommonFilterDescriptor) child;
+		for (int i = 0; i < children.length; i++) {
+			filterDescriptor = (ICommonFilterDescriptor) children[i];
 			if(filterService.isActive(filterDescriptor.getId())) {
-				getTableViewer().setChecked(child, true);
-				getCheckedItems().add(child);
+				getTableViewer().setChecked(children[i], true);
+				getCheckedItems().add(children[i]);
 			} else {
-				getTableViewer().setChecked(child, false);
+				getTableViewer().setChecked(children[i], false);
 			}
 		}
 	}

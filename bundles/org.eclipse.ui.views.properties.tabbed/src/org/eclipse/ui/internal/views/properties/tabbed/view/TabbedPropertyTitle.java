@@ -64,7 +64,6 @@ public class TabbedPropertyTitle
 
 		this.addPaintListener(new PaintListener() {
 
-			@Override
 			public void paintControl(PaintEvent e) {
 				if (image == null && (text == null || text.equals(BLANK))) {
 					label.setVisible(false);

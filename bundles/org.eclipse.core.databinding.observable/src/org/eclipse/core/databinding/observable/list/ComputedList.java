@@ -1,5 +1,5 @@
 /************************************************************************************************************
- * Copyright (c) 2007, 2017 Matthew Hall and others.
+ * Copyright (c) 2007, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  * 		Brad Reynolds - initial API and implementation (through bug 116920 and bug 147515)
  * 		Matthew Hall - bugs 211786, 274081
  * 		Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *      Conrad Groth <info@conrad-groth.de> - Bug 502084
  ***********************************************************************************************************/
 package org.eclipse.core.databinding.observable.list;
 
@@ -208,16 +207,16 @@ public abstract class ComputedList<E> extends AbstractObservableList<E> {
 			// even if we were already stale before recomputing. This is in case
 			// clients assume that a list change is indicative of non-staleness.
 			stale = false;
-			for (IObservable newDependency : newDependencies) {
-				if (newDependency.isStale()) {
+			for (int i = 0; i < newDependencies.length; i++) {
+				if (newDependencies[i].isStale()) {
 					makeStale();
 					break;
 				}
 			}
 
 			if (!stale) {
-				for (IObservable newDependency : newDependencies) {
-					newDependency.addStaleListener(privateInterface);
+				for (int i = 0; i < newDependencies.length; i++) {
+					newDependencies[i].addStaleListener(privateInterface);
 				}
 			}
 
@@ -245,22 +244,36 @@ public abstract class ComputedList<E> extends AbstractObservableList<E> {
 
 	private void makeDirty() {
 		if (!dirty) {
-			// copy the old list
-			final List<E> oldList = new ArrayList<E>(cachedList);
-
 			dirty = true;
 
 			makeStale();
 
 			stopListening();
 
-			fireListChange(Diffs.computeListDiff(oldList, getList()));
+			// copy the old list
+			final List<E> oldList = new ArrayList<E>(cachedList);
+			// Fire the "dirty" event. This implementation recomputes the new
+			// list lazily.
+			fireListChange(new ListDiff<E>() {
+				List<ListDiffEntry<E>> differences;
+
+				@Override
+				public ListDiffEntry<E>[] getDifferences() {
+					if (differences == null)
+						return Diffs.computeListDiff(oldList, getList())
+								.getDifferences();
+					return differences.toArray(new ListDiffEntry[differences
+							.size()]);
+				}
+			});
 		}
 	}
 
 	private void stopListening() {
 		if (dependencies != null) {
-			for (IObservable observable : dependencies) {
+			for (int i = 0; i < dependencies.length; i++) {
+				IObservable observable = dependencies[i];
+
 				observable.removeChangeListener(privateInterface);
 				observable.removeStaleListener(privateInterface);
 			}

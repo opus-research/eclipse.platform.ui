@@ -26,9 +26,6 @@ import org.eclipse.ui.IViewPart;
  * @deprecated marked for deletion, see Bug 442961, nested contexts are no
  *             longer supported by the help support system
  * @noextend This class is not intended to be subclassed by clients.
- * @noinstantiate This class is not intended to be instantiated by clients.
- * @noreference This class is not intended to be referenced by clients.
- *
  */
 @Deprecated
 public class ViewContextComputer implements IContextComputer {
@@ -77,8 +74,8 @@ public class ViewContextComputer implements IContextComputer {
 		}
 
         // copy the contexts into our list
-        for (Object ctx : contexts) {
-			contextList.add(ctx);
+        for (int i = 0; i < contexts.length; i++) {
+			contextList.add(contexts[i]);
 		}
     }
 

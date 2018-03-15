@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2017 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Matthew Hall - bug 274081
  *     Abel Hegedus - bug 414297
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Conrad Groth <info@conrad-groth.de> - Bug 502084
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.set;
 
@@ -202,16 +201,16 @@ privateInterface, privateInterface, null);
 			// even if we were already stale before recomputing. This is in case
 			// clients assume that a set change is indicative of non-staleness.
 			stale = false;
-			for (IObservable newDependency : newDependencies) {
-				if (newDependency.isStale()) {
+			for (int i = 0; i < newDependencies.length; i++) {
+				if (newDependencies[i].isStale()) {
 					makeStale();
 					break;
 				}
 			}
 
 			if (!stale) {
-				for (IObservable newDependency : newDependencies) {
-					newDependency.addStaleListener(privateInterface);
+				for (int i = 0; i < newDependencies.length; i++) {
+					newDependencies[i].addStaleListener(privateInterface);
 				}
 			}
 
@@ -246,13 +245,35 @@ privateInterface, privateInterface, null);
 
 			stopListening();
 
-			fireSetChange(Diffs.computeSetDiff(oldSet, getSet()));
+			// Fire the "dirty" event. This implementation recomputes the new
+			// set lazily.
+			fireSetChange(new SetDiff<E>() {
+				SetDiff<E> delegate;
+
+				private SetDiff<E> getDelegate() {
+					if (delegate == null)
+						delegate = Diffs.computeSetDiff(oldSet, getSet());
+					return delegate;
+				}
+
+				@Override
+				public Set<E> getAdditions() {
+					return getDelegate().getAdditions();
+				}
+
+				@Override
+				public Set<E> getRemovals() {
+					return getDelegate().getRemovals();
+				}
+			});
 		}
 	}
 
 	private void stopListening() {
 		if (dependencies != null) {
-			for (IObservable observable : dependencies) {
+			for (int i = 0; i < dependencies.length; i++) {
+				IObservable observable = dependencies[i];
+
 				observable.removeChangeListener(privateInterface);
 				observable.removeStaleListener(privateInterface);
 			}

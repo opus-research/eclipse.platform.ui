@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.osgi.util.NLS;
@@ -390,11 +389,7 @@ public class DeferredTreeContentManager {
 				clearJob.addJobChangeListener(listener);
 			}
 		}
-		// See bug 470554 if IElementCollector.done() is called immediately
-		// after IElementCollector.add(), SWT/GTK seem to be confused.
-		// Delay tree element deletion to avoid race conditions with GTK code
-		long timeout = Util.isGtk() ? 100 : 0;
-		clearJob.schedule(timeout);
+		clearJob.schedule();
 	}
 
 	/**

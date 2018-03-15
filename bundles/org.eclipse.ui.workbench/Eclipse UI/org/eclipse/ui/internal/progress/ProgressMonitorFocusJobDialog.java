@@ -12,8 +12,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
 import org.eclipse.core.runtime.IStatus;
@@ -26,6 +24,10 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.operation.ProgressMonitorUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -75,11 +77,14 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(job.getName());
-		shell.addTraverseListener(e -> {
-			if (e.detail == SWT.TRAVERSE_ESCAPE) {
-				cancelPressed();
-				e.detail = SWT.TRAVERSE_NONE;
-				e.doit = true;
+		shell.addTraverseListener(new TraverseListener() {
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_ESCAPE) {
+					cancelPressed();
+					e.detail = SWT.TRAVERSE_NONE;
+					e.doit = true;
+				}
 			}
 		});
 	}
@@ -91,12 +96,16 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 				IDialogConstants.CLOSE_ID,
 				ProgressMessages.ProgressMonitorFocusJobDialog_RunInBackgroundButton,
 				true);
-		runInWorkspace.addSelectionListener(widgetSelectedAdapter(e -> {
-			Rectangle shellPosition = getShell().getBounds();
-			job.setProperty(IProgressConstants.PROPERTY_IN_DIALOG, Boolean.FALSE);
-			finishedRun();
-			ProgressManagerUtil.animateDown(shellPosition);
-		}));
+		runInWorkspace.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Rectangle shellPosition = getShell().getBounds();
+				job.setProperty(IProgressConstants.PROPERTY_IN_DIALOG,
+						Boolean.FALSE);
+				finishedRun();
+				ProgressManagerUtil.animateDown(shellPosition);
+			}
+		});
 		runInWorkspace.setCursor(arrowCursor);
 
 		cancel = createButton(parent, IDialogConstants.CANCEL_ID,
@@ -190,16 +199,19 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 		// start with a quick busy indicator. Lock the UI as we
 		// want to preserve modality
 		BusyIndicator.showWhile(PlatformUI.getWorkbench().getDisplay(),
-				() -> {
-					try {
-						synchronized (jobIsDone) {
-							if (job.getState() != Job.NONE) {
-								jobIsDone.wait(ProgressManagerUtil.SHORT_OPERATION_TIME);
+				new Runnable() {
+					@Override
+					public void run() {
+						try {
+							synchronized (jobIsDone) {
+								if (job.getState() != Job.NONE) {
+									jobIsDone.wait(ProgressManagerUtil.SHORT_OPERATION_TIME);
+								}
 							}
+						} catch (InterruptedException e) {
+							// Do not log as this is a common operation from the
+							// lock listener
 						}
-					} catch (InterruptedException e) {
-						// Do not log as this is a common operation from the
-						// lock listener
 					}
 				});
 		job.removeJobChangeListener(jobListener);
@@ -255,7 +267,7 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 		Control area = super.createDialogArea(parent);
 		// Give the job info as the initial details
 		getProgressMonitor().setTaskName(
-				ProgressManager.getInstance().progressFor(this.job).getJobInfo()
+				ProgressManager.getInstance().getJobInfo(this.job)
 						.getDisplayString());
 		return area;
 	}
@@ -275,7 +287,12 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 		gd.horizontalAlignment = GridData.FILL;
 		showUserDialogButton.setLayoutData(gd);
 
-		showUserDialogButton.addSelectionListener(widgetSelectedAdapter(e -> showDialog = showUserDialogButton.getSelection()));
+		showUserDialogButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				showDialog = showUserDialogButton.getSelection();
+			}
+		});
 
 		super.createExtendedDialogArea(parent);
 	}
