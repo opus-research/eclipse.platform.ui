@@ -767,7 +767,9 @@ public class LazySortedCollection {
      */
     public final void addAll(Object[] toAdd) {
     	Assert.isNotNull(toAdd);
-        for (Object object : toAdd) {
+        for (int i = 0; i < toAdd.length; i++) {
+            Object object = toAdd[i];
+
             add(object);
         }
 
@@ -829,7 +831,9 @@ public class LazySortedCollection {
     public final void removeAll(Object[] toRemove) {
     	Assert.isNotNull(toRemove);
 
-        for (Object object : toRemove) {
+        for (int i = 0; i < toRemove.length; i++) {
+            Object object = toRemove[i];
+
             internalRemove(object);
         }
     	pack();
