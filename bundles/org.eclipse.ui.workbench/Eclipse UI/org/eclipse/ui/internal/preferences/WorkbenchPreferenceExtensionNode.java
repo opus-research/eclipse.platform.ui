@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,8 +72,9 @@ public abstract class WorkbenchPreferenceExtensionNode extends WorkbenchPreferen
 			IConfigurationElement[] references = getConfigurationElement()
 					.getChildren(IWorkbenchRegistryConstants.TAG_KEYWORD_REFERENCE);
 			HashSet list = new HashSet(references.length);
-			for (IConfigurationElement configElement : references) {
-				String id = configElement.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
+			for (int i = 0; i < references.length; i++) {
+				IConfigurationElement page = references[i];
+				String id = page.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
 				if (id != null) {
 					list.add(id);
 				}
@@ -190,10 +191,11 @@ public abstract class WorkbenchPreferenceExtensionNode extends WorkbenchPreferen
 		return pluginId;
 	}
 
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+    @Override
+	public Object getAdapter(Class adapter)
+    {
         if (adapter == IConfigurationElement.class)
-			return adapter.cast(getConfigurationElement());
+            return getConfigurationElement();
         return null;
     }
 

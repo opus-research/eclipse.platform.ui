@@ -123,10 +123,10 @@ public class QuickStartAction extends Action implements
 
         AboutInfo[] features = IDEWorkbenchPlugin.getDefault()
                 .getFeatureInfos();
-        for (AboutInfo feature : features) {
-            URL url = feature.getWelcomePageURL();
+        for (int i = 0; i < features.length; i++) {
+            URL url = features[i].getWelcomePageURL();
             if (url != null && (productUrl == null || !url.toString().equals(productUrl.toString()))) {
-				welcomeFeatures.add(feature);
+				welcomeFeatures.add(features[i]);
 			}
         }
 
@@ -176,7 +176,8 @@ public class QuickStartAction extends Action implements
     private AboutInfo findFeature(String featureId) throws WorkbenchException {
         AboutInfo[] features = IDEWorkbenchPlugin.getDefault()
                 .getFeatureInfos();
-        for (AboutInfo info : features) {
+        for (int i = 0; i < features.length; i++) {
+            AboutInfo info = features[i];
             if (info.getFeatureId().equals(featureId)) {
                 return info;
             }

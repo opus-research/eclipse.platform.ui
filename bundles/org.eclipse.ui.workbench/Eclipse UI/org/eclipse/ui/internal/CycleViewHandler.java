@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2017 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,14 +8,11 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143, 461063, 495917
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 504089, 509224, 509232
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143, 461063
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.core.commands.Command;
@@ -25,9 +22,14 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.commands.ICommandService;
 
 /**
@@ -39,11 +41,10 @@ import org.eclipse.ui.commands.ICommandService;
  * @since 3.3
  *
  */
-public class CycleViewHandler extends FilteredTableBaseHandler {
+public class CycleViewHandler extends CycleBaseHandler {
 
 	@Override
-	protected Object getInput(WorkbenchPage page) {
-		List<IWorkbenchPartReference> refs = new ArrayList<>();
+	protected void addItems(Table table, WorkbenchPage page) {
 
 		EPartService partService = page.getWorkbenchWindow().getService(EPartService.class);
 		EModelService modelService = page.getWorkbenchWindow().getService(EModelService.class);
@@ -65,63 +66,57 @@ public class CycleViewHandler extends FilteredTableBaseHandler {
 			if (!partService.isPartOrPlaceholderInPerspective(part.getElementId(), currentPerspective)) {
 				return;
 			}
+
 			if (part.getTags().contains("Editor")) { //$NON-NLS-1$
 				if (includeEditor.getAndSet(false)) {
-					addExistingReference(refs, part);
+					IEditorPart activeEditor = page.getActiveEditor();
+					TableItem item = new TableItem(table, SWT.NONE);
+					item.setText(WorkbenchMessages.CyclePartAction_editor);
+					item.setImage(activeEditor.getTitleImage());
+					if (activeEditor.getSite() instanceof PartSite) {
+						item.setData(((PartSite) activeEditor.getSite()).getPartReference());
+					} else {
+						item.setData(part);
+					}
 				}
 			} else {
-				addExistingReference(refs, part);
+				TableItem item = new TableItem(table, SWT.NONE);
+				item.setText(part.getLabel());
+				IWorkbenchWindow iwbw = page.getWorkbenchWindow();
+				if (iwbw instanceof WorkbenchWindow) {
+					WorkbenchWindow wbw = (WorkbenchWindow) iwbw;
+					if (part != null && wbw.getModel().getRenderer() instanceof SWTPartRenderer) {
+						SWTPartRenderer r = (SWTPartRenderer) wbw.getModel().getRenderer();
+						item.setImage(r.getImage(part));
+					}
+				}
+				item.setData(part);
 			}
 		});
-		return refs;
 
-	}
-
-	/*
-	 * Specialized to get the static label that was shown in the past (509232)
-	 */
-	@Override
-	protected String getWorkbenchPartReferenceText(WorkbenchPartReference ref) {
-		if (ref instanceof EditorReference) {
-			return WorkbenchMessages.CyclePartAction_editor;
-		} else if (ref instanceof ViewReference) {
-			return ref.getPartName();
-		}
-		return super.getWorkbenchPartReferenceText(ref);
-	}
-
-	/**
-	 * Adds the {@link IWorkbenchPartReference} contained in part's transient
-	 * data, if exists.
-	 */
-	protected void addExistingReference(List<IWorkbenchPartReference> refs, MPart part) {
-		Object tData = part.getTransientData().get(IWorkbenchPartReference.class.getName());
-		if (tData instanceof IWorkbenchPartReference) {
-			// instanceof checks also for non null values
-			refs.add((IWorkbenchPartReference) tData);
-		}
 	}
 
 	@Override
 	protected ParameterizedCommand getBackwardCommand() {
-		return getParametrizedCommand(IWorkbenchCommandConstants.WINDOW_PREVIOUS_VIEW);
+		// TODO Auto-generated method stub
+		final ICommandService commandService = window.getWorkbench().getService(ICommandService.class);
+		final Command command = commandService.getCommand(IWorkbenchCommandConstants.WINDOW_PREVIOUS_VIEW);
+		ParameterizedCommand commandBack = new ParameterizedCommand(command, null);
+		return commandBack;
 	}
 
 	@Override
 	protected ParameterizedCommand getForwardCommand() {
-		return getParametrizedCommand(IWorkbenchCommandConstants.WINDOW_NEXT_VIEW);
-	}
-
-    private ParameterizedCommand getParametrizedCommand(String workbenchCommand)
-	{
+		// TODO Auto-generated method stub
 		final ICommandService commandService = window.getWorkbench().getService(ICommandService.class);
-		final Command command = commandService.getCommand(workbenchCommand);
-		ParameterizedCommand parameterizedCommand = new ParameterizedCommand(command, null);
-		return parameterizedCommand;
+		final Command command = commandService.getCommand(IWorkbenchCommandConstants.WINDOW_NEXT_VIEW);
+		ParameterizedCommand commandF = new ParameterizedCommand(command, null);
+		return commandF;
 	}
 
 	@Override
 	protected String getTableHeader(IWorkbenchPart activePart) {
+		// TODO Auto-generated method stub
 		return WorkbenchMessages.CyclePartAction_header;
 	}
 

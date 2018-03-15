@@ -12,7 +12,7 @@
  *     Brian de Alwis - Fix size computation to account for trim
  *     Markus Kuppe <bugs.eclipse.org@lemmster.de> - Bug 449485: [QuickAccess] "Widget is disposed" exception in errorlog during shutdown due to quickaccess.SearchField.storeDialog
  *     Elena Laskavaia <elaskavaia.cdt@gmail.com> - Bug 433746: [QuickAccess] SWTException on closing quick access shell
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278, 491291, 491312, 491293, 436788, 513436
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278, 491291, 491312
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
@@ -62,8 +62,12 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -124,9 +128,11 @@ public class SearchField {
 
 	private String selectedString = ""; //$NON-NLS-1$
 	private AccessibleAdapter accessibleListener;
+	private Font font;
 
 	@Inject
 	private IBindingService bindingService;
+
 
 	private TriggerSequence triggerSequence = null;
 
@@ -164,8 +170,8 @@ public class SearchField {
 				new EditorProvider(), new ViewProvider(application, window),
 				new PerspectiveProvider(), commandProvider, new ActionProvider(),
 				new WizardProvider(), new PreferenceProvider(), new PropertiesProvider() };
-		for (QuickAccessProvider provider : providers) {
-			providerMap.put(provider.getId(), provider);
+		for (int i = 0; i < providers.length; i++) {
+			providerMap.put(providers[i].getId(), providers[i]);
 		}
 		restoreDialog();
 
@@ -197,11 +203,6 @@ public class SearchField {
 					txtQuickAccess.setText(""); //$NON-NLS-1$
 					element.execute();
 
-					// after execution, the search box might be disposed
-					if (txtQuickAccess.isDisposed()) {
-						return;
-					}
-
 					/*
 					 * By design, attempting to activate a part that is already
 					 * active does not change the focus. However in the case of
@@ -218,11 +219,6 @@ public class SearchField {
 							pe.focusGui(activePart);
 						}
 					}
-
-					if (shell.isVisible()) {
-						// after selection, closes the shell
-						quickAccessContents.doClose();
-					}
 				}
 			}
 		};
@@ -231,7 +227,6 @@ public class SearchField {
 		shell.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		shell.setText(QuickAccessMessages.QuickAccess_EnterSearch); // just for debugging, not shown anywhere
 		GridLayoutFactory.fillDefaults().applyTo(shell);
-		quickAccessContents.createHintText(shell, Window.getDefaultOrientation());
 		table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
 		txtQuickAccess.addMouseListener(new MouseAdapter() {
 			@Override
@@ -244,7 +239,12 @@ public class SearchField {
 			@Override
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close the shell
-				table.getDisplay().asyncExec(() -> checkFocusLost(table, txtQuickAccess));
+				table.getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						checkFocusLost(table, txtQuickAccess);
+					}
+				});
 				activated = false;
 			}
 
@@ -263,10 +263,20 @@ public class SearchField {
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close
 				// the shell
-				table.getDisplay().asyncExec(() -> checkFocusLost(table, txtQuickAccess));
+				table.getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						checkFocusLost(table, txtQuickAccess);
+					}
+				});
 			}
 		});
-		txtQuickAccess.addModifyListener(e -> showList());
+		txtQuickAccess.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				showList();
+			}
+		});
 		txtQuickAccess.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -346,7 +356,14 @@ public class SearchField {
 
 	private Text createText(Composite parent) {
 		Text text = new Text(parent, SWT.SEARCH);
-		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
+		text.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription);
+
+		FontData[] fD = text.getFont().getFontData();
+		int round = (int) Math.round(fD[0].getHeight() * 0.8);
+		fD[0].setHeight(round);
+		font = new Font(text.getDisplay(), fD[0]);
+		text.setFont(font);
+
 		return text;
 	}
 
@@ -357,10 +374,9 @@ public class SearchField {
 		updateQuickAccessTriggerSequence();
 
 		if (triggerSequence != null) {
-			txtQuickAccess.setToolTipText(
-					NLS.bind(QuickAccessMessages.QuickAccess_TooltipDescription, triggerSequence.format()));
+			txtQuickAccess.setMessage(NLS.bind(QuickAccessMessages.QuickAccess_EnterSearch, triggerSequence.format()));
 		} else {
-			txtQuickAccess.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription_Empty);
+			txtQuickAccess.setMessage(QuickAccessMessages.QuickAccess_EnterSearch_Empty);
 		}
 
 		GC gc = new GC(txtQuickAccess);
@@ -443,17 +459,19 @@ public class SearchField {
 		Monitor[] monitors = toSearch.getMonitors();
 		Monitor result = monitors[0];
 
-		for (Monitor currentMonitor : monitors) {
-			Rectangle clientArea = currentMonitor.getClientArea();
+		for (int idx = 0; idx < monitors.length; idx++) {
+			Monitor current = monitors[idx];
+
+			Rectangle clientArea = current.getClientArea();
 
 			if (clientArea.contains(toFind)) {
-				return currentMonitor;
+				return current;
 			}
 
 			int distance = Geometry.distanceSquared(Geometry.centerPoint(clientArea), toFind);
 			if (distance < closest) {
 				closest = distance;
-				result = currentMonitor;
+				result = current;
 			}
 		}
 

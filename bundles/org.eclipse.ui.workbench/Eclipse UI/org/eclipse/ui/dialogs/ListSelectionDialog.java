@@ -12,8 +12,6 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -23,6 +21,8 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -117,13 +117,23 @@ public class ListSelectionDialog extends SelectionDialog {
         Button selectButton = createButton(buttonComposite,
                 IDialogConstants.SELECT_ALL_ID, SELECT_ALL_TITLE, false);
 
-        SelectionListener listener = widgetSelectedAdapter(e -> listViewer.setAllChecked(true));
+        SelectionListener listener = new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                listViewer.setAllChecked(true);
+            }
+        };
         selectButton.addSelectionListener(listener);
 
         Button deselectButton = createButton(buttonComposite,
                 IDialogConstants.DESELECT_ALL_ID, DESELECT_ALL_TITLE, false);
 
-        listener = widgetSelectedAdapter(e -> listViewer.setAllChecked(false));
+        listener = new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                listViewer.setAllChecked(false);
+            }
+        };
         deselectButton.addSelectionListener(listener);
     }
 
@@ -208,7 +218,8 @@ public class ListSelectionDialog extends SelectionDialog {
         // Build a list of selected children.
         if (children != null) {
             ArrayList list = new ArrayList();
-            for (Object element : children) {
+            for (int i = 0; i < children.length; ++i) {
+                Object element = children[i];
                 if (listViewer.getChecked(element)) {
 					list.add(element);
 				}

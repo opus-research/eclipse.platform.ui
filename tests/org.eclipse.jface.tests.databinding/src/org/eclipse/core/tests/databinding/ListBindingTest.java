@@ -13,9 +13,6 @@
 
 package org.eclipse.core.tests.databinding;
 
-import static org.eclipse.core.databinding.UpdateListStrategy.POLICY_NEVER;
-import static org.eclipse.core.databinding.UpdateListStrategy.POLICY_UPDATE;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +20,6 @@ import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.ListBinding;
 import org.eclipse.core.databinding.UpdateListStrategy;
 import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.databinding.observable.list.IObservableList;
@@ -51,13 +47,6 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 		target = new WritableList(new ArrayList(), String.class);
 		model = new WritableList(new ArrayList(), String.class);
 		dbc = new DataBindingContext();
-	}
-
-	@Override
-	public void tearDown() throws Exception {
-		dbc.dispose();
-		model.dispose();
-		target.dispose();
 	}
 
 	public void testUpdateModelFromTarget() throws Exception {
@@ -235,8 +224,6 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 		model.add("first");
 
 		Assert.assertEquals(0, latch.getCount());
-
-		Policy.setLog(null);
 	}
 
 	/**
@@ -328,32 +315,5 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 		model.set(0, "second");
 
 		Assert.assertEquals(0, latch.getCount());
-	}
-
-	/**
-	 * test for bug 491678
-	 */
-	public void testAddListenerAndInitialSyncAreUninterruptable() {
-		Policy.setLog(new ILogger() {
-			@Override
-			public void log(IStatus status) {
-				if (!status.isOK()) {
-					Assert.fail("The databinding logger has the not-ok status " + status);
-				}
-			}
-		});
-
-		model.add("first");
-		new ListBinding(target, model, new UpdateListStrategy(), new UpdateListStrategy());
-		model.remove(0);
-	}
-
-	/**
-	 * test for bug 491678
-	 */
-	public void testTargetValueIsSyncedToModelIfModelWasNotSyncedToTarget() {
-		target.add("first");
-		dbc.bindList(target, model, new UpdateListStrategy(POLICY_UPDATE), new UpdateListStrategy(POLICY_NEVER));
-		assertEquals(model.size(), target.size());
 	}
 }

@@ -36,6 +36,7 @@ import org.eclipse.jface.examples.databinding.model.SampleData;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -85,7 +86,8 @@ public class ComboScenarios extends ScenariosTestCase {
 	}
 
 	protected Object getViewerSelection() {
-		return cviewer.getStructuredSelection().getFirstElement();
+		return ((IStructuredSelection) cviewer.getSelection())
+				.getFirstElement();
 	}
 
 	/**
@@ -403,8 +405,9 @@ public class ComboScenarios extends ScenariosTestCase {
 		// Ensure that setting the selection is driven forward to the other
 		// combo
 		cviewer.setSelection(new StructuredSelection(lodging));
-		assertEquals(cviewer.getStructuredSelection().getFirstElement(),
-				otherViewer.getStructuredSelection().getFirstElement());
+		assertEquals(((IStructuredSelection) cviewer.getSelection())
+				.getFirstElement(), ((IStructuredSelection) otherViewer
+				.getSelection()).getFirstElement());
 
 		// Change the list of one combo, and ensure it updates the other combo
 		catalog.removeLodging(lodging);
