@@ -172,8 +172,8 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		// overwrite B.
 		IResourceDelta[] affectedChildren = delta
 				.getAffectedChildren(IResourceDelta.CHANGED);
-		for (int i = 0; i < affectedChildren.length; i++) {
-			if ((affectedChildren[i].getFlags() & IResourceDelta.TYPE) != 0) {
+		for (IResourceDelta element : affectedChildren) {
+			if ((element.getFlags() & IResourceDelta.TYPE) != 0) {
 				runnables.add(getRefreshRunnable(resource));
 				return;
 			}
@@ -205,8 +205,8 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		}
 
 		// Handle changed children .
-		for (int i = 0; i < affectedChildren.length; i++) {
-			processDelta(affectedChildren[i], runnables);
+		for (IResourceDelta element : affectedChildren) {
+			processDelta(element, runnables);
 		}
 
 		// @issue several problems here:

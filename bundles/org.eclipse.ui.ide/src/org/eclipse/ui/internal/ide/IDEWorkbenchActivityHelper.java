@@ -121,8 +121,7 @@ public class IDEWorkbenchActivityHelper {
         IExtensionPoint point = Platform.getExtensionRegistry()
                 .getExtensionPoint("org.eclipse.core.resources.natures"); //$NON-NLS-1$
         IExtension[] extensions = point.getExtensions();
-        for (int i = 0; i < extensions.length; i++) {
-            IExtension extension = extensions[i];
+        for (IExtension extension : extensions) {
             final String localId = extension.getSimpleIdentifier();
             final String pluginId = extension.getNamespaceIdentifier();
             String natureId = extension.getUniqueIdentifier();
@@ -161,8 +160,7 @@ public class IDEWorkbenchActivityHelper {
 
 				IResourceDelta[] children = mainDelta.getAffectedChildren();
 				Set projectsToUpdate = new HashSet();
-				for (int i = 0; i < children.length; i++) {
-					IResourceDelta delta = children[i];
+				for (IResourceDelta delta : children) {
 					if (delta.getResource().getType() == IResource.PROJECT) {
 						IProject project = (IProject) delta.getResource();
 
@@ -190,9 +188,9 @@ public class IDEWorkbenchActivityHelper {
 		}
 		IWorkbenchActivitySupport workbenchActivitySupport = PlatformUI
 				.getWorkbench().getActivitySupport();
-		for (int j = 0; j < ids.length; j++) {
+		for (String id : ids) {
 			final IPluginContribution contribution = (IPluginContribution) natureMap
-					.get(ids[j]);
+					.get(id);
 			if (contribution == null) {
 				continue; // bad nature ID.
 			}

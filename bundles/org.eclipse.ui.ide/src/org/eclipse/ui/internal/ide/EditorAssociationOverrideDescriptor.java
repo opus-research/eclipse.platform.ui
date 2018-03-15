@@ -151,8 +151,7 @@ public final class EditorAssociationOverrideDescriptor {
 
 	private static EditorAssociationOverrideDescriptor[] createDescriptors(IConfigurationElement[] elements) {
 		List result= new ArrayList(elements.length);
-		for (int i= 0; i < elements.length; i++) {
-			IConfigurationElement element= elements[i];
+		for (IConfigurationElement element : elements) {
 			if (EDITOR_ASSOCIATION_OVERRIDE_ELEMENT.equals(element.getName())) {
 				EditorAssociationOverrideDescriptor desc= new EditorAssociationOverrideDescriptor(element);
 				result.add(desc);
