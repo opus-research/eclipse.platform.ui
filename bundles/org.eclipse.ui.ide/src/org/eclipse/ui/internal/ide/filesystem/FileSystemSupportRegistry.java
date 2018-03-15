@@ -110,8 +110,7 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 		}
 		IExtension[] extensions = point.getExtensions();
 		// initial population
-		for (int i = 0; i < extensions.length; i++) {
-			IExtension extension = extensions[i];
+		for (IExtension extension : extensions) {
 			processExtension(tracker, extension);
 		}
 		tracker.registerHandler(this, ExtensionTracker
@@ -127,8 +126,8 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (int i = 0; i < objects.length; i++) {
-			registeredContributions.remove(objects[i]);
+		for (Object object : objects) {
+			registeredContributions.remove(object);
 		}
 		allConfigurations = null;//Clear the cache
 
@@ -143,8 +142,7 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 	private void processExtension(IExtensionTracker tracker,
 			IExtension extension) {
 		IConfigurationElement[] elements = extension.getConfigurationElements();
-		for (int j = 0; j < elements.length; j++) {
-			IConfigurationElement element = elements[j];
+		for (IConfigurationElement element : elements) {
 			FileSystemConfiguration contribution = newConfiguration(element);
 			registeredContributions.add(contribution);
 			tracker.registerObject(extension, contribution,

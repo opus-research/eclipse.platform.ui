@@ -57,11 +57,9 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 	public IProject[] getProjects() {
 		Set<IProject> result = new HashSet<>();
 		ResourceMapping[] mappings = getMappings();
-		for (int i = 0; i < mappings.length; i++) {
-			ResourceMapping mapping = mappings[i];
+		for (ResourceMapping mapping : mappings) {
 			IProject[] projects = mapping.getProjects();
-			for (int j = 0; j < projects.length; j++) {
-				IProject project = projects[j];
+			for (IProject project : projects) {
 				result.add(project);
 			}
 		}
@@ -75,8 +73,7 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 		SubMonitor subMonitor = SubMonitor.convert(mon, mappings.length);
 
 		List<ResourceTraversal> result = new ArrayList<>();
-		for (int i = 0; i < mappings.length; i++) {
-			ResourceMapping mapping = mappings[i];
+		for (ResourceMapping mapping : mappings) {
 			result.addAll(Arrays.asList(mapping.getTraversals(context, subMonitor.split(1))));
 		}
 		return result.toArray(new ResourceTraversal[result.size()]);
@@ -89,8 +86,7 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 	private ResourceMapping[] getMappings() {
 		IAdaptable[] elements = set.getElements();
 		List<ResourceMapping> result = new ArrayList<>();
-		for (int i = 0; i < elements.length; i++) {
-			IAdaptable element = elements[i];
+		for (IAdaptable element : elements) {
 			ResourceMapping mapping = WorkingSetAdapterFactory.getContributedResourceMapping(element);
 			if (mapping == null) {
 				mapping = WorkingSetAdapterFactory.getResourceMapping(element);
@@ -105,8 +101,7 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 	@Override
 	public boolean contains(ResourceMapping mapping) {
 		ResourceMapping[] mappings = getMappings();
-		for (int i = 0; i < mappings.length; i++) {
-			ResourceMapping childMapping = mappings[i];
+		for (ResourceMapping childMapping : mappings) {
 			if (childMapping.contains(mapping)) {
 				return true;
 			}

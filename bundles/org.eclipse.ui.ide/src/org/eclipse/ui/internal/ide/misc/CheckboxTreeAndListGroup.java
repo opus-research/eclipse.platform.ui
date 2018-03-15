@@ -219,8 +219,8 @@ public class CheckboxTreeAndListGroup extends EventManager implements
      *	time and check each one in the tree viewer as appropriate
      */
     protected void checkNewTreeElements(Object[] elements) {
-        for (int i = 0; i < elements.length; ++i) {
-            Object currentElement = elements[i];
+        for (Object element : elements) {
+            Object currentElement = element;
             boolean checked = checkedStateStore.containsKey(currentElement);
             treeViewer.setChecked(currentElement, checked);
             treeViewer.setGrayed(currentElement, checked
@@ -337,8 +337,8 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         // if any children of treeElement are still gray-checked then treeElement
         // must remain gray-checked as well
         Object[] children = treeContentProvider.getChildren(treeElement);
-        for (int i = 0; i < children.length; ++i) {
-            if (checkedStateStore.containsKey(children[i])) {
+        for (Object element : children) {
+            if (checkedStateStore.containsKey(element)) {
 				return true;
 			}
         }
@@ -369,8 +369,8 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         // statuses will be needed to determine the white-checked status for
         // this tree element
         Object[] children = treeContentProvider.getElements(treeElement);
-        for (int i = 0; i < children.length; ++i) {
-			determineWhiteCheckedDescendents(children[i]);
+        for (Object element : children) {
+			determineWhiteCheckedDescendents(element);
 		}
 
         // now determine the white-checked status for this tree element
@@ -538,8 +538,8 @@ public class CheckboxTreeAndListGroup extends EventManager implements
     protected void notifyCheckStateChangeListeners(
             final CheckStateChangedEvent event) {
         Object[] array = getListeners();
-        for (int i = 0; i < array.length; i++) {
-            final ICheckStateListener l = (ICheckStateListener) array[i];
+        for (Object element : array) {
+            final ICheckStateListener l = (ICheckStateListener) element;
             SafeRunner.run(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -661,8 +661,8 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         if (state) {
             Object[] listItems = listContentProvider.getElements(treeElement);
             List listItemsChecked = new ArrayList();
-            for (int i = 0; i < listItems.length; ++i) {
-				listItemsChecked.add(listItems[i]);
+            for (Object listItem : listItems) {
+				listItemsChecked.add(listItem);
 			}
 
             checkedStateStore.put(treeElement, listItemsChecked);
@@ -676,8 +676,8 @@ public class CheckboxTreeAndListGroup extends EventManager implements
 
         // now logically check/uncheck all children as well
         Object[] children = treeContentProvider.getChildren(treeElement);
-        for (int i = 0; i < children.length; ++i) {
-            setTreeChecked(children[i], state);
+        for (Object element : children) {
+            setTreeChecked(element, state);
         }
     }
 
