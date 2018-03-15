@@ -123,6 +123,7 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
         TestElement first2 = first.getFirstChild();
         TestElement first3 = first2.getFirstChild();
         fTreeViewer.expandToLevel(3);
+        processEvents();
         assertNotNull("first2 is visible", fViewer.testFindItem(first2));
         assertNotNull("first3 is visible", fViewer.testFindItem(first3));
     }
@@ -181,6 +182,9 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
         // setExpanded(true)).
         // This behaviour makes it impossible to do this regression test.
         // See bug 40797 for more details.
+        // Because GTK 3 takes longer to process, a wait statement is needed so
+		// that the assert will be done correctly.
+        waitForJobs(300, 1000);
         processEvents();
         if (((AbstractTreeViewer) fViewer).getExpandedState(parent)) {
             assertNotNull("new child is visible", fViewer.testFindItem(child));
