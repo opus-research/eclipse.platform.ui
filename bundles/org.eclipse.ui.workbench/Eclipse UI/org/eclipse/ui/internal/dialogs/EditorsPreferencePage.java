@@ -19,6 +19,7 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -63,11 +64,14 @@ public class EditorsPreferencePage extends PreferencePage implements
 
     private IntegerFieldEditor recentFilesEditor;
 
-    private IPropertyChangeListener validityChangeListener = event -> {
-	    if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-			updateValidState();
-		}
-	};
+    private IPropertyChangeListener validityChangeListener = new IPropertyChangeListener() {
+        @Override
+		public void propertyChange(PropertyChangeEvent event) {
+            if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+				updateValidState();
+			}
+        }
+    };
 
 	private Button promptWhenStillOpenEditor;
 
