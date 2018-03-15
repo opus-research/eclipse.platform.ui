@@ -232,8 +232,7 @@ public class TabbedPropertyRegistry {
 								.getSymbolicName(), extensionPointId);
 		IConfigurationElement[] extensions = point.getConfigurationElements();
 		List unordered = new ArrayList(extensions.length);
-		for (IConfigurationElement extension2 : extensions) {
-			IConfigurationElement extension = extension2;
+		for (IConfigurationElement extension : extensions) {
 			if (!extension.getName().equals(extensionPointId)) {
 				continue;
 			}
@@ -295,11 +294,11 @@ public class TabbedPropertyRegistry {
 			ITabDescriptor[] descriptors, IWorkbenchPart part,
 			ISelection selection) {
 		List result = new ArrayList();
-		for (ITabDescriptor descriptor2 : descriptors) {
-			ITabDescriptor descriptor = adaptDescriptorFor(descriptor2,
+		for (ITabDescriptor descriptor : descriptors) {
+			ITabDescriptor filteredDescriptor = adaptDescriptorFor(descriptor,
 					part, selection);
-			if (!descriptor.getSectionDescriptors().isEmpty()) {
-				result.add(descriptor);
+			if (!filteredDescriptor.getSectionDescriptors().isEmpty()) {
+				result.add(filteredDescriptor);
 			}
 		}
 		if (result.size() == 0) {

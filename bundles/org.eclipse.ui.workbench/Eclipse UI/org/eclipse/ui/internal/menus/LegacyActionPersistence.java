@@ -430,34 +430,29 @@ public final class LegacyActionPersistence extends RegistryPersistence {
 		final IConfigurationElement[][] indexedConfigurationElements = new IConfigurationElement[5][];
 
 		// Sort the actionSets extension point.
-		final IConfigurationElement[] actionSetsExtensionPoint = registry
-				.getConfigurationElementsFor(EXTENSION_ACTION_SETS);
-		for (final IConfigurationElement element : actionSetsExtensionPoint) {
-			final String name = element.getName();
+		for (final IConfigurationElement configElement : registry.getConfigurationElementsFor(EXTENSION_ACTION_SETS)) {
+			final String name = configElement.getName();
 			if (TAG_ACTION_SET.equals(name)) {
-				addElementToIndexedArray(element, indexedConfigurationElements,
+				addElementToIndexedArray(configElement, indexedConfigurationElements,
 						INDEX_ACTION_SETS, actionSetCount++);
 			}
 		}
 
 		// Sort the editorActions extension point.
-		final IConfigurationElement[] editorActionsExtensionPoint = registry
-				.getConfigurationElementsFor(EXTENSION_EDITOR_ACTIONS);
-		for (final IConfigurationElement element : editorActionsExtensionPoint) {
-			final String name = element.getName();
+		for (final IConfigurationElement configElement : registry
+				.getConfigurationElementsFor(EXTENSION_EDITOR_ACTIONS)) {
+			final String name = configElement.getName();
 			if (TAG_EDITOR_CONTRIBUTION.equals(name)) {
-				addElementToIndexedArray(element, indexedConfigurationElements,
+				addElementToIndexedArray(configElement, indexedConfigurationElements,
 						INDEX_EDITOR_CONTRIBUTIONS, editorContributionCount++);
 			}
 		}
 
 		// Sort the viewActions extension point.
-		final IConfigurationElement[] viewActionsExtensionPoint = registry
-				.getConfigurationElementsFor(EXTENSION_VIEW_ACTIONS);
-		for (final IConfigurationElement element : viewActionsExtensionPoint) {
-			final String name = element.getName();
+		for (final IConfigurationElement configElement : registry.getConfigurationElementsFor(EXTENSION_VIEW_ACTIONS)) {
+			final String name = configElement.getName();
 			if (TAG_VIEW_CONTRIBUTION.equals(name)) {
-				addElementToIndexedArray(element, indexedConfigurationElements,
+				addElementToIndexedArray(configElement, indexedConfigurationElements,
 						INDEX_VIEW_CONTRIBUTIONS, viewContributionCount++);
 			}
 		}
@@ -501,12 +496,12 @@ public final class LegacyActionPersistence extends RegistryPersistence {
 	private final void readActions(final String primaryId,
 			final IConfigurationElement[] elements, final List warningsToLog,
 			final Expression visibleWhenExpression, final String viewId) {
-		for (final IConfigurationElement element : elements) {
+		for (final IConfigurationElement configElement : elements) {
 			/*
 			 * We might need the identifier to generate the command, so we'll
 			 * read it out now.
 			 */
-			final String id = readRequired(element, ATT_ID, warningsToLog,
+			final String id = readRequired(configElement, ATT_ID, warningsToLog,
 					"Actions require an id"); //$NON-NLS-1$
 			if (id == null) {
 				continue;
@@ -514,12 +509,12 @@ public final class LegacyActionPersistence extends RegistryPersistence {
 
 			// Try to break out the command part of the action.
 			final ParameterizedCommand command = convertActionToCommand(
-					element, primaryId, id, warningsToLog);
+					configElement, primaryId, id, warningsToLog);
 			if (command == null) {
 				continue;
 			}
 
-			convertActionToHandler(element, id, command, visibleWhenExpression,
+			convertActionToHandler(configElement, id, command, visibleWhenExpression,
 					viewId, warningsToLog);
 			// TODO Read the overrideActionId attribute
 		}

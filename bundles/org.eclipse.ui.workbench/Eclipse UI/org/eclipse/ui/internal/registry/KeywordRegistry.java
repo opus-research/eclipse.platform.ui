@@ -12,7 +12,6 @@ package org.eclipse.ui.internal.registry;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -61,8 +60,7 @@ public final class KeywordRegistry implements IExtensionChangeHandler {
 	private KeywordRegistry() {
 		IExtensionTracker tracker = PlatformUI.getWorkbench().getExtensionTracker();
         tracker.registerHandler(this, ExtensionTracker.createExtensionPointFilter(getExtensionPointFilter()));
-		IExtension[] extensions = getExtensionPointFilter().getExtensions();
-		for (IExtension extension : extensions) {
+		for (IExtension extension : getExtensionPointFilter().getExtensions()) {
 			addExtension(PlatformUI.getWorkbench().getExtensionTracker(),
 					extension);
 		}
@@ -70,8 +68,7 @@ public final class KeywordRegistry implements IExtensionChangeHandler {
 
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
-		IConfigurationElement[] elements = extension.getConfigurationElements();
-		for (IConfigurationElement element : elements) {
+		for (IConfigurationElement element : extension.getConfigurationElements()) {
 			if (element.getName().equals(TAG_KEYWORD)) {
 				String name = element.getAttribute(ATT_LABEL);
 				String id = element.getAttribute(ATT_ID);

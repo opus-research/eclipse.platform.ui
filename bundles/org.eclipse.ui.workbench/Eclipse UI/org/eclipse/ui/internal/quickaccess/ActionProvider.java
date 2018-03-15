@@ -69,9 +69,7 @@ public class ActionProvider extends QuickAccessProvider {
 	}
 
 	private void collectContributions(MenuManager menu, Set result) {
-		IContributionItem[] items = menu.getItems();
-		for (IContributionItem item2 : items) {
-			IContributionItem item = item2;
+		for (IContributionItem item : menu.getItems()) {
 			if (item instanceof SubContributionItem) {
 				item = ((SubContributionItem) item).getInnerItem();
 			}

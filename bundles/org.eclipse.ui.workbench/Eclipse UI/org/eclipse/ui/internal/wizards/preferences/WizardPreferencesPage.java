@@ -859,10 +859,10 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 						.getArray(TRANSFER_PREFERENCES_NAMES_ID);
 				if (preferenceIds != null) {
 					PreferenceTransferElement[] transfers = getTransfers();
-					for (PreferenceTransferElement transfer : transfers) {
-						for (String preferenceId : preferenceIds) {
-							if (transfer.getID().equals(preferenceId)) {
-								viewer.setChecked(transfer, true);
+					for (int i = 0; i < transfers.length; i++) {
+						for (int j = 0; j < preferenceIds.length; j++) {
+							if (transfers[i].getID().equals(preferenceIds[j])) {
+								viewer.setChecked(transfers[i], true);
 								break;
 							}
 						}
@@ -880,8 +880,8 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 			if (directoryNames != null) {
 				// destination
 				setDestinationValue(directoryNames[0]);
-				for (String directoryName : directoryNames) {
-					addDestinationItem(directoryName);
+				for (int i = 0; i < directoryNames.length; i++) {
+					addDestinationItem(directoryNames[i]);
 				}
 
 				String current = settings.get(STORE_DESTINATION_ID);

@@ -564,10 +564,9 @@ public final class DefaultOperationHistory implements IOperationHistory {
 					// It is not enough to simply remove the context. There could
 					// be one or more contexts that match the one we are trying to
 					// dispose.
-					IUndoContext[] contexts = operation.getContexts();
-					for (IUndoContext context2 : contexts) {
-						if (context2.matches(context)) {
-							operation.removeContext(context2);
+					for (IUndoContext undoContext : operation.getContexts()) {
+						if (undoContext.matches(context)) {
+							operation.removeContext(undoContext);
 						}
 					}
 					if (operation.getContexts().length == 0) {
@@ -604,10 +603,9 @@ public final class DefaultOperationHistory implements IOperationHistory {
 					// It is not enough to simply remove the context. There could
 					// be one or more contexts that match the one we are trying to
 					// dispose.
-					IUndoContext[] contexts = operation.getContexts();
-					for (IUndoContext context2 : contexts) {
-						if (context2.matches(context)) {
-							operation.removeContext(context2);
+					for (IUndoContext undoContext : operation.getContexts()) {
+						if (undoContext.matches(context)) {
+							operation.removeContext(undoContext);
 						}
 					}
 					if (operation.getContexts().length == 0) {

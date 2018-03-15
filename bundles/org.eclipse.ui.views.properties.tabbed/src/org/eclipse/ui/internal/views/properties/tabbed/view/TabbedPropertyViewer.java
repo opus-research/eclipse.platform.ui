@@ -131,9 +131,9 @@ public class TabbedPropertyViewer extends StructuredViewer {
 		elements.clear();
 		Object[] children = getSortedChildren(getRoot());
 		list.removeAll();
-		for (Object element : children) {
-			elements.add(element);
-			mapElement(element, list);
+		for (Object child : children) {
+			elements.add(child);
+			mapElement(child, list);
 		}
 		list.setElements(children);
 	}

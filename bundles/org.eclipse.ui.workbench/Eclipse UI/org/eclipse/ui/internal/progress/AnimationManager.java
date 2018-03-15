@@ -148,8 +148,7 @@ public class AnimationManager {
                 ProgressManager manager = ProgressManager.getInstance();
                 jobs.clear();
                 setAnimated(false);
-                JobInfo[] currentInfos = manager.getJobInfos(showsDebug());
-                for (JobInfo currentInfo : currentInfos) {
+				for (JobInfo currentInfo : manager.getJobInfos(showsDebug())) {
                     addJob(currentInfo);
                 }
             }

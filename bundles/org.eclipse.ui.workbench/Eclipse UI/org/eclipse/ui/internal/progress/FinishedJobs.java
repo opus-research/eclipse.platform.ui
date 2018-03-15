@@ -153,10 +153,9 @@ public class FinishedJobs extends EventManager {
 	}
 
 	private void checkForDuplicates(GroupInfo info) {
-		Object[] objects = info.getChildren();
-		for (Object object : objects) {
-			if (object instanceof JobInfo) {
-				checkForDuplicates((JobInfo) object);
+		for (Object child : info.getChildren()) {
+			if (child instanceof JobInfo) {
+				checkForDuplicates((JobInfo) child);
 			}
 		}
 	}
@@ -192,9 +191,8 @@ public class FinishedJobs extends EventManager {
 		}
 
 		if (fire) {
-			Object l[] = getListeners();
-			for (Object element : l) {
-				KeptJobsListener jv = (KeptJobsListener) element;
+			for (Object listener : getListeners()) {
+				KeptJobsListener jv = (KeptJobsListener) listener;
 				jv.finished(info);
 			}
 		}
@@ -311,14 +309,14 @@ public class FinishedJobs extends EventManager {
 			// delete all elements that have jte as their direct or indirect
 			// parent
 			JobTreeElement jtes[] = (JobTreeElement[]) keptjobinfos.toArray(new JobTreeElement[keptjobinfos.size()]);
-			for (JobTreeElement jte2 : jtes) {
-				JobTreeElement parent = (JobTreeElement) jte2.getParent();
+			for (JobTreeElement jobTreeElement : jtes) {
+				JobTreeElement parent = (JobTreeElement) jobTreeElement.getParent();
 				if (parent != null) {
 					if (parent == jte || parent.getParent() == jte) {
-						if (keptjobinfos.remove(jte2)) {
-							disposeAction(jte2);
+						if (keptjobinfos.remove(jobTreeElement)) {
+							disposeAction(jobTreeElement);
 						}
-						finishedTime.remove(jte2);
+						finishedTime.remove(jobTreeElement);
 					}
 				}
 			}
@@ -327,9 +325,8 @@ public class FinishedJobs extends EventManager {
 
 		if (fire) {
 			// notify listeners
-			Object l[] = getListeners();
-			for (Object element : l) {
-				KeptJobsListener jv = (KeptJobsListener) element;
+			for (Object listener : getListeners()) {
+				KeptJobsListener jv = (KeptJobsListener) listener;
 				jv.removed(jte);
 			}
 		}
@@ -392,9 +389,8 @@ public class FinishedJobs extends EventManager {
 		}
 
 		// notify listeners
-		Object l[] = getListeners();
-		for (Object element : l) {
-			KeptJobsListener jv = (KeptJobsListener) element;
+		for (Object listener : getListeners()) {
+			KeptJobsListener jv = (KeptJobsListener) listener;
 			jv.removed(null);
 		}
 	}
