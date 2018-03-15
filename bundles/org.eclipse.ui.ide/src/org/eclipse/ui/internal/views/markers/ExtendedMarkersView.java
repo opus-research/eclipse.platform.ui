@@ -541,21 +541,25 @@ public class ExtendedMarkersView extends ViewPart {
 	 * @since 3.8
 	 */
 	IMarker[] getOpenableMarkers() {
-		IStructuredSelection structured = viewer.getStructuredSelection();
-		Iterator<?> elements = structured.iterator();
-		HashSet<IMarker> result = new HashSet<>();
-		while (elements.hasNext()) {
-			MarkerSupportItem next = (MarkerSupportItem) elements.next();
-			if (next.isConcrete()) {
-				result.add(((MarkerEntry) next).getMarker());
+		ISelection selection = viewer.getSelection();
+		if (selection instanceof IStructuredSelection) {
+			IStructuredSelection structured = (IStructuredSelection) selection;
+			Iterator<?> elements = structured.iterator();
+			HashSet<IMarker> result = new HashSet<>();
+			while (elements.hasNext()) {
+				MarkerSupportItem next = (MarkerSupportItem) elements.next();
+				if (next.isConcrete()) {
+					result.add(((MarkerEntry) next).getMarker());
+				}
 			}
+			if (result.isEmpty()) {
+				return MarkerSupportInternalUtilities.EMPTY_MARKER_ARRAY;
+			}
+			IMarker[] markers = new IMarker[result.size()];
+			result.toArray(markers);
+			return markers;
 		}
-		if (result.isEmpty()) {
-			return MarkerSupportInternalUtilities.EMPTY_MARKER_ARRAY;
-		}
-		IMarker[] markers = new IMarker[result.size()];
-		result.toArray(markers);
-		return markers;
+		return MarkerSupportInternalUtilities.EMPTY_MARKER_ARRAY;
 	}
 
 	/**
@@ -824,26 +828,30 @@ public class ExtendedMarkersView extends ViewPart {
 	 * @return Array of {@link IMarker}
 	 */
 	public IMarker[] getSelectedMarkers() {
-		IStructuredSelection structured = viewer.getStructuredSelection();
-		final List<IMarker> result = new ArrayList<>(structured.size());
-		MarkerCategory lastCategory = null;
-		for (Iterator<?> i = structured.iterator(); i.hasNext();) {
-			final MarkerSupportItem next = (MarkerSupportItem) i.next();
-			if (next.isConcrete()) {
-				if (lastCategory != null && lastCategory == next.getParent()) {
-					continue;
-				}
-				result.add(next.getMarker());
-			} else {
-				lastCategory = (MarkerCategory) next;
-				final MarkerEntry[] children = (MarkerEntry[]) lastCategory.getChildren();
+		ISelection selection = viewer.getSelection();
+		if (selection instanceof IStructuredSelection) {
+			final IStructuredSelection structured = (IStructuredSelection) selection;
+			final List<IMarker> result = new ArrayList<>(structured.size());
+			MarkerCategory lastCategory = null;
+			for (Iterator<?> i = structured.iterator(); i.hasNext();) {
+				final MarkerSupportItem next = (MarkerSupportItem) i.next();
+				if(next.isConcrete()) {
+					if(lastCategory != null && lastCategory == next.getParent()) {
+						continue;
+					}
+					result.add(next.getMarker());
+				} else {
+					lastCategory = (MarkerCategory) next;
+					final MarkerEntry[] children = (MarkerEntry[]) lastCategory.getChildren();
 
-				for (MarkerEntry element : children) {
-					result.add(element.getMarker());
+					for (MarkerEntry element : children) {
+						result.add(element.getMarker());
+					}
 				}
 			}
+			return result.toArray(new IMarker[result.size()]);
 		}
-		return result.toArray(new IMarker[result.size()]);
+		return MarkerSupportInternalUtilities.EMPTY_MARKER_ARRAY;
 	}
 
 	/**
