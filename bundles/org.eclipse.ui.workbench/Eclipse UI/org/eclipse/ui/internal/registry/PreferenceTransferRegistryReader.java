@@ -155,7 +155,8 @@ public class PreferenceTransferRegistryReader extends RegistryReader {
 			return null;
 		}
 		Map map = new HashMap(entries.length);
-		for (IConfigurationElement entry : entries) {
+		for (int i = 0; i < entries.length; i++) {
+			IConfigurationElement entry = entries[i];
 			IConfigurationElement[] keys = entry
 					.getChildren(IWorkbenchRegistryConstants.ATT_KEY);
 			PreferenceFilterEntry[] prefFilters = null;

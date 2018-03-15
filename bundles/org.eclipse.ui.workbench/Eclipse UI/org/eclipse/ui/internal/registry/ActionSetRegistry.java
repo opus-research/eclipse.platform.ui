@@ -214,16 +214,16 @@ public class ActionSetRegistry implements IExtensionChangeHandler {
      */
     private void readFromRegistry() {
         IExtension[] extensions = getActionSetExtensionPoint().getExtensions();
-        for (IExtension extension : extensions) {
+        for (int i = 0; i < extensions.length; i++) {
             addActionSets(PlatformUI.getWorkbench().getExtensionTracker(),
-                    extension);
+                    extensions[i]);
         }
 
         extensions = getActionSetPartAssociationExtensionPoint()
                 .getExtensions();
-        for (IExtension extension : extensions) {
+        for (int i = 0; i < extensions.length; i++) {
             addActionSetPartAssociations(PlatformUI.getWorkbench()
-                    .getExtensionTracker(), extension);
+                    .getExtensionTracker(), extensions[i]);
         }
     }
 
@@ -244,11 +244,13 @@ public class ActionSetRegistry implements IExtensionChangeHandler {
      */
     private void addActionSetPartAssociations(IExtensionTracker tracker, IExtension extension) {
         IConfigurationElement [] elements = extension.getConfigurationElements();
-        for (IConfigurationElement element : elements) {
+        for (int i = 0; i < elements.length; i++) {
+            IConfigurationElement element = elements[i];
             if (element.getName().equals(IWorkbenchRegistryConstants.TAG_ACTION_SET_PART_ASSOCIATION)) {
                 String actionSetId = element.getAttribute(IWorkbenchRegistryConstants.ATT_TARGET_ID);
                 IConfigurationElement[] children = element.getChildren();
-                for (IConfigurationElement child : children) {
+                for (int j = 0; j < children.length; j++) {
+                    IConfigurationElement child = children[j];
                     if (child.getName().equals(IWorkbenchRegistryConstants.TAG_PART)) {
                         String partId = child.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
                         if (partId != null) {
@@ -280,7 +282,8 @@ public class ActionSetRegistry implements IExtensionChangeHandler {
      */
     private void addActionSets(IExtensionTracker tracker, IExtension extension) {
         IConfigurationElement [] elements = extension.getConfigurationElements();
-        for (IConfigurationElement element : elements) {
+        for (int i = 0; i < elements.length; i++) {
+            IConfigurationElement element = elements[i];
             if (element.getName().equals(IWorkbenchRegistryConstants.TAG_ACTION_SET)) {
                 try {
                     ActionSetDescriptor desc = new ActionSetDescriptor(element);
@@ -315,7 +318,8 @@ public class ActionSetRegistry implements IExtensionChangeHandler {
      * @param objects
      */
     private void removeActionSetPartAssociations(Object[] objects) {
-        for (Object object : objects) {
+        for (int i = 0; i < objects.length; i++) {
+            Object object = objects[i];
             if (object instanceof ActionSetPartAssociation) {
                 ActionSetPartAssociation association = (ActionSetPartAssociation) object;
                 String actionSetId = association.actionSetId;
@@ -338,7 +342,8 @@ public class ActionSetRegistry implements IExtensionChangeHandler {
      * @param objects
      */
     private void removeActionSets(Object[] objects) {
-        for (Object object : objects) {
+        for (int i = 0; i < objects.length; i++) {
+            Object object = objects[i];
             if (object instanceof IActionSetDescriptor) {
                 IActionSetDescriptor desc = (IActionSetDescriptor) object;
                 removeActionSet(desc);

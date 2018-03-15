@@ -72,7 +72,9 @@ public class ShellPool {
                         // the 'doit' to false...if so, do nothing
                         if (e.doit) {
                             Control[] children = s.getChildren();
-	                        for (Control control : children) {
+	                        for (int i = 0; i < children.length; i++) {
+	                            Control control = children[i];
+
 	                            control.dispose();
 	                        }
 	                        availableShells.add(s);

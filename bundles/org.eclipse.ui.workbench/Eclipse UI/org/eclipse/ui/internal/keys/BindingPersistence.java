@@ -800,8 +800,8 @@ public class BindingPersistence extends PreferencePersistence {
 
 		String platform = SWT.getPlatform();
 		boolean modifierExists = false;
-		for (String platform2 : platforms) {
-			if(platform2.equals(platform)) {
+		for (String currentPlatform : platforms) {
+			if(currentPlatform.equals(platform)) {
 				modifierExists = true;
 				break;
 			}
@@ -825,11 +825,10 @@ public class BindingPersistence extends PreferencePersistence {
 	private static IConfigurationElement[] getSequenceModifierElements(IConfigurationElement configurationElement) {
 
 		IExtension extension = configurationElement.getDeclaringExtension();
-		IConfigurationElement[] configurationElements = extension.getConfigurationElements();
 		List modifierElements = new ArrayList();
-		for (final IConfigurationElement anElement : configurationElements) {
-			if(TAG_SEQUENCE_MODIFIER.equals(anElement.getName()))
-				modifierElements.add(anElement);
+		for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
+			if(TAG_SEQUENCE_MODIFIER.equals(configElement.getName()))
+				modifierElements.add(configElement);
 		}
 		return (IConfigurationElement[]) modifierElements.toArray(new IConfigurationElement[modifierElements.size()]);
 	}

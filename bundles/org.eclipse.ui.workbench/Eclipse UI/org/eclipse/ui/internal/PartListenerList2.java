@@ -63,8 +63,8 @@ public class PartListenerList2 extends EventManager {
      */
     public void firePartActivated(final IWorkbenchPartReference ref) {
         Object[] array = getListeners();
-        for (Object element : array) {
-            final IPartListener2 l = (IPartListener2) element;
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -79,8 +79,8 @@ public class PartListenerList2 extends EventManager {
      */
     public void firePartBroughtToTop(final IWorkbenchPartReference ref) {
         Object[] array = getListeners();
-        for (Object element : array) {
-            final IPartListener2 l = (IPartListener2) element;
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -95,8 +95,8 @@ public class PartListenerList2 extends EventManager {
      */
     public void firePartClosed(final IWorkbenchPartReference ref) {
         Object[] array = getListeners();
-        for (Object element : array) {
-            final IPartListener2 l = (IPartListener2) element;
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -111,8 +111,8 @@ public class PartListenerList2 extends EventManager {
      */
     public void firePartDeactivated(final IWorkbenchPartReference ref) {
         Object[] array = getListeners();
-        for (Object element : array) {
-            final IPartListener2 l = (IPartListener2) element;
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -127,8 +127,8 @@ public class PartListenerList2 extends EventManager {
      */
     public void firePartOpened(final IWorkbenchPartReference ref) {
         Object[] array = getListeners();
-        for (Object element : array) {
-            final IPartListener2 l = (IPartListener2) element;
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -143,10 +143,10 @@ public class PartListenerList2 extends EventManager {
      */
     public void firePartHidden(final IWorkbenchPartReference ref) {
         Object[] array = getListeners();
-        for (Object element : array) {
+        for (int i = 0; i < array.length; i++) {
             final IPartListener2 l;
-            if (element instanceof IPartListener2) {
-				l = (IPartListener2) element;
+            if (array[i] instanceof IPartListener2) {
+				l = (IPartListener2) array[i];
 			} else {
 				continue;
 			}
@@ -165,10 +165,10 @@ public class PartListenerList2 extends EventManager {
      */
     public void firePartVisible(final IWorkbenchPartReference ref) {
         Object[] array = getListeners();
-        for (Object element : array) {
+        for (int i = 0; i < array.length; i++) {
             final IPartListener2 l;
-            if (element instanceof IPartListener2) {
-				l = (IPartListener2) element;
+            if (array[i] instanceof IPartListener2) {
+				l = (IPartListener2) array[i];
 			} else {
 				continue;
 			}
@@ -187,10 +187,10 @@ public class PartListenerList2 extends EventManager {
      */
     public void firePartInputChanged(final IWorkbenchPartReference ref) {
         Object[] array = getListeners();
-        for (Object element : array) {
+        for (int i = 0; i < array.length; i++) {
             final IPartListener2 l;
-            if (element instanceof IPartListener2) {
-				l = (IPartListener2) element;
+            if (array[i] instanceof IPartListener2) {
+				l = (IPartListener2) array[i];
 			} else {
 				continue;
 			}
@@ -213,10 +213,10 @@ public class PartListenerList2 extends EventManager {
 
 	public void firePageChanged(final PageChangedEvent event) {
 		Object[] array = getListeners();
-        for (Object element : array) {
+        for (int i = 0; i < array.length; i++) {
             final IPageChangedListener l;
-            if (element instanceof IPageChangedListener) {
-				l = (IPageChangedListener) element;
+            if (array[i] instanceof IPageChangedListener) {
+				l = (IPageChangedListener) array[i];
 			} else {
 				continue;
 			}

@@ -205,7 +205,8 @@ public class MenuAdditionCacheEntry {
 	private void addMenuChildren(final MElementContainer<MMenuElement> container,
 			IConfigurationElement parent, String filter) {
 		IConfigurationElement[] items = parent.getChildren();
-		for (final IConfigurationElement child : items) {
+		for (int i = 0; i < items.length; i++) {
+			final IConfigurationElement child = items[i];
 			String itemType = child.getName();
 			String id = MenuHelper.getId(child);
 
@@ -413,7 +414,8 @@ public class MenuAdditionCacheEntry {
 		toolBarContribution.getTags().add("scheme:" + location.getScheme()); //$NON-NLS-1$
 
 		IConfigurationElement[] items = toolbar.getChildren();
-		for (final IConfigurationElement item : items) {
+		for (int i = 0; i < items.length; i++) {
+			final IConfigurationElement item = items[i];
 			String itemType = item.getName();
 
 			if (IWorkbenchRegistryConstants.TAG_COMMAND.equals(itemType)) {

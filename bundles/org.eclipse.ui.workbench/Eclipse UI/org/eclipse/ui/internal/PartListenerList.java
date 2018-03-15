@@ -65,8 +65,8 @@ public class PartListenerList extends EventManager {
      */
     public void firePartActivated(final IWorkbenchPart part) {
         Object[] array = getListeners();
-        for (Object element : array) {
-            final IPartListener l = (IPartListener) element;
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -81,8 +81,8 @@ public class PartListenerList extends EventManager {
      */
     public void firePartBroughtToTop(final IWorkbenchPart part) {
         Object[] array = getListeners();
-        for (Object element : array) {
-            final IPartListener l = (IPartListener) element;
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -97,8 +97,8 @@ public class PartListenerList extends EventManager {
      */
     public void firePartClosed(final IWorkbenchPart part) {
         Object[] array = getListeners();
-        for (Object element : array) {
-            final IPartListener l = (IPartListener) element;
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -113,8 +113,8 @@ public class PartListenerList extends EventManager {
      */
     public void firePartDeactivated(final IWorkbenchPart part) {
         Object[] array = getListeners();
-        for (Object element : array) {
-            final IPartListener l = (IPartListener) element;
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -129,8 +129,8 @@ public class PartListenerList extends EventManager {
      */
     public void firePartOpened(final IWorkbenchPart part) {
         Object[] array = getListeners();
-        for (Object element : array) {
-            final IPartListener l = (IPartListener) element;
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {

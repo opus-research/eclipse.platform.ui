@@ -412,10 +412,8 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 		String attribute = configurationElement
 				.getAttribute(handlerAttributeName);
 		if (attribute == null) {
-			IConfigurationElement[] children = configurationElement
-					.getChildren(handlerAttributeName);
-			for (IConfigurationElement element : children) {
-				String childAttribute = element
+			for (IConfigurationElement configElement : configurationElement.getChildren(handlerAttributeName)) {
+				String childAttribute = configElement
 						.getAttribute(IWorkbenchRegistryConstants.ATT_CLASS);
 				if (childAttribute != null) {
 					return childAttribute;

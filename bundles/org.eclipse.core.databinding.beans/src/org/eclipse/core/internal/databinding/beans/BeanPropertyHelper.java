@@ -152,15 +152,10 @@ public class BeanPropertyHelper {
 			}
 		} else {
 			try {
-				PropertyDescriptor propertyDescriptors[];
 				List<PropertyDescriptor> pds = new ArrayList<PropertyDescriptor>();
 				getInterfacePropertyDescriptors(pds, beanClass);
 				if (pds.size() > 0) {
-					propertyDescriptors = pds
-							.toArray(new PropertyDescriptor[pds.size()]);
-					PropertyDescriptor descriptor;
-					for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
-						descriptor = propertyDescriptor;
+					for (PropertyDescriptor descriptor : pds.toArray(new PropertyDescriptor[pds.size()])) {
 						if (descriptor.getName().equals(propertyName))
 							return descriptor;
 					}
