@@ -159,20 +159,20 @@ public class RegistryCSSPropertyHandlerProvider extends
 		if (stylableElement.getDefaultStyleDeclaration(pseudoE) != null)
 			return stylableElement.getDefaultStyleDeclaration(pseudoE);
 		if (newStyle != null) {
-			StringBuffer style = null;
+			StringBuilder style = null;
 			int length = newStyle.getLength();
 			for (int i = 0; i < length; i++) {
 				String propertyName = newStyle.item(i);
 				String[] compositePropertiesNames = engine
 						.getCSSCompositePropertiesNames(propertyName);
 				if (compositePropertiesNames != null) {
-					for (int j = 0; j < compositePropertiesNames.length; j++) {
-						propertyName = compositePropertiesNames[j];
+					for (String compositePropertyName : compositePropertiesNames) {
+						propertyName = compositePropertyName;
 						String s = getCSSPropertyStyle(engine, stylableElement,
 								propertyName, pseudoE);
 						if (s != null) {
 							if (style == null)
-								style = new StringBuffer();
+								style = new StringBuilder();
 							style.append(s);
 						}
 					}
@@ -181,7 +181,7 @@ public class RegistryCSSPropertyHandlerProvider extends
 							propertyName, pseudoE);
 					if (s != null) {
 						if (style == null)
-							style = new StringBuffer();
+							style = new StringBuilder();
 						style.append(s);
 					}
 				}

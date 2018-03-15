@@ -26,7 +26,6 @@ import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.commands.contexts.Context;
 import org.eclipse.core.commands.contexts.ContextManager;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -35,7 +34,8 @@ import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.bindings.internal.BindingTable;
 import org.eclipse.e4.ui.bindings.internal.BindingTableManager;
 import org.eclipse.e4.ui.internal.workbench.Activator;
-import org.eclipse.e4.ui.internal.workbench.Policy;
+import org.eclipse.e4.ui.internal.workbench.swt.Policy;
+import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MBindingContext;
 import org.eclipse.e4.ui.model.application.commands.MBindingTable;
@@ -55,6 +55,7 @@ import org.eclipse.jface.bindings.BindingManager;
 import org.eclipse.jface.bindings.Scheme;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.osgi.service.event.EventHandler;
+import org.osgi.service.log.LogService;
 
 /**
  * Process contexts in the model, feeding them into the command service.
@@ -147,7 +148,9 @@ public class BindingProcessingAddon {
 	}
 
 	private void defineBindingTables() {
-		Activator.trace(Policy.DEBUG_CMDS, "Initialize binding tables from model", null); //$NON-NLS-1$
+		if (Policy.DEBUG_CMDS) {
+			WorkbenchSWTActivator.trace(Policy.DEBUG_CMDS_FLAG, "Initialize binding tables from model", null); //$NON-NLS-1$
+		}
 		for (MBindingTable bindingTable : application.getBindingTables()) {
 			defineBindingTable(bindingTable);
 		}
@@ -203,7 +206,7 @@ public class BindingProcessingAddon {
 		}
 
 		if (cmdModel == null) {
-			Activator.log(IStatus.ERROR, "binding with no command: " + binding); //$NON-NLS-1$
+			Activator.log(LogService.LOG_ERROR, "binding with no command: " + binding); //$NON-NLS-1$
 			return null;
 		}
 		Map<String, Object> parameters = null;
@@ -248,7 +251,9 @@ public class BindingProcessingAddon {
 				keyBinding = bindingService.createBinding(sequence, cmd, bindingContext.getId(), attrs);
 				binding.getTransientData().put(EBindingService.MODEL_TO_BINDING_KEY, keyBinding);
 			} catch (IllegalArgumentException e) {
-				Activator.trace(Policy.DEBUG_MENUS, "failed to create: " + binding, e); //$NON-NLS-1$
+				if (Policy.DEBUG_MENUS) {
+					WorkbenchSWTActivator.trace(Policy.DEBUG_MENUS_FLAG, "failed to create: " + binding, e); //$NON-NLS-1$
+				}
 				return null;
 			}
 
@@ -273,7 +278,7 @@ public class BindingProcessingAddon {
 		final Context bindingContext = contextManager.getContext(bt.getBindingContext().getElementId());
 		BindingTable table = bindingTables.getTable(bindingContext.getId());
 		if (table == null) {
-			Activator.log(IStatus.ERROR, "Trying to create \'" + binding //$NON-NLS-1$
+			Activator.log(LogService.LOG_ERROR, "Trying to create \'" + binding //$NON-NLS-1$
 					+ "\' without binding table " + bindingContext.getId()); //$NON-NLS-1$
 			return;
 		}

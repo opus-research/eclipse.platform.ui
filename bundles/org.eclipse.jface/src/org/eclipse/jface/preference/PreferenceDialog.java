@@ -14,6 +14,8 @@
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
+import static org.eclipse.swt.events.SelectionListener.widgetDefaultSelectedAdapter;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -52,8 +54,6 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Font;
@@ -332,7 +332,8 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		// create OK and Cancel buttons by default
-		okButton = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+		okButton = createButton(parent, IDialogConstants.OK_ID,
+				JFaceResources.getString("PreferencesDialog.okButtonLabel"), true); //$NON-NLS-1$
 		getShell().setDefaultButton(okButton);
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
@@ -664,18 +665,15 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 				}
 			}
 		});
-		((Tree) viewer.getControl()).addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetDefaultSelected(final SelectionEvent event) {
-				ISelection selection = viewer.getSelection();
-				if (selection.isEmpty()) {
-					return;
-				}
-				IPreferenceNode singleSelection = getSingleSelection(selection);
-				boolean expanded = viewer.getExpandedState(singleSelection);
-				viewer.setExpandedState(singleSelection, !expanded);
+		((Tree) viewer.getControl()).addSelectionListener(widgetDefaultSelectedAdapter(event -> {
+			ISelection selection = viewer.getSelection();
+			if (selection.isEmpty()) {
+				return;
 			}
-		});
+			IPreferenceNode singleSelection = getSingleSelection(selection);
+			boolean expanded = viewer.getExpandedState(singleSelection);
+			viewer.setExpandedState(singleSelection, !expanded);
+		}));
 		//Register help listener on the tree to use context sensitive help
 		viewer.getControl().addHelpListener(new HelpListener() {
 			@Override
@@ -1101,7 +1099,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 */
 	private void setSelectedNode() {
 		String storeValue = null;
-		IStructuredSelection selection = (IStructuredSelection) getTreeViewer().getSelection();
+		IStructuredSelection selection = getTreeViewer().getStructuredSelection();
 		if (selection.size() == 1) {
 			IPreferenceNode node = (IPreferenceNode) selection.getFirstElement();
 			storeValue = node.getId();
@@ -1483,5 +1481,4 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	protected boolean isResizable() {
     	return true;
     }
-
 }

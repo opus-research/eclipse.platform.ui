@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,10 +9,12 @@
  *     IBM Corporation - initial API and implementation
  *      Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 435949
  *      Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *      Simon Scholz <simon.scholz@vogella.com> - Bug 484398
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,12 +25,21 @@ import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.internal.expressions.ReferenceExpression;
 import org.eclipse.e4.core.commands.ExpressionContext;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.InjectionException;
+import org.eclipse.e4.core.di.InjectorFactory;
+import org.eclipse.e4.core.di.annotations.Evaluate;
+import org.eclipse.e4.core.di.suppliers.PrimaryObjectSupplier;
+import org.eclipse.e4.core.internal.contexts.ContextObjectSupplier;
+import org.eclipse.e4.core.internal.di.InjectorImpl;
+import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MExpression;
+import org.eclipse.e4.ui.model.application.ui.MImperativeExpression;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
@@ -47,11 +58,16 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 public final class ContributionsAnalyzer {
+
+	private static final Object missingEvaluate = new Object();
+
 	public static void trace(String msg, Throwable error) {
-		Activator.trace("/trace/menus", msg, error); //$NON-NLS-1$
+		if (DEBUG) {
+			Activator.trace(Policy.DEBUG_MENUS_FLAG, msg, error);
+		}
 	}
 
-	private static boolean DEBUG = true;
+	private static boolean DEBUG = Policy.DEBUG_MENUS;
 
 	private static void trace(String msg, Object menu, Object menuModel) {
 		trace(msg + ": " + menu + ": " + menuModel, null); //$NON-NLS-1$ //$NON-NLS-2$
@@ -237,15 +253,27 @@ public final class ContributionsAnalyzer {
 		return isVisible((MCoreExpression) contribution.getVisibleWhen(), eContext);
 	}
 
-	public static boolean isVisible(MCoreExpression exp, final ExpressionContext eContext) {
-		final Expression ref;
-		if (exp.getCoreExpression() instanceof Expression) {
-			ref = (Expression) exp.getCoreExpression();
-		} else {
-			ref = new ReferenceExpression(exp.getCoreExpressionId());
-			exp.setCoreExpression(ref);
+	public static boolean isVisible(MExpression exp, final ExpressionContext eContext) {
+		if (exp instanceof MCoreExpression) {
+			MCoreExpression coreExpression = (MCoreExpression) exp;
+			return isCoreExpressionVisible(coreExpression, eContext);
+		} else if (exp instanceof MImperativeExpression) {
+			return isImperativeExpressionVisible((MImperativeExpression) exp, eContext);
 		}
-		// Creates dependency on a predefined value that can be "poked" by the evaluation
+
+		return true;
+	}
+
+	private static boolean isCoreExpressionVisible(MCoreExpression coreExpression, final ExpressionContext eContext) {
+		final Expression ref;
+		if (coreExpression.getCoreExpression() instanceof Expression) {
+			ref = (Expression) coreExpression.getCoreExpression();
+		} else {
+			ref = new ReferenceExpression(coreExpression.getCoreExpressionId());
+			coreExpression.setCoreExpression(ref);
+		}
+		// Creates dependency on a predefined value that can be "poked" by
+		// the evaluation
 		// service
 		ExpressionInfo info = ref.computeExpressionInfo();
 		String[] names = info.getAccessedPropertyNames();
@@ -256,9 +284,46 @@ public final class ContributionsAnalyzer {
 		try {
 			ret = ref.evaluate(eContext) != EvaluationResult.FALSE;
 		} catch (Exception e) {
-			trace("isVisible exception", e); //$NON-NLS-1$
+			if (DEBUG) {
+				trace("isVisible exception", e); //$NON-NLS-1$
+			}
 		}
 		return ret;
+	}
+
+	private static boolean isImperativeExpressionVisible(MImperativeExpression exp, final ExpressionContext eContext) {
+		Object imperativeExpressionObject = exp.getObject();
+		if (imperativeExpressionObject == null) {
+			IContributionFactory contributionFactory = eContext.eclipseContext.get(IContributionFactory.class);
+			Object newImperativeExpression = contributionFactory.create(exp.getContributionURI(),
+					eContext.eclipseContext);
+			exp.setObject(newImperativeExpression);
+			imperativeExpressionObject = newImperativeExpression;
+		}
+
+		Object result = null;
+
+		if (exp.isTracking()) {
+			result = invoke(imperativeExpressionObject, Evaluate.class, eContext.eclipseContext, null, missingEvaluate);
+		} else {
+			result = ContextInjectionFactory.invoke(imperativeExpressionObject, Evaluate.class, eContext.eclipseContext,
+					null, missingEvaluate);
+		}
+
+		if (result == missingEvaluate) {
+			throw new IllegalStateException(
+					"There is no method annotated with @Evaluate in the imperative expression class"); //$NON-NLS-1$
+		}
+		return (boolean) result;
+	}
+
+	final private static InjectorImpl injector = (InjectorImpl) InjectorFactory.getDefault();
+
+	static private Object invoke(Object object, Class<? extends Annotation> qualifier, IEclipseContext context,
+			IEclipseContext localContext, Object defaultValue) throws InjectionException {
+		PrimaryObjectSupplier supplier = ContextObjectSupplier.getObjectSupplier(context, injector);
+		PrimaryObjectSupplier tempSupplier = ContextObjectSupplier.getObjectSupplier(localContext, injector);
+		return injector.invoke(object, qualifier, defaultValue, supplier, tempSupplier, false, true);
 	}
 
 	public static void addMenuContributions(final MMenu menuModel,
@@ -540,6 +605,9 @@ public final class ContributionsAnalyzer {
 	}
 
 	public static void printContributions(ArrayList<MMenuContribution> contributions) {
+		if (!DEBUG) {
+			return;
+		}
 		for (MMenuContribution c : contributions) {
 			trace("\n" + c, null); //$NON-NLS-1$
 			for (MMenuElement element : c.getChildren()) {
@@ -565,7 +633,9 @@ public final class ContributionsAnalyzer {
 	public static void mergeToolBarContributions(ArrayList<MToolBarContribution> contributions,
 			ArrayList<MToolBarContribution> result) {
 		HashMap<ToolBarKey, ArrayList<MToolBarContribution>> buckets = new HashMap<>();
-		trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
+		if (DEBUG) {
+			trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
+		}
 		// first pass, sort by parentId?position,scheme,visibleWhen
 		for (MToolBarContribution contribution : contributions) {
 			ToolBarKey key = getKey(contribution);
@@ -591,8 +661,8 @@ public final class ContributionsAnalyzer {
 					continue;
 				}
 				Object[] array = item.getChildren().toArray();
-				for (int c = 0; c < array.length; c++) {
-					MToolBarElement me = (MToolBarElement) array[c];
+				for (Object element : array) {
+					MToolBarElement me = (MToolBarElement) element;
 					if (!containsMatching(toContribute.getChildren(), me)) {
 						toContribute.getChildren().add(me);
 					}
@@ -603,14 +673,18 @@ public final class ContributionsAnalyzer {
 				result.add(toContribute);
 			}
 		}
-		trace("mergeContributions: final size: " + result.size(), null); //$NON-NLS-1$
+		if (DEBUG) {
+			trace("mergeContributions: final size: " + result.size(), null); //$NON-NLS-1$
+		}
 	}
 
 	public static void mergeContributions(ArrayList<MMenuContribution> contributions,
 			ArrayList<MMenuContribution> result) {
 		HashMap<MenuKey, ArrayList<MMenuContribution>> buckets = new HashMap<>();
-		trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
-		printContributions(contributions);
+		if (DEBUG) {
+			trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
+			printContributions(contributions);
+		}
 		// first pass, sort by parentId?position,scheme,visibleWhen
 		for (MMenuContribution contribution : contributions) {
 			MenuKey key = getKey(contribution);
@@ -640,8 +714,8 @@ public final class ContributionsAnalyzer {
 				if (idx == -1) {
 					idx = 0;
 				}
-				for (int c = 0; c < array.length; c++) {
-					MMenuElement me = (MMenuElement) array[c];
+				for (Object element : array) {
+					MMenuElement me = (MMenuElement) element;
 					if (!containsMatching(toContribute.getChildren(), me)) {
 						toContribute.getChildren().add(idx, me);
 						idx++;
@@ -711,7 +785,9 @@ public final class ContributionsAnalyzer {
 	public static void mergeTrimContributions(ArrayList<MTrimContribution> contributions,
 			ArrayList<MTrimContribution> result) {
 		HashMap<TrimKey, ArrayList<MTrimContribution>> buckets = new HashMap<>();
-		trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
+		if (DEBUG) {
+			trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
+		}
 		// first pass, sort by parentId?position,scheme,visibleWhen
 		for (MTrimContribution contribution : contributions) {
 			TrimKey key = getKey(contribution);
@@ -737,8 +813,8 @@ public final class ContributionsAnalyzer {
 					continue;
 				}
 				Object[] array = item.getChildren().toArray();
-				for (int c = 0; c < array.length; c++) {
-					MTrimElement me = (MTrimElement) array[c];
+				for (Object element : array) {
+					MTrimElement me = (MTrimElement) element;
 					if (!containsMatching(toContribute.getChildren(), me)) {
 						toContribute.getChildren().add(me);
 					}
@@ -749,14 +825,18 @@ public final class ContributionsAnalyzer {
 				result.add(toContribute);
 			}
 		}
-		trace("mergeContributions: final size: " + result.size(), null); //$NON-NLS-1$
+		if (DEBUG) {
+			trace("mergeContributions: final size: " + result.size(), null); //$NON-NLS-1$
+		}
 	}
 
 	public static void populateModelInterfaces(Object modelObject, IEclipseContext context,
 			Class<?>[] interfaces) {
 		for (Class<?> intf : interfaces) {
-			Activator.trace(Policy.DEBUG_CONTEXTS, "Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
-					+ modelObject.getClass().getName(), null);
+			if (Policy.DEBUG_CONTEXTS) {
+				Activator.trace(Policy.DEBUG_CONTEXTS_FLAG, "Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
+						+ modelObject.getClass().getName(), null);
+			}
 			context.set(intf.getName(), modelObject);
 
 			populateModelInterfaces(modelObject, context, intf.getInterfaces());

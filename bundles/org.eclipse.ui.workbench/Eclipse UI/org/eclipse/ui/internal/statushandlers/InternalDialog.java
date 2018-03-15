@@ -12,6 +12,8 @@
  ******************************************************************************/
 package org.eclipse.ui.internal.statushandlers;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -27,7 +29,6 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -37,8 +38,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -921,30 +920,20 @@ public class InternalDialog extends TrayDialog {
 				.setText(WorkbenchMessages.WorkbenchStatusDialog_SupportHyperlink);
 		link
 				.setToolTipText(WorkbenchMessages.WorkbenchStatusDialog_SupportTooltip);
-		link.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				openTray();
-			}
-		});
+		link.addSelectionListener(widgetSelectedAdapter(e -> openTray()));
 		Dialog.applyDialogFont(link);
 		return link;
 	}
 
 	private Link createShowErrorLogLink() {
 		Link link = new Link(linkComposite, SWT.NONE);
-		link.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				try {
-					Workbench.getInstance().getActiveWorkbenchWindow()
-							.getActivePage().showView(LOG_VIEW_ID);
-				} catch (CoreException ce) {
-					StatusManager.getManager().handle(ce,
-							WorkbenchPlugin.PI_WORKBENCH);
-				}
+		link.addSelectionListener(widgetSelectedAdapter(e -> {
+			try {
+				Workbench.getInstance().getActiveWorkbenchWindow().getActivePage().showView(LOG_VIEW_ID);
+			} catch (CoreException ce) {
+				StatusManager.getManager().handle(ce, WorkbenchPlugin.PI_WORKBENCH);
 			}
-		});
+		}));
 		link.setText(WorkbenchMessages.ErrorLogUtil_ShowErrorLogHyperlink);
 		link
 				.setToolTipText(WorkbenchMessages.ErrorLogUtil_ShowErrorLogTooltip);
@@ -986,13 +975,9 @@ public class InternalDialog extends TrayDialog {
 	 * @return StatusAdapter or <code>null</code>.
 	 */
 	private StatusAdapter getSingleSelection() {
-		ISelection rawSelection = statusListViewer.getSelection();
-		if (rawSelection != null
-				&& rawSelection instanceof IStructuredSelection) {
-			IStructuredSelection selection = (IStructuredSelection) rawSelection;
-			if (selection.size() == 1) {
-				return (StatusAdapter) selection.getFirstElement();
-			}
+		IStructuredSelection selection = statusListViewer.getStructuredSelection();
+		if (selection.size() == 1) {
+			return (StatusAdapter) selection.getFirstElement();
 		}
 		return null;
 	}

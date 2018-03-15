@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -466,7 +467,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		removeButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				removeFilters(configsTable.getSelection());
+				removeFilters(configsTable.getStructuredSelection());
 			}
 		});
 		removeButton.setEnabled(false);
@@ -562,6 +563,14 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		return config;
 	}
 
+	@Override
+	protected void createButtonsForButtonBar(Composite parent) {
+		super.createButtonsForButtonBar(parent);
+		Button okButton = getButton(IDialogConstants.OK_ID);
+		okButton.setText(MarkerMessages.filtersDialog_applyAndCloseButton);
+		setButtonLayoutData(okButton);
+	}
+
 	/**
 	 * Return the dialog settings for the receiver.
 	 *
@@ -608,11 +617,11 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		List<MarkerFieldFilterGroup> selectedElements = new ArrayList<>();
 
 		if (selectedElementNames != null) {
-			for (int i = 0; i < selectedElementNames.length; i++) {
+			for (String selectedElementName : selectedElementNames) {
 				Iterator<MarkerFieldFilterGroup> filterGroupIterator = filterGroups.iterator();
 				while (filterGroupIterator.hasNext()) {
 					MarkerFieldFilterGroup group = filterGroupIterator.next();
-					if (Util.equals(group.getName(), selectedElementNames[i])) {
+					if (Util.equals(group.getName(), selectedElementName)) {
 						selectedElements.add(group);
 						break;
 					}
@@ -734,9 +743,8 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	private void setEnabled(boolean enabled, Control control) {
 		control.setEnabled(enabled);
 		if (control instanceof Composite) {
-			Control[] children = ((Composite) control).getChildren();
-			for (int i = 0; i < children.length; i++) {
-				setEnabled(enabled, children[i]);
+			for (Control child : ((Composite) control).getChildren()) {
+				setEnabled(enabled, child);
 			}
 		}
 	}
