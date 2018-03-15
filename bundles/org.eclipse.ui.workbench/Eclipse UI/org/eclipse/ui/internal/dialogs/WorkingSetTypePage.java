@@ -166,10 +166,11 @@ public class WorkingSetTypePage extends WizardPage {
 	 */
 	private WorkingSetDescriptor getSelectedWorkingSet() {
 		IStructuredSelection selection = typesListViewer.getStructuredSelection();
-		boolean hasSelection = !selection.isEmpty();
+        boolean hasSelection = selection != null
+                && selection.isEmpty() == false;
 
         WorkingSetDescriptor descriptor = null;
-		if (hasSelection) {
+		if (hasSelection && selection != null) {
             descriptor = (WorkingSetDescriptor) selection
                     .getFirstElement();
         }
