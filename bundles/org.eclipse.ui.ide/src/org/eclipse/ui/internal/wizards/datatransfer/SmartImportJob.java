@@ -168,9 +168,9 @@ public class SmartImportJob extends Job {
 
 			if (directoriesToImport != null) {
 				this.deepChildrenDetection = false;
-				SubMonitor loopMonitor = SubMonitor.convert(monitor,
-						DataTransferMessages.SmartImportJob_configuringSelectedDirectories,
-						directoriesToImport.size() * (configureProjects ? 3 : 2) + 1);
+				SubMonitor subMonitor = SubMonitor.convert(monitor,
+						directoriesToImport.size() * (configureProjects ? 2 : 1) + 1);
+				subMonitor.beginTask(DataTransferMessages.SmartImportJob_crawling, directoriesToImport.size() + 1);
 				Comparator<File> rootToLeafComparator = new Comparator<File>() {
 					@Override
 					public int compare(File arg0, File arg1) {
@@ -185,17 +185,17 @@ public class SmartImportJob extends Job {
 				directories.addAll(this.directoriesToImport);
 				SortedMap<File, IProject> leafToRootProjects = new TreeMap<>(Collections.reverseOrder(rootToLeafComparator));
 				final Set<IProject> alreadyConfiguredProjects = new HashSet<>();
-				loopMonitor.worked(1);
+				subMonitor.worked(1);
 				for (final File directoryToImport : directories) {
 					final boolean alreadyAnEclipseProject = new File(directoryToImport, IProjectDescription.DESCRIPTION_FILE_NAME).isFile();
 					try {
-						IProject newProject = toExistingOrNewProject(directoryToImport, loopMonitor.split(1),
+						IProject newProject = toExistingOrNewProject(directoryToImport, subMonitor,
 								IResource.BACKGROUND_REFRESH);
 						if (alreadyAnEclipseProject) {
 							alreadyConfiguredProjects.add(newProject);
 						}
 						leafToRootProjects.put(directoryToImport, newProject);
-						loopMonitor.worked(1);
+						subMonitor.worked(1);
 					} catch (CouldNotImportProjectException ex) {
 						Path path = new Path(directoryToImport.getAbsolutePath());
 						if (listener != null) {
@@ -207,11 +207,18 @@ public class SmartImportJob extends Job {
 				if (configureProjects) {
 					JobGroup multiDirectoriesJobGroup = new JobGroup(
 							DataTransferMessages.SmartImportJob_configuringSelectedDirectories, 20, 1);
+					SubMonitor mon = subMonitor.split(directoriesToImport.size());
 					for (final IProject newProject : leafToRootProjects.values()) {
 						Job directoryJob = new Job(
 								NLS.bind(DataTransferMessages.SmartImportJob_configuring, newProject.getName())) {
 							@Override
 							protected IStatus run(IProgressMonitor aMonitor) {
+								SubMonitor monitor = null;
+								if (aMonitor instanceof SubMonitor) {
+									monitor = (SubMonitor) aMonitor;
+								} else {
+									monitor = SubMonitor.convert(aMonitor);
+								}
 								try {
 									importProjectAndChildrenRecursively(newProject,
 											!alreadyConfiguredProjects.contains(newProject), monitor);
@@ -228,12 +235,12 @@ public class SmartImportJob extends Job {
 						directoryJob.setJobGroup(multiDirectoriesJobGroup);
 						directoryJob.schedule();
 					}
-					multiDirectoriesJobGroup.join(0, loopMonitor.split(leafToRootProjects.size()));
+					multiDirectoriesJobGroup.join(0, mon);
 				}
 
 
 			} else { // no specific projects included, consider only root
-				SubMonitor subMonitor = SubMonitor.convert(monitor, 3);
+				SubMonitor subMonitor = SubMonitor.convert(monitor);
 				File rootProjectFile = new File(this.rootDirectory, IProjectDescription.DESCRIPTION_FILE_NAME);
 				boolean isRootANewProject = !rootProjectFile.isFile();
 				this.rootProject = toExistingOrNewProject(this.rootDirectory, subMonitor, IResource.NONE);
@@ -318,7 +325,6 @@ public class SmartImportJob extends Job {
 	}
 
 	private Set<IProject> searchAndImportChildrenProjectsRecursively(IContainer parentContainer, Set<IPath> directoriesToExclude, final IProgressMonitor progressMonitor) throws Exception {
-		SubMonitor subMonitor = SubMonitor.convert(progressMonitor, parentContainer.members().length);
 		for (IProject processedProjects : Collections.synchronizedSet(this.report.keySet())) {
 			if (processedProjects.getLocation().equals(parentContainer.getLocation())) {
 				return Collections.emptySet();
@@ -328,6 +334,9 @@ public class SmartImportJob extends Job {
 		Set<IFolder> childrenToProcess = new HashSet<>();
 		final Set<IProject> res = Collections.synchronizedSet(new HashSet<IProject>());
 		for (IResource childResource : parentContainer.members()) {
+			if (progressMonitor.isCanceled()) {
+				throw new InterruptedException();
+			}
 			if (childResource.getType() == IResource.FOLDER && !childResource.isDerived()) {
 				boolean excluded = false;
 				if (directoriesToExclude != null) {
@@ -345,6 +354,9 @@ public class SmartImportJob extends Job {
 
 		Set<CrawlFolderJob> jobs = new HashSet<>();
 		for (final IFolder childFolder : childrenToProcess) {
+			if (progressMonitor.isCanceled()) {
+				throw new InterruptedException();
+			}
 			CrawlFolderJob crawlerJob = new CrawlFolderJob(
 					NLS.bind(DataTransferMessages.SmartImportJob_crawling, childFolder.getLocation().toString()),
 					childFolder, res);
@@ -353,24 +365,24 @@ public class SmartImportJob extends Job {
 				jobs.add(crawlerJob);
 				crawlerJob.schedule();
 			} else {
-				crawlerJob.run(subMonitor);
-				subMonitor.worked(1);
+				crawlerJob.run(progressMonitor);
 			}
 		}
 		for (CrawlFolderJob job : jobs) {
-			job.join(0, subMonitor.split(1));
+			if (progressMonitor.isCanceled()) {
+				throw new InterruptedException();
+			}
+			job.join();
 		}
-		subMonitor.done();
 		return res;
 	}
 
 	private Set<IProject> importProjectAndChildrenRecursively(IContainer container, boolean forceFullProjectCheck,
-			IProgressMonitor progressMonitor) throws Exception {
-		int allWork = 30 + ProjectConfiguratorExtensionManager.getAllExtensionLabels().size() * 5;
-		SubMonitor subMonitor = SubMonitor.convert(progressMonitor,
-				NLS.bind(DataTransferMessages.SmartImportJob_inspecting,
-						container.getLocation().toFile().getAbsolutePath()),
-				allWork);
+			SubMonitor progressMonitor) throws Exception {
+		SubMonitor monitor = progressMonitor.split(1);
+		monitor.beginTask(null, ProjectConfiguratorExtensionManager.getAllExtensionLabels().size() * 2);
+		progressMonitor.setTaskName(NLS.bind(DataTransferMessages.SmartImportJob_inspecting,
+				container.getLocation().toFile().getAbsolutePath()));
 		Set<IProject> projectFromCurrentContainer = new HashSet<>();
 		boolean isAlreadyAnEclipseProject = false;
 		Set<ProjectConfigurator> mainProjectConfigurators = new HashSet<>();
@@ -383,7 +395,7 @@ public class SmartImportJob extends Job {
 		container.refreshLocal(IResource.DEPTH_INFINITE, progressMonitor);
 		if (!forceFullProjectCheck) {
 			EclipseProjectConfigurator eclipseProjectConfigurator = new EclipseProjectConfigurator();
-			if (eclipseProjectConfigurator.shouldBeAnEclipseProject(container, subMonitor.split(1))) {
+			if (eclipseProjectConfigurator.shouldBeAnEclipseProject(container, monitor)) {
 				isAlreadyAnEclipseProject = true;
 			}
 		}
@@ -395,16 +407,19 @@ public class SmartImportJob extends Job {
 		Set<ProjectConfigurator> potentialSecondaryConfigurators = new HashSet<>();
 		IProject project = null;
 		for (ProjectConfigurator configurator : activeConfigurators) {
+			if (monitor.isCanceled()) {
+				return null;
+			}
 			// exclude Eclipse project configurator for root project if is new
 			if (configurator instanceof EclipseProjectConfigurator && forceFullProjectCheck) {
 				continue;
 			}
-			if (configurator.shouldBeAnEclipseProject(container, subMonitor.split(1))) {
+			if (configurator.shouldBeAnEclipseProject(container, monitor)) {
 				mainProjectConfigurators.add(configurator);
 				if (project == null) {
 					// Create project
 					try {
-						project = toExistingOrNewProject(container.getLocation().toFile(), subMonitor.split(1),
+						project = toExistingOrNewProject(container.getLocation().toFile(), monitor,
 								IResource.BACKGROUND_REFRESH);
 					} catch (CouldNotImportProjectException ex) {
 						this.errors.put(container.getLocation(), ex);
@@ -418,21 +433,26 @@ public class SmartImportJob extends Job {
 			} else {
 				potentialSecondaryConfigurators.add(configurator);
 			}
+			monitor.worked(1);
 		}
 
 		if (!mainProjectConfigurators.isEmpty()) {
-			project.refreshLocal(IResource.DEPTH_INFINITE, subMonitor.split(1));
+			project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		}
+		monitor.setWorkRemaining(activeConfigurators.size());
 		for (ProjectConfigurator configurator : mainProjectConfigurators) {
-			IProgressMonitor childMonitor = subMonitor.split(1);
+			if (monitor.isCanceled()) {
+				throw new InterruptedException();
+			}
 			if (configurator instanceof EclipseProjectConfigurator || !isAlreadyAnEclipseProject || this.reconfigureEclipseProjects) {
-				configurator.configure(project, excludedPaths, childMonitor);
+				configurator.configure(project, excludedPaths, monitor);
 				this.report.get(project).add(configurator);
 				if (this.listener != null) {
 					listener.projectConfigured(project, configurator);
 				}
 			}
-			excludedPaths.addAll(toPathSet(configurator.getFoldersToIgnore(project, subMonitor.split(20))));
+			excludedPaths.addAll(toPathSet(configurator.getFoldersToIgnore(project, monitor)));
+			monitor.worked(1);
 		}
 
 		Set<IProject> allNestedProjects = new HashSet<>();
@@ -447,8 +467,7 @@ public class SmartImportJob extends Job {
 			if (project == null) {
 				// Create project
 				try {
-					project = toExistingOrNewProject(container.getLocation().toFile(), subMonitor.split(1),
-							IResource.BACKGROUND_REFRESH);
+					project = toExistingOrNewProject(container.getLocation().toFile(), progressMonitor, IResource.BACKGROUND_REFRESH);
 				} catch (CouldNotImportProjectException ex) {
 					this.errors.put(container.getLocation(), ex);
 					if (this.listener != null) {
@@ -458,23 +477,29 @@ public class SmartImportJob extends Job {
 				}
 				projectFromCurrentContainer.add(project);
 			}
-			project.refreshLocal(IResource.DEPTH_ONE, subMonitor.split(1));
-			// At least depth one, maybe INFINITE is necessary
-			progressMonitor.setTaskName(
-					NLS.bind(DataTransferMessages.SmartImportJob_continuingConfiguration, project.getName()));
+			project.refreshLocal(IResource.DEPTH_ONE, monitor); // At least one,
+																// maybe
+																// INFINITE is
+																// necessary
+			progressMonitor.beginTask(
+					NLS.bind(DataTransferMessages.SmartImportJob_continuingConfiguration, project.getName()),
+					potentialSecondaryConfigurators.size());
 			for (ProjectConfigurator additionalConfigurator : potentialSecondaryConfigurators) {
-				if (additionalConfigurator.canConfigure(project, excludedPaths, subMonitor.split(1))) {
-					additionalConfigurator.configure(project, excludedPaths, subMonitor.split(1));
+				if (progressMonitor.isCanceled()) {
+					throw new InterruptedException();
+				}
+				if (additionalConfigurator.canConfigure(project, excludedPaths, progressMonitor)) {
+					additionalConfigurator.configure(project, excludedPaths, monitor);
 					this.report.get(project).add(additionalConfigurator);
 					if (this.listener != null) {
 						listener.projectConfigured(project, additionalConfigurator);
 					}
-					excludedPaths
-							.addAll(toPathSet(additionalConfigurator.getFoldersToIgnore(project, subMonitor.split(1))));
+					excludedPaths.addAll(toPathSet(additionalConfigurator.getFoldersToIgnore(project, monitor)));
 				}
+				monitor.worked(1);
 			}
 		}
-		subMonitor.done();
+		monitor.setWorkRemaining(0);
 		return projectFromCurrentContainer;
 	}
 
@@ -498,15 +523,17 @@ public class SmartImportJob extends Job {
 	 */
 	private IProject toExistingOrNewProject(File directory, IProgressMonitor progressMonitor, int refreshMode) throws CouldNotImportProjectException {
 		try {
-			SubMonitor subMonitor = SubMonitor.convert(progressMonitor, NLS.bind(
-					DataTransferMessages.SmartImportJob_importingProjectIntoWorkspace, directory.getAbsolutePath()), 2);
+			progressMonitor.setTaskName(NLS.bind(DataTransferMessages.SmartImportJob_importingProjectIntoWorkspace,
+					directory.getAbsolutePath()));
 			IProject project = projectAlreadyExistsInWorkspace(directory);
 			if (project == null) {
-				project = createOrImportProject(directory, subMonitor.split(1));
+				project = createOrImportProject(directory, progressMonitor);
 			}
-			subMonitor.setWorkRemaining(1);
 
-			project.open(refreshMode, subMonitor.split(1));
+			if (progressMonitor.isCanceled()) {
+				return null;
+			}
+			project.open(refreshMode, progressMonitor);
 			if (!this.report.containsKey(project)) {
 				this.report.put(project, new ArrayList<ProjectConfigurator>());
 			}
@@ -605,23 +632,16 @@ public class SmartImportJob extends Job {
 			}
 			List<ProjectConfigurator> activeConfigurators = configurationManager
 					.getAllActiveProjectConfigurators(this.rootDirectory);
-			SubMonitor loopMonitor = SubMonitor.convert(monitor, activeConfigurators.size());
 			for (ProjectConfigurator configurator : activeConfigurators) {
 				Set<File> supportedDirectories = configurator.findConfigurableLocations(
 						SmartImportJob.this.rootDirectory,
-						loopMonitor.split(1));
+						monitor);
 				if (supportedDirectories != null) {
-					for (File supportedDirectory : supportedDirectories) {
-						if (supportedDirectory.isDirectory()) {
-							if (!res.containsKey(supportedDirectory)) {
-								res.put(supportedDirectory, new ArrayList<ProjectConfigurator>());
-							}
-							res.get(supportedDirectory).add(configurator);
-						} else {
-							IDEWorkbenchPlugin.log("Project detection must return only directories.\n" //$NON-NLS-1$
-									+ supportedDirectory + " is not a directory.\nContributed by " //$NON-NLS-1$
-									+ configurator.getClass().getName());
+					for (File supportedFile : supportedDirectories) {
+						if (!res.containsKey(supportedFile)) {
+							res.put(supportedFile, new ArrayList<ProjectConfigurator>());
 						}
+						res.get(supportedFile).add(configurator);
 					}
 				}
 			}

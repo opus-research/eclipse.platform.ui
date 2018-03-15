@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, 2016 Google Inc and others.
+ * Copyright (C) 2014, 2015 Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,13 +12,9 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
-import java.util.concurrent.TimeUnit;
-
-import org.eclipse.core.internal.runtime.CancelabilityMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IStartup;
-import org.eclipse.ui.internal.monitoring.preferences.CancelabilityMonitorPreferenceListener;
 import org.eclipse.ui.internal.monitoring.preferences.MonitoringPreferenceListener;
 import org.eclipse.ui.monitoring.PreferenceConstants;
 
@@ -28,7 +24,6 @@ import org.eclipse.ui.monitoring.PreferenceConstants;
 public class MonitoringStartup implements IStartup {
 	private EventLoopMonitorThread monitoringThread;
 
-	@SuppressWarnings("restriction")
 	@Override
 	public void earlyStartup() {
 		if (monitoringThread != null) {
@@ -41,26 +36,6 @@ public class MonitoringStartup implements IStartup {
 		}
 
 		preferences.addPropertyChangeListener(new MonitoringPreferenceListener(monitoringThread));
-
-		CancelabilityMonitor.BasicOptionsImpl jobCancelabilityMonitorOptions = null;
-		if (preferences.getBoolean(PreferenceConstants.TASK_MONITORING_ENABLED)) {
-			jobCancelabilityMonitorOptions = createCancelabilityMonitorService(preferences);
-		}
-
-		preferences.addPropertyChangeListener(new CancelabilityMonitorPreferenceListener(jobCancelabilityMonitorOptions));
-	}
-
-	@SuppressWarnings("restriction")
-	private CancelabilityMonitor.BasicOptionsImpl createCancelabilityMonitorService(IPreferenceStore preferences) {
-		CancelabilityMonitor.BasicOptionsImpl cancelabilityMonitorOptions;
-		cancelabilityMonitorOptions = new CancelabilityMonitor.BasicOptionsImpl();
-		cancelabilityMonitorOptions.setEnabled(true);
-		cancelabilityMonitorOptions.setErrorThreshold(TimeUnit.MILLISECONDS.toNanos(preferences.getInt(PreferenceConstants.TASK_MONITORING_ERROR_THRESHOLD_MILLIS)));
-		cancelabilityMonitorOptions.setWarningThreshold(TimeUnit.MILLISECONDS.toNanos(preferences.getInt(PreferenceConstants.TASK_MONITORING_WARNING_THRESHOLD_MILLIS)));
-		cancelabilityMonitorOptions.setMaxStackSamples(preferences.getInt(PreferenceConstants.TASK_MONITORING_MAX_STACK_SAMPLES));
-		cancelabilityMonitorOptions.setAlwaysReportNonCancelableUserTaskAsError(preferences.getBoolean(PreferenceConstants.TASK_MONITORING_LOG_NON_CANCELLABLE_USER_JOB));
-		MonitoringPlugin.getDefault().getBundle().getBundleContext().registerService(CancelabilityMonitor.Options.class, cancelabilityMonitorOptions, null);
-		return cancelabilityMonitorOptions;
 	}
 
 	/**

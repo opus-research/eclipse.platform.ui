@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mikael Barbero (Eclipse Foundation) - Bug 470175
  ******************************************************************************/
 package org.eclipse.jface.internal;
 
-import org.eclipse.core.internal.runtime.CancelabilityMonitor;
-import org.eclipse.core.internal.runtime.CancelabilityMonitor.BasicOptionsImpl;
 import org.eclipse.jface.util.BidiUtils;
 import org.osgi.framework.FrameworkUtil;
 
@@ -84,7 +81,7 @@ public class InternalPolicy {
 	 *
 	 * @since 3.11
 	 */
-	public static boolean DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x = true;
+	public static boolean DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x = false;
 
 	/**
 	 * (NON-API) Always load the .png image of the "@2x" version, even if the
@@ -110,31 +107,4 @@ public class InternalPolicy {
 		}
 	}
 
-	private static CancelabilityMonitor.Options cancelabilityMonitorOptions;
-
-	/**
-	 * Returns the options for task cancelability monitoring
-	 *
-	 * @return the options for task cancelability monitoring. Never
-	 *         {@code null}.
-	 * @since 3.13
-	 */
-	public static CancelabilityMonitor.Options getCancelabilityMonitorOptions() {
-		if (cancelabilityMonitorOptions == null) {
-			cancelabilityMonitorOptions = new CancelabilityMonitor.BasicOptionsImpl();
-			((BasicOptionsImpl) cancelabilityMonitorOptions).setEnabled(false);
-		}
-		return cancelabilityMonitorOptions;
-	}
-
-	/**
-	 * Sets the options for task cancelability monitoring.
-	 *
-	 * @param options
-	 *            the new options
-	 * @since 3.13
-	 */
-	public static void setCancelabilityMonitorOptions(CancelabilityMonitor.Options options) {
-		cancelabilityMonitorOptions = options;
-	}
 }
