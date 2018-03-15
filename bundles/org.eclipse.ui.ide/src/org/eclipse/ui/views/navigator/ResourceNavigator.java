@@ -1214,7 +1214,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     @Override
 	public void setFiltersPreference(String[] patterns) {
 
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
 
         for (int i = 0; i < patterns.length; i++) {
             if (i != 0) {
