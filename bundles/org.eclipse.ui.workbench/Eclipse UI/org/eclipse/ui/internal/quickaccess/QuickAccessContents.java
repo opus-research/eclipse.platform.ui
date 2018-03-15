@@ -54,6 +54,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -832,25 +833,25 @@ public abstract class QuickAccessContents {
 		} else {
 			boldStyle = null;
 		}
-
-		table.addListener(SWT.MeasureItem, event -> {
-			Object entry = event.item.getData();
-			if (entry instanceof QuickAccessEntry) {
-				((QuickAccessEntry) entry).measure(event, textLayout, resourceManager, boldStyle);
+		Listener listener = event -> {
+			QuickAccessEntry entry = (QuickAccessEntry) event.item.getData();
+			if (entry != null) {
+				switch (event.type) {
+				case SWT.MeasureItem:
+					entry.measure(event, textLayout, resourceManager, boldStyle);
+					break;
+				case SWT.PaintItem:
+					entry.paint(event, textLayout, resourceManager, boldStyle, grayColor);
+					break;
+				case SWT.EraseItem:
+					entry.erase(event);
+					break;
+				}
 			}
-		});
-		table.addListener(SWT.EraseItem, event -> {
-			Object entry = event.item.getData();
-			if (entry instanceof QuickAccessEntry) {
-				((QuickAccessEntry) entry).erase(event);
-			}
-		});
-		table.addListener(SWT.PaintItem, event -> {
-			Object entry = event.item.getData();
-			if (entry instanceof QuickAccessEntry) {
-				((QuickAccessEntry) entry).paint(event, textLayout, resourceManager, boldStyle, grayColor);
-			}
-		});
+		};
+		table.addListener(SWT.MeasureItem, listener);
+		table.addListener(SWT.EraseItem, listener);
+		table.addListener(SWT.PaintItem, listener);
 
 		return table;
 	}
