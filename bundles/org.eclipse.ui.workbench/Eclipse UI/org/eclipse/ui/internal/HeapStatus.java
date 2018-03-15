@@ -207,6 +207,7 @@ public class HeapStatus extends Composite {
 	public void setBackground(Color color) {
 		bgCol = color;
 		button.redraw();
+		button.update();
 	}
 
 	@Override
@@ -218,6 +219,7 @@ public class HeapStatus extends Composite {
 		}
 
 		button.redraw();
+		button.update();
 	}
 
 	@Override
@@ -289,6 +291,7 @@ public class HeapStatus extends Composite {
 		}
         this.armed = armed;
         button.redraw();
+        button.update();
     }
 
 	private void gcRunning(boolean isInGC) {
@@ -297,6 +300,7 @@ public class HeapStatus extends Composite {
 		}
 		this.isInGC = isInGC;
 		 button.redraw();
+		 button.update();
 	}
 
     /**
