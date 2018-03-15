@@ -38,7 +38,7 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
 
 	@Override
 	protected void assertSelectionEquals(String message, TestElement expected) {
-	    ISelection selection = fViewer.getSelection();
+		ISelection selection = fViewer.getStructuredSelection();
 	    assertTrue(selection instanceof IStructuredSelection);
 	    List expectedList = new ArrayList();
 	    expectedList.add(expected);
