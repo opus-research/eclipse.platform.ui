@@ -1014,12 +1014,12 @@ public class ContentProposalAdapter {
 			// Check each string for a match. Use the string displayed to the
 			// user, not the proposal content.
 			ArrayList<IContentProposal> list = new ArrayList<>();
-			for (IContentProposal proposal : proposals) {
-				String string = getString(proposal);
+			for (int i = 0; i < proposals.length; i++) {
+				String string = getString(proposals[i]);
 				if (string.length() >= filterString.length()
 						&& string.substring(0, filterString.length())
 								.equalsIgnoreCase(filterString)) {
-					list.add(proposal);
+					list.add(proposals[i]);
 				}
 
 			}

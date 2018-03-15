@@ -872,17 +872,10 @@ public class PopupDialog extends Window {
 		GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL,
 				SWT.BEGINNING).applyTo(infoLabel);
 		Display display = parent.getDisplay();
-
-		Color backgroundColor = getBackground();
-		if (backgroundColor == null)
-			backgroundColor = getDefaultBackground();
-		Color foregroundColor = getForeground();
-		if (foregroundColor == null)
-			foregroundColor = getDefaultForeground();
 		infoColor = new Color(display, blend(
-				backgroundColor.getRGB(), foregroundColor.getRGB(),
+				display.getSystemColor(SWT.COLOR_INFO_BACKGROUND).getRGB(),
+				display.getSystemColor(SWT.COLOR_INFO_FOREGROUND).getRGB(),
 				0.56f));
-
 		infoLabel.setForeground(infoColor);
 		return infoLabel;
 	}
@@ -1412,10 +1405,8 @@ public class PopupDialog extends Window {
 	 * @return the default foreground color.
 	 */
 	private Color getDefaultForeground() {
-		if ((getShellStyle() & SWT.NO_FOCUS) != 0) {
-			return getShell().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-		}
-		return getShell().getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND);
+		return getShell().getDisplay()
+				.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 	}
 
 	/**
@@ -1424,10 +1415,8 @@ public class PopupDialog extends Window {
 	 * @return the default background color
 	 */
 	private Color getDefaultBackground() {
-		if ((getShellStyle() & SWT.NO_FOCUS) != 0) {
-			return getShell().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-		}
-		return getShell().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+		return getShell().getDisplay()
+				.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 	}
 
 	/**
@@ -1442,8 +1431,8 @@ public class PopupDialog extends Window {
 		if (titleLabel != null) {
 			Font font = titleLabel.getFont();
 			FontData[] fontDatas = font.getFontData();
-			for (FontData fontData : fontDatas) {
-				fontData.setStyle(SWT.BOLD);
+			for (int i = 0; i < fontDatas.length; i++) {
+				fontDatas[i].setStyle(SWT.BOLD);
 			}
 			titleFont = new Font(titleLabel.getDisplay(), fontDatas);
 			titleLabel.setFont(titleFont);
@@ -1452,8 +1441,8 @@ public class PopupDialog extends Window {
 		if (infoLabel != null) {
 			Font font = infoLabel.getFont();
 			FontData[] fontDatas = font.getFontData();
-			for (FontData fontData : fontDatas) {
-				fontData.setHeight(fontData.getHeight() * 9 / 10);
+			for (int i = 0; i < fontDatas.length; i++) {
+				fontDatas[i].setHeight(fontDatas[i].getHeight() * 9 / 10);
 			}
 			infoFont = new Font(infoLabel.getDisplay(), fontDatas);
 			infoLabel.setFont(infoFont);
@@ -1479,8 +1468,8 @@ public class PopupDialog extends Window {
 		}
 		if (control instanceof Composite) {
 			Control[] children = ((Composite) control).getChildren();
-			for (Control element : children) {
-				applyForegroundColor(color, element, exclusions);
+			for (int i = 0; i < children.length; i++) {
+				applyForegroundColor(color, children[i], exclusions);
 			}
 		}
 	}
@@ -1504,8 +1493,8 @@ public class PopupDialog extends Window {
 		}
 		if (control instanceof Composite) {
 			Control[] children = ((Composite) control).getChildren();
-			for (Control element : children) {
-				applyBackgroundColor(color, element, exclusions);
+			for (int i = 0; i < children.length; i++) {
+				applyBackgroundColor(color, children[i], exclusions);
 			}
 		}
 	}

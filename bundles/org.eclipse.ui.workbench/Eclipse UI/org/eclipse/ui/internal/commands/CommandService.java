@@ -396,7 +396,12 @@ public final class CommandService implements ICommandService, IUpdateService {
 		try {
 			final IElementReference reference = registerElementForCommand(parameterizedCommand,
 					element);
-			return () -> unregisterElement(reference);
+			return new Runnable() {
+				@Override
+				public void run() {
+					unregisterElement(reference);
+				}
+			};
 		} catch (NotDefinedException e) {
 			WorkbenchPlugin.log(e);
 		}

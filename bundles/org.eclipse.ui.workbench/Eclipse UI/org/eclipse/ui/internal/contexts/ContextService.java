@@ -122,9 +122,19 @@ public final class ContextService implements IContextService {
 						return updating;
 					}
 					if (result != EvaluationResult.FALSE) {
-						runExternalCode(() -> contextService.activateContext(contextId));
+						runExternalCode(new Runnable() {
+							@Override
+							public void run() {
+								contextService.activateContext(contextId);
+							}
+						});
 					} else if (cached != null) {
-						runExternalCode(() -> contextService.deactivateContext(contextId));
+						runExternalCode(new Runnable() {
+							@Override
+							public void run() {
+								contextService.deactivateContext(contextId);
+							}
+						});
 					}
 					cached = result;
 				}

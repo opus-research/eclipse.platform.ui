@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.contexts.IContextActivation;
@@ -64,7 +65,7 @@ public class ActionSetManager {
     public static final int CHANGE_SHOW = 2;
     public static final int CHANGE_HIDE = 3;
 
-	private ListenerList<IPropertyListener> listeners = new ListenerList<>();
+    private ListenerList listeners = new ListenerList();
 	private IPropertyListener contextListener;
 	private Map activationsById = new HashMap();
 	private IContextService contextService;
@@ -79,18 +80,21 @@ public class ActionSetManager {
 	 */
 	private IPropertyListener getContextListener() {
 		if (contextListener == null) {
-			contextListener = (source, propId) -> {
-				if (source instanceof IActionSetDescriptor) {
-					IActionSetDescriptor desc = (IActionSetDescriptor) source;
-					String id = desc.getId();
-					if (propId == PROP_VISIBLE) {
-						activationsById.put(id, contextService
-								.activateContext(id));
-					} else if (propId == PROP_HIDDEN) {
-						IContextActivation act = (IContextActivation) activationsById
-								.remove(id);
-						if (act != null) {
-							contextService.deactivateContext(act);
+			contextListener = new IPropertyListener() {
+				@Override
+				public void propertyChanged(Object source, int propId) {
+					if (source instanceof IActionSetDescriptor) {
+						IActionSetDescriptor desc = (IActionSetDescriptor) source;
+						String id = desc.getId();
+						if (propId == PROP_VISIBLE) {
+							activationsById.put(id, contextService
+									.activateContext(id));
+						} else if (propId == PROP_HIDDEN) {
+							IContextActivation act = (IContextActivation) activationsById
+									.remove(id);
+							if (act != null) {
+								contextService.deactivateContext(act);
+							}
 						}
 					}
 				}
@@ -108,7 +112,9 @@ public class ActionSetManager {
     }
 
     private void firePropertyChange(IActionSetDescriptor descriptor, int id) {
-		for (IPropertyListener listener : listeners) {
+    	Object[] l = listeners.getListeners();
+        for (int i=0; i<l.length; i++) {
+            IPropertyListener listener = (IPropertyListener) l[i];
             listener.propertyChanged(descriptor, id);
         }
     }

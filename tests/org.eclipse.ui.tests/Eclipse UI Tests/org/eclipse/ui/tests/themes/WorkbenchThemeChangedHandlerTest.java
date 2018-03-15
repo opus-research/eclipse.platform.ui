@@ -362,9 +362,7 @@ public class WorkbenchThemeChangedHandlerTest extends TestCase {
 
 		verify(fontDefinition2, times(1)).isOverridden();
 		verify(fontDefinition2, times(1)).resetToDefaultValue();
-		// There does not seem to be a reason why put(fontDefinition2.getId(),
-		// fontData) would be called twice. Swapping to 1 time instead.
-		verify(fontRegistry, times(1)).put(fontDefinition2.getId(), fontData);
+		verify(fontRegistry, times(2)).put(fontDefinition2.getId(), fontData);
 
 		verify(fontDefinition3, times(1)).isOverridden();
 		verify(fontDefinition3, never()).resetToDefaultValue();
