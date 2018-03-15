@@ -192,13 +192,13 @@ public class DialogSettings implements IDialogSettings {
 	public int getInt(String key) throws NumberFormatException {
         String setting = items.get(key);
         if (setting == null) {
-			// Integer.valueOf(null) will throw a NumberFormatException and
-			// meet our spec, but this message is clearer.
+            //new Integer(null) will throw a NumberFormatException and meet our spec, but this message
+            //is clearer.
             throw new NumberFormatException(
                     "There is no setting associated with the key \"" + key + "\"");//$NON-NLS-1$ //$NON-NLS-2$
         }
 
-		return Integer.valueOf(setting).intValue();
+        return new Integer(setting).intValue();
     }
 
     @Override
