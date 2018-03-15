@@ -30,6 +30,7 @@ public class SimpleFormEditor extends FormEditor {
 	public SimpleFormEditor() {
 	}
 	/*
+	 *  (non-Javadoc)
 	 * @see org.eclipse.ui.forms.editor.FormEditor#createToolkit(org.eclipse.swt.widgets.Display)
 	 */
 	@Override
@@ -39,6 +40,8 @@ public class SimpleFormEditor extends FormEditor {
 				display));
 	}
 	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.eclipse.ui.forms.editor.FormEditor#addPages()
 	 */
 	@Override
@@ -59,18 +62,24 @@ public class SimpleFormEditor extends FormEditor {
 		}
 	}
 	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 	}
 	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
 	 */
 	@Override
 	public void doSaveAs() {
 	}
 	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
 	 */
 	@Override

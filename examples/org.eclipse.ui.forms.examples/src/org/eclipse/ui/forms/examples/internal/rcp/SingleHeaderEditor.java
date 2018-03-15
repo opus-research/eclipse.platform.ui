@@ -39,6 +39,8 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 	}
 
 	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.eclipse.ui.forms.editor.FormEditor#createToolkit(org.eclipse.swt.widgets.Display)
 	 */
 	@Override
@@ -66,6 +68,8 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 	}
 
 	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.eclipse.ui.forms.editor.FormEditor#addPages()
 	 */
 	@Override
@@ -80,6 +84,8 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 	}
 
 	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
@@ -87,6 +93,8 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 	}
 
 	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
 	 */
 	@Override
@@ -94,6 +102,8 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 	}
 
 	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
 	 */
 	@Override
