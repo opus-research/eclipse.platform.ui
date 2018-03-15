@@ -480,25 +480,13 @@ public class PartServiceImpl implements EPartService {
 				}
 			}
 
-			if (parent instanceof MPartStack && parent.getSelectedElement() != element) {
-				return false;
+			if (parent instanceof MPartStack) {
+				return parent.getSelectedElement() == element;
 			}
-			if (!element.isVisible()) {
-				return false;
-			}
-			if (isMinimized(parent) || isMinimized(element)) {
-				return false;
-			}
-			return true;
+
+			return element.isVisible();
 		}
 		return false;
-	}
-
-	private boolean isMinimized(MUIElement elt) {
-		List<String> tags = elt.getTags();
-		return (tags.contains(IPresentationEngine.MINIMIZED)
-				|| tags.contains(IPresentationEngine.MINIMIZED_BY_ZOOM))
-				&& !tags.contains(IPresentationEngine.ACTIVE);
 	}
 
 	private boolean isInActivePerspective(MUIElement element) {

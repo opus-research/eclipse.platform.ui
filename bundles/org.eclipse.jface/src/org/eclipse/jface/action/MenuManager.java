@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - Bug 12116 [Contributions] widgets: MenuManager.setImageDescriptor() method needed
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440252
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 436225
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 488500
  *******************************************************************************/
 package org.eclipse.jface.action;
 
@@ -53,7 +52,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /**
      * List of registered menu listeners (element type: <code>IMenuListener</code>).
      */
-	private ListenerList<IMenuListener> listeners = new ListenerList<>();
+    private ListenerList listeners = new ListenerList();
 
     /**
      * The menu control; <code>null</code> before
@@ -329,8 +328,9 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @see IMenuListener#menuAboutToShow
      */
     private void fireAboutToShow(IMenuManager manager) {
-		for (IMenuListener listener : this.listeners) {
-			listener.menuAboutToShow(manager);
+        Object[] listeners = this.listeners.getListeners();
+        for (Object listener : listeners) {
+            ((IMenuListener) listener).menuAboutToShow(manager);
         }
     }
 
@@ -342,9 +342,11 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      *
      */
     private void fireAboutToHide(IMenuManager manager) {
-		for (IMenuListener listener : this.listeners) {
+        final Object[] listeners = this.listeners.getListeners();
+        for (final Object listener : listeners) {
         	if (listener instanceof IMenuListener2) {
-				((IMenuListener2) listener).menuAboutToHide(manager);
+				final IMenuListener2 listener2 = (IMenuListener2) listener;
+				listener2.menuAboutToHide(manager);
 			}
         }
     }
