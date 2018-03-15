@@ -250,7 +250,8 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
     private void internalComputeInterfaceOrder(Class[] interfaces, List result,
             Map seen) {
         List newInterfaces = new ArrayList(seen.size());
-        for (Class interfac : interfaces) {
+        for (int i = 0; i < interfaces.length; i++) {
+            Class interfac = interfaces[i];
             if (seen.get(interfac) == null) {
                 result.add(interfac);
                 seen.put(interfac, interfac);
@@ -525,8 +526,8 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
             result.add(clazz);
             // add all the interfaces it implements
             Class[] interfaces = clazz.getInterfaces();
-            for (Class interface1 : interfaces) {
-                result.add(interface1);
+            for (int i = 0; i < interfaces.length; i++) {
+                result.add(interfaces[i]);
             }
             // get the superclass
             clazz = clazz.getSuperclass();
@@ -550,9 +551,9 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 
     @Override
 	public void removeExtension(IExtension source, Object[] objects) {
-        for (Object object : objects) {
-            if (object instanceof ContributorRecord) {
-                ContributorRecord contributorRecord = (ContributorRecord) object;
+        for (int i = 0; i < objects.length; i++) {
+            if (objects[i] instanceof ContributorRecord) {
+                ContributorRecord contributorRecord = (ContributorRecord) objects[i];
                 unregisterContributor((contributorRecord).contributor, (contributorRecord).objectClassName);
                 contributorRecordSet.remove(contributorRecord);
             }
@@ -859,8 +860,8 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         for (Iterator list = classList.iterator(); list.hasNext();) {
             Class clazz = ((Class) list.next());
             String[] adapters = adapterMgr.computeAdapterTypes(clazz);
-            for (String adapter2 : adapters) {
-                String adapter = adapter2;
+            for (int i = 0; i < adapters.length; i++) {
+                String adapter = adapters[i];
                 if (!result.contains(adapter)) {
                     result.add(adapter);
                 }

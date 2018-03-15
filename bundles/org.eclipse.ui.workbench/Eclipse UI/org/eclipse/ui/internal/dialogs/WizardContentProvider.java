@@ -81,8 +81,8 @@ public class WizardContentProvider implements ITreeContentProvider {
 	public Object getParent(Object element) {
         if (element instanceof WizardCollectionElement) {
             Object[] children = input.getChildren();
-            for (Object element2 : children) {
-                if (element2.equals(element)) {
+            for (Object child : children) {
+                if (child.equals(element)) {
 					return input;
 				}
             }
