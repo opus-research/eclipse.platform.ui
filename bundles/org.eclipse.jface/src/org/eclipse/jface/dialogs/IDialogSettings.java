@@ -77,7 +77,7 @@ public interface IDialogSettings {
      *
      * @param key
      *            the key
-     * @return the value coverted to double, or throws
+     * @return the value converted to double, or throws
      *         <code>NumberFormatException</code> if none
      *
      * @exception NumberFormatException
@@ -92,7 +92,7 @@ public interface IDialogSettings {
      *
      * @param key
      *            the key
-     * @return the value coverted to float, or throws
+     * @return the value converted to float, or throws
      *         <code>NumberFormatException</code> if none
      *
      * @exception NumberFormatException
@@ -107,7 +107,7 @@ public interface IDialogSettings {
      *
      * @param key
      *            the key
-     * @return the value coverted to int, or throws
+     * @return the value converted to int, or throws
      *         <code>NumberFormatException</code> if none
      *
      * @exception NumberFormatException
@@ -122,7 +122,7 @@ public interface IDialogSettings {
      *
      * @param key
      *            the key
-     * @return the value coverted to long, or throws
+     * @return the value converted to long, or throws
      *         <code>NumberFormatException</code> if none
      *
      * @exception NumberFormatException
