@@ -423,11 +423,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	}
 
 	private IWorkbenchWindow getActiveWindow() {
-		Display workbenchDisplay = workbench.getDisplay();
-		if (workbenchDisplay.isDisposed()) {
-			return null;
-		}
-		final Shell newActiveShell = workbenchDisplay.getActiveShell();
+		final Shell newActiveShell = workbench.getDisplay().getActiveShell();
 		final IContextService contextService = workbench
 				.getService(IContextService.class);
 		if (contextService != null) {

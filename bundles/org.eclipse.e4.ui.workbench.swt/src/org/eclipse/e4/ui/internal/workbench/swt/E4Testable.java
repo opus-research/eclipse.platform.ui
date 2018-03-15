@@ -124,14 +124,12 @@ public class E4Testable extends TestableObject {
 	public void testingFinished() {
 		// force events to be processed, and ensure the close is done in the UI
 		// thread
-		if (!display.isDisposed()) {
-			display.syncExec(new Runnable() {
-				@Override
-				public void run() {
-					Assert.isTrue(workbench.close());
-				}
-			});
-		}
+		display.syncExec(new Runnable() {
+			@Override
+			public void run() {
+				Assert.isTrue(workbench.close());
+			}
+		});
 		ErrorDialog.AUTOMATED_MODE = oldAutomatedMode;
 		SafeRunnable.setIgnoreErrors(oldIgnoreErrors);
 	}

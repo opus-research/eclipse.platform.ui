@@ -183,13 +183,7 @@ public class RetargetAction extends PartEventAction implements
     @Override
 	public void partDeactivated(IWorkbenchPart part) {
         super.partDeactivated(part);
-		if (part == null) {
-			return;
-		}
         IWorkbenchPartSite site = part.getSite();
-		if (site == null) {
-			return;
-		}
         SubActionBars bars = (SubActionBars) ((PartSite) site).getActionBars();
         bars.removePropertyChangeListener(propertyChangeListener);
 

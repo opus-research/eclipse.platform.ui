@@ -1055,9 +1055,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 		@Override
 		public void partDeactivated(IWorkbenchPartReference partRef) {
-			if (partRef != null) {
-				PageBookView.this.partDeactivated(partRef.getPart(false));
-			}
+			PageBookView.this.partDeactivated(partRef.getPart(false));
 		}
 
 		@Override

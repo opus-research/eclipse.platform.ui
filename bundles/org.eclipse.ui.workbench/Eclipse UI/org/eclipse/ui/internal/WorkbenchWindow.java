@@ -2827,10 +2827,7 @@ STATUS_LINE_ID, model);
 		MTrimBar topTrim = getTopTrim();
 		if (topTrim != null) {
 			topTrim.setVisible(isToolbarVisible());
-			Shell shell = getShell();
-			if (shell != null) {
-				shell.layout();
-			}
+			getShell().layout();
 		}
 	}
 

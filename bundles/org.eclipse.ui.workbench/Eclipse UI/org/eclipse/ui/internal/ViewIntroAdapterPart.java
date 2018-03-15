@@ -26,7 +26,6 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IViewSite;
@@ -250,10 +249,7 @@ public final class ViewIntroAdapterPart extends ViewPart {
 		}
 
 		if (layout) {
-			Shell shell = window.getShell();
-			if (shell != null) {
-				shell.layout();
-			}
+			window.getShell().layout();
 		}
 	}
 }
