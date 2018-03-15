@@ -912,6 +912,11 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	public void linkModelToContribution(MMenuElement model, IContributionItem item) {
 		modelToContribution.put(model, item);
 		contributionToModel.put(item, model);
+		if (logger.isDebugEnabled()) {
+			logger.debug(
+					"\nMMR:linkModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
+					modelToContribution.size(), contributionToModel.size());
+		}
 	}
 
 	public void clearModelToContribution(MMenuElement model, IContributionItem item) {
@@ -923,6 +928,11 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 		modelToContribution.remove(model);
 		contributionToModel.remove(item);
+		if (logger.isDebugEnabled()) {
+			logger.debug(
+					"\nMMR:clearModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
+					modelToContribution.size(), contributionToModel.size());
+		}
 	}
 
 	public ContributionRecord getContributionRecord(MMenuElement element) {

@@ -15,6 +15,7 @@
  *     Sopot Cela <scela@redhat.com> - Bug 472761
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 473184
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 506306
+ *     Axel Richard <axel.richard@oebo.fr> - Bug 354538
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -867,6 +868,11 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public void linkModelToContribution(MToolBarElement model, IContributionItem item) {
 		modelToContribution.put(model, item);
 		contributionToModel.put(item, model);
+		if (logger.isDebugEnabled()) {
+			logger.debug(
+					"\nTBMR:linkModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
+					modelToContribution.size(), contributionToModel.size());
+		}
 	}
 
 	/**
@@ -882,6 +888,11 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 		modelToContribution.remove(model);
 		contributionToModel.remove(item);
+		if (logger.isDebugEnabled()) {
+			logger.debug(
+					"\nTBMR:clearModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
+					modelToContribution.size(), contributionToModel.size());
+		}
 	}
 
 	/**
