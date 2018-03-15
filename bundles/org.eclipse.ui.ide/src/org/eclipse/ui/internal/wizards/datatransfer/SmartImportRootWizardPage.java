@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016 Red Hat Inc., and others
+ * Copyright (c) 2014-2016 Red Hat Inc., and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -204,42 +204,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 		setDescription(DataTransferMessages.SmartImportWizardPage_importProjectsInFolderDescription);
 		Composite res = new Composite(parent, SWT.NONE);
 		res.setLayout(new GridLayout(4, false));
-
-		createInputSelectionOptions(res);
-
-
-		Composite proposalParent = new Composite(res, SWT.NONE);
-		proposalParent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
-		proposalParent.setLayout(new FillLayout());
-		createProposalsGroup(proposalParent);
-
-		createConfigurationOptions(res);
-
-		Group workingSetsGroup = new Group(res, SWT.NONE);
-		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1);
-		layoutData.verticalIndent = 20;
-		workingSetsGroup.setLayoutData(layoutData);
-		workingSetsGroup.setLayout(new GridLayout(1, false));
-		workingSetsGroup.setText(DataTransferMessages.SmartImportWizardPage_workingSets);
-		workingSetsBlock = new WorkingSetConfigurationBlock(getDialogSettings(),
-				"org.eclipse.ui.resourceWorkingSetPage"); //$NON-NLS-1$
-		if (this.workingSets != null) {
-			workingSetsBlock.setWorkingSets(this.workingSets.toArray(new IWorkingSet[this.workingSets.size()]));
-		}
-		workingSetsBlock.createContent(workingSetsGroup);
-
-		if (this.selection != null) {
-			rootDirectoryText.setText(this.selection.getAbsolutePath());
-			validatePage();
-		}
-
-		setControl(res);
-	}
-
-	/**
-	 * @param res
-	 */
-	private void createInputSelectionOptions(Composite res) {
 		Label rootDirectoryLabel = new Label(res, SWT.NONE);
 		rootDirectoryLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		rootDirectoryLabel.setText(DataTransferMessages.SmartImportWizardPage_selectRootDirectory);
@@ -347,12 +311,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 				}
 			}
 		});
-	}
 
-	/**
-	 * Creates the UI elements for the import options
-	 */
-	private void createConfigurationOptions(Composite res) {
 		Link showDetectorsLink = new Link(res, SWT.NONE);
 		showDetectorsLink.setText(DataTransferMessages.SmartImportWizardPage_showAvailableDetectors);
 		showDetectorsLink.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
@@ -398,6 +357,30 @@ public class SmartImportRootWizardPage extends WizardPage {
 			}
 		});
 
+		Composite proposalParent = new Composite(res, SWT.NONE);
+		proposalParent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
+		proposalParent.setLayout(new FillLayout());
+		createProposalsGroup(proposalParent);
+
+		Group workingSetsGroup = new Group(res, SWT.NONE);
+		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1);
+		layoutData.verticalIndent = 20;
+		workingSetsGroup.setLayoutData(layoutData);
+		workingSetsGroup.setLayout(new GridLayout(1, false));
+		workingSetsGroup.setText(DataTransferMessages.SmartImportWizardPage_workingSets);
+		workingSetsBlock = new WorkingSetConfigurationBlock(getDialogSettings(),
+				"org.eclipse.ui.resourceWorkingSetPage"); //$NON-NLS-1$
+		if (this.workingSets != null) {
+			workingSetsBlock.setWorkingSets(this.workingSets.toArray(new IWorkingSet[this.workingSets.size()]));
+		}
+		workingSetsBlock.createContent(workingSetsGroup);
+
+		if (this.selection != null) {
+			rootDirectoryText.setText(this.selection.getAbsolutePath());
+			validatePage();
+		}
+
+		setControl(res);
 	}
 
 	/**
@@ -409,9 +392,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		selectionSummary = new Label(res, SWT.NONE);
 		selectionSummary.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 2, 1));
 		selectionSummary.setText(NLS.bind(DataTransferMessages.SmartImportProposals_selectionSummary, 0, 0));
-		PatternFilter patternFilter = new PatternFilter();
-		patternFilter.setIncludeLeadingWildcard(true);
-		FilteredTree filterTree = new FilteredTree(res, SWT.BORDER | SWT.CHECK, patternFilter, true) {
+		FilteredTree filterTree = new FilteredTree(res, SWT.BORDER | SWT.CHECK, new PatternFilter(), true) {
 			@Override
 			public CheckboxTreeViewer doCreateTreeViewer(Composite treeParent, int style) {
 				return new CheckboxTreeViewer(treeParent, style);
@@ -422,6 +403,14 @@ public class SmartImportRootWizardPage extends WizardPage {
 		treeGridData.heightHint = 90;
 		tree.getControl().setLayoutData(treeGridData);
 		tree.setContentProvider(new ITreeContentProvider() {
+			@Override
+			public void dispose() {
+			}
+
+			@Override
+			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			}
+
 			@Override
 			public Object[] getElements(Object inputElement) {
 				Map<File, ?> potentialProjects = (Map<File, ?>) inputElement;
