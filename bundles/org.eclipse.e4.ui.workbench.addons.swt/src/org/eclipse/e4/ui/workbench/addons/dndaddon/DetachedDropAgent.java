@@ -111,7 +111,7 @@ public class DetachedDropAgent extends DropAgent {
 
 	@Override
 	public void dragLeave(MUIElement dragElement, DnDInfo info) {
-		// manager.clearOverlay();
+		manager.clearOverlay();
 		dndManager.setCursor(Display.getCurrent().getSystemCursor(SWT.CURSOR_NO));
 
 		super.dragLeave(dragElement, info);

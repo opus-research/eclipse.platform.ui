@@ -422,7 +422,6 @@ class DnDManager {
 			});
 		}
 
-		bounds = Display.getCurrent().getClientArea();
 		// Reset for this set of overlays
 		overlayFrame.setBounds(bounds);
 
@@ -504,9 +503,7 @@ class DnDManager {
 	}
 
 	public void frameRect(Rectangle bounds) {
-		frames.clear();
-		images.clear();
-		imageRects.clear();
+		clearOverlay();
 		if (bounds != null)
 			addFrame(bounds);
 	}
