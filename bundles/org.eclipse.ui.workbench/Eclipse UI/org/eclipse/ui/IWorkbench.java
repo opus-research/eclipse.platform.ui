@@ -665,4 +665,15 @@ public interface IWorkbench extends IAdaptable, IServiceLocator {
 	 * @since 3.6
 	 */
 	public IShellProvider getModalDialogShellProvider();
+
+	/**
+	 * Return the case whether the workbench is using a custom theme or not.
+	 *
+	 * @return a boolean that provides whether the workbench is currently
+	 *         themed.
+	 * @since 3.109
+	 *
+	 */
+
+	boolean getCustomThemeFlag();
 }

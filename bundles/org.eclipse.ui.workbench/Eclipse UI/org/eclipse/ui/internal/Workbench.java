@@ -79,6 +79,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
@@ -302,6 +303,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private static final String PROP_EXIT_CODE = "eclipse.exitcode"; //$NON-NLS-1$
 	private static final String CMD_DATA = "-data"; //$NON-NLS-1$
 	private static final String CMD_VMARGS = "-vmargs"; //$NON-NLS-1$
+
+	private static final String DEFAULT_THEME = "org.eclipse.e4.ui.css.theme.e4_default"; //$NON-NLS-1$
 
 	private final class StartupProgressBundleListener implements SynchronousBundleListener {
 
@@ -3743,5 +3746,18 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 	protected String createId() {
 		return UUID.randomUUID().toString();
+	}
+	/*
+	 * Check if workspace is using a theme. If it is, confirm it is not the
+	 * default theme.
+	 */
+
+	@Override
+	public boolean getCustomThemeFlag() {
+		IThemeEngine engine = e4Context.get(IThemeEngine.class);
+		if (engine != null) {
+			return !engine.getActiveTheme().getId().equals(DEFAULT_THEME);
+		}
+		return false;
 	}
 }
