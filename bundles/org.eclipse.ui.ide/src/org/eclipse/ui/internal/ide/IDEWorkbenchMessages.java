@@ -393,6 +393,9 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String CopyFilesAndFoldersOperation_sourceCannotBeCopiedIntoAVirtualFolder;
 	public static String CopyFilesAndFoldersOperation_copyTitle;
 	public static String CopyFilesAndFoldersOperation_moveTitle;
+	public static String CopyFilesAndFoldersOperation_overwriteButtonLabel;
+	public static String CopyFilesAndFoldersOperation_overwriteAllButtonLabel;
+	public static String CopyFilesAndFoldersOperation_dontOverwriteButtonLabel;
 
 	public static String MoveFilesAndFoldersOperation_sameSourceAndDest;
 	public static String MoveFilesAndFoldersOperation_moveFailedTitle;
@@ -1001,6 +1004,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String CleanDialog_cleanSelectedTaskName;
 	public static String CleanDialog_cleanAllTaskName;
 	public static String CleanDialog_alwaysCleanAllButton;
+	public static String CleanDialog_copySettingsDecoLabel;
 	public static String IDEEncoding_EncodingJob;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_viewsRelatedLink;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_FileEditorsRelatedLink;
