@@ -522,10 +522,10 @@ try {
 		IPerspectiveRegistry registry = PlatformUI.getWorkbench()
 				.getPerspectiveRegistry();
 		IPerspectiveDescriptor[] perspectives = registry.getPerspectives();
-		for (int i = 0; i < perspectives.length; i++) {
+		for (IPerspectiveDescriptor perspective : perspectives) {
 			// @issue illegal ref to workbench internal class;
 			// consider adding getOriginalId() as API on IPerspectiveDescriptor
-			PerspectiveDescriptor descriptor = ((PerspectiveDescriptor) perspectives[i]);
+			PerspectiveDescriptor descriptor = ((PerspectiveDescriptor) perspective);
 			if (descriptor.getOriginalId().equals(id)) {
 				perspectiveIds.add(descriptor.getId());
 			}

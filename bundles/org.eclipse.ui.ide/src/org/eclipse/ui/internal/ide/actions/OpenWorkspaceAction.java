@@ -151,8 +151,8 @@ public class OpenWorkspaceAction extends Action implements
 			createDropDownMenuMgr();
 			dropDownMenuMgr.addMenuListener(manager -> {
 				IContributionItem[] items = getContributionItems();
-				for (int i = 0; i < items.length; i++) {
-					manager.add(items[i]);
+				for (IContributionItem item : items) {
+					manager.add(item);
 				}
 				manager.add(new OpenDialogAction());
 			});
@@ -168,12 +168,12 @@ public class OpenWorkspaceAction extends Action implements
 					return;
 				}
 				MenuItem[] items = menu.getItems();
-				for (int i1 = 0; i1 < items.length; i1++) {
-					items[i1].dispose();
+				for (MenuItem item : items) {
+					item.dispose();
 				}
 				IContributionItem[] contributions = getContributionItems();
-				for (int i2 = 0; i2 < contributions.length; i2++) {
-					contributions[i2].fill(menu, -1);
+				for (IContributionItem contribution : contributions) {
+					contribution.fill(menu, -1);
 				}
 				new ActionContributionItem(new OpenDialogAction()).fill(
 						menu, -1);
