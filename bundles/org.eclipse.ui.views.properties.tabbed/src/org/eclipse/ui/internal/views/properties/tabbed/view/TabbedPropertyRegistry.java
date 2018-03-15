@@ -27,6 +27,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.internal.views.properties.tabbed.TabbedPropertyViewPlugin;
 import org.eclipse.ui.internal.views.properties.tabbed.TabbedPropertyViewStatusCodes;
 import org.eclipse.ui.internal.views.properties.tabbed.l10n.TabbedPropertyMessages;
 import org.eclipse.ui.views.properties.tabbed.AbstractTabDescriptor;
@@ -36,8 +37,6 @@ import org.eclipse.ui.views.properties.tabbed.ISectionDescriptorProvider;
 import org.eclipse.ui.views.properties.tabbed.ITabDescriptor;
 import org.eclipse.ui.views.properties.tabbed.ITabDescriptorProvider;
 import org.eclipse.ui.views.properties.tabbed.ITypeMapper;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 import com.ibm.icu.text.MessageFormat;
 
@@ -190,11 +189,11 @@ public class TabbedPropertyRegistry {
 	 */
 	private void handleConfigurationError(String id, CoreException exception) {
 		String message = MessageFormat.format(CONTRIBUTOR_ERROR, id);
-		Bundle bundle = FrameworkUtil.getBundle(TabbedPropertyRegistry.class);
-		IStatus status = new Status(IStatus.ERROR, bundle.getSymbolicName(),
+		IStatus status = new Status(IStatus.ERROR, TabbedPropertyViewPlugin
+				.getPlugin().getBundle().getSymbolicName(),
 				TabbedPropertyViewStatusCodes.CONTRIBUTOR_ERROR, message,
 				exception);
-		Platform.getLog(bundle).log(status);
+		TabbedPropertyViewPlugin.getPlugin().getLog().log(status);
 	}
 
 	/**
@@ -228,8 +227,9 @@ public class TabbedPropertyRegistry {
 			return new IConfigurationElement[0];
 		}
 		IExtensionPoint point = Platform.getExtensionRegistry()
-				.getExtensionPoint(FrameworkUtil.getBundle(TabbedPropertyRegistry.class).getSymbolicName(),
-						extensionPointId);
+				.getExtensionPoint(
+						TabbedPropertyViewPlugin.getPlugin().getBundle()
+								.getSymbolicName(), extensionPointId);
 		IConfigurationElement[] extensions = point.getConfigurationElements();
 		List unordered = new ArrayList(extensions.length);
 		for (IConfigurationElement extension : extensions) {
@@ -396,10 +396,10 @@ public class TabbedPropertyRegistry {
 		}
 		// could not append the section to any of the existing tabs - log error
 		String message = MessageFormat.format(NO_TAB_ERROR, section.getId(), section.getTargetTab());
-		Bundle bundle = FrameworkUtil.getBundle(TabbedPropertyRegistry.class);
-		IStatus status = new Status(IStatus.ERROR, bundle.getSymbolicName(),
+		IStatus status = new Status(IStatus.ERROR, TabbedPropertyViewPlugin
+				.getPlugin().getBundle().getSymbolicName(),
 				TabbedPropertyViewStatusCodes.NO_TAB_ERROR, message, null);
-		Platform.getLog(bundle).log(status);
+		TabbedPropertyViewPlugin.getPlugin().getLog().log(status);
 	}
 
 	/**
@@ -408,7 +408,6 @@ public class TabbedPropertyRegistry {
 	protected List sortTabDescriptorsByCategory(List descriptors) {
 		Collections.sort(descriptors, new Comparator() {
 
-			@Override
 			public int compare(Object arg0, Object arg1) {
 				TabDescriptor one = (TabDescriptor) arg0;
 				TabDescriptor two = (TabDescriptor) arg1;
@@ -453,7 +452,6 @@ public class TabbedPropertyRegistry {
 			}
 			Collections.sort(categoryList, new Comparator() {
 
-				@Override
 				public int compare(Object arg0, Object arg1) {
 					TabDescriptor one = (TabDescriptor) arg0;
 					TabDescriptor two = (TabDescriptor) arg1;
@@ -527,8 +525,7 @@ public class TabbedPropertyRegistry {
 		String message = MessageFormat.format(TAB_ERROR, pluginId, category );
 		IStatus status = new Status(IStatus.ERROR, pluginId,
 				TabbedPropertyViewStatusCodes.TAB_ERROR, message, null);
-		Bundle bundle = FrameworkUtil.getBundle(TabbedPropertyRegistry.class);
-		Platform.getLog(bundle).log(status);
+		TabbedPropertyViewPlugin.getPlugin().getLog().log(status);
 	}
 
 	/**
