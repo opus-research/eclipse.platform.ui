@@ -602,18 +602,6 @@ public class SimplePropertyObservableList<S, E> extends AbstractObservableList<E
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		getterCalled();
-		return getList().equals(o);
-	}
-
-	@Override
-	public int hashCode() {
-		getterCalled();
-		return getList().hashCode();
-	}
-
-	@Override
 	public Object getObserved() {
 		return source;
 	}

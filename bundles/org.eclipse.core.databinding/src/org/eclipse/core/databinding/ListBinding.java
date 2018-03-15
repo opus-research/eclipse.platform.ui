@@ -177,7 +177,7 @@ public class ListBinding extends Binding {
 				destination.getRealm().exec(new Runnable() {
 					@Override
 					public void run() {
-						if (destination == getTarget()) {
+						if (destination.equals(getTarget())) {
 							updatingTarget = true;
 						} else {
 							updatingModel = true;
@@ -247,7 +247,7 @@ public class ListBinding extends Binding {
 						} finally {
 							setValidationStatus(multiStatus);
 
-							if (destination == getTarget()) {
+							if (destination.equals(getTarget())) {
 								updatingTarget = false;
 							} else {
 								updatingModel = false;

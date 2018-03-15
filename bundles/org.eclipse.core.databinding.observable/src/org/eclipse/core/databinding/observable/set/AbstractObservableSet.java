@@ -94,18 +94,6 @@ public abstract class AbstractObservableSet<E> extends AbstractObservable
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		getterCalled();
-		return getWrappedSet().equals(o);
-	}
-
-	@Override
-	public int hashCode() {
-		getterCalled();
-		return getWrappedSet().hashCode();
-	}
-
-	@Override
 	public boolean isEmpty() {
 		getterCalled();
 		return getWrappedSet().isEmpty();
