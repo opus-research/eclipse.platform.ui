@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -62,22 +61,22 @@ public final class ServiceLocator implements IDisposable, INestable,
 		}
 	}
 
-	private final AbstractServiceFactory factory;
+	private AbstractServiceFactory factory;
 
 	/**
 	 * The parent for this service locator. If a service can't be found in this
 	 * locator, then the parent is asked. This value may be <code>null</code> if
 	 * there is no parent.
 	 */
-	private final IServiceLocator parent;
+	private IServiceLocator parent;
 
-	private volatile boolean disposed;
+	private boolean disposed;
 
 	private IDisposable owner;
 
 	private IEclipseContext e4Context;
 
-	private final Map<Class<?>, Object> servicesToDispose = new ConcurrentHashMap<>();
+	private Map<Class<?>, Object> servicesToDispose = new HashMap<>();
 
 	/**
 	 * Constructs a service locator with no parent.
@@ -133,18 +132,19 @@ public final class ServiceLocator implements IDisposable, INestable,
 			// See: Bug 459833 - ConcurrentModificationException in
 			// ServiceLocator.dispose
 			disposeServices();
-		}
-		// Check if there was some other leftover and warn about it.
-		if (servicesToDispose.size() > 0) {
-			WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.WARNING,
-					String.format(
-							"Services: %s register themselves while disposing (skipping dispose of such services).", //$NON-NLS-1$
-							servicesToDispose),
-					null));
+
+			// Check if there was some other leftover and warn about it.
+			if (servicesToDispose.size() > 0) {
+				WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.WARNING,
+						String.format(
+								"Services: %s register themselves while disposing (skipping dispose of such services).", //$NON-NLS-1$
+								servicesToDispose),
+						null));
+			}
 		}
 		servicesToDispose.clear();
-		disposed = true;
 		e4Context = null;
+		disposed = true;
 		owner = null;
 	}
 
