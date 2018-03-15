@@ -108,8 +108,7 @@ public class Form extends Composite {
 	private class FormLayout extends Layout implements ILayoutExtension {
 		@Override
 		public int computeMinimumWidth(Composite composite, boolean flushCache) {
-			initCaches(flushCache);
-			return Math.max(headCache.computeMinimumWidth(), bodyCache.computeMinimumWidth());
+			return computeSize(composite, 5, SWT.DEFAULT, flushCache).x;
 		}
 
 		@Override
@@ -120,12 +119,18 @@ public class Form extends Composite {
 		@Override
 		public Point computeSize(Composite composite, int wHint, int hHint,
 				boolean flushCache) {
-			initCaches(flushCache);
+			if (flushCache) {
+				bodyCache.flush();
+				headCache.flush();
+			}
+			bodyCache.setControl(body);
+			headCache.setControl(head);
 
 			int width = 0;
 			int height = 0;
 
-			Point hsize = headCache.computeSize(wHint, SWT.DEFAULT);
+			Point hsize = headCache.computeSize(FormUtil.getWidthHint(wHint,
+					head), SWT.DEFAULT);
 			width = Math.max(hsize.x, width);
 			height = hsize.y;
 
@@ -135,7 +140,8 @@ public class Form extends Composite {
 			if (ignoreBody)
 				bsize = new Point(0,0);
 			else
-				bsize = bodyCache.computeSize(wHint, SWT.DEFAULT);
+				bsize = bodyCache.computeSize(FormUtil.getWidthHint(wHint,
+					body), SWT.DEFAULT);
 			width = Math.max(bsize.x, width);
 			height += bsize.y;
 			return new Point(width, height);
@@ -143,22 +149,18 @@ public class Form extends Composite {
 
 		@Override
 		protected void layout(Composite composite, boolean flushCache) {
-			initCaches(flushCache);
-			Rectangle carea = composite.getClientArea();
-
-			Point hsize = headCache.computeSize(carea.width, SWT.DEFAULT);
-			headCache.setBounds(0, 0, carea.width, hsize.y);
-			bodyCache
-					.setBounds(0, hsize.y, carea.width, carea.height - hsize.y);
-		}
-
-		private void initCaches(boolean flushCache) {
 			if (flushCache) {
 				bodyCache.flush();
 				headCache.flush();
 			}
 			bodyCache.setControl(body);
 			headCache.setControl(head);
+			Rectangle carea = composite.getClientArea();
+
+			Point hsize = headCache.computeSize(carea.width, SWT.DEFAULT);
+			headCache.setBounds(0, 0, carea.width, hsize.y);
+			bodyCache
+					.setBounds(0, hsize.y, carea.width, carea.height - hsize.y);
 		}
 	}
 
@@ -173,7 +175,7 @@ public class Form extends Composite {
 		super.setLayout(new FormLayout());
 		head = new FormHeading(this, SWT.NULL);
 		head.setMenu(parent.getMenu());
-		body = new Composite(this, SWT.NULL);
+		body = new LayoutComposite(this, SWT.NULL);
 		body.setMenu(parent.getMenu());
 	}
 
@@ -188,6 +190,15 @@ public class Form extends Composite {
 		super.setMenu(menu);
 		head.setMenu(menu);
 		body.setMenu(menu);
+	}
+
+	/**
+	 * Fully delegates the size computation to the internal layout manager.
+	 */
+	@Override
+	public final Point computeSize(int wHint, int hHint, boolean changed) {
+		return ((FormLayout) getLayout()).computeSize(this, wHint, hHint,
+				changed);
 	}
 
 	/**
@@ -262,7 +273,7 @@ public class Form extends Composite {
 	 * <p>
 	 * <strong>Note:</strong> Mnemonics are indicated by an '&amp;' that causes
 	 * the next character to be the mnemonic. Mnemonics are not applicable in
-	 * the case of the form title but need to be taken into acount due to the
+	 * the case of the form title but need to be taken into account due to the
 	 * usage of the underlying widget that renders mnemonics in the title area.
 	 * The mnemonic indicator character '&amp;' can be escaped by doubling it in
 	 * the string, causing a single '&amp;' to be displayed.
