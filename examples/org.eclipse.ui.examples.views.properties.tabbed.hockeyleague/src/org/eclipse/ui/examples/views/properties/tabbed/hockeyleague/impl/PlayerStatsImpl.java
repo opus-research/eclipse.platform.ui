@@ -619,25 +619,25 @@ public class PlayerStatsImpl extends EObjectImpl implements PlayerStats {
 				if (resolve) return getTeam();
 				return basicGetTeam();
 			case HockeyleaguePackage.PLAYER_STATS__GAMES_PLAYED_IN:
-				return Integer.valueOf(getGamesPlayedIn());
+				return new Integer(getGamesPlayedIn());
 			case HockeyleaguePackage.PLAYER_STATS__GOALS:
-				return Integer.valueOf(getGoals());
+				return new Integer(getGoals());
 			case HockeyleaguePackage.PLAYER_STATS__ASSISTS:
-				return Integer.valueOf(getAssists());
+				return new Integer(getAssists());
 			case HockeyleaguePackage.PLAYER_STATS__POINTS:
-				return Integer.valueOf(getPoints());
+				return new Integer(getPoints());
 			case HockeyleaguePackage.PLAYER_STATS__PLUS_MINUS:
-				return Integer.valueOf(getPlusMinus());
+				return new Integer(getPlusMinus());
 			case HockeyleaguePackage.PLAYER_STATS__PENALTY_MINUTES:
-				return Integer.valueOf(getPenaltyMinutes());
+				return new Integer(getPenaltyMinutes());
 			case HockeyleaguePackage.PLAYER_STATS__POWER_PLAY_GOALS:
-				return Integer.valueOf(getPowerPlayGoals());
+				return new Integer(getPowerPlayGoals());
 			case HockeyleaguePackage.PLAYER_STATS__SHORT_HANDED_GOALS:
-				return Integer.valueOf(getShortHandedGoals());
+				return new Integer(getShortHandedGoals());
 			case HockeyleaguePackage.PLAYER_STATS__GAME_WINNING_GOALS:
-				return Integer.valueOf(getGameWinningGoals());
+				return new Integer(getGameWinningGoals());
 			case HockeyleaguePackage.PLAYER_STATS__SHOTS:
-				return Integer.valueOf(getShots());
+				return new Integer(getShots());
 			case HockeyleaguePackage.PLAYER_STATS__SHOT_PERCENTAGE:
 				return new Float(getShotPercentage());
 		}
