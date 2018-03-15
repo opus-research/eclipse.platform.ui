@@ -18,7 +18,12 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.util.Util;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -80,13 +85,16 @@ public class BrowserDescriptorDialog extends Dialog {
 		}
 		final Text text = new Text(comp, style);
 		if (multiLine) {
-			text.addTraverseListener(event -> {
-				switch (event.detail) {
-				case SWT.TRAVERSE_RETURN:
-				case SWT.TRAVERSE_TAB_NEXT:
-				case SWT.TRAVERSE_TAB_PREVIOUS:
-					event.doit = true;
-					break;
+			text.addTraverseListener(new TraverseListener() {
+				@Override
+				public void keyTraversed(TraverseEvent event) {
+					switch (event.detail) {
+					case SWT.TRAVERSE_RETURN:
+					case SWT.TRAVERSE_TAB_NEXT:
+					case SWT.TRAVERSE_TAB_PREVIOUS:
+						event.doit = true;
+						break;
+					}
 				}
 			});
 		}
@@ -105,7 +113,12 @@ public class BrowserDescriptorDialog extends Dialog {
 
 		text.setLayoutData(data);
 		if (listener != null)
-			text.addModifyListener(e -> listener.valueChanged(text.getText()));
+			text.addModifyListener(new ModifyListener() {
+				@Override
+				public void modifyText(ModifyEvent e) {
+					listener.valueChanged(text.getText());
+				}
+			});
 		return text;
 	}
 
@@ -119,39 +132,52 @@ public class BrowserDescriptorDialog extends Dialog {
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(composite, ContextIds.PREF_BROWSER_DIALOG);
 
 		SWTUtil.createLabel(composite, Messages.name).setFont(font);
-		browserNameTextfield = createText(composite, browser.getName(), s -> {
-			browser.setName(s);
-			validateFields();
+		browserNameTextfield = createText(composite, browser.getName(), new StringModifyListener() {
+			@Override
+			public void valueChanged(String s) {
+				browser.setName(s);
+				validateFields();
+			}
 		}, false);
 		browserNameTextfield.setFont(font);
 
 		new Label(composite, SWT.NONE);
 
 		SWTUtil.createLabel(composite, Messages.location).setFont(font);
-		browserLocationTextfield = createText(composite, browser.getLocation(), s -> {
-			browser.setLocation(s);
-			validateFields();
+		browserLocationTextfield = createText(composite, browser.getLocation(), new StringModifyListener() {
+			@Override
+			public void valueChanged(String s) {
+				browser.setLocation(s);
+				validateFields();
+			}
 		}, false);
 		browserLocationTextfield.setFont(font);
 
 		browseButton = SWTUtil.createButton(composite, Messages.browse);
 		browseButton.setFont(font);
-		browseButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-			FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
-			dialog.setText(Messages.browseMessage);
+		browseButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
+				dialog.setText(Messages.browseMessage);
 
-			String fname = browserLocationTextfield.getText();
+				String fname = browserLocationTextfield.getText();
 
-			dialog.setFileName(fname);
-			fname = dialog.open();
+				dialog.setFileName(fname);
+				fname = dialog.open();
 
-			if (fname != null)
-				browserLocationTextfield.setText(fname);
-		}));
+				if (fname != null)
+					browserLocationTextfield.setText(fname);
+			}
+		});
 
 		SWTUtil.createLabel(composite, Messages.parameters).setFont(font);
-		browserParametersTextfield = createText(composite, browser.getParameters(), s -> browser.setParameters(s),
-				true);
+		browserParametersTextfield = createText(composite, browser.getParameters(), new StringModifyListener() {
+			@Override
+			public void valueChanged(String s) {
+				browser.setParameters(s);
+			}
+		}, true);
 		browserParametersTextfield.setFont(font);
 
 		new Label(composite, SWT.NONE);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2013, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -94,8 +94,8 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 			int x = minimumPageSize.x;
 			int y = minimumPageSize.y;
 			Control[] children = composite.getChildren();
-			for (Control element : children) {
-				Point size = element.computeSize(SWT.DEFAULT, SWT.DEFAULT, force);
+			for (int i = 0; i < children.length; i++) {
+				Point size = children[i].computeSize(SWT.DEFAULT, SWT.DEFAULT, force);
 				x = Math.max(x, size.x);
 				y = Math.max(y, size.y);
 			}
@@ -121,8 +121,8 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		public void layout(Composite composite, boolean force) {
 			Rectangle rect = composite.getClientArea();
 			Control[] children = composite.getChildren();
-			for (Control element : children) {
-				element.setSize(rect.width, rect.height);
+			for (int i = 0; i < children.length; i++) {
+				children[i].setSize(rect.width, rect.height);
 			}
 		}
 	}
@@ -200,7 +200,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 */
 	private TreeViewer treeViewer;
 
-	private ListenerList<IPageChangedListener> pageChangedListeners = new ListenerList<>();
+    private ListenerList pageChangedListeners = new ListenerList();
 
     /**
      *  Composite with a FormLayout to contain the title area
@@ -566,8 +566,8 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 				Font dialogFont = JFaceResources.getDialogFont();
 				updateTreeFont(dialogFont);
 				Control[] children = ((Composite) buttonBar).getChildren();
-				for (Control element : children) {
-					element.setFont(dialogFont);
+				for (int i = 0; i < children.length; i++) {
+					children[i].setFont(dialogFont);
 				}
 			}
 		};
@@ -726,7 +726,8 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 */
 	protected IPreferenceNode findNodeMatching(String nodeId) {
 		List<IPreferenceNode> nodes = preferenceManager.getElements(PreferenceManager.POST_ORDER);
-		for (IPreferenceNode node : nodes) {
+		for (Iterator<IPreferenceNode> i = nodes.iterator(); i.hasNext();) {
+			IPreferenceNode node = i.next();
 			if (node.getId().equals(nodeId)) {
 				return node;
 			}
@@ -969,11 +970,12 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 				comparator.sort(null, nodes);
 			}
 			ViewerFilter[] filters = getTreeViewer().getFilters();
-			for (IPreferenceNode preferenceNode : nodes) {
-				IPreferenceNode selectedNode = preferenceNode;
+			for (int i = 0; i < nodes.length; i++) {
+				IPreferenceNode selectedNode = nodes[i];
 				// See if it passes all filters
 				for (int j = 0; j < filters.length; j++) {
-					if (!filters[j].select(this.treeViewer, preferenceManager.getRoot(), selectedNode)) {
+					if (!filters[j].select(this.treeViewer, preferenceManager
+							.getRoot(), selectedNode)) {
 						selectedNode = null;
 						break;
 					}
@@ -1253,9 +1255,9 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		// their creation).
 		Control[] children = pageContainer.getChildren();
 		Control currentControl = currentPage.getControl();
-		for (Control element : children) {
-			if (element != currentControl) {
-				element.setVisible(false);
+		for (int i = 0; i < children.length; i++) {
+			if (children[i] != currentControl) {
+				children[i].setVisible(false);
 			}
 		}
 		// Make the new page visible
@@ -1469,7 +1471,9 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
      * @since 3.1
      */
     protected void firePageChanged(final PageChangedEvent event) {
-		for (IPageChangedListener l : pageChangedListeners) {
+        Object[] listeners = pageChangedListeners.getListeners();
+        for (int i = 0; i < listeners.length; i++) {
+            final IPageChangedListener l = (IPageChangedListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
 				public void run() {
