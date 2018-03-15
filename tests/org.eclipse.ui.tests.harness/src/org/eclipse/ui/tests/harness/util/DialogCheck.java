@@ -57,7 +57,7 @@ public class DialogCheck {
 	 *            this is the test case object, assertions will be executed on
 	 *            this object.
 	 */
-	public static void assertDialog(Dialog dialog) {
+    public static void assertDialog(Dialog dialog, Assert assertion) {
         Assert.assertNotNull(dialog);
         if (_verifyDialog.getShell() == null) {
             //force the creation of the verify dialog
@@ -79,12 +79,12 @@ public class DialogCheck {
 	 *            this is the test case object, assertions will be executed on
 	 *            this object.
 	 */
-	public static void assertDialogTexts(Dialog dialog) {
+    public static void assertDialogTexts(Dialog dialog, Assert assertion) {
         Assert.assertNotNull(dialog);
         dialog.setBlockOnOpen(false);
         dialog.open();
         Shell shell = dialog.getShell();
-		verifyCompositeText(shell);
+        verifyCompositeText(shell, assertion);
 		dialog.close();
 		// close "verify results" dialog, it makes other tests unhappy
 		_verifyDialog.buttonPressed(IDialogConstants.YES_ID);
@@ -112,7 +112,8 @@ public class DialogCheck {
      * @param composite The composite to look through
      * @param assert The object to invoke assertions on.
      */
-	private static void verifyCompositeText(Composite composite) {
+    private static void verifyCompositeText(Composite composite,
+            Assert assertion) {
         Control children[] = composite.getChildren();
 		for (Control child : children) {
             if (child instanceof TabFolder) {
@@ -132,7 +133,7 @@ public class DialogCheck {
             }
             else if (child instanceof Composite) {
                 //child is not a label, make a recursive call if it is a composite
-				verifyCompositeText((Composite) child);
+                verifyCompositeText((Composite) child, assertion);
             }
         }
     }

@@ -136,42 +136,42 @@ public class UIPreferences extends TestCase {
 
     public void testWorkbenchPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.Workbench");
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 
     public void testAppearancePref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.Views");
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 
     public void testDefaultTextEditorPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.TextEditor");
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 
     public void testFileEditorsPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.FileEditors");
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 
     public void testLocalHistoryPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.FileStates");
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 
     public void testPerspectivesPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.Perspectives");
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 
     public void testInfoProp() {
         Dialog dialog = getPropertyDialog("org.eclipse.ui.propertypages.info.file");
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 
     public void testProjectReferencesProp() {
         Dialog dialog = getPropertyDialog("org.eclipse.ui.propertypages.project.reference");
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 }
 
