@@ -541,6 +541,7 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkbenchPreference_noEffectOnAllViews;
 	public static String WorkbenchPreference_HeapStatusButton;
 	public static String WorkbenchPreference_HeapStatusButtonToolTip;
+	public static String WorkbenchPreferenceDialog_applyAndCloseButtonLabel;
 
 	// --- Globalization -----
 	public static String GlobalizationPreference_nlExtensions;

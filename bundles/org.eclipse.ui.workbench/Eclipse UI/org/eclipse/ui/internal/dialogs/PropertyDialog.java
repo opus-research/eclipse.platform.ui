@@ -13,12 +13,15 @@ package org.eclipse.ui.internal.dialogs;
 
 import java.util.Iterator;
 import org.eclipse.core.runtime.Adapters;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
@@ -182,6 +185,11 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 		return IContributionService.TYPE_PROPERTY;
 	}
 
-
-
+	@Override
+	protected Button createButton(Composite parent, int id, String label, boolean defaultButton) {
+		if (id == IDialogConstants.OK_ID) {
+			return super.createButton(parent, id, IDialogConstants.CLOSE_LABEL, defaultButton);
+		}
+		return super.createButton(parent, id, label, defaultButton);
+	}
 }
