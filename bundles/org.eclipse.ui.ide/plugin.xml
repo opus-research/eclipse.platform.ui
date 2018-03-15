@@ -1682,6 +1682,23 @@
                   style="push"
                   tooltip="%menu.toggleCoolbar.tooltip">
             </command>
+            <separator
+                  name="org.eclipse.ui.appearance.separator1">
+            </separator>
+            <command
+                  commandId="org.eclipse.ui.edit.text.zoomIn"
+                  icon="icons/full/etool16/zoomIn.gif"
+                  id="org.eclipse.ui.appearance.zoomIn"
+                  label="%menu.window.appearance.increase.font.size"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.edit.text.zoomOut"
+                  icon="icons/full/etool16/zoomOut.gif"
+                  id="org.eclipse.ui.appearance.zoomOut"
+                  label="%menu.window.appearance.decrease.font.size"
+                  style="push">
+            </command>
          </menu>
       </menuContribution>
 
