@@ -14,14 +14,6 @@ package org.eclipse.ui.internal.browser;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.ClosedWatchServiceException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,8 +40,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -108,8 +98,6 @@ public class BrowserViewer extends Composite {
 
     protected ToolItem forward;
 
-    protected MenuItem autoRefresh;
-
     protected BusyIndicator busy;
 
     protected boolean loading;
@@ -127,8 +115,6 @@ public class BrowserViewer extends Composite {
     protected String title;
 
     protected int progressWorked = 0;
-
-	protected WatchService watcher;
 
 	 protected List<PropertyChangeListener> propertyListeners;
 
@@ -438,17 +424,6 @@ public class BrowserViewer extends Composite {
                         }// else
                         //    combo.setText(""); //$NON-NLS-1$
                     }
-                    // disable auto-refresh button if URL is not a file
-                    File temp = getFile(browser.getUrl());
-                    if (temp != null && temp.exists()) {
-                        autoRefresh.setEnabled(true);
-                        if (autoRefresh.getSelection()) {
-                            fileChangedWatchService(temp);
-                        }
-                    } else {
-                        autoRefresh.setSelection(false);
-                        autoRefresh.setEnabled(false);
-                    }
                 }
             });
         }
@@ -645,24 +620,6 @@ public class BrowserViewer extends Composite {
 		  }
     }
 
-    private void autoRefresh() {
-        File temp = getFile(browser.getUrl());
-        if (temp != null && temp.exists()) {
-            if (autoRefresh.getSelection()) {
-                refresh();
-                fileChangedWatchService(temp);
-            } else {
-                if (watcher != null) {
-                    try {
-                        watcher.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-
     private void setURL(String url, boolean browse) {
         Trace.trace(Trace.FINEST, "setURL: " + url + " " + browse); //$NON-NLS-1$ //$NON-NLS-2$
         if (url == null) {
@@ -792,26 +749,17 @@ public class BrowserViewer extends Composite {
         stop.setToolTipText(Messages.actionWebBrowserStop);
 		stop.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> stop()));
 
-        ToolItem refresh = new ToolItem(toolbar, SWT.DROP_DOWN);
-        refresh.setImage(ImageResource.getImage(ImageResource.IMG_ELCL_NAV_REFRESH));
-        refresh.setHotImage(ImageResource.getImage(ImageResource.IMG_CLCL_NAV_REFRESH));
-        refresh.setDisabledImage(ImageResource.getImage(ImageResource.IMG_DLCL_NAV_REFRESH));
+        ToolItem refresh = new ToolItem(toolbar, SWT.NONE);
+        refresh.setImage(ImageResource
+                .getImage(ImageResource.IMG_ELCL_NAV_REFRESH));
+        refresh.setHotImage(ImageResource
+                .getImage(ImageResource.IMG_CLCL_NAV_REFRESH));
+        refresh.setDisabledImage(ImageResource
+                .getImage(ImageResource.IMG_DLCL_NAV_REFRESH));
         refresh.setToolTipText(Messages.actionWebBrowserRefresh);
+		refresh.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> refresh()));
 
-        // create auto-refresh action
-        Menu refreshMenu = new Menu(getShell(), SWT.POP_UP);
-        autoRefresh = new MenuItem(refreshMenu, SWT.CHECK);
-        autoRefresh.setText(Messages.actionWebBrowserAutoRefresh);
-        refresh.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-            if (e.detail == SWT.ARROW) {
-                refreshMenu.setVisible(true);
-            } else {
-                refresh();
-            }
-        }));
-        autoRefresh.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> autoRefresh()));
-
-        return toolbar;
+		return toolbar;
     }
 
     /**
@@ -947,46 +895,4 @@ public class BrowserViewer extends Composite {
    	 browser.removeLocationListener(locationListener2);
    	 locationListener2 = null;
     }
-
-	/*
-	 * Start the WatchService so that it monitors the local file system for any
-	 * changes. This is used by the auto-refresh action as it will monitor the HTML
-	 * file being displayed and refresh the browser when there are changes.
-	 */
-	private void fileChangedWatchService(File file) {
-		while (file.isFile()) {
-			// get the directory as that is the requirement of WatchService
-			file = file.getParentFile();
-		}
-		try {
-			if (watcher != null) {
-				watcher.close();
-			}
-			watcher = FileSystems.getDefault().newWatchService();
-			final Path path = FileSystems.getDefault().getPath(file.getAbsolutePath());
-			path.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
-			new Thread(() -> {
-				try {
-					WatchKey key = watcher.take();
-					while (key != null) {
-						for (WatchEvent<?> event : key.pollEvents()) {
-							final Path changedPath = (Path) event.context();
-							if (changedPath.toString().endsWith(".html")) { //$NON-NLS-1$
-								Display.getDefault().asyncExec(() -> browser.refresh());
-							}
-						}
-						key.reset();
-						key = watcher.take();
-					}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} catch (ClosedWatchServiceException e) {
-					// ignore
-				}
-			}).start();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 }
