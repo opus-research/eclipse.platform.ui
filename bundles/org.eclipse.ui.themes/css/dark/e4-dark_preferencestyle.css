@@ -49,7 +49,7 @@ IEclipsePreferences#org-eclipse-ui-editors {
 		'writeOccurrenceIndicationColor=27,98,145'
 }
 
-IEclipsePreferences#org-eclipse-ui-workbench {
+IEclipsePreferences#org-eclipse-ui-workbench:eclipse.plaform.ui {
 	preferences:
 		'ACTIVE_HYPERLINK_COLOR=138,201,242'
 		'CONFLICTING_COLOR=240,15,66'
