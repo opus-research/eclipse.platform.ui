@@ -147,14 +147,6 @@
             </command>
          </menu>
       </menuContribution>
-      <menuContribution
-            allPopups="false"
-            locationURI="menu:org.eclipse.ui.appearance?after=org.eclipse.ui.window.appearance.separator1">
-         <dynamic
-               class="org.eclipse.ui.internal.actions.ThemeDynamicMenu"
-               id="org.eclipse.ui.ide.dynamic1">
-         </dynamic>
-      </menuContribution>
    </extension>
    <extension
          id="id1"

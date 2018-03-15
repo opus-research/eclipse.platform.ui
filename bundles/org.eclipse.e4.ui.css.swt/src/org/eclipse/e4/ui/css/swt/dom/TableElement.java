@@ -58,12 +58,6 @@ implements ISelectionBackgroundCustomizationElement, IHeaderCustomizationElement
 	}
 
 	@Override
-	public void reset() {
-		setHeaderColor(null);
-		setHeaderBackgroundColor(null);
-	}
-
-	@Override
 	public void setSelectionBackgroundColor(Color color) {
 		this.fControlSelectedColorCustomization.setSelectionBackgroundColor(color);
 	}
