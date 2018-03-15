@@ -24,7 +24,7 @@ import org.eclipse.ui.internal.forms.widgets.FormImages;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class FormImagesTests {
+public class FormImagesTest {
 	@Test
 	public void testSingleton() throws Exception {
 		Display display = Display.getCurrent();
