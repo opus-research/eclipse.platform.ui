@@ -126,6 +126,7 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getId()
 	 */
+	@Override
 	public String getId() {
 		return id;
 	}
@@ -133,6 +134,7 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getFilter()
 	 */
+	@Override
 	public IFilter getFilter() {
 		if (filter == null) {
 			try {
@@ -154,6 +156,7 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	 *
 	 * @return the value for section enablement.
 	 */
+	@Override
 	public int getEnablesFor() {
 		return enablesFor;
 	}
@@ -161,6 +164,7 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getTargetTab()
 	 */
+	@Override
 	public String getTargetTab() {
 		return targetTab;
 	}
@@ -168,6 +172,7 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getAfterSection()
 	 */
+	@Override
 	public String getAfterSection() {
 		if (afterSection == null) {
 			return super.getAfterSection();
@@ -180,6 +185,7 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	 *
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getSectionClass()
 	 */
+	@Override
 	public ISection getSectionClass() {
 		ISection section = null;
 		try {
@@ -197,6 +203,7 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	 *
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getInputTypes()
 	 */
+	@Override
 	public List getInputTypes() {
 		if (inputTypes == null) {
 			inputTypes = new ArrayList();
@@ -210,9 +217,7 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 		return inputTypes;
 	}
 
-	/**
-	 * @see java.lang.Object#toString()
-	 */
+	@Override
 	public String toString() {
 		return getId();
 	}
