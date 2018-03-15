@@ -19,7 +19,6 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.swt.graphics.Image;
-import org.junit.After;
 import org.junit.Before;
 
 import junit.framework.TestCase;
@@ -52,13 +51,6 @@ public class DecorationOverlayIconTest extends TestCase {
 		assertNotNull(overlayDescriptor1);
 		overlayDescriptor2 = imageRegistry.getDescriptor(Dialog.DLG_IMG_MESSAGE_WARNING);
 		assertNotNull(overlayDescriptor2);
-	}
-
-	@Override
-	@After
-	public void tearDown() {
-		baseImage1.dispose();
-		baseImage2.dispose();
 	}
 
 	public void testEqualsAndHashCode() {
