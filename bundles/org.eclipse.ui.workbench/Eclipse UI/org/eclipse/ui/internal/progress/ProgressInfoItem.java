@@ -32,8 +32,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
-import org.eclipse.e4.ui.css.swt.theme.ITheme;
-import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -57,8 +55,10 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -89,8 +89,6 @@ public class ProgressInfoItem extends Composite {
 	static String DEFAULT_JOB_KEY = "org.eclipse.ui.internal.progress.PROGRESS_DEFAULT"; //$NON-NLS-1$
 
 	static String DARK_COLOR_KEY = "org.eclipse.ui.internal.progress.PROGRESS_DARK_COLOR"; //$NON-NLS-1$
-
-	static String DEFAULT_THEME = "org.eclipse.e4.ui.css.theme.e4_default"; //$NON-NLS-1$
 
 	JobTreeElement info;
 
@@ -146,8 +144,6 @@ public class ProgressInfoItem extends Composite {
 	private Link link;
 
 	private HandlerChangeTracker tracker;
-
-	private boolean isThemed;
 
 	static {
 		JFaceResources
@@ -211,7 +207,6 @@ public class ProgressInfoItem extends Composite {
 			JobTreeElement progressInfo) {
 		super(parent, style);
 		info = progressInfo;
-		isThemed = getCustomThemeFlag();
 		setData(info);
 		setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 		createChildren();
@@ -259,18 +254,21 @@ public class ProgressInfoItem extends Composite {
 				cancelOrRemove();
 			}
 		});
-		actionBar.addListener(SWT.Traverse, event -> {
-			if (indexListener == null) {
-				return;
-			}
-			int detail = event.detail;
-			if (detail == SWT.TRAVERSE_ARROW_NEXT) {
-				indexListener.selectNext();
-			}
-			if (detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
-				indexListener.selectPrevious();
-			}
+		actionBar.addListener(SWT.Traverse, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				if (indexListener == null) {
+					return;
+				}
+				int detail = event.detail;
+				if (detail == SWT.TRAVERSE_ARROW_NEXT) {
+					indexListener.selectNext();
+				}
+				if (detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
+					indexListener.selectPrevious();
+				}
 
+			}
 		});
 		updateToolBarValues();
 
@@ -781,14 +779,17 @@ public class ProgressInfoItem extends Composite {
 				}
 			});
 
-			link.addListener(SWT.Resize, event -> {
+			link.addListener(SWT.Resize, new Listener() {
+				@Override
+				public void handleEvent(Event event) {
 
-				Object text = link.getData(TEXT_KEY);
-				if (text == null)
-					return;
+					Object text = link.getData(TEXT_KEY);
+					if (text == null)
+						return;
 
-				updateText((String) text, link);
+					updateText((String) text, link);
 
+				}
 			});
 			taskEntries.add(link);
 		} else {
@@ -923,15 +924,15 @@ public class ProgressInfoItem extends Composite {
 			return;
 		}
 
-		if (!isThemed) {
-			if (i % 2 == 0) {
-				setAllBackgrounds(JFaceResources.getColorRegistry().get(DARK_COLOR_KEY));
-			} else {
-				setAllBackgrounds(getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			}
-			setAllForegrounds(getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND));
+		if (i % 2 == 0) {
+			setAllBackgrounds(JFaceResources.getColorRegistry().get(
+					DARK_COLOR_KEY));
+		} else {
+			setAllBackgrounds(getDisplay().getSystemColor(
+					SWT.COLOR_LIST_BACKGROUND));
 		}
-
+		setAllForegrounds(getDisplay()
+				.getSystemColor(SWT.COLOR_LIST_FOREGROUND));
 	}
 
 	/**
@@ -1103,20 +1104,5 @@ public class ProgressInfoItem extends Composite {
 			link.setEnabled(service != null && service.canExecute(parmCommand));
 			return true;
 		}
-	}
-	/*
-	 * Check if workspace is using a theme. If it is, confirm it is not the
-	 * default theme.
-	 */
-
-	private boolean getCustomThemeFlag() {
-		IThemeEngine engine = PlatformUI.getWorkbench().getService(IThemeEngine.class);
-		if (engine != null) {
-			ITheme activeTheme = engine.getActiveTheme();
-			if (activeTheme != null) {
-				return !DEFAULT_THEME.equals(activeTheme.getId());
-			}
-		}
-		return false;
 	}
 }

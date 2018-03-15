@@ -21,7 +21,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.OpenStrategy;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -188,15 +190,20 @@ public class WorkbenchPreferencePage extends PreferencePage implements
 		saveInterval.setPage(this);
 		saveInterval.setTextLimit(Integer.toString(MAX_SAVE_INTERVAL).length());
 		saveInterval.setErrorMessage(NLS.bind(
-				WorkbenchMessages.WorkbenchPreference_workbenchSaveIntervalError, Integer.valueOf(MAX_SAVE_INTERVAL)));
+				WorkbenchMessages.WorkbenchPreference_workbenchSaveIntervalError, new Integer(
+						MAX_SAVE_INTERVAL)));
 		saveInterval.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
 		saveInterval.setValidRange(0, MAX_SAVE_INTERVAL);
 
 		saveInterval.load();
 
-		saveInterval.setPropertyChangeListener(event -> {
-			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-				setValid(saveInterval.isValid());
+		saveInterval.setPropertyChangeListener(new IPropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+					setValid(saveInterval.isValid());
+				}
 			}
 		});
 

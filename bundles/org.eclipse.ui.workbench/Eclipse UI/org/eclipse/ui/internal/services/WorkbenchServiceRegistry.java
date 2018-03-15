@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2017 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,11 +13,13 @@ package org.eclipse.ui.internal.services;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -73,12 +75,12 @@ public class WorkbenchServiceRegistry implements IExtensionChangeHandler {
 	 */
 	public static final IServiceLocator GLOBAL_PARENT = new IServiceLocator() {
 		@Override
-		public <T> T getService(Class<T> api) {
+		public Object getService(Class api) {
 			return null;
 		}
 
 		@Override
-		public boolean hasService(Class<?> api) {
+		public boolean hasService(Class api) {
 			return false;
 		}
 	};
@@ -247,10 +249,19 @@ public class WorkbenchServiceRegistry implements IExtensionChangeHandler {
 				ServiceFactoryHandle handle = (ServiceFactoryHandle) object;
 				Set locatorSet = handle.serviceLocators.keySet();
 				ServiceLocator[] locators = (ServiceLocator[]) locatorSet.toArray(new ServiceLocator[locatorSet.size()]);
-				Arrays.sort(locators, (loc1, loc2) -> {
-					int l1 = loc1.getService(IWorkbenchLocationService.class).getServiceLevel();
-					int l2 = loc2.getService(IWorkbenchLocationService.class).getServiceLevel();
-					return l1 < l2 ? -1 : (l1 > l2 ? 1 : 0);
+				Arrays.sort(locators, new Comparator(){
+					@Override
+					public int compare(Object o1, Object o2) {
+						ServiceLocator loc1 = (ServiceLocator) o1;
+						ServiceLocator loc2 = (ServiceLocator) o2;
+						int l1 = ((IWorkbenchLocationService) loc1
+								.getService(IWorkbenchLocationService.class))
+								.getServiceLevel();
+						int l2 = ((IWorkbenchLocationService) loc2
+								.getService(IWorkbenchLocationService.class))
+								.getServiceLevel();
+						return l1 < l2 ? -1 : (l1 > l2 ? 1 : 0);
+					}
 				});
 				for (int j = 0; j < locators.length; j++) {
 					ServiceLocator serviceLocator = locators[j];

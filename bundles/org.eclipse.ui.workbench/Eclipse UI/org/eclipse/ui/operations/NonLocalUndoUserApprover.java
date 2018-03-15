@@ -195,12 +195,14 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		// a syncExec because operation approval notifications may come from
 		// a background thread.
 		final int[] answer = new int[1];
-		PlatformUI.getWorkbench().getDisplay().syncExec(() -> {
-			MessageDialog dialog = new MessageDialog(part.getSite().getShell(), title,
-					null, message, MessageDialog.QUESTION, 0, IDialogConstants.OK_LABEL, discardButton,
-					IDialogConstants.CANCEL_LABEL); // yes is the default
-		    answer[0] = dialog.open();
-});
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				MessageDialog dialog = new MessageDialog(part.getSite().getShell(), title,
+						null, message, MessageDialog.QUESTION, new String[] { IDialogConstants.OK_LABEL,
+		                        discardButton, IDialogConstants.CANCEL_LABEL }, 0); // yes is the default
+		        answer[0] = dialog.open();
+		}});
 		switch (answer[0]) {
 		case 0:
 			return Status.OK_STATUS;

@@ -76,9 +76,12 @@ public class PartTester {
      * @throws Exception
      */
     private static void testWorkbenchPart(IWorkbenchPart part) throws Exception {
-        IPropertyListener testListener = (source, propId) -> {
+        IPropertyListener testListener = new IPropertyListener() {
+            @Override
+			public void propertyChanged(Object source, int propId) {
 
-		};
+            }
+        };
 
         // Test addPropertyListener
         part.addPropertyListener(testListener);
@@ -88,7 +91,7 @@ public class PartTester {
 
         // Test equals
 		Assert.isTrue(part.equals(part), "A part must be equal to itself"); //$NON-NLS-1$
-		Assert.isTrue(!part.equals(Integer.valueOf(32)),
+		Assert.isTrue(!part.equals(new Integer(32)),
 				"A part must have a meaningful equals method"); //$NON-NLS-1$
 
         // Test getAdapter

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,17 +20,22 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.DeviceResourceException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -48,6 +53,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -113,6 +119,62 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
      */
     public static final String ACTIVITY_PROMPT_BUTTON_TOOLTIP = "activityPromptButtonTooltip"; //$NON-NLS-1$
 
+    private class AdvancedDialog extends TrayDialog {
+
+    	private static final String DIALOG_SETTINGS_SECTION = "ActivityCategoryPreferencePageAdvancedDialogSettings"; //$NON-NLS-1$
+
+
+        ActivityEnabler enabler;
+        /**
+         * @param parentShell
+         */
+        protected AdvancedDialog(Shell parentShell) {
+            super(parentShell);
+			setShellStyle(getShellStyle() | SWT.SHEET);
+         }
+
+		@Override
+        protected void configureShell(Shell newShell) {
+            super.configureShell(newShell);
+            String activityName = strings.getProperty(ACTIVITY_NAME, ActivityMessages.ActivityEnabler_activities);
+            activityName = Util.replaceAll(activityName, "&", ""); //strips possible mnemonic //$NON-NLS-1$ //$NON-NLS-2$
+            activityName = Util.replaceAll(activityName, ":", ""); //strips possible colon //$NON-NLS-1$ //$NON-NLS-2$
+			newShell.setText(NLS.bind(
+            		ActivityMessages.ActivitiesPreferencePage_advancedDialogTitle,
+            		activityName
+            ));
+        }
+
+		@Override
+		protected Control createDialogArea(Composite parent) {
+            Composite composite = (Composite) super.createDialogArea(parent);
+            enabler = new ActivityEnabler(workingCopy, strings);
+            Control enablerControl = enabler.createControl(composite);
+            enablerControl.setLayoutData(new GridData(GridData.FILL_BOTH));
+            return composite;
+        }
+
+        @Override
+		protected void okPressed() {
+            enabler.updateActivityStates();
+            super.okPressed();
+        }
+
+    	@Override
+		protected IDialogSettings getDialogBoundsSettings() {
+            IDialogSettings settings = WorkbenchPlugin.getDefault().getDialogSettings();
+            IDialogSettings section = settings.getSection(DIALOG_SETTINGS_SECTION);
+            if (section == null) {
+                section = settings.addNewSection(DIALOG_SETTINGS_SECTION);
+            }
+            return section;
+    	}
+
+        @Override
+		protected boolean isResizable() {
+        	return true;
+        }
+    }
     private class CategoryLabelProvider extends LabelProvider implements
             ITableLabelProvider, IActivityManagerListener {
 
@@ -196,10 +258,22 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
     }
 
     private class CategoryContentProvider implements IStructuredContentProvider {
+
 		@Override
         public Object[] getElements(Object inputElement) {
             // convert to category objects
-            return WorkbenchActivityHelper.resolveCategories(workingCopy, (Set) inputElement);
+            return WorkbenchActivityHelper.resolveCategories(workingCopy,
+                    (Set) inputElement);
+        }
+
+		@Override
+        public void dispose() {
+
+        }
+
+		@Override
+        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+
         }
     }
 
@@ -231,9 +305,9 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
 
     private boolean allowAdvanced = false;
 
-    private Properties strings = new Properties();
+    private Button advancedButton;
 
-	private ActivityEnabler enabler;
+    private Properties strings = new Properties();
 
     @Override
 	protected Control createContents(Composite parent) {
@@ -257,22 +331,12 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
         data.horizontalSpan = 2;
         label.setLayoutData(data);
         createPromptButton(composite);
-
-		workbench.getHelpSystem().setHelp(parent, IWorkbenchHelpContextIds.CAPABILITY_PREFERENCE_PAGE);
-
-		if (allowAdvanced) {
-			enabler = new ActivityEnabler(workingCopy, strings);
-			Control enablerControl = enabler.createControl(composite);
-			enablerControl.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-			Dialog.applyDialogFont(composite);
-			return composite;
-		}
-
         createCategoryArea(composite);
         createDetailsArea(composite);
         createButtons(composite);
 
+        workbench.getHelpSystem().setHelp(parent,
+				IWorkbenchHelpContextIds.CAPABILITY_PREFERENCE_PAGE);
 
         Dialog.applyDialogFont(composite);
 
@@ -328,6 +392,22 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
         disableAll.setText(ActivityMessages.ActivityEnabler_deselectAll);
         setButtonLayoutData(disableAll);
 
+        if (allowAdvanced) {
+        		Label spacer = new Label(composite, SWT.NONE);
+        		data = new GridData(GridData.GRAB_HORIZONTAL);
+        		spacer.setLayoutData(data);
+            advancedButton = new Button(composite, SWT.PUSH);
+            advancedButton.addSelectionListener(new SelectionAdapter() {
+
+                @Override
+				public void widgetSelected(SelectionEvent e) {
+                    AdvancedDialog dialog = new AdvancedDialog(parent.getShell());
+                    dialog.open(); // logic for updating the working copy is in the dialog class.
+                }
+            });
+            advancedButton.setText(ActivityMessages.ActivitiesPreferencePage_advancedButton);
+            setButtonLayoutData(advancedButton);
+        }
     }
 
     /**
@@ -419,11 +499,15 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
         categoryViewer.addFilter(new EmptyCategoryFilter());
 
         categoryViewer
-                .addSelectionChangedListener(event -> {
-				    ICategory element = (ICategory) ((IStructuredSelection) event
-				            .getSelection()).getFirstElement();
-				    setDetails(element);
-				});
+                .addSelectionChangedListener(new ISelectionChangedListener() {
+
+                    @Override
+                    public void selectionChanged(SelectionChangedEvent event) {
+                        ICategory element = (ICategory) ((IStructuredSelection) event
+                                .getSelection()).getFirstElement();
+                        setDetails(element);
+                    }
+                });
         categoryViewer.setInput(workingCopy.getDefinedCategoryIds());
 
 		updateCategoryCheckState();
@@ -510,10 +594,6 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
 
     @Override
 	public boolean performOk() {
-		if (allowAdvanced) {
-			enabler.updateActivityStates();
-		}
-
         workbench.getActivitySupport().setEnabledActivityIds(
                 workingCopy.getEnabledActivityIds());
         getPreferenceStore().setValue(
@@ -528,10 +608,6 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
         activityPromptButton.setSelection(getPreferenceStore()
                 .getDefaultBoolean(
                         IPreferenceConstants.SHOULD_PROMPT_FOR_ENABLEMENT));
-		if (allowAdvanced) {
-			enabler.restoreDefaults();
-			return;
-		}
 
         Set defaultEnabled = new HashSet();
         Set activityIds = workingCopy.getDefinedActivityIds();
@@ -562,8 +638,8 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
 
     @Override
 	public void dispose() {
-		if ((workingCopy != null) && (!allowAdvanced)) {
-				workingCopy.removeActivityManagerListener((CategoryLabelProvider) categoryViewer.getLabelProvider());
+    	if (workingCopy != null) {
+    		workingCopy.removeActivityManagerListener((CategoryLabelProvider)categoryViewer.getLabelProvider());
     	}
     	super.dispose();
     }

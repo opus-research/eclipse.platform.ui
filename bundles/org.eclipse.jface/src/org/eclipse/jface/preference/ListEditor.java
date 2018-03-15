@@ -213,8 +213,8 @@ public abstract class ListEditor extends FieldEditor {
         if (list != null) {
             String s = getPreferenceStore().getString(getPreferenceName());
             String[] array = parseString(s);
-            for (String element : array) {
-                list.add(element);
+            for (int i = 0; i < array.length; i++) {
+                list.add(array[i]);
             }
         }
     }
@@ -226,8 +226,8 @@ public abstract class ListEditor extends FieldEditor {
             String s = getPreferenceStore().getDefaultString(
                     getPreferenceName());
             String[] array = parseString(s);
-            for (String element : array) {
-                list.add(element);
+            for (int i = 0; i < array.length; i++) {
+                list.add(array[i]);
             }
         }
     }

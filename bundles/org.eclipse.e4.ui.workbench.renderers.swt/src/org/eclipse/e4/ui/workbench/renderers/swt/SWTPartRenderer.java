@@ -21,8 +21,6 @@ import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
-import org.eclipse.e4.ui.internal.workbench.swt.Policy;
-import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -36,21 +34,19 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Widget;
 
 public abstract class SWTPartRenderer extends AbstractPartRenderer {
-
-	private static final boolean DEBUG = WorkbenchSWTActivator.getDefault().getDebugOptions()
-			.getBooleanOption(WorkbenchSWTActivator.PI_RENDERERS + Policy.DEBUG_RENDERER, false);
-
 	private static final String ICON_URI_FOR_PART = "IconUriForPart"; //$NON-NLS-1$
 
 	private Map<String, Image> imageMap = new HashMap<>();
 
-	private String pinURI = "platform:/plugin/org.eclipse.e4.ui.workbench.renderers.swt/icons/full/ovr16/pinned_ovr.png"; //$NON-NLS-1$
+	private String pinURI = "platform:/plugin/org.eclipse.e4.ui.workbench.renderers.swt/icons/full/ovr16/pinned_ovr.gif"; //$NON-NLS-1$
 	private Image pinImage;
 
 	private ISWTResourceUtilities resUtils;
@@ -134,11 +130,14 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 
 			// Ensure that disposed widgets are unbound form the model
 			Widget swtWidget = (Widget) widget;
-			swtWidget.addDisposeListener(e -> {
-				MUIElement element = (MUIElement) e.widget
-						.getData(OWNING_ME);
-				if (element != null)
-					unbindWidget(element);
+			swtWidget.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent e) {
+					MUIElement element = (MUIElement) e.widget
+							.getData(OWNING_ME);
+					if (element != null)
+						unbindWidget(element);
+				}
 			});
 		}
 
@@ -330,9 +329,12 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 				.getName());
 		pinImage = getImageFromURI(pinURI);
 
-		Display.getCurrent().disposeExec(() -> {
-			for (Image image : imageMap.values()) {
-				image.dispose();
+		Display.getCurrent().disposeExec(new Runnable() {
+			@Override
+			public void run() {
+				for (Image image : imageMap.values()) {
+					image.dispose();
+				}
 			}
 		});
 	}
@@ -382,9 +384,5 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 			if (!ctrl.isDisposed())
 				ctrl.forceFocus();
 		}
-	}
-
-	static boolean isDebugEnabled() {
-		return DEBUG;
 	}
 }

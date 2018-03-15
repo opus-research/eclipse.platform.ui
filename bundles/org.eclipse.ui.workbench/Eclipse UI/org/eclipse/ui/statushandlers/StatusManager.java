@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,10 +26,8 @@ import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.internal.WorkbenchErrorHandlerProxy;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
-import org.eclipse.ui.internal.statushandlers.StatusHandlerDescriptor;
 import org.eclipse.ui.internal.statushandlers.StatusHandlerRegistry;
 import org.eclipse.ui.progress.IProgressConstants;
-import org.osgi.framework.BundleContext;
 
 /**
  * <p>
@@ -55,8 +53,8 @@ import org.osgi.framework.BundleContext;
  * <li>SHOW - a style indicating that handlers should show a problem to an user
  * without blocking the calling method while awaiting user response. This is
  * generally done using a non modal {@link Dialog}</li>
- * <li>BLOCK - a style indicating that the handling should block the UI
- * until the user has responded. This is generally done using a modal
+ * <li>BLOCK - a style indicating that the handling should block the calling
+ * method until the user has responded. This is generally done using a modal
  * window such as a {@link Dialog}</li>
  * </ul>
  * </p>
@@ -103,19 +101,19 @@ public class StatusManager {
 	 * therefore likely but not required that the <code>StatusHandler</code>
 	 * would achieve this through the use of a modal dialog.
 	 * </p><p>Due to the fact
-	 * that use of <code>BLOCK</code> will block UI, care should be
+	 * that use of <code>BLOCK</code> will block any thread, care should be
 	 * taken in this use of this flag.
 	 * </p>
 	 */
 	public static final int BLOCK = 0x04;
 
-	private static volatile StatusManager MANAGER;
+	private static StatusManager MANAGER;
 
-	private volatile AbstractStatusHandler statusHandler;
+	private AbstractStatusHandler statusHandler;
 
 	private List loggedStatuses = new ArrayList();
 
-	private ListenerList<INotificationListener> listeners = new ListenerList<>();
+	private ListenerList listeners = new ListenerList();
 
 	/**
 	 * Returns StatusManager singleton instance.
@@ -123,13 +121,8 @@ public class StatusManager {
 	 * @return the manager instance
 	 */
 	public static StatusManager getManager() {
-		if (MANAGER != null) {
-			return MANAGER;
-		}
-		synchronized (StatusManager.class) {
-			if (MANAGER == null) {
-				MANAGER = new StatusManager();
-			}
+		if (MANAGER == null) {
+			MANAGER = new StatusManager();
 		}
 		return MANAGER;
 	}
@@ -139,32 +132,17 @@ public class StatusManager {
 	}
 
 	private AbstractStatusHandler getStatusHandler(){
-		if (statusHandler != null) {
-			return statusHandler;
-		}
-		BundleContext bundleContext = WorkbenchPlugin.getDefault().getBundle().getBundleContext();
-		if (bundleContext == null) {
-			// bundle is not in the STARTING, ACTIVE, or STOPPING state: we
-			// should not do anything, most likely we are going to shut down
-			return null;
-		}
-
-		StatusHandlerDescriptor defaultHandlerDescriptor = StatusHandlerRegistry.getDefault()
-				.getDefaultHandlerDescriptor();
-
-		synchronized (this) {
-			if (statusHandler == null) {
-				if (defaultHandlerDescriptor != null) {
-					try {
-						statusHandler = defaultHandlerDescriptor.getStatusHandler();
-					} catch (CoreException ex) {
-						logError("Errors during the default handler creating", ex); //$NON-NLS-1$
-					}
-				}
-				if (statusHandler == null) {
-					statusHandler = new WorkbenchErrorHandlerProxy();
-				}
+		if(statusHandler == null && StatusHandlerRegistry.getDefault()
+					.getDefaultHandlerDescriptor() != null){
+			try {
+				statusHandler = StatusHandlerRegistry.getDefault()
+						.getDefaultHandlerDescriptor().getStatusHandler();
+			} catch (CoreException ex) {
+				logError("Errors during the default handler creating", ex); //$NON-NLS-1$
 			}
+		}
+		if(statusHandler == null){
+			statusHandler = new WorkbenchErrorHandlerProxy();
 		}
 		return statusHandler;
 	}
@@ -208,25 +186,18 @@ public class StatusManager {
 			}
 
 			// delegates the problem to workbench handler
-			AbstractStatusHandler handler = getStatusHandler();
-			if (handler != null) {
-				handler.handle(statusAdapter, style);
-			} else if (style != StatusManager.NONE) {
-				logError(statusAdapter.getStatus());
-			}
+			getStatusHandler().handle(statusAdapter, style);
 
 			// if attached status handler is not able to notify StatusManager
 			// about particular event, use the default policy and fake the
 			// notification
-			if (handler == null || !handler.supportsNotification(
+			if (!getStatusHandler().supportsNotification(
 					INotificationTypes.HANDLED)) {
 				generateFakeNotification(statusAdapter, style);
 			}
 		} catch (Throwable ex) {
 			// The used status handler failed
-			if (statusAdapter != null) {
-				logError(statusAdapter.getStatus());
-			}
+			logError(statusAdapter.getStatus());
 			logError("Error occurred during status handling", ex); //$NON-NLS-1$
 		}
 	}
@@ -349,15 +320,18 @@ public class StatusManager {
 	 * @since 3.5
 	 */
 	public void fireNotification(int type, StatusAdapter[] adapters){
-		AbstractStatusHandler handler = getStatusHandler();
-		if (handler != null && handler.supportsNotification(type)) {
+		if(getStatusHandler().supportsNotification(type)){
 			doFireNotification(type, adapters);
 		}
 	}
 
 	private void doFireNotification(int type, StatusAdapter[] adapters) {
-		for (INotificationListener listener : listeners) {
-			listener.statusManagerNotified(type, adapters);
+		Object[] oListeners = listeners.getListeners();
+		for (int i = 0; i < oListeners.length; i++) {
+			if (oListeners[i] instanceof INotificationListener) {
+				((INotificationListener) oListeners[i])
+						.statusManagerNotified(type, adapters);
+			}
 		}
 	}
 

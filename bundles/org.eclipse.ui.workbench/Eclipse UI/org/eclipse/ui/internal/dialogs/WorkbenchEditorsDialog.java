@@ -23,6 +23,8 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -144,16 +146,16 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
             String[] array = s.getArray(BOUNDS);
             if (array != null) {
                 bounds = new Rectangle(0, 0, 0, 0);
-                bounds.x = Integer.valueOf(array[0]).intValue();
-                bounds.y = Integer.valueOf(array[1]).intValue();
-                bounds.width = Integer.valueOf(array[2]).intValue();
-                bounds.height = Integer.valueOf(array[3]).intValue();
+                bounds.x = new Integer(array[0]).intValue();
+                bounds.y = new Integer(array[1]).intValue();
+                bounds.width = new Integer(array[2]).intValue();
+                bounds.height = new Integer(array[3]).intValue();
             }
             array = s.getArray(COLUMNS);
             if (array != null) {
                 columnsWidth = new int[array.length];
                 for (int i = 0; i < columnsWidth.length; i++) {
-					columnsWidth[i] = Integer.valueOf(array[i]).intValue();
+					columnsWidth[i] = new Integer(array[i]).intValue();
 				}
             }
         }
@@ -381,18 +383,21 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
                 okPressed();
             }
         });
-        editorsTable.addDisposeListener(e -> {
-		    for (Iterator images1 = imageCache.values().iterator(); images1
-		            .hasNext();) {
-		        Image i1 = (Image) images1.next();
-		        i1.dispose();
-		    }
-		    for (Iterator images2 = disabledImageCache.values().iterator(); images2
-		            .hasNext();) {
-		        Image i2 = (Image) images2.next();
-		        i2.dispose();
-		    }
-		});
+        editorsTable.addDisposeListener(new DisposeListener() {
+            @Override
+			public void widgetDisposed(DisposeEvent e) {
+                for (Iterator images = imageCache.values().iterator(); images
+                        .hasNext();) {
+                    Image i = (Image) images.next();
+                    i.dispose();
+                }
+                for (Iterator images = disabledImageCache.values().iterator(); images
+                        .hasNext();) {
+                    Image i = (Image) images.next();
+                    i.dispose();
+                }
+            }
+        });
         editorsTable.setFocus();
         applyDialogFont(dialogArea);
         return dialogArea;

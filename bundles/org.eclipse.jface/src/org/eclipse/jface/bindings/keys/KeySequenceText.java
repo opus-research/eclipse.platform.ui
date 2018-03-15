@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -471,13 +471,13 @@ public final class KeySequenceText {
 	}
 
 	static {
-		TreeSet<KeyStroke> trappedKeys = new TreeSet<>();
+		TreeSet trappedKeys = new TreeSet();
 		trappedKeys.add(SWTKeySupport.convertAcceleratorToKeyStroke(SWT.TAB));
 		trappedKeys.add(SWTKeySupport.convertAcceleratorToKeyStroke(SWT.TAB
 				| SWT.SHIFT));
 		trappedKeys.add(SWTKeySupport.convertAcceleratorToKeyStroke(SWT.BS));
 		trappedKeys.add(SWTKeySupport.convertAcceleratorToKeyStroke(SWT.DEL));
-		List<KeyStroke> trappedKeyList = new ArrayList<>(trappedKeys);
+		List trappedKeyList = new ArrayList(trappedKeys);
 		TRAPPED_KEYS = Collections.unmodifiableList(trappedKeyList);
 	}
 
@@ -519,7 +519,7 @@ public final class KeySequenceText {
 	 * Those listening to changes to the key sequence in this widget. This value
 	 * may be <code>null</code> if there are no listeners.
 	 */
-	private Collection<IPropertyChangeListener> listeners = null;
+	private Collection listeners = null;
 
 	/** The maximum number of key strokes permitted in the sequence. */
 	private int maxStrokes = INFINITE;
@@ -582,7 +582,7 @@ public final class KeySequenceText {
 		}
 
 		if (listeners == null) {
-			listeners = new ArrayList<>(1);
+			listeners = new ArrayList(1);
 		}
 
 		listeners.add(listener);
@@ -633,8 +633,8 @@ public final class KeySequenceText {
 		 * Keep track of the text range under which the stroke appears (i.e.,
 		 * startTextIndex->string.length() is the first selected stroke).
 		 */
-		String string = ""; //$NON-NLS-1$
-		List<KeyStroke> currentStrokes = new ArrayList<>();
+		String string = new String();
+		List currentStrokes = new ArrayList();
 		int startTextIndex = 0; // keeps track of the start of the stroke
 		final int keyStrokesLength = keyStrokes.length;
 		int i;
@@ -723,11 +723,12 @@ public final class KeySequenceText {
 	protected final void firePropertyChangeEvent(
 			final KeySequence oldKeySequence) {
 		if (listeners != null) {
-			final Iterator<IPropertyChangeListener> listenerItr = listeners.iterator();
+			final Iterator listenerItr = listeners.iterator();
 			final PropertyChangeEvent event = new PropertyChangeEvent(this,
 					P_KEY_SEQUENCE, oldKeySequence, getKeySequence());
 			while (listenerItr.hasNext()) {
-				final IPropertyChangeListener listener = listenerItr.next();
+				final IPropertyChangeListener listener = (IPropertyChangeListener) listenerItr
+						.next();
 				listener.propertyChange(event);
 			}
 		}

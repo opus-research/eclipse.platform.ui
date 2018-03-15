@@ -218,7 +218,8 @@ public class ListSelectionDialog extends SelectionDialog {
         // Build a list of selected children.
         if (children != null) {
             ArrayList list = new ArrayList();
-            for (Object element : children) {
+            for (int i = 0; i < children.length; ++i) {
+                Object element = children[i];
                 if (listViewer.getChecked(element)) {
 					list.add(element);
 				}

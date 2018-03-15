@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 473973
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  ******************************************************************************/
 package org.eclipse.ui.internal.statushandlers;
 
@@ -28,8 +26,10 @@ import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -47,8 +47,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.WorkbenchMessages;
@@ -152,13 +154,16 @@ public class InternalDialog extends TrayDialog {
 	public InternalDialog(final Map dialogState, boolean modal) {
 		super(ProgressManagerUtil.getDefaultParent());
 		this.dialogState = dialogState;
-		supportTray = new SupportTray(dialogState, event -> {
-			dialogState.put(IStatusDialogConstants.TRAY_OPENED,
-					Boolean.FALSE);
-			// close the tray
-			closeTray();
-			// set focus back to shell
-			getShell().setFocus();
+		supportTray = new SupportTray(dialogState, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				dialogState.put(IStatusDialogConstants.TRAY_OPENED,
+						Boolean.FALSE);
+				// close the tray
+				closeTray();
+				// set focus back to shell
+				getShell().setFocus();
+			}
 		});
 		detailsManager = new DetailsAreaManager(dialogState);
 		setShellStyle(SWT.RESIZE | SWT.MAX | SWT.MIN | getShellStyle());
@@ -364,9 +369,6 @@ public class InternalDialog extends TrayDialog {
 	}
 
 	void refreshDialogSize() {
-		if (dialogArea == null || dialogArea.isDisposed()) {
-			return;
-		}
 		Point newSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		getShell().setSize(newSize);
 	}
@@ -462,6 +464,7 @@ public class InternalDialog extends TrayDialog {
 
 	@Override
 	public Point getInitialLocation(Point initialSize) {
+		// TODO Auto-generated method stub
 		return super.getInitialLocation(initialSize);
 	}
 
@@ -506,18 +509,21 @@ public class InternalDialog extends TrayDialog {
 		control.setLayoutData(data);
 		initContentProvider();
 		initLabelProvider();
-		statusListViewer.addPostSelectionChangedListener(event -> {
-			handleSelectionChange();
-			if ((getTray() == null) && getBooleanValue(IStatusDialogConstants.TRAY_OPENED)
-					&& providesSupport()) {
-				silentTrayOpen();
-				return;
+		statusListViewer.addPostSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				handleSelectionChange();
+				if ((getTray() == null) && getBooleanValue(IStatusDialogConstants.TRAY_OPENED)
+						&& providesSupport()) {
+					silentTrayOpen();
+					return;
+				}
+				if ((getTray() != null) && !providesSupport()) {
+					silentTrayClose();
+					return;
+				}
+				supportTray.selectionChanged(event);
 			}
-			if ((getTray() != null) && !providesSupport()) {
-				silentTrayClose();
-				return;
-			}
-			supportTray.selectionChanged(event);
 		});
 		Dialog.applyDialogFont(parent);
 	}

@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -203,26 +202,32 @@ public final class Util {
 		}
     }
 
-	public static void diff(Map<?, ?> left, Map<?, ?> right, Set leftOnly, Set different,
+    public static void diff(Map left, Map right, Set leftOnly, Set different,
             Set rightOnly) {
         if (left == null || right == null || leftOnly == null
                 || different == null || rightOnly == null) {
 			throw new NullPointerException();
 		}
 
-		for (Entry<?, ?> leftEntry : left.entrySet()) {
-			Object key = leftEntry.getKey();
+        Iterator iterator = left.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            Object key = iterator.next();
 
             if (!right.containsKey(key)) {
 				leftOnly.add(key);
-			} else if (!Util.equals(leftEntry.getValue(), right.get(key))) {
+			} else if (!Util.equals(left.get(key), right.get(key))) {
 				different.add(key);
 			}
         }
 
-		for (Object rightKey : right.keySet()) {
-			if (!left.containsKey(rightKey)) {
-				rightOnly.add(rightKey);
+        iterator = right.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            Object key = iterator.next();
+
+            if (!left.containsKey(key)) {
+				rightOnly.add(key);
 			}
         }
     }
@@ -723,7 +728,7 @@ public final class Util {
 		IWorkbenchWindow windowToParentOn = activeWindow == null ? (workbench
 				.getWorkbenchWindowCount() > 0 ? workbench
 				.getWorkbenchWindows()[0] : null) : activeWindow;
-		return windowToParentOn == null ? null : windowToParentOn.getShell();
+		return windowToParentOn == null ? null : activeWindow.getShell();
 	}
 
 	/**

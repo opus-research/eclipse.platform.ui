@@ -37,7 +37,7 @@ public class UnassociatedEditorStrategyRegistry {
 	 * @return an instance of the strategy, or {@code null} if no strategy is
 	 *         found for this id
 	 */
-	public IUnassociatedEditorStrategy getStrategy(String strategyId) {
+	public static IUnassociatedEditorStrategy getStrategy(String strategyId) {
 		if (strategyId == null) {
 			return null;
 		}
@@ -58,7 +58,7 @@ public class UnassociatedEditorStrategyRegistry {
 		return null;
 	}
 
-	private String readAttribute(IConfigurationElement extension, String attribute) {
+	private static String readAttribute(IConfigurationElement extension, String attribute) {
 		String res = extension.getAttribute(attribute);
 		if (res == null) {
 			IDEWorkbenchPlugin.log("Missing attribute '" + attribute + "' for extension to " + EXTENSION_POINT_ID //$NON-NLS-1$ //$NON-NLS-2$
@@ -73,7 +73,7 @@ public class UnassociatedEditorStrategyRegistry {
 	 * @return not modifiable set with all known strategy id's in their
 	 *         definition order
 	 */
-	public Set<String> retrieveAllStrategies() {
+	public static Set<String> retrieveAllStrategies() {
 		populateIdsToLabel();
 		return Collections.unmodifiableSet(idsToLabel.keySet());
 	}
@@ -84,14 +84,14 @@ public class UnassociatedEditorStrategyRegistry {
 	 * @return the label for the supplied strategy id, or {@code null} for
 	 *         unknown id.
 	 */
-	public String getLabel(String id) {
+	public static String getLabel(String id) {
 		if (idsToLabel == null || !idsToLabel.containsKey(id)) {
 			populateIdsToLabel();
 		}
 		return idsToLabel.get(id);
 	}
 
-	private void populateIdsToLabel() {
+	private static void populateIdsToLabel() {
 		Map<String, String> res = new LinkedHashMap<>();
 		IExtensionRegistry extRegistry = Platform.getExtensionRegistry();
 		IConfigurationElement[] extensions = extRegistry.getConfigurationElementsFor(EXTENSION_POINT_ID);
@@ -105,28 +105,6 @@ public class UnassociatedEditorStrategyRegistry {
 			}
 		}
 		idsToLabel = res;
-	}
-
-	/**
-	 * @param strategyId
-	 * @return Whether the specified strategy is interactive, or false is
-	 *         strategy is unknown
-	 */
-	public boolean isInteractive(String strategyId) {
-		if (strategyId == null) {
-			return false;
-		}
-		IExtensionRegistry extRegistry = Platform.getExtensionRegistry();
-		IConfigurationElement[] extensions = extRegistry.getConfigurationElementsFor(EXTENSION_POINT_ID);
-		if (extensions != null) {
-			for (IConfigurationElement extension : extensions) {
-				if (strategyId.equals(readAttribute(extension, "id"))) { //$NON-NLS-1$
-					return Boolean.parseBoolean(readAttribute(extension, "interactive")); //$NON-NLS-1$
-				}
-			}
-		}
-		IDEWorkbenchPlugin.log("No editor strategy found for " + strategyId); //$NON-NLS-1$
-		return false;
 	}
 
 }

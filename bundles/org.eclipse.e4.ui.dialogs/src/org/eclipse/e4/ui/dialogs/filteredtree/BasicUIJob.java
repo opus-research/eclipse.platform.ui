@@ -53,19 +53,22 @@ public abstract class BasicUIJob extends Job {
 		if (asyncDisplay == null || asyncDisplay.isDisposed()) {
 			return Status.CANCEL_STATUS;
 		}
-		asyncDisplay.asyncExec(() -> {
-			IStatus result = null;
-			try {
-				// As we are in the UI Thread we can
-				// always know what to tell the job.
-				setThread(Thread.currentThread());
-				if (monitor.isCanceled()) {
-					result = Status.CANCEL_STATUS;
-				} else {
-					result = runInUIThread(monitor);
+		asyncDisplay.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				IStatus result = null;
+				try {
+					// As we are in the UI Thread we can
+					// always know what to tell the job.
+					setThread(Thread.currentThread());
+					if (monitor.isCanceled()) {
+						result = Status.CANCEL_STATUS;
+					} else {
+						result = runInUIThread(monitor);
+					}
+				} finally {
+					done(result);
 				}
-			} finally {
-				done(result);
 			}
 		});
 		return Job.ASYNC_FINISH;

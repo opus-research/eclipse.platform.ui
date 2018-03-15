@@ -39,7 +39,8 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 
 	@Override
 	public void handle(final StatusAdapter statusAdapter, int style) {
-		statusAdapter.setProperty(WorkbenchStatusDialogManager.HINT, Integer.valueOf(style));
+		statusAdapter.setProperty(WorkbenchStatusDialogManager.HINT,
+				new Integer(style));
 		if (((style & StatusManager.SHOW) == StatusManager.SHOW)
 				|| ((style & StatusManager.BLOCK) == StatusManager.BLOCK)) {
 
@@ -48,7 +49,22 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 			if (Display.getCurrent() != null) {
 				showStatusAdapter(statusAdapter, block);
 			} else {
-				Display.getDefault().asyncExec(() -> showStatusAdapter(statusAdapter, block));
+				if (block) {
+					Display.getDefault().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							showStatusAdapter(statusAdapter, true);
+						}
+					});
+
+				} else {
+					Display.getDefault().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							showStatusAdapter(statusAdapter, false);
+						}
+					});
+				}
 			}
 		}
 
