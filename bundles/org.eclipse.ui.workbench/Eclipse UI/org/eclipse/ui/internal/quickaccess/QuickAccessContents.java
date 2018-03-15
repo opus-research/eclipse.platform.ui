@@ -420,10 +420,8 @@ public abstract class QuickAccessContents {
 				entries[0].add(entry);
 			}
 		}
-
 		// number of items matching the filtered search
 		numberOfFilteredResults = countTotal - prevPick;
-
 		return entries;
 	}
 
@@ -580,18 +578,20 @@ public abstract class QuickAccessContents {
 				JFaceResources.getDialogFont()).setStyle(SWT.BOLD));
 		textLayout.setFont(table.getFont());
 		textLayout.setText(QuickAccessMessages.QuickAccess_AvailableCategories);
-		int maxProviderWidth = (textLayout.getBounds().width);
+		int maxProviderWidth = (int) (textLayout.getBounds().width * 1.1);
 		textLayout.setFont(boldFont);
 		for (int i = 0; i < providers.length; i++) {
 			QuickAccessProvider provider = providers[i];
 			textLayout.setText(provider.getName());
-			int width = (textLayout.getBounds().width);
+			int width = (int) (textLayout.getBounds().width * 1.1);
 			if (width > maxProviderWidth) {
 				maxProviderWidth = width;
 			}
 		}
-		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(0, maxProviderWidth));
-		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(100, 100));
+		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(0,
+				maxProviderWidth));
+		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(100,
+				100));
 		table.getShell().addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(ControlEvent e) {
