@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
  *     Eugene Ostroukhov <eugeneo@symbian.org> - Bug 287887 [Wizards] [api] Cancel button has two distinct roles
  *     Paul Adams <padams@ittvis.com> - Bug 202534 - [Dialogs] SWT error in Wizard dialog when help is displayed and "Finish" is pressed
  *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
+ *     Mikael Barbero (Eclipse Foundation) - Bug 470175
  *******************************************************************************/
 package org.eclipse.jface.wizard;
 
@@ -35,6 +36,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.dialogs.PageChangingEvent;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.internal.CancelabilityMonitorUtils;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.resource.JFaceResources;
@@ -986,6 +988,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		if (progressMonitor == null) {
 			progressMonitor = new NullProgressMonitor();
 		}
+		progressMonitor = CancelabilityMonitorUtils.aboutToStart(cancelable, progressMonitor,
+				runnable.getClass().getName());
 		try {
 			if (!fork) {
 				lockedUI = true;
@@ -1003,6 +1007,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 				stopped(state);
 			}
 			activeRunningOperations--;
+			CancelabilityMonitorUtils.hasStopped(progressMonitor);
 		}
 	}
 
