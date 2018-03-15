@@ -19,6 +19,11 @@ import org.eclipse.ui.examples.fieldassist.FieldAssistPlugin;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+	 */
 	@Override
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = FieldAssistPlugin.getDefault()
