@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Axel Richard <axel.richard@obeo.fr> - initial API and implementation, Bug 492401
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 498760
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -319,8 +318,8 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 		autoSaveGroup = new Group(composite, SWT.NONE);
 		final GridLayout autoSaveGroupLayout = new GridLayout();
 		autoSaveGroupLayout.numColumns = 1;
-		autoSaveGroupLayout.marginWidth = 6;
-		autoSaveGroupLayout.marginHeight = 2;
+		autoSaveGroupLayout.marginWidth = 0;
+		autoSaveGroupLayout.marginHeight = 0;
 		autoSaveGroup.setLayout(autoSaveGroupLayout);
 		final GridData autoSaveGroupLayoutData = new GridData();
 		autoSaveGroupLayoutData.horizontalAlignment = GridData.FILL;
@@ -340,7 +339,8 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 		intervalCompositeLayout.marginWidth = 0;
 		intervalCompositeLayout.marginHeight = 10;
 		intervalComposite.setLayout(intervalCompositeLayout);
-		intervalComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		final GridData intervalCompositeLayoutData = new GridData(SWT.FILL, SWT.FILL, true, false);
+		intervalComposite.setLayoutData(intervalCompositeLayoutData);
 		intervalComposite.setEnabled(autoSaveButton.getSelection());
 
 		intervalField = new IntegerFieldEditor(IPreferenceConstants.SAVE_AUTOMATICALLY_INTERVAL, "", //$NON-NLS-1$
@@ -375,7 +375,8 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 		messageLayout.marginWidth = 0;
 		messageLayout.marginHeight = 0;
 		noteComposite.setLayout(messageLayout);
-		noteComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		final GridData noteCompositeData = new GridData(SWT.FILL, SWT.FILL, true, false);
+		noteComposite.setLayoutData(noteCompositeData);
 
 		noteLabel = new Label(noteComposite, SWT.NONE);
 		noteLabel.setText(IDEWorkbenchMessages.AutoSavePreferencPage_noteLabel);
