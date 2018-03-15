@@ -95,10 +95,6 @@
             class="org.eclipse.ui.tests.propertysheet.PropertySheetPerspectiveFactory3"
             id="org.eclipse.ui.tests.propertysheet.PropertySheetPerspectiveFactory3"
             name="Second UI Test Perspective for hidden Properties view instance"/>
-      <perspective
-            class="org.eclipse.ui.tests.views.OpenViewTest$TestPerspectiveFactory"
-            id="org.eclipse.ui.tests.views.OpenViewTest.TestPerspective"
-            name="org.eclipse.ui.tests.views.OpenViewTest.TestPerspective"/>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -502,16 +498,7 @@
             id="org.eclipse.ui.tests.propertysheet.AdaptingSaveableView"
             name="AdaptingSaveableView">
       </view>
-      <view
-            class="org.eclipse.ui.tests.views.OpenViewTest$OtherView"
-            id="org.eclipse.ui.tests.views.OpenViewTest.OtherView"
-            name="org.eclipse.ui.tests.views.OpenViewTest.OtherView">
-      </view>
-      <view
-            class="org.eclipse.ui.tests.views.OpenViewTest$PerspectiveView"
-            id="org.eclipse.ui.tests.views.OpenViewTest.PerspectiveView"
-            name="org.eclipse.ui.tests.views.OpenViewTest.PerspectiveView">
-      </view>
+
    </extension>
    <extension
          point="org.eclipse.ui.editors">
