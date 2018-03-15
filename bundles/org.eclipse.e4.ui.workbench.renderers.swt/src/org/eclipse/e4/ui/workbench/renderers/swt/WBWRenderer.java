@@ -40,6 +40,7 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
+import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
@@ -73,6 +74,7 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.layout.GridData;
@@ -256,6 +258,48 @@ public class WBWRenderer extends SWTPartRenderer {
 		themeDefinitionChanged.handleEvent(event);
 	}
 
+	@Inject
+	@Optional
+	private void subscribeTopicDetachedChanged(@UIEventTopic(UIEvents.Window.TOPIC_WINDOWS) Event event) {
+		/*
+		 * Handle any changes required for parent changes on detached windows.
+		 * This isn't quite straightforward as we don't see TOPIC_PARENT events
+		 * parent changes are only described as ADD and REMOVE on the
+		 * Window.TOPIC_WINDOWS and Application.TOPIC_CHILDREN.
+		 */
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MWindow))
+			return;
+
+		if (UIEvents.isREMOVE(event)) {
+			for (Object removed : UIEvents.asIterable(event, UIEvents.EventTags.OLD_VALUE)) {
+				if (removed instanceof MWindow && ((MWindow) removed).getRenderer() instanceof WBWRenderer) {
+					MWindow window = (MWindow) removed;
+					((WBWRenderer) window.getRenderer()).handleParentChange(window);
+				}
+			}
+		} else if (UIEvents.isADD(event)) {
+			for (Object removed : UIEvents.asIterable(event, UIEvents.EventTags.NEW_VALUE)) {
+				if (removed instanceof MWindow && ((MWindow) removed).getRenderer() instanceof WBWRenderer) {
+					MWindow window = (MWindow) removed;
+					((WBWRenderer) window.getRenderer()).handleParentChange(window);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param window
+	 */
+	private void handleParentChange(MWindow windowModel) {
+		// No widget == nothing to update
+		Shell theShell = (Shell) windowModel.getWidget();
+		if (theShell == null)
+			return;
+
+		// Update any values that could have been obtained from the parent
+		theShell.setImage(getImage(windowModel));
+	}
+
 	/**
 	 * Closes the provided detached window.
 	 *
@@ -430,8 +474,9 @@ public class WBWRenderer extends SWTPartRenderer {
 		if (wbwModel.getLabel() != null)
 			wbwShell.setText(wbwModel.getLocalizedLabel());
 
-		if (wbwModel.getIconURI() != null && wbwModel.getIconURI().length() > 0) {
-			wbwShell.setImage(getImage(wbwModel));
+		Image windowImage = getImage(wbwModel);
+		if (windowImage != null) {
+			wbwShell.setImage(windowImage);
 		} else {
 			// TODO: This should be added to the model, see bug 308494
 			// it allows for a range of icon sizes that the platform gets to
@@ -440,6 +485,19 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 
 		return newWidget;
+	}
+
+	@Override
+	public Image getImage(MUILabel element) {
+		Image image = super.getImage(element);
+		if (image == null && element instanceof MWindow) {
+			// Detached windows should take their image from parent window
+			MWindow parent = modelService.getTopLevelWindowFor((MWindow) element);
+			if (parent != null && parent != element) {
+				image = getImage(parent);
+			}
+		}
+		return image;
 	}
 
 	private void setCloseHandler(MWindow window) {

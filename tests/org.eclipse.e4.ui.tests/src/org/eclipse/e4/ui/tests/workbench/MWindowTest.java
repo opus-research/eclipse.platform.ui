@@ -13,13 +13,16 @@ package org.eclipse.e4.ui.tests.workbench;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.eclipse.e4.core.commands.CommandServiceAddon;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
@@ -63,6 +66,18 @@ public class MWindowTest {
 		appContext = E4Application.createDefaultContext();
 		ContextInjectionFactory.make(CommandServiceAddon.class, appContext);
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG, PartRenderingEngine.engineURI);
+		appContext.set(UISynchronize.class, new UISynchronize() {
+			@Override
+			public void syncExec(Runnable runnable) {
+				runnable.run();
+			}
+
+			@Override
+			public void asyncExec(final Runnable runnable) {
+				runnable.run();
+			}
+		});
+		ContextInjectionFactory.setDefault(appContext);
 		ems = appContext.get(EModelService.class);
 	}
 
@@ -426,6 +441,43 @@ public class MWindowTest {
 
 		assertEquals(shell.getBounds().height, window.getHeight());
 		assertEquals(300, shell.getBounds().height);
+	}
+
+	@Test
+	public void testDetachedWindow() {
+		final MWindow window = ems.createModelElement(MWindow.class);
+		window.setLabel("MyWindow");
+		window.setIconURI("platform:/plugin/org.eclipse.e4.ui.tests/icons/filenav_nav.png");
+		final MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		detachedWindow.setLabel("DetachedWindow");
+		window.getWindows().add(detachedWindow);
+
+		MApplication application = ems.createModelElement(MApplication.class);
+		application.getChildren().add(window);
+		application.setContext(appContext);
+		appContext.set(MApplication.class, application);
+
+		wb = new E4Workbench(application, appContext);
+		wb.createAndRunUI(window);
+
+		Widget topWidget = (Widget) window.getWidget();
+		Widget detachedWidget = (Widget) detachedWindow.getWidget();
+		assertNotNull(topWidget);
+		assertNotNull(detachedWidget);
+		assertEquals(window, ems.getContainer(detachedWindow));
+		assertTrue(topWidget instanceof Shell);
+		assertTrue(detachedWidget instanceof Shell);
+		assertNotNull(((Shell) topWidget).getImage());
+		assertNotNull(((Shell) detachedWidget).getImage());
+		assertTrue(((Shell) topWidget).getImage() == ((Shell) detachedWidget).getImage());
+
+		application.getChildren().add(detachedWindow);
+		while (topWidget.getDisplay().readAndDispatch())
+			;
+		assertTrue(window.getWindows().isEmpty());
+		assertNotEquals(window, ems.getContainer(detachedWindow));
+		assertNotNull(((Shell) topWidget).getImage());
+		assertNull(((Shell) detachedWidget).getImage());
 	}
 
 	private MPart getContributedPart(MWindow window) {
