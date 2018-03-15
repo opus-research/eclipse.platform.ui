@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.util.Geometry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -41,8 +40,6 @@ import org.junit.Test;
  * Tests for expandable composite
  */
 public class ExpandableCompositeTest {
-	private static final int SHORT_CONTROL_WIDTH = 58;
-
 	private int defaultFlags = ExpandableComposite.TWISTIE;
 	private static Display display;
 	private Shell shell;
@@ -418,7 +415,8 @@ public class ExpandableCompositeTest {
 	private void assertTextLines(int lines, Rectangle bounds) {
 		Point textExtend = getTextExtend(shortText);
 		// it will be around "lines" lines of text
-		assertAround("Expected " + lines + " lines of text", (textExtend.y * lines), bounds.height, textExtend.y * 2);
+		assertAround("Expected " + lines + " lines of text", (textExtend.y * lines), bounds.height,
+ textExtend.y * 2);
 	}
 
 	private Label createLabel(Composite comp, String text) {
@@ -459,8 +457,8 @@ public class ExpandableCompositeTest {
 	private Composite createFixedComp(Composite parent) {
 		Composite comp = createComposite(parent);
 		GridLayoutFactory.fillDefaults().applyTo(comp);
-		Control control = ControlFactory.create(comp, SHORT_CONTROL_WIDTH, 15);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(control);
+		Label l = createLabel(comp, shortText);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(l);
 		return comp;
 	}
 
@@ -510,7 +508,9 @@ public class ExpandableCompositeTest {
 
 		Rectangle bounds = update();
 
-		assertEquals(SHORT_CONTROL_WIDTH, client.getBounds().width);
+		int w = getTextExtend(shortText).x;
+
+		assertEquals(w, client.getBounds().width);
 		assertTextLines(4, bounds);
 		assertAround("Width", 500, bounds.width, 8);
 	}
@@ -525,24 +525,10 @@ public class ExpandableCompositeTest {
 
 		Rectangle bounds = update();
 
+		int w = getTextExtend(shortText).x;
 		// not sure +8
-		assertAround("Text Client width", SHORT_CONTROL_WIDTH, client.getBounds().width, 8);
+		assertAround("Text Client width", w, client.getBounds().width, 8);
 		assertTextLines(4, bounds);
 		assertAround("Width", 500, bounds.width, 2);
-	}
-
-	@Test
-	public void testTwistieIsVerticallyCentered() {
-		createExtendableComposite(shortText,
-				ExpandableComposite.LEFT_TEXT_CLIENT_ALIGNMENT | ExpandableComposite.TWISTIE);
-		width500();
-		update();
-
-		Control[] children = ec.getChildren();
-
-		int textCenter = Geometry.centerPoint(children[1].getBounds()).y;
-		int twistieCenter = Geometry.centerPoint(children[0].getBounds()).y;
-
-		assertAround("Twisty position", textCenter, twistieCenter, 1);
 	}
 }
