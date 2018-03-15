@@ -352,14 +352,7 @@ public class PropertySheet extends PageBookView
     @Override
 	protected boolean isImportant(IWorkbenchPart part) {
 		// Don't interfere with other property views
-		if (part == null) {
-			return false;
-		}
-    	IWorkbenchPartSite site = part.getSite();
-		if (site == null) {
-			return false;
-		}
-		String partID = site.getId();
+    	String partID = part.getSite().getId();
 		boolean isPropertyView = getSite().getId().equals(partID);
 		return !isPinned() && !isPropertyView && !isViewIgnored(partID);
     }
@@ -603,12 +596,9 @@ public class PropertySheet extends PageBookView
 		if (!isPinned()
 				&& aContext instanceof PropertyShowInContext) {
 			PropertyShowInContext context = (PropertyShowInContext) aContext;
-			IWorkbenchPart part = context.getPart();
-			if (part != null) {
-				partActivated(part);
-				selectionChanged(part, context.getSelection());
-				return true;
-			}
+			partActivated(context.getPart());
+			selectionChanged(context.getPart(), context.getSelection());
+			return true;
 		}
 		return false;
 	}
