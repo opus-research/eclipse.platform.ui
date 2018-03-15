@@ -18,7 +18,6 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 391430, 472654, 460886
  *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 473779
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 506306
- *     Axel Richard <axel.richard@oebo.fr> - Bug 354538
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -46,7 +45,6 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
-import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
@@ -347,7 +345,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			rendererFilter = null;
 		}
 		context.remove(MenuManagerRenderer.class);
-		if (Policy.DEBUG_RENDERER) {
+		if (isDebugEnabled()) {
 			logger.debug("\nMMR:dispose: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
 		}
@@ -643,7 +641,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		List<MUIElement> parts = container.getChildren();
 		if (parts != null) {
 			MUIElement[] plist = parts.toArray(new MUIElement[parts.size()]);
-			for (MUIElement childME : plist) {
+			for (int i = 0; i < plist.length; i++) {
+				MUIElement childME = plist[i];
 				modelProcessSwitch(parentManager, (MMenuElement) childME);
 			}
 		}
@@ -685,7 +684,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		List<MMenuElement> parts = menuModel.getChildren();
 		if (parts != null) {
 			MMenuElement[] plist = parts.toArray(new MMenuElement[parts.size()]);
-			for (MMenuElement childME : plist) {
+			for (int i = 0; i < plist.length; i++) {
+				MMenuElement childME = plist[i];
 				modelProcessSwitch(menuManager, childME);
 			}
 		}
@@ -878,7 +878,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	public void linkModelToManager(MMenu model, MenuManager manager) {
 		modelToManager.put(model, manager);
 		managerToModel.put(manager, model);
-		if (Policy.DEBUG_RENDERER) {
+		if (isDebugEnabled()) {
 			logger.debug("\nMMR:linkModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
 		}
@@ -886,15 +886,12 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	public void clearModelToManager(MMenu model, MenuManager manager) {
 		for (MMenuElement element : model.getChildren()) {
-			if (element instanceof MMenu) {
-				clearModelToManager((MMenu) element, getManager((MMenu) element));
-			}
 			IContributionItem ici = getContribution(element);
 			clearModelToContribution(element, ici);
 		}
 		modelToManager.remove(model);
 		managerToModel.remove(manager);
-		if (Policy.DEBUG_RENDERER) {
+		if (isDebugEnabled()) {
 			logger.debug("\nMMR:clearModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
 		}
@@ -911,7 +908,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	public void linkModelToContribution(MMenuElement model, IContributionItem item) {
 		modelToContribution.put(model, item);
 		contributionToModel.put(item, model);
-		if (Policy.DEBUG_RENDERER) {
+		if (isDebugEnabled()) {
 			logger.debug(
 					"\nMMR:linkModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
 					modelToContribution.size(), contributionToModel.size());
@@ -919,15 +916,9 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	}
 
 	public void clearModelToContribution(MMenuElement model, IContributionItem item) {
-		if (model instanceof MMenu) {
-			for (MMenuElement element : ((MMenu) model).getChildren()) {
-				IContributionItem ici = getContribution(element);
-				clearModelToContribution(element, ici);
-			}
-		}
 		modelToContribution.remove(model);
 		contributionToModel.remove(item);
-		if (Policy.DEBUG_RENDERER) {
+		if (isDebugEnabled()) {
 			logger.debug(
 					"\nMMR:clearModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
 					modelToContribution.size(), contributionToModel.size());

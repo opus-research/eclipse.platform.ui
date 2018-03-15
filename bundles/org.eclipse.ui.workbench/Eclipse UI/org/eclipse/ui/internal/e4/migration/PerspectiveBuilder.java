@@ -502,8 +502,8 @@ public class PerspectiveBuilder {
 		}
 		List<MStackElement> originalOrder = new ArrayList<>(renderedViews);
 		stackChildren.clear();
-		for (int element : partOrder) {
-			stackChildren.add(originalOrder.get(element));
+		for (int i = 0; i < partOrder.length; i++) {
+			stackChildren.add(originalOrder.get(partOrder[i]));
 		}
 		originalOrder.removeAll(stackChildren);
 		stackChildren.addAll(originalOrder);
@@ -616,8 +616,8 @@ public class PerspectiveBuilder {
 		ArrayList<String> list = new ArrayList<>();
 		IExtension[] extensions = getPerspectiveExtensions();
 		if (extensions != null) {
-			for (IExtension extension : extensions) {
-				list.addAll(getExtensionShowInPartFromRegistry(extension, targetId));
+			for (int i = 0; i < extensions.length; i++) {
+				list.addAll(getExtensionShowInPartFromRegistry(extensions[i], targetId));
 			}
 		}
 		return list;
@@ -637,12 +637,12 @@ public class PerspectiveBuilder {
 	private static ArrayList<String> getExtensionShowInPartFromRegistry(IExtension extension, String targetId) {
 		ArrayList<String> list = new ArrayList<>();
 		IConfigurationElement[] configElements = extension.getConfigurationElements();
-		for (IConfigurationElement configElement : configElements) {
-			String type = configElement.getName();
+		for (int j = 0; j < configElements.length; j++) {
+			String type = configElements[j].getName();
 			if (type.equals(IWorkbenchRegistryConstants.TAG_PERSPECTIVE_EXTENSION)) {
-				String id = configElement.getAttribute(IWorkbenchRegistryConstants.ATT_TARGET_ID);
+				String id = configElements[j].getAttribute(IWorkbenchRegistryConstants.ATT_TARGET_ID);
 				if (targetId.equals(id) || "*".equals(id)) { //$NON-NLS-1$
-					list.addAll(getConfigElementShowInPartsFromRegistry(configElement));
+					list.addAll(getConfigElementShowInPartsFromRegistry(configElements[j]));
 				}
 			}
 		}
@@ -653,7 +653,8 @@ public class PerspectiveBuilder {
 		ArrayList<String> list = new ArrayList<>();
 		String tag = IWorkbenchRegistryConstants.TAG_SHOW_IN_PART;
 		IConfigurationElement[] children = configElement.getChildren();
-		for (IConfigurationElement child : children) {
+		for (int nX = 0; nX < children.length; nX++) {
+			IConfigurationElement child = children[nX];
 			String ctype = child.getName();
 			if (tag.equals(ctype)) {
 				String tid = child.getAttribute(IWorkbenchRegistryConstants.ATT_ID);

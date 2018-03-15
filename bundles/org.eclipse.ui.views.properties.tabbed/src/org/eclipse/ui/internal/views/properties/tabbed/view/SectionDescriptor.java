@@ -199,7 +199,8 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 			inputTypes = new ArrayList();
 			IConfigurationElement[] elements = getConfigurationElement()
 					.getChildren(ELEMENT_INPUT);
-			for (IConfigurationElement element : elements) {
+			for (int i = 0; i < elements.length; i++) {
+				IConfigurationElement element = elements[i];
 				inputTypes.add(element.getAttribute(ATT_INPUT_TYPE));
 			}
 		}

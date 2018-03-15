@@ -69,7 +69,12 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 				return value;
 			}
 		};
-		this.size = () -> sizeValue;
+		this.size = new Supplier<Point>() {
+			@Override
+			public Point get() {
+				return sizeValue;
+			}
+		};
     }
 
     /**
@@ -121,9 +126,12 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 			int quadrant) {
 		this.referenceImageOrDescriptor = baseImageDescriptor;
 		this.overlays = createArrayFrom(overlayImageDescriptor, quadrant);
-		this.size = () -> {
-			ImageData data = baseImageData.get();
-			return new Point(data.width, data.height);
+		this.size = new Supplier<Point>() {
+			@Override
+			public Point get() {
+				ImageData data = baseImageData.get();
+				return new Point(data.width, data.height);
+			}
 		};
 		this.baseImageData = new Supplier<ImageData>() {
 			private ImageData value;
