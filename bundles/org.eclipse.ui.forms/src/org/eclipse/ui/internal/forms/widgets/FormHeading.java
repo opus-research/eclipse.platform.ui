@@ -7,6 +7,7 @@
  *
  *  Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Ralf M Petter <ralf.petter@gmail.com> - Bug 509719
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 
@@ -25,10 +26,7 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -40,9 +38,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Layout;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.IMessage;
@@ -577,35 +573,18 @@ public class FormHeading extends Canvas {
 	public FormHeading(Composite parent, int style) {
 		super(parent, style);
 		setBackgroundMode(SWT.INHERIT_DEFAULT);
-		addListener(SWT.Paint, new Listener() {
-			@Override
-			public void handleEvent(Event e) {
-				onPaint(e.gc);
+		addListener(SWT.Paint, e -> onPaint(e.gc));
+		addListener(SWT.Dispose, e -> {
+			if (gradientImage != null) {
+				FormImages.getInstance().markFinished(gradientImage, getDisplay());
+				gradientImage = null;
 			}
 		});
-		addListener(SWT.Dispose, new Listener() {
-			@Override
-			public void handleEvent(Event e) {
-				if (gradientImage != null) {
-					FormImages.getInstance().markFinished(gradientImage, getDisplay());
-					gradientImage = null;
-				}
-			}
+		addListener(SWT.Resize, e -> {
+			if (gradientInfo != null || (backgroundImage != null && !isBackgroundImageTiled()))
+				updateGradientImage();
 		});
-		addListener(SWT.Resize, new Listener() {
-			@Override
-			public void handleEvent(Event e) {
-				if (gradientInfo != null
-						|| (backgroundImage != null && !isBackgroundImageTiled()))
-					updateGradientImage();
-			}
-		});
-		addMouseMoveListener(new MouseMoveListener() {
-			@Override
-			public void mouseMove(MouseEvent e) {
-				updateTitleRegionHoverState(e);
-			}
-		});
+		addMouseMoveListener(e -> updateTitleRegionHoverState(e));
 		addMouseTrackListener(new MouseTrackListener() {
 			@Override
 			public void mouseEnter(MouseEvent e) {
@@ -788,13 +767,10 @@ public class FormHeading extends Canvas {
 			toolbar.setBackground(getBackground());
 			toolbar.setForeground(getForeground());
 			toolbar.setCursor(FormsResources.getHandCursor());
-			addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(DisposeEvent e) {
-					if (toolBarManager != null) {
-						toolBarManager.dispose();
-						toolBarManager = null;
-					}
+			addDisposeListener(e -> {
+				if (toolBarManager != null) {
+					toolBarManager.dispose();
+					toolBarManager = null;
 				}
 			});
 		}
@@ -878,10 +854,8 @@ public class FormHeading extends Canvas {
 
 	private void updateGradientImage() {
 		Rectangle rect = getBounds();
-		if (gradientImage != null) {
-			FormImages.getInstance().markFinished(gradientImage, getDisplay());
-			gradientImage = null;
-		}
+		Image oldGradientImage = gradientImage;
+		gradientImage = null;
 		if (gradientInfo != null) {
 			gradientImage = FormImages.getInstance().getGradient(gradientInfo.gradientColors, gradientInfo.percents,
 					gradientInfo.vertical ? rect.height : rect.width, gradientInfo.vertical, getColor(COLOR_BASE_BG), getDisplay());
@@ -892,6 +866,9 @@ public class FormHeading extends Canvas {
 			GC gc = new GC(gradientImage);
 			gc.drawImage(backgroundImage, 0, 0);
 			gc.dispose();
+		}
+		if (oldGradientImage != null) {
+			FormImages.getInstance().markFinished(oldGradientImage, getDisplay());
 		}
 		setBackgroundImage(gradientImage);
 	}

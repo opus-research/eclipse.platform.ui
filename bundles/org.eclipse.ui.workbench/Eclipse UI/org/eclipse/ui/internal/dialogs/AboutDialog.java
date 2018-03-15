@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440149, 472654
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 496319, 498301
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -31,8 +32,6 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -65,7 +64,12 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
  * Displays information about the product.
  */
 public class AboutDialog extends TrayDialog {
-    private final static int MAX_IMAGE_WIDTH_FOR_TEXT = 250;
+	/**
+	 *
+	 */
+	private static final String COPY_BUILD_ID_COMMAND = "org.eclipse.ui.ide.copyBuildIdCommand"; //$NON-NLS-1$
+
+	private final static int MAX_IMAGE_WIDTH_FOR_TEXT = 250;
 
     private final static int DETAILS_ID = IDialogConstants.CLIENT_ID + 1;
 
@@ -117,14 +121,11 @@ public class AboutDialog extends TrayDialog {
 	protected void buttonPressed(int buttonId) {
         switch (buttonId) {
         case DETAILS_ID:
-			BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
-				@Override
-				public void run() {
-					IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-					InstallationDialog dialog = new InstallationDialog(getShell(), workbenchWindow);
-					dialog.setModalParent(AboutDialog.this);
-					dialog.open();
-				}
+			BusyIndicator.showWhile(getShell().getDisplay(), () -> {
+				IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				InstallationDialog dialog = new InstallationDialog(getShell(), workbenchWindow);
+				dialog.setModalParent(AboutDialog.this);
+				dialog.open();
 			});
             break;
         default:
@@ -133,16 +134,15 @@ public class AboutDialog extends TrayDialog {
         }
     }
 
-    @Override
+	@Override
 	public boolean close() {
-        // dispose all images
-        for (int i = 0; i < images.size(); ++i) {
-            Image image = images.get(i);
-            image.dispose();
-        }
-
-        return super.close();
-    }
+		// dispose all images
+		for (int i = 0; i < images.size(); ++i) {
+			Image image = images.get(i);
+			image.dispose();
+		}
+		return super.close();
+	}
 
     @Override
 	protected void configureShell(Shell newShell) {
@@ -397,16 +397,12 @@ public class AboutDialog extends TrayDialog {
 						CommandContributionItem.STYLE_PUSH)));
 		textManager.add(new CommandContributionItem(
 				new CommandContributionItemParameter(PlatformUI
+						.getWorkbench(), null, COPY_BUILD_ID_COMMAND, CommandContributionItem.STYLE_PUSH)));
+		textManager.add(new CommandContributionItem(new CommandContributionItemParameter(PlatformUI
 						.getWorkbench(), null, IWorkbenchCommandConstants.EDIT_SELECT_ALL,
 						CommandContributionItem.STYLE_PUSH)));
 		text.setMenu(textManager.createContextMenu(text));
-		text.addDisposeListener(new DisposeListener() {
-
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				textManager.dispose();
-			}
-		});
+		text.addDisposeListener(e -> textManager.dispose());
 
 	}
 
