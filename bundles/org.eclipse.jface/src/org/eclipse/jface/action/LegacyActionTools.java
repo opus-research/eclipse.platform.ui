@@ -709,7 +709,7 @@ public final class LegacyActionTools {
 	 * (or the last <code>'@'</code> if there is no tab).
 	 *
 	 * @param text
-	 *            the text
+	 *            the
 	 * @return the text sans accelerator
 	 */
 	public static final String removeAcceleratorText(final String text) {
