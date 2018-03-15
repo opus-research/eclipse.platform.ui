@@ -22,28 +22,18 @@ import org.osgi.framework.FrameworkUtil;
 
 public class PluginsNotLoadedTest {
 
-	private static String[] NOT_LOADED_BUNDLES= new String[] {
+	private static String[] NOT_ACTIVE_BUNDLES = new String[] {
 			"org.apache.xerces",
-			"org.eclipse.jdt.astview",
-			"org.eclipse.jdt.jeview",
-			"org.eclipse.reftracker",
-			"org.eclipse.swt.sleak",
-			"org.eclipse.swt.spy",
 			"com.jcraft.jsch",
 			"javax.servlet",
 			"javax.servlet.jsp",
 			"org.apache.ant",
-			"org.apache.commons.el",
 			"org.apache.commons.logging",
-			"org.apache.jasper",
 			"org.apache.lucene",
-			"org.apache.lucene.analysis",
 			"org.eclipse.ant.core",
 			"org.eclipse.ant.ui",
 			"org.eclipse.compare", // caveat, see workaround for EGit in setUpTest below!
 			"org.eclipse.core.commands",
-			"org.eclipse.core.expressions.tests",
-			"org.eclipse.core.filebuffers.tests",
 			"org.eclipse.core.filesystem.win32.x86",
 			"org.eclipse.core.resources.compatibility",
 			"org.eclipse.core.resources.win32",
@@ -69,14 +59,8 @@ public class PluginsNotLoadedTest {
 			"org.eclipse.jdt.junit",
 			"org.eclipse.jdt.junit.runtime",
 			"org.eclipse.jdt.junit4.runtime",
-			"org.eclipse.jdt.ui.examples.javafamily",
-			"org.eclipse.jdt.ui.examples.projects",
-			"org.eclipse.jdt.ui.tests.refactoring",
 			"org.eclipse.jface.databinding",
 			"org.eclipse.jface.text",
-			"org.eclipse.jface.text.tests",
-			"org.eclipse.ltk.core.refactoring.tests",
-			"org.eclipse.ltk.ui.refactoring.tests",
 			"org.eclipse.osgi.services",
 			"org.eclipse.pde",
 			"org.eclipse.pde.build",
@@ -87,7 +71,6 @@ public class PluginsNotLoadedTest {
 			"org.eclipse.sdk",
 			"org.eclipse.sdk.tests",
 			"org.eclipse.search",
-			"org.eclipse.search.tests",
 			"org.eclipse.swt",
 			"org.eclipse.swt.win32.win32.x86",
 			"org.eclipse.team.cvs.core",
@@ -102,9 +85,6 @@ public class PluginsNotLoadedTest {
 			"org.eclipse.ui.cheatsheets",
 			"org.eclipse.ui.console",
 			"org.eclipse.ui.editors.tests",
-			"org.eclipse.ui.examples.javaeditor",
-			"org.eclipse.ui.examples.rcp.texteditor",
-			"org.eclipse.ui.examples.recipeeditor",
 			"org.eclipse.ui.externaltools",
 // Bug 416915: Allow to run tests with tycho-surefire-plugin
 //			"org.eclipse.ui.navigator",
@@ -112,44 +92,113 @@ public class PluginsNotLoadedTest {
 			"org.eclipse.ui.views.properties.tabbed",
 			"org.eclipse.ui.win32",
 			"org.eclipse.ui.workbench.compatibility",
-			"org.eclipse.ui.workbench.texteditor.tests",
 			"org.eclipse.update.core.win32",
 			"org.eclipse.update.core.linux",
 			"org.eclipse.update.ui",
 			"org.junit",
-			"org.junit4",
-			"org.mortbay.jetty",
-			"com.ibm.icu.source",
-			"javax.servlet.jsp.source",
-			"javax.servlet.source",
-			"org.apache.ant.source",
-			"org.apache.commons.el.source",
-			"org.apache.commons.logging.source",
-			"org.apache.jasper.source",
-			"org.apache.lucene.analysis.source",
-			"org.apache.lucene.source",
-			"org.eclipse.core.boot",
 			"org.eclipse.core.databinding.beans",
 			"org.eclipse.cvs",
-			"org.eclipse.cvs.source",
 			"org.eclipse.equinox.launcher",
 			"org.eclipse.equinox.launcher.win32.win32.x86",
 			"org.eclipse.help.appserver",
 			"org.eclipse.jdt.apt.pluggable.core",
-			"org.eclipse.jdt.source",
 			"org.eclipse.jsch.ui",
 			"org.eclipse.osgi.util",
-			"org.eclipse.pde.source",
 			"org.eclipse.pde.ui.templates",
 			"org.eclipse.platform",
-			"org.eclipse.platform.source",
-			"org.eclipse.platform.source.win32.win32.x86",
 			"org.eclipse.rcp",
-			"org.eclipse.rcp.source",
-			"org.eclipse.rcp.source.win32.win32.x86",
-			"org.eclipse.ui.browser",
-			"org.junit.source",
-			"org.mortbay.jetty.source"
+			"org.eclipse.ui.browser"
+		};
+
+	private static String[] ACTIVE_BUNDLES = new String[] {
+			"org.eclipse.osgi",
+			"org.eclipse.equinox.simpleconfigurator",
+			"com.ibm.icu",
+			"org.apache.felix.gogo.command",
+			"org.apache.felix.gogo.runtime",
+			"org.apache.felix.gogo.shell",
+			"org.apache.felix.scr",
+			"org.eclipse.compare",
+			"org.eclipse.compare.core",
+			"org.eclipse.core.contenttype",
+			"org.eclipse.core.expressions",
+			"org.eclipse.core.filebuffers",
+			"org.eclipse.core.filesystem",
+			"org.eclipse.core.jobs",
+			"org.eclipse.core.net",
+			"org.eclipse.core.resources",
+			"org.eclipse.core.runtime",
+			"org.eclipse.debug.core",
+			"org.eclipse.debug.ui",
+			"org.eclipse.e4.core.contexts",
+			"org.eclipse.e4.core.di",
+			"org.eclipse.e4.core.di.extensions",
+			"org.eclipse.e4.core.di.extensions.supplier",
+			"org.eclipse.e4.core.services",
+			"org.eclipse.e4.demo.contacts",
+			"org.eclipse.e4.ui.bindings",
+			"org.eclipse.e4.ui.css.swt",
+			"org.eclipse.e4.ui.css.swt.theme",
+			"org.eclipse.e4.ui.di",
+			"org.eclipse.e4.ui.model.workbench",
+			"org.eclipse.e4.ui.progress",
+			"org.eclipse.e4.ui.services",
+			"org.eclipse.e4.ui.workbench",
+			"org.eclipse.e4.ui.workbench.swt",
+			"org.eclipse.emf.common",
+			"org.eclipse.emf.ecore",
+			"org.eclipse.emf.ecore.xmi",
+			"org.eclipse.equinox.app",
+			"org.eclipse.equinox.common",
+			"org.eclipse.equinox.console",
+			"org.eclipse.equinox.ds",
+			"org.eclipse.equinox.event",
+			"org.eclipse.equinox.p2.core",
+			"org.eclipse.equinox.p2.engine",
+			"org.eclipse.equinox.p2.metadata",
+			"org.eclipse.equinox.p2.metadata.repository",
+			"org.eclipse.equinox.p2.operations",
+			"org.eclipse.equinox.p2.repository",
+			"org.eclipse.equinox.p2.ui.sdk.scheduler",
+			"org.eclipse.equinox.p2.updatechecker",
+			"org.eclipse.equinox.preferences",
+			"org.eclipse.equinox.registry",
+			"org.eclipse.equinox.security",
+			"org.eclipse.help",
+			"org.eclipse.jdt.core",
+			"org.eclipse.jdt.core.manipulation",
+			"org.eclipse.jdt.launching",
+			"org.eclipse.jdt.ui",
+			"org.eclipse.jgit",
+			"org.eclipse.jsch.core",
+			"org.eclipse.ltk.core.refactoring",
+			"org.eclipse.ltk.ui.refactoring",
+			"org.eclipse.pde.core",
+			"org.eclipse.pde.junit.runtime",
+			"org.eclipse.pde.launching",
+			"org.eclipse.pde.ui",
+			"org.eclipse.search",
+			"org.eclipse.team.core",
+			"org.eclipse.team.ui",
+			"org.eclipse.ui",
+			"org.eclipse.ui.editors",
+			"org.eclipse.ui.examples.contributions",
+			"org.eclipse.ui.externaltools",
+			"org.eclipse.ui.ide",
+			"org.eclipse.ui.ide.application",
+			"org.eclipse.ui.intro",
+			"org.eclipse.ui.intro.universal",
+			"org.eclipse.ui.monitoring",
+			"org.eclipse.ui.net",
+			"org.eclipse.ui.tests",
+			"org.eclipse.ui.tests.harness",
+			"org.eclipse.ui.themes",
+			"org.eclipse.ui.trace",
+			"org.eclipse.ui.views.log",
+			"org.eclipse.ui.workbench",
+			"org.eclipse.ui.workbench.texteditor",
+			"org.eclipse.update.configurator",
+			"org.hamcrest.core"
 		};
 
 	@Before
@@ -183,43 +232,96 @@ public class PluginsNotLoadedTest {
 	 */
 	public static void addLoadedPlugIns(String... loadedPlugins) {
 		Assert.isLegal(loadedPlugins != null);
-		List<String> l = new ArrayList<>(Arrays.asList(NOT_LOADED_BUNDLES));
+		List<String> l = new ArrayList<>(Arrays.asList(NOT_ACTIVE_BUNDLES));
 		l.removeAll(Arrays.asList(loadedPlugins));
-		NOT_LOADED_BUNDLES = l.toArray(new String[0]);
+		NOT_ACTIVE_BUNDLES = l.toArray(new String[0]);
 	}
 
-	public void _testPrintNotLoaded() {
+	/**
+	 * For debugging purposes
+	 *
+	 * @param active
+	 *            defines if method should print the active or the not not active
+	 */
+	public void printPluginStatus(boolean active) {
 		Bundle bundle = FrameworkUtil.getBundle(PluginsNotLoadedTest.class);
 		Bundle[] bundles = bundle.getBundleContext().getBundles();
+		System.out.println("Started printPluginStatus\n. Active status: " + active);
 		for (Bundle b : bundles) {
-			if (b.getState() != Bundle.ACTIVE) {
-				System.out.println(b.getSymbolicName());
+			if (!active) {
+				if (b.getState() != Bundle.ACTIVE) {
+					System.out.println(b.getSymbolicName());
+				}
+			} else {
+				if (b.getState() == Bundle.ACTIVE) {
+					System.out.println(b.getSymbolicName());
+				}
+
 			}
+
 		}
+		System.out.println("Finished printPluginStatus\n");
 	}
 
-	@Test
-	public void testPluginsNotLoaded() {
-		// _testPrintNotLoaded();
-		int i = 0;
-		StringBuffer buf = new StringBuffer();
-		for (String element : NOT_LOADED_BUNDLES) {
-			Bundle bundle = Platform.getBundle(element);
+	/**
+	 * Only plug-ins which provides OSGi services should be active.
+	 *
+	 * Also plug-ins with an activator must be activated but additional activators
+	 * should be avoided as the slow down the startup of Eclipse
+	 *
+	 */
 
-			if (element.contains("org.junit")) {
-				System.out.println();
-			}
+	@Test
+	public void pluginsWithoutOSGiServiceOrActivatorShouldNotActive() {
+		printPluginStatus(true);
+		// int i = 0;
+		StringBuffer buf = new StringBuffer();
+		for (String element : NOT_ACTIVE_BUNDLES) {
+			Bundle bundle = Platform.getBundle(element);
 			if (bundle == null) {
-				// log bundles that cannot be found:
-				buf.append("- not found: ");
-				buf.append(NOT_LOADED_BUNDLES[i]);
-				buf.append('\n');
+				// // log bundles that cannot be found:
+				// buf.append("- not found: ");
+				// buf.append(NOT_ACTIVE_BUNDLES[i]);
+				// buf.append('\n');
 			} else if (bundle.getState() == Bundle.ACTIVE) {
 				buf.append("- ");
 				buf.append(element);
 				buf.append('\n');
 			}
-			i++;
+			// i++;
+		}
+		assertTrue("Wrong bundles in active status:\n" + buf, buf.length() == 0);
+	}
+
+	/**
+	 * As the number of active plug-ins with an activator slow down the start of
+	 * Eclipse, we should avoid increasing them.
+	 *
+	 * If a bundle provides OSGi services (without an activator), this is a desired
+	 * situation. If the test is failing due to such a situation, add the
+	 * corresponding bundle to this list.
+	 *
+	 * Also plug-ins with an activator must be activated but additional activators
+	 * should be avoided as the slow down the startup of Eclipse
+	 *
+	 */
+
+	@Test
+	public void activePluginsShouldNotIncrease() {
+		printPluginStatus(true);
+		StringBuffer buf = new StringBuffer();
+		for (String element : ACTIVE_BUNDLES) {
+			Bundle bundle = Platform.getBundle(element);
+			if (bundle == null) {
+				// // log bundles that cannot be found:
+				// buf.append("- not found: ");
+				// buf.append(NOT_ACTIVE_BUNDLES[i]);
+				// buf.append('\n');
+			} else if (bundle.getState() != Bundle.ACTIVE) {
+				buf.append("- ");
+				buf.append(element);
+				buf.append('\n');
+			}
 		}
 		assertTrue("Wrong bundles loaded:\n" + buf, buf.length() == 0);
 	}
