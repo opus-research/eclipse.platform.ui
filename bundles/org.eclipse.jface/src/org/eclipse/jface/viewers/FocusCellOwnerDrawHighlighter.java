@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2017 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -83,6 +83,16 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 		}
 	}
 
+	private void removeSelectionInformation(Event event, ViewerCell cell) {
+		GC gc = event.gc;
+		gc.setBackground(cell.getViewerRow().getBackground(
+				cell.getColumnIndex()));
+		gc.setForeground(cell.getViewerRow().getForeground(
+				cell.getColumnIndex()));
+		gc.fillRectangle(cell.getBounds());
+		event.detail &= ~SWT.SELECTED;
+	}
+
 	private void hookListener(final ColumnViewer viewer) {
 
 		Listener listener = event -> {
@@ -96,7 +106,9 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 
 				ViewerCell cell = row.getCell(event.index);
 
-				if (focusCell != null && cell.equals(focusCell)) {
+				if (focusCell == null || !cell.equals(focusCell)) {
+					removeSelectionInformation(event, cell);
+				} else {
 					markFocusedCell(event, cell);
 				}
 			}
@@ -113,7 +125,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	 * @return the color or <code>null</code> to use the default
 	 */
 	protected Color getSelectedCellBackgroundColor(ViewerCell cell) {
-		return cell.getItem().getDisplay().getSystemColor(SWT.COLOR_LIST_SELECTION);
+		return null;
 	}
 
 	/**
