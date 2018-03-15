@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,6 @@ import org.eclipse.e4.ui.tests.application.ModelRobustnessTest;
 import org.eclipse.e4.ui.tests.application.ResourceHandlerTest;
 import org.eclipse.e4.ui.tests.application.StartupTestSuite;
 import org.eclipse.e4.ui.tests.application.UIEventTypesTest;
-import org.eclipse.e4.ui.tests.reconciler.ModelReconcilerTestSuite;
 import org.eclipse.e4.ui.tests.workbench.Bug308317Test;
 import org.eclipse.e4.ui.tests.workbench.ContextTest;
 import org.eclipse.e4.ui.tests.workbench.ExtensionsSortTests;
@@ -71,7 +70,6 @@ public class UIAllTests extends TestSuite {
 		addTestSuite(MSashTest.class);
 		addTestSuite(HandlerTest.class);
 		addTestSuite(ContextTest.class);
-		addTest(ModelReconcilerTestSuite.suite());
 		addTestSuite(Bug308317Test.class);
 		addTestSuite(ModelRobustnessTest.class);
 		addTestSuite(ResourceHandlerTest.class);
