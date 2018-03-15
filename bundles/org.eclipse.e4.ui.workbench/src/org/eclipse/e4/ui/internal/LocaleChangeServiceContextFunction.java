@@ -19,8 +19,7 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.osgi.service.component.annotations.Component;
 
 /**
- * Context function to provide the LocaleChangeServiceImpl. to the application
- * context.
+ * Context function to provide the LocaleChangeServiceImpl to the application context.
  */
 @Component(service = IContextFunction.class, property = "service.context.key=org.eclipse.e4.core.services.nls.ILocaleChangeService")
 public class LocaleChangeServiceContextFunction extends ContextFunction {
