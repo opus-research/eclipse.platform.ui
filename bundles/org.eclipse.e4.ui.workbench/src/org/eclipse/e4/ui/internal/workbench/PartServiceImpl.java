@@ -50,6 +50,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -58,13 +59,12 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.IPartListener;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.osgi.util.NLS;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
-/**
- * A window-based {@link EPartService}.
- */
 public class PartServiceImpl implements EPartService {
 
 	/**
@@ -818,10 +818,35 @@ public class PartServiceImpl implements EPartService {
 		return activePart;
 	}
 
+	private MPart createPart(MPartDescriptor descriptor) {
+		if (descriptor == null) {
+			return null;
+		}
+		MPart part = modelService.createModelElement(MPart.class);
+		part.setElementId(descriptor.getElementId());
+		part.getMenus().addAll(EcoreUtil.copyAll(descriptor.getMenus()));
+		if (descriptor.getToolbar() != null) {
+			part.setToolbar((MToolBar) EcoreUtil.copy((EObject) descriptor.getToolbar()));
+		}
+		part.setContributorURI(descriptor.getContributorURI());
+		part.setCloseable(descriptor.isCloseable());
+		part.setContributionURI(descriptor.getContributionURI());
+		part.setLabel(descriptor.getLabel());
+		part.setIconURI(descriptor.getIconURI());
+		part.setTooltip(descriptor.getTooltip());
+		part.getHandlers().addAll(EcoreUtil.copyAll(descriptor.getHandlers()));
+		part.getTags().addAll(descriptor.getTags());
+		part.getVariables().addAll(descriptor.getVariables());
+		part.getProperties().putAll(descriptor.getProperties());
+		part.getPersistedState().putAll(descriptor.getPersistedState());
+		part.getBindingContexts().addAll(descriptor.getBindingContexts());
+		return part;
+	}
+
 	@Override
 	public MPart createPart(String id) {
 		MPartDescriptor descriptor = modelService.getPartDescriptor(id);
-		return modelService.createPart(descriptor);
+		return createPart(descriptor);
 	}
 
 	@Override
@@ -847,7 +872,7 @@ public class PartServiceImpl implements EPartService {
 
 		if (sharedPart == null) {
 			MPartDescriptor descriptor = modelService.getPartDescriptor(id);
-			sharedPart = modelService.createPart(descriptor);
+			sharedPart = createPart(descriptor);
 			if (sharedPart == null) {
 				return null;
 			}
@@ -1155,7 +1180,7 @@ public class PartServiceImpl implements EPartService {
 		MPart part = findPart(id);
 		if (part == null) {
 			MPartDescriptor descriptor = modelService.getPartDescriptor(id);
-			part = modelService.createPart(descriptor);
+			part = createPart(descriptor);
 			if (part == null) {
 				return null;
 			}
@@ -1261,86 +1286,82 @@ public class PartServiceImpl implements EPartService {
 
 	@Override
 	public void hidePart(MPart part, boolean force) {
-		// if part is not in a container, nothing to do
-		if (!isInContainer(part)) {
-			return;
-		}
+		if (isInContainer(part)) {
+			MPlaceholder sharedRef = part.getCurSharedRef();
+			MUIElement toBeRemoved = getRemoveTarget(part);
+			MElementContainer<MUIElement> parent = getParent(toBeRemoved);
+			List<MUIElement> children = parent.getChildren();
 
-		MPlaceholder sharedRef = part.getCurSharedRef();
-		MUIElement toBeRemoved = getRemoveTarget(part);
-		MElementContainer<MUIElement> parent = getParent(toBeRemoved);
-		List<MUIElement> children = parent.getChildren();
+			// check if we're a placeholder but not actually the shared ref of the part
+			if (toBeRemoved != part && toBeRemoved instanceof MPlaceholder
+					&& sharedRef != toBeRemoved) {
+				toBeRemoved.setToBeRendered(false);
 
-		// check if we're a placeholder but not actually the shared ref of the
-		// part
-		if (toBeRemoved != part && toBeRemoved instanceof MPlaceholder && sharedRef != toBeRemoved) {
-			toBeRemoved.setToBeRendered(false);
-
-			// if so, not much to do, remove ourselves if necessary but that's
-			// it
-			if (force || part.getTags().contains(REMOVE_ON_HIDE_TAG)) {
-				parent.getChildren().remove(toBeRemoved);
+				// if so, not much to do, remove ourselves if necessary but that's it
+				if (force || part.getTags().contains(REMOVE_ON_HIDE_TAG)) {
+					parent.getChildren().remove(toBeRemoved);
+				}
+				return;
 			}
-			return;
-		}
 
-		boolean isActiveChild = isActiveChild(part);
-		MPart activationCandidate = null;
-		// check if we're the active child
-		if (isActiveChild) {
-			// get the activation candidate if we are
-			activationCandidate = partActivationHistory.getNextActivationCandidate(getParts(), part);
-		}
+			boolean isActiveChild = isActiveChild(part);
+			MPart activationCandidate = null;
+			// check if we're the active child
+			if (isActiveChild) {
+				// get the activation candidate if we are
+				activationCandidate = partActivationHistory.getNextActivationCandidate(getParts(),
+						part);
+			}
 
-		MPerspective thePersp = modelService.getPerspectiveFor(toBeRemoved);
-		boolean needNewSel = thePersp == null || !thePersp.getTags().contains("PerspClosing"); //$NON-NLS-1$
-		if (needNewSel) {
-			if (parent.getSelectedElement() == toBeRemoved) {
-				// if we're the selected element and we're going to be hidden,
-				// need to select something else
-				MUIElement candidate = partActivationHistory.getSiblingSelectionCandidate(part);
-				candidate = candidate == null ? null
-						: candidate.getCurSharedRef() == null ? candidate : candidate.getCurSharedRef();
-				if (candidate != null && children.contains(candidate)) {
-					parent.setSelectedElement(candidate);
-				} else {
-					for (MUIElement child : children) {
-						if (child != toBeRemoved && child.isToBeRendered()) {
-							parent.setSelectedElement(child);
-							break;
+			MPerspective thePersp = modelService.getPerspectiveFor(toBeRemoved);
+			boolean needNewSel = thePersp == null || !thePersp.getTags().contains("PerspClosing"); //$NON-NLS-1$
+			if (needNewSel) {
+				if (parent.getSelectedElement() == toBeRemoved) {
+					// if we're the selected element and we're going to be hidden, need to select
+					// something else
+					MUIElement candidate = partActivationHistory.getSiblingSelectionCandidate(part);
+					candidate = candidate == null ? null
+							: candidate.getCurSharedRef() == null ? candidate : candidate
+									.getCurSharedRef();
+					if (candidate != null && children.contains(candidate)) {
+						parent.setSelectedElement(candidate);
+					} else {
+						for (MUIElement child : children) {
+							if (child != toBeRemoved && child.isToBeRendered()) {
+								parent.setSelectedElement(child);
+								break;
+							}
 						}
 					}
 				}
-			}
 
-			if (activationCandidate == null) {
-				// nothing else to activate and we're the active child,
-				// deactivate
-				if (isActiveChild) {
-					part.getContext().deactivate();
+				if (activationCandidate == null) {
+					// nothing else to activate and we're the active child, deactivate
+					if (isActiveChild) {
+						part.getContext().deactivate();
+					}
+				} else {
+					// activate our candidate
+					activate(activationCandidate);
 				}
-			} else {
-				// activate our candidate
-				activate(activationCandidate);
 			}
-		}
 
-		if (toBeRemoved != null) {
-			toBeRemoved.setToBeRendered(false);
-		} else {
-			part.setToBeRendered(false);
-		}
+			if (toBeRemoved != null) {
+				toBeRemoved.setToBeRendered(false);
+			} else {
+				part.setToBeRendered(false);
+			}
 
-		if (parent.getSelectedElement() == toBeRemoved) {
-			parent.setSelectedElement(null);
-		}
+			if (parent.getSelectedElement() == toBeRemoved) {
+				parent.setSelectedElement(null);
+			}
 
-		if (force || part.getTags().contains(REMOVE_ON_HIDE_TAG)) {
-			children.remove(toBeRemoved);
+			if (force || part.getTags().contains(REMOVE_ON_HIDE_TAG)) {
+				children.remove(toBeRemoved);
+			}
+			// remove ourselves from the activation history also since we're being hidden
+			partActivationHistory.forget(getWindow(), part, toBeRemoved == part);
 		}
-		// remove ourselves from the activation history also since we're being
-		// hidden
-		partActivationHistory.forget(getWindow(), part, toBeRemoved == part);
 	}
 
 	private boolean isActiveChild(MPart part) {
