@@ -8,7 +8,7 @@ Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: javax.annotation,
- javax.inject;version="1.0.0",
+ javax.inject,
  org.eclipse.e4.core.commands,
  org.eclipse.e4.core.commands.internal,
  org.eclipse.e4.core.services.log,
