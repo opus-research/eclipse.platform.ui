@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,10 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700, 511198
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,8 +41,6 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -494,12 +494,10 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 				// Show a dialog.
 				String[] buttons;
 				if(canCancel) {
-					buttons = new String[] { IDialogConstants.YES_LABEL,
-							IDialogConstants.NO_LABEL,
+					buttons = new String[] { WorkbenchMessages.Save, WorkbenchMessages.Dont_Save,
 							IDialogConstants.CANCEL_LABEL };
 				} else {
-					buttons = new String[] { IDialogConstants.YES_LABEL,
-							IDialogConstants.NO_LABEL};
+					buttons = new String[] { WorkbenchMessages.Save, WorkbenchMessages.Dont_Save };
 				}
 
 				// don't save if we don't prompt
@@ -790,7 +788,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		@Override
 		protected void createButtonsForButtonBar(Composite parent) {
 			createButton(parent, IDialogConstants.OK_ID,
-					IDialogConstants.OK_LABEL, true);
+					WorkbenchMessages.Save, true);
 			if (canCancel) {
 				createButton(parent, IDialogConstants.CANCEL_ID,
 						IDialogConstants.CANCEL_LABEL, false);
@@ -806,12 +804,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 				 checkboxComposite.setLayout(new GridLayout(2, false));
 
 				 checkbox = new Button(checkboxComposite, SWT.CHECK);
-				 checkbox.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						dontPromptSelection = checkbox.getSelection();
-					}
-				 });
+				 checkbox.addSelectionListener(widgetSelectedAdapter(e -> dontPromptSelection = checkbox.getSelection()));
 				 GridData gd = new GridData();
 				 gd.horizontalAlignment = SWT.BEGINNING;
 				 checkbox.setLayoutData(gd);
