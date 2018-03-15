@@ -252,8 +252,11 @@ public class EditorsPreferencePage extends PreferencePage implements
         reuseEditors.setSelection(store
                 .getBoolean(IPreferenceConstants.REUSE_EDITORS_BOOLEAN));
         reuseEditors.addSelectionListener(widgetSelectedAdapter(e -> {
-			reuseEditorsThreshold.getLabelControl(editorReuseThresholdGroup).setEnabled(reuseEditors.getSelection());
-			reuseEditorsThreshold.getTextControl(editorReuseThresholdGroup).setEnabled(reuseEditors.getSelection());
+		    reuseEditorsThreshold
+		            .getLabelControl(editorReuseThresholdGroup).setEnabled(
+		                    reuseEditors.getSelection());
+		    reuseEditorsThreshold.getTextControl(editorReuseThresholdGroup)
+		            .setEnabled(reuseEditors.getSelection());
 		}));
 
         editorReuseIndentGroup = new Composite(editorReuseGroup, SWT.LEFT);
