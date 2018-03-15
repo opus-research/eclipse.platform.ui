@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -183,7 +183,7 @@ public class PartServiceImpl implements EPartService {
 
 	private MPart activePart;
 
-	private ListenerList<IPartListener> listeners = new ListenerList<>();
+	private ListenerList listeners = new ListenerList();
 
 	private boolean constructed = false;
 
@@ -238,11 +238,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartActivated(final MPart part) {
-		for (final IPartListener listener : listeners) {
+		for (final Object listener : listeners.getListeners()) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partActivated(part);
+					((IPartListener) listener).partActivated(part);
 				}
 
 				@Override
@@ -254,11 +254,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartDeactivated(final MPart part) {
-		for (final IPartListener listener : listeners) {
+		for (final Object listener : listeners.getListeners()) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partDeactivated(part);
+					((IPartListener) listener).partDeactivated(part);
 				}
 
 				@Override
@@ -270,11 +270,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartHidden(final MPart part) {
-		for (final IPartListener listener : listeners) {
+		for (final Object listener : listeners.getListeners()) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partHidden(part);
+					((IPartListener) listener).partHidden(part);
 				}
 
 				@Override
@@ -286,11 +286,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartVisible(final MPart part) {
-		for (final IPartListener listener : listeners) {
+		for (final Object listener : listeners.getListeners()) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partVisible(part);
+					((IPartListener) listener).partVisible(part);
 				}
 
 				@Override
@@ -302,11 +302,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartBroughtToTop(final MPart part) {
-		for (final IPartListener listener : listeners) {
+		for (final Object listener : listeners.getListeners()) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partBroughtToTop(part);
+					((IPartListener) listener).partBroughtToTop(part);
 				}
 
 				@Override
