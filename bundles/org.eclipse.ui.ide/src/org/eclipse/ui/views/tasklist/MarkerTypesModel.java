@@ -80,7 +80,8 @@ class MarkerTypesModel {
         if (point != null) {
             // Gather all registered marker types.
             IExtension[] extensions = point.getExtensions();
-            for (IExtension ext : extensions) {
+            for (int i = 0; i < extensions.length; ++i) {
+                IExtension ext = extensions[i];
                 String id = ext.getUniqueIdentifier();
                 String label = ext.getLabel();
                 if (label.equals("")) {//$NON-NLS-1$
@@ -89,7 +90,8 @@ class MarkerTypesModel {
                 ArrayList supersList = new ArrayList();
                 IConfigurationElement[] configElements = ext
                         .getConfigurationElements();
-                for (IConfigurationElement elt : configElements) {
+                for (int j = 0; j < configElements.length; ++j) {
+                    IConfigurationElement elt = configElements[j];
                     if (elt.getName().equalsIgnoreCase("super")) {//$NON-NLS-1$
                         String sup = elt.getAttribute("type");//$NON-NLS-1$
                         if (sup != null) {

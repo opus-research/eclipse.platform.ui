@@ -144,8 +144,8 @@ class FiltersDialog extends TrayDialog {
         void updateEnabledState() {
             boolean enabled = enableButton.isEnabled()
                     && enableButton.getSelection();
-            for (Button valueButton : valueButtons) {
-                valueButton.setEnabled(enabled);
+            for (int i = 0; i < valueButtons.length; ++i) {
+                valueButtons[i].setEnabled(enabled);
             }
         }
 
@@ -374,8 +374,8 @@ class FiltersDialog extends TrayDialog {
         MarkerType type = (MarkerType) event.getElement();
         typesViewer.setSubtreeChecked(type, event.getChecked());
         MarkerType[] allSupertypes = type.getAllSupertypes();
-        for (MarkerType allSupertype : allSupertypes) {
-            typesViewer.setChecked(allSupertype, false);
+        for (int i = 0; i < allSupertypes.length; ++i) {
+            typesViewer.setChecked(allSupertypes[i], false);
         }
         updateEnabledState();
     }
@@ -640,7 +640,8 @@ class FiltersDialog extends TrayDialog {
         if (markerTypes == null) {
             ArrayList typesList = new ArrayList();
             MarkerType[] types = markerTypesModel.getTypes();
-            for (MarkerType type : types) {
+            for (int i = 0; i < types.length; ++i) {
+                MarkerType type = types[i];
                 if (type.getLabel().length() > 0) {
                     if (type.isSubtypeOf(markerTypesModel
                             .getType(IMarker.PROBLEM))
@@ -673,8 +674,8 @@ class FiltersDialog extends TrayDialog {
     String[] getSelectedTypes() {
         Object[] checked = typesViewer.getCheckedElements();
         ArrayList list = new ArrayList();
-        for (Object element : checked) {
-            MarkerType type = (MarkerType) element;
+        for (int i = 0; i < checked.length; ++i) {
+            MarkerType type = (MarkerType) checked[i];
             // Skip it if any supertypes have already been included.
             // Relies on getCheckedElements() using a pre-order traversal
             // so parents are earlier in the list.
@@ -813,8 +814,8 @@ class FiltersDialog extends TrayDialog {
             return false;
         }
         Object[] checked = typesViewer.getCheckedElements();
-        for (Object element : checked) {
-            if (((MarkerType) element).isSubtypeOf(superType)) {
+        for (int i = 0; i < checked.length; ++i) {
+            if (((MarkerType) checked[i]).isSubtypeOf(superType)) {
                 return true;
             }
         }
@@ -837,8 +838,8 @@ class FiltersDialog extends TrayDialog {
      */
     void setSelectedTypes(String[] typeIds) {
         typesViewer.setCheckedElements(new MarkerType[0]);
-        for (String typeId : typeIds) {
-            MarkerType type = markerTypesModel.getType(typeId);
+        for (int i = 0; i < typeIds.length; ++i) {
+            MarkerType type = markerTypesModel.getType(typeIds[i]);
             if (type != null) {
                 typesViewer.setSubtreeChecked(type, true);
             }

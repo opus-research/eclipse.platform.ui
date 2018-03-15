@@ -893,8 +893,8 @@ public final class IDE {
 	 */
 	public static IEditorDescriptor overrideDefaultEditorAssociation(IEditorInput editorInput, IContentType contentType, IEditorDescriptor editorDescriptor) {
 		IEditorAssociationOverride[] overrides = getEditorAssociationOverrides();
-		for (IEditorAssociationOverride override : overrides) {
-			editorDescriptor = override.overrideDefaultEditor(editorInput, contentType, editorDescriptor);
+		for (int i = 0; i < overrides.length; i++) {
+			editorDescriptor = overrides[i].overrideDefaultEditor(editorInput, contentType, editorDescriptor);
 		}
 		return editorDescriptor;
 	}
@@ -915,8 +915,8 @@ public final class IDE {
 	 */
 	private static IEditorDescriptor overrideDefaultEditorAssociation(String fileName, IContentType contentType, IEditorDescriptor editorDescriptor) {
 		IEditorAssociationOverride[] overrides = getEditorAssociationOverrides();
-		for (IEditorAssociationOverride override : overrides) {
-			editorDescriptor = override.overrideDefaultEditor(fileName, contentType, editorDescriptor);
+		for (int i = 0; i < overrides.length; i++) {
+			editorDescriptor = overrides[i].overrideDefaultEditor(fileName, contentType, editorDescriptor);
 		}
 		return editorDescriptor;
 	}
@@ -936,8 +936,8 @@ public final class IDE {
 	 */
 	public static IEditorDescriptor[] overrideEditorAssociations(IEditorInput editorInput, IContentType contentType, IEditorDescriptor[] editorDescriptors) {
 		IEditorAssociationOverride[] overrides = getEditorAssociationOverrides();
-		for (IEditorAssociationOverride override : overrides) {
-			editorDescriptors = override.overrideEditors(editorInput, contentType, editorDescriptors);
+		for (int i = 0; i < overrides.length; i++) {
+			editorDescriptors = overrides[i].overrideEditors(editorInput, contentType, editorDescriptors);
 		}
 		return removeNullEntries(editorDescriptors);
 	}
@@ -957,8 +957,8 @@ public final class IDE {
 	 */
 	public static IEditorDescriptor[] overrideEditorAssociations(String fileName, IContentType contentType, IEditorDescriptor[] editorDescriptors) {
 		IEditorAssociationOverride[] overrides = getEditorAssociationOverrides();
-		for (IEditorAssociationOverride override : overrides) {
-			editorDescriptors = override.overrideEditors(fileName, contentType, editorDescriptors);
+		for (int i = 0; i < overrides.length; i++) {
+			editorDescriptors = overrides[i].overrideEditors(fileName, contentType, editorDescriptors);
 		}
 		return removeNullEntries(editorDescriptors);
 	}
@@ -1452,9 +1452,9 @@ public final class IDE {
 
 		IEditorRegistry editorReg = PlatformUI.getWorkbench().getEditorRegistry();
 		if (contentTypes != null) {
-			for (IContentType contentType : contentTypes) {
-				IEditorDescriptor editorDesc = editorReg.getDefaultEditor(name, contentType);
-				editorDesc = overrideDefaultEditorAssociation(input, contentType, editorDesc);
+			for(int i = 0 ; i < contentTypes.length; i++) {
+				IEditorDescriptor editorDesc = editorReg.getDefaultEditor(name, contentTypes[i]);
+				editorDesc = overrideDefaultEditorAssociation(input, contentTypes[i], editorDesc);
 				if ((editorDesc != null) && (editorDesc.isInternal()))
 					return page.openEditor(input, editorDesc.getId());
 			}
@@ -1464,9 +1464,9 @@ public final class IDE {
 		IEditorDescriptor[] editors = editorReg.getEditors(name);
 		if (editors != null) {
 			editors = overrideEditorAssociations(input, null, editors);
-			for (IEditorDescriptor editor : editors) {
-				if ((editor != null) && (editor.isInternal()))
-					return page.openEditor(input, editor.getId());
+			for(int i = 0 ; i < editors.length; i++) {
+				if ((editors[i] != null) && (editors[i].isInternal()))
+					return page.openEditor(input, editors[i].getId());
 			}
 		}
 
@@ -1730,8 +1730,8 @@ public final class IDE {
 		if (status.isMultiStatus()) {
 			List result = new ArrayList();
 			IStatus[] children = status.getChildren();
-			for (IStatus element : children) {
-				IStatus child = element;
+			for (int i = 0; i < children.length; i++) {
+				IStatus child = children[i];
 				if (!isIgnoredStatus(child, ignoreModelProviderIds)) {
 					result.add(child);
 				}
@@ -1836,7 +1836,8 @@ public final class IDE {
 		}
 		if (status instanceof ModelStatus) {
 			ModelStatus ms = (ModelStatus) status;
-			for (String id : ignoreModelProviderIds) {
+			for (int i = 0; i < ignoreModelProviderIds.length; i++) {
+				String id = ignoreModelProviderIds[i];
 				if (ms.getModelProviderId().equals(id)) {
 					return true;
 				}

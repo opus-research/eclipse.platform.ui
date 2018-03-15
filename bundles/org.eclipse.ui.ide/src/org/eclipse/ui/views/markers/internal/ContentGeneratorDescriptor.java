@@ -87,8 +87,8 @@ public class ContentGeneratorDescriptor {
 	 */
 	private void addGroupsFrom(IConfigurationElement element, Collection<MarkerGroup> groupss) {
 		IConfigurationElement[] groupings = element.getChildren(MarkerSupportRegistry.MARKER_GROUPING);
-		for (IConfigurationElement grouping : groupings) {
-			groupss.add(MarkerGroup.createMarkerGroup(grouping));
+		for (int i = 0; i < groupings.length; i++) {
+			groupss.add(MarkerGroup.createMarkerGroup(groupings[i]));
 		}
 	}
 
@@ -137,8 +137,8 @@ public class ContentGeneratorDescriptor {
 		while (extensions.hasNext()) {
 			IConfigurationElement extension = extensions.next();
 			IConfigurationElement[] extensionFilters = extension.getChildren(ELEMENT_MARKER_FIELD_CONFIGURATION);
-			for (IConfigurationElement extensionFilter : extensionFilters) {
-				extendedElements.add(extensionFilter);
+			for (int i = 0; i < extensionFilters.length; i++) {
+				extendedElements.add(extensionFilters[i]);
 			}
 		}
 		if (extendedElements.size() > 0) {
@@ -201,18 +201,19 @@ public class ContentGeneratorDescriptor {
 		if (markerTypes == null) {
 			markerTypes = new HashSet<>();
 			IConfigurationElement[] markerTypeElements = configurationElement.getChildren(MarkerSupportRegistry.MARKER_TYPE_REFERENCE);
-			for (IConfigurationElement configurationElt : markerTypeElements) {
+			for (int i = 0; i < markerTypeElements.length; i++) {
+				IConfigurationElement configurationElt = markerTypeElements[i];
 				String elementName = configurationElt.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_ID);
 				MarkerType[] types = MarkerTypesModel.getInstance().getType(elementName).getAllSubTypes();
-				for (MarkerType type : types) {
-					markerTypes.add(type);
+				for (int j = 0; j < types.length; j++) {
+					markerTypes.add(types[j]);
 				}
 				markerTypes.add(MarkerTypesModel.getInstance().getType(elementName));
 			}
 			if (markerTypes.isEmpty()) {
 				MarkerType[] types = MarkerTypesModel.getInstance().getType(IMarker.PROBLEM).getAllSubTypes();
-				for (MarkerType type : types) {
-					markerTypes.add(type);
+				for (int i = 0; i < types.length; i++) {
+					markerTypes.add(types[i]);
 				}
 			}
 		}
