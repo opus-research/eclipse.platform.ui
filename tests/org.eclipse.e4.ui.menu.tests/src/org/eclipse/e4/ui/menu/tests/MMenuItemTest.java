@@ -38,6 +38,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.impl.UiFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.ItemType;
+import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
@@ -46,6 +47,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.services.ContextServiceAddon;
 import org.eclipse.e4.ui.services.EContextService;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.renderers.swt.ContributionRecord;
 import org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
@@ -72,6 +74,8 @@ public class MMenuItemTest {
 
 	protected IEclipseContext appContext;
 
+	private EModelService modelService;
+
 	protected E4Workbench wb;
 
 	private MMenuContribution createContribution(boolean withVisibleWhen) {
@@ -97,8 +101,7 @@ public class MMenuItemTest {
 	}
 
 	private void createMenuContribution(MApplication application) {
-		MMenuContribution mmc = MenuFactoryImpl.eINSTANCE
-				.createMenuContribution();
+		MMenuContribution mmc = MenuFactoryImpl.eINSTANCE.createMenuContribution();
 		mmc.setElementId("test.contrib2");
 		mmc.setParentId("org.eclipse.ui.main.menu");
 		mmc.setPositionInParent("after=additions");
@@ -127,11 +130,9 @@ public class MMenuItemTest {
 		application.getMenuContributions().add(mmc);
 	}
 
-	private MenuManagerRenderer getRenderer(IEclipseContext context,
-			MUIElement element) {
+	private MenuManagerRenderer getRenderer(IEclipseContext context, MUIElement element) {
 		IRendererFactory rendererFactory = context.get(IRendererFactory.class);
-		AbstractPartRenderer renderer = rendererFactory.getRenderer(element,
-				null);
+		AbstractPartRenderer renderer = rendererFactory.getRenderer(element, null);
 		assertEquals(MenuManagerRenderer.class, renderer.getClass());
 		return (MenuManagerRenderer) renderer;
 	}
@@ -139,11 +140,11 @@ public class MMenuItemTest {
 	@Before
 	public void setUp() {
 		appContext = E4Application.createDefaultContext();
+		modelService = appContext.get(EModelService.class);
 		ContextInjectionFactory.make(CommandServiceAddon.class, appContext);
 		ContextInjectionFactory.make(ContextServiceAddon.class, appContext);
 		ContextInjectionFactory.make(BindingServiceAddon.class, appContext);
-		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
-				PartRenderingEngine.engineURI);
+		appContext.set(E4Workbench.PRESENTATION_URI_ARG, PartRenderingEngine.engineURI);
 	}
 
 	@After
@@ -158,13 +159,11 @@ public class MMenuItemTest {
 	@Ignore("See bug 452765")
 	public void testContributionRecordMerging() {
 		MApplication application = TestUtil.setupRenderer(appContext);
-		MenuManagerRenderer renderer = appContext
-				.get(MenuManagerRenderer.class);
+		MenuManagerRenderer renderer = appContext.get(MenuManagerRenderer.class);
 		MMenu menuBar = application.getChildren().get(0).getMainMenu();
 
 		// read in the relevant extensions.
-		MenuPersistence mp = new MenuPersistence(application, appContext,
-				"org.eclipse.e4.ui.menu.tests.p1");
+		MenuPersistence mp = new MenuPersistence(application, appContext, "org.eclipse.e4.ui.menu.tests.p1");
 		mp.reRead();
 		// printContributions(application);
 
@@ -188,35 +187,34 @@ public class MMenuItemTest {
 
 	@Test
 	public void testMenuContribution() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
-		MMenu menuBar = MenuFactoryImpl.eINSTANCE.createMenu();
+		MWindow window = modelService.createModelElement(MWindow.class);
+		MMenu menuBar = modelService.createModelElement(MMenu.class);
 		menuBar.setElementId("org.eclipse.ui.main.menu");
 		window.setMainMenu(menuBar);
 
-		MMenu fileMenu = MenuFactoryImpl.eINSTANCE.createMenu();
+		MMenu fileMenu = modelService.createModelElement(MMenu.class);
 		fileMenu.setElementId("file");
 		fileMenu.setLabel("File");
 		menuBar.getChildren().add(fileMenu);
 
-		MMenuItem item1 = MenuFactoryImpl.eINSTANCE.createDirectMenuItem();
+		MDirectMenuItem item1 = modelService.createModelElement(MDirectMenuItem.class);
 		item1.setElementId("item1");
 		item1.setLabel("item1");
 		fileMenu.getChildren().add(item1);
 
-		MMenuSeparator sep = MenuFactoryImpl.eINSTANCE.createMenuSeparator();
+		MMenuSeparator sep = modelService.createModelElement(MMenuSeparator.class);
 		sep.setElementId("group1");
 		fileMenu.getChildren().add(sep);
 
-		MMenuItem item2 = MenuFactoryImpl.eINSTANCE.createDirectMenuItem();
+		MDirectMenuItem item2 = modelService.createModelElement(MDirectMenuItem.class);
 		item2.setElementId("item2");
 		item2.setLabel("item2");
 		fileMenu.getChildren().add(item2);
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE
-				.createApplication();
+		MApplication application = modelService.createModelElement(MApplication.class);
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class.getName(), application);
+		appContext.set(MApplication.class, application);
 		application.getMenuContributions().add(createContribution(false));
 
 		wb = new E4Workbench(window, appContext);
