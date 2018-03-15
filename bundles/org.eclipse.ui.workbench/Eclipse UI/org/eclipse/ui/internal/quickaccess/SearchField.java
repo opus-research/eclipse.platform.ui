@@ -389,8 +389,9 @@ public class SearchField {
 	}
 
 	private void updateText(Text text) {
-		if (text == null || text.isDisposed())
+		if (text == null || text.isDisposed()) {
 			return;
+		}
 
 		text.setMessage(NLS.bind(QuickAccessMessages.QuickAccess_EnterSearch, getQuickAccessTriggerSequenceFormat()));
 
