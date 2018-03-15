@@ -19,6 +19,7 @@ import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.internal.gtk.OS;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -39,19 +40,6 @@ public class ListViewerRefreshTest extends TestCase {
 	private ListViewer viewer = null;
 
 	private ArrayList input = null;
-
-	protected static boolean disableTestsBug493357 = false;
-
-	private static final String GTK_VERSION_PROPERTY = "org.eclipse.swt.internal.gtk.version";
-	static {
-		String value = System.getProperty(GTK_VERSION_PROPERTY);
-		if (value != null) {
-			if (value.startsWith("3")) {
-				disableTestsBug493357 = true;
-			}
-		}
-
-	}
 
 	@Override
 	protected void setUp() throws Exception {
@@ -85,7 +73,7 @@ public class ListViewerRefreshTest extends TestCase {
 	 * @throws Exception
 	 */
 	public void testNoSelectionRefresh() throws Exception {
-		if (disableTestsBug493357) {
+		if (OS.GTK3) {
 			System.out.println(getName() + " disabled due to Bug 493357");
 			return;
 		}
@@ -118,7 +106,7 @@ public class ListViewerRefreshTest extends TestCase {
 	 * @throws Exception
 	 */
 	public void testSelectionRefresh() throws Exception {
-		if (disableTestsBug493357) {
+		if (OS.GTK3) {
 			System.out.println(getName() + " disabled due to Bug 493357");
 			return;
 		}
