@@ -404,6 +404,14 @@ public class SmartImportRootWizardPage extends WizardPage {
 		tree.getControl().setLayoutData(treeGridData);
 		tree.setContentProvider(new ITreeContentProvider() {
 			@Override
+			public void dispose() {
+			}
+
+			@Override
+			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			}
+
+			@Override
 			public Object[] getElements(Object inputElement) {
 				Map<File, ?> potentialProjects = (Map<File, ?>) inputElement;
 				return potentialProjects.keySet().toArray(new File[potentialProjects.size()]);
