@@ -125,6 +125,12 @@ public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListe
 	}
 
 	public static void trace(String option, String msg, Throwable error) {
+		if (DEBUG) {
+			System.out.println(msg);
+			if (error != null) {
+				error.printStackTrace(System.out);
+			}
+		}
 		activator.getTrace().trace(option, msg, error);
 	}
 
