@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator;
 
-import java.util.StringJoiner;
-
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -45,8 +43,6 @@ public class CommonNavigatorActionGroup extends ActionGroup {
 
 	private static final String FRAME_ACTION_SEPARATOR_ID= "FRAME_ACTION_SEPARATOR_ID"; //$NON-NLS-1$
 	private static final String FRAME_ACTION_GROUP_ID= "FRAME_ACTION_GROUP_ID"; //$NON-NLS-1$
-
-	public StringJoiner thisDoesNotCompileAgainst_1_7;
 
     private BackAction backAction;
 
@@ -120,7 +116,7 @@ public class CommonNavigatorActionGroup extends ActionGroup {
 			}
 		});
 
-        IHandlerService service = commonNavigator.getSite()
+        IHandlerService service = (IHandlerService) commonNavigator.getSite()
 				.getService(IHandlerService.class);
 
 		INavigatorViewerDescriptor viewerDescriptor = commonViewer
