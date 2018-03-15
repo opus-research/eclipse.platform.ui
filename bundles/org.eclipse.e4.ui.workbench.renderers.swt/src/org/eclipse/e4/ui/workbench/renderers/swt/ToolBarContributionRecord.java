@@ -24,8 +24,8 @@ import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
-import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
+import org.eclipse.e4.ui.model.application.ui.MExpression;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
@@ -123,9 +123,9 @@ public class ToolBarContributionRecord {
 			}
 		}
 		if (currentVisibility
-				&& item.getVisibleWhen() instanceof MCoreExpression) {
+				&& item.getVisibleWhen() instanceof MExpression) {
 			boolean val = ContributionsAnalyzer.isVisible(
-					(MCoreExpression) item.getVisibleWhen(), exprContext);
+					(MExpression) item.getVisibleWhen(), exprContext);
 			currentVisibility = val;
 		}
 		return currentVisibility;
