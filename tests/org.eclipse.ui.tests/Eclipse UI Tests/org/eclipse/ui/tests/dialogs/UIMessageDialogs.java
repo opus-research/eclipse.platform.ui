@@ -225,7 +225,7 @@ public class UIMessageDialogs extends TestCase {
 				DUMMY_PROJECT,
 				"c:\\dummypath\\" + DUMMY_PROJECT })),
 				MessageDialog.QUESTION, 0, IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL);
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
         DialogCheck.assertDialog(dialog, this);
     }
 
