@@ -115,6 +115,9 @@ public class ProgressAnimationItemTest {
 				throw new RuntimeException(e);
 			}
 		});
+		Display display = Display.getCurrent();
+		while (display.readAndDispatch()) {
+		}
 	}
 
 	private ToolBar getToolBar(ProgressAnimationItem animationItem) {
