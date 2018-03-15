@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 
 package org.eclipse.jface.dialogs;
@@ -381,7 +380,8 @@ public class MessageDialogWithToggle extends MessageDialog {
             Image image, String message, int dialogImageType,
             String[] dialogButtonLabels, int defaultIndex,
             String toggleMessage, boolean toggleState) {
-		super(parentShell, dialogTitle, image, message, dialogImageType, defaultIndex, dialogButtonLabels);
+        super(parentShell, dialogTitle, image, message, dialogImageType,
+                dialogButtonLabels, defaultIndex);
         this.toggleMessage = toggleMessage;
         this.toggleState = toggleState;
         setButtonLabels(dialogButtonLabels);

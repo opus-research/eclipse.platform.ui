@@ -8,7 +8,6 @@
  * Contributors:
  *     Mickael Istria (Red Hat Inc.) - initial API and implementation
  *     Snjezana Peco (Red Hat Inc.)
- *     Lars Vogel <Lars.Vogel@vogella.com>
  ******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
@@ -52,7 +51,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -102,11 +100,9 @@ public class SmartImportRootWizardPage extends WizardPage {
 		public String getText(Object o) {
 			File file = (File) o;
 			String label = file.getAbsolutePath();
-			File root = getWizard().getImportJob().getRoot();
-			if (label.startsWith(root.getAbsolutePath())) {
-				if (root.getParentFile() != null) {
-					label = label.substring(root.getParentFile().getAbsolutePath().length() + 1);
-				}
+			if (label.startsWith(getWizard().getImportJob().getRoot().getAbsolutePath())) {
+				label = label
+						.substring(getWizard().getImportJob().getRoot().getParentFile().getAbsolutePath().length() + 1);
 			}
 			return label;
 		}
@@ -245,6 +241,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 	 */
 	private void createInputSelectionOptions(Composite res) {
 		Label rootDirectoryLabel = new Label(res, SWT.NONE);
+		rootDirectoryLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		rootDirectoryLabel.setText(DataTransferMessages.SmartImportWizardPage_selectRootDirectory);
 		rootDirectoryText = new Combo(res, SWT.BORDER);
 		String[] knownSources = getWizard().getDialogSettings().getArray(IMPORTED_SOURCES);
@@ -409,6 +406,9 @@ public class SmartImportRootWizardPage extends WizardPage {
 	private void createProposalsGroup(Composite parent) {
 		Composite res = new Composite(parent, SWT.NONE);
 		res.setLayout(new GridLayout(2, false));
+		selectionSummary = new Label(res, SWT.NONE);
+		selectionSummary.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 2, 1));
+		selectionSummary.setText(NLS.bind(DataTransferMessages.SmartImportProposals_selectionSummary, 0, 0));
 		PatternFilter patternFilter = new PatternFilter();
 		patternFilter.setIncludeLeadingWildcard(true);
 		FilteredTree filterTree = new FilteredTree(res, SWT.BORDER | SWT.CHECK, patternFilter, true) {
@@ -485,7 +485,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 		Composite selectionButtonsGroup = new Composite(res, SWT.NONE);
 		selectionButtonsGroup.setLayout(new GridLayout(1, false));
-		selectionButtonsGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
+		selectionButtonsGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 		Button selectAllButton = new Button(selectionButtonsGroup, SWT.PUSH);
 		selectAllButton.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		selectAllButton.setText(DataTransferMessages.DataTransfer_selectAll);
@@ -506,10 +506,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 				proposalsSelectionChanged();
 			}
 		});
-
-		selectionSummary = new Label(selectionButtonsGroup, SWT.NONE);
-		selectionSummary.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, true, 1, 1));
-		selectionSummary.setText(NLS.bind(DataTransferMessages.SmartImportProposals_selectionSummary, 0, 0));
 
 		tree.setInput(Collections.emptyMap());
 	}
@@ -620,11 +616,10 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 	private void refreshProposals() {
 		try {
-			if (sourceIsValid()) {
-				Point initialSelection = rootDirectoryText.getSelection();
-				getContainer().run(true, true, new IRunnableWithProgress() {
-					@Override
-					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+			getContainer().run(true, true, new IRunnableWithProgress() {
+				@Override
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					if (sourceIsValid()) {
 						SmartImportRootWizardPage.this.potentialProjects = getWizard().getImportJob()
 								.getImportProposals(monitor);
 						if (!potentialProjects.containsKey(getWizard().getImportJob().getRoot())) {
@@ -639,15 +634,13 @@ public class SmartImportRootWizardPage extends WizardPage {
 									.remove(project.getLocation().toFile());
 							SmartImportRootWizardPage.this.alreadyExistingProjects.add(project.getLocation().toFile());
 						}
+					} else {
+						SmartImportRootWizardPage.this.potentialProjects = Collections.emptyMap();
+						SmartImportRootWizardPage.this.notAlreadyExistingProjects = Collections.emptySet();
+						SmartImportRootWizardPage.this.alreadyExistingProjects = Collections.emptySet();
 					}
-				});
-				// restore selection as getContainer().run(...) looses it
-				rootDirectoryText.setSelection(initialSelection);
-			} else {
-				SmartImportRootWizardPage.this.potentialProjects = Collections.emptyMap();
-				SmartImportRootWizardPage.this.notAlreadyExistingProjects = Collections.emptySet();
-				SmartImportRootWizardPage.this.alreadyExistingProjects = Collections.emptySet();
-			}
+				}
+			});
 			tree.setInput(potentialProjects);
 			tree.setCheckedElements(this.notAlreadyExistingProjects.toArray());
 		} catch (Exception ex) {
