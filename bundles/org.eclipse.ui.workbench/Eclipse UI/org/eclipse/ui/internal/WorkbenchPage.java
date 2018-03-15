@@ -786,15 +786,15 @@ public class WorkbenchPage implements IWorkbenchPage {
 			if (part != null) {
 				IActionSetDescriptor[] partActionSets = WorkbenchPlugin.getDefault()
 						.getActionSetRegistry().getActionSetsFor(part.getSite().getId());
-				for (IActionSetDescriptor partActionSetDescriptor : partActionSets) {
-					newActionSets.add(partActionSetDescriptor);
+				for (IActionSetDescriptor partActionSet : partActionSets) {
+					newActionSets.add(partActionSet);
 				}
 			}
 			if (editor != null && editor != part) {
 				IActionSetDescriptor[] editorActionSets = WorkbenchPlugin.getDefault()
 						.getActionSetRegistry().getActionSetsFor(editor.getSite().getId());
-				for (IActionSetDescriptor editorActionSetDescriptor : editorActionSets) {
-					newActionSets.add(editorActionSetDescriptor);
+				for (IActionSetDescriptor editorActionSet : editorActionSets) {
+					newActionSets.add(editorActionSet);
 				}
 			}
 			return newActionSets;
@@ -1065,13 +1065,15 @@ public class WorkbenchPage implements IWorkbenchPage {
 			return null;
 		}
 
-		for (IViewReference reference : viewReferences) {
+		for (ViewReference viewReference : viewReferences) {
+			IViewReference reference = viewReference;
 			if (part == reference.getPart(false)) {
 				return ((WorkbenchPartReference) reference).getModel();
 			}
 		}
 
-		for (IEditorReference reference : editorReferences) {
+		for (EditorReference editorReference : editorReferences) {
+			IEditorReference reference = editorReference;
 			if (part == reference.getPart(false)) {
 				return ((WorkbenchPartReference) reference).getModel();
 			}
@@ -1359,7 +1361,8 @@ public class WorkbenchPage implements IWorkbenchPage {
         IEditorReference editors[] = getEditorReferences();
         IEditorReference savedEditors[] = new IEditorReference[editors.length];
         int j = 0;
-		for (IEditorReference editor : editors) {
+        for (IEditorReference editor2 : editors) {
+            IEditorReference editor = editor2;
             if (!editor.isDirty()) {
                 savedEditors[j++] = editor;
             }
@@ -2760,9 +2763,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 				IMemento[] workingSetChildren = workingSetMem
 						.getChildren(IWorkbenchConstants.TAG_WORKING_SET);
 				List<IWorkingSet> workingSetList = new ArrayList<>(workingSetChildren.length);
-				for (IMemento memento : workingSetChildren) {
+				for (IMemento element : workingSetChildren) {
 					IWorkingSet set = getWorkbenchWindow().getWorkbench().getWorkingSetManager()
-							.getWorkingSet(memento.getID());
+							.getWorkingSet(element.getID());
 					if (set != null) {
 						workingSetList.add(set);
 					}
@@ -3803,7 +3806,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 		ArrayList<Saveable> result = new ArrayList<>();
 		HashSet<Saveable> seen = new HashSet<>();
 		for (IWorkbenchPart part : parts) {
-			for (Saveable saveable : getSaveables(part)) {
+			Saveable[] saveables = getSaveables(part);
+			for (Saveable saveable2 : saveables) {
+				Saveable saveable = saveable2;
 				if (saveable.isDirty() && !seen.contains(saveable)) {
 					seen.add(saveable);
 					if (!closing
@@ -3819,7 +3824,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 					ISaveablesLifecycleListener.class);
 			ISaveablesSource[] nonPartSources = saveablesList.getNonPartSources();
 			for (ISaveablesSource nonPartSource : nonPartSources) {
-				for (Saveable saveable : nonPartSource.getSaveables()) {
+				Saveable[] saveables = nonPartSource.getSaveables();
+				for (Saveable saveable2 : saveables) {
+					Saveable saveable = saveable2;
 					if (saveable.isDirty() && !seen.contains(saveable)) {
 						seen.add(saveable);
 						result.add(saveable);
@@ -4656,11 +4663,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 		// filter out any duplicates if necessary
 		if (newWorkingSets.length > 1) {
 			Set<IWorkingSet> setOfSets = new HashSet<>();
-			for (IWorkingSet workingSet : newWorkingSets) {
-				if (workingSet == null) {
+			for (IWorkingSet newWorkingSet : newWorkingSets) {
+				if (newWorkingSet == null) {
 					throw new IllegalArgumentException();
 				}
-				setOfSets.add(workingSet);
+				setOfSets.add(newWorkingSet);
 			}
 			newWorkingSets = setOfSets.toArray(new IWorkingSet[setOfSets.size()]);
 		}
@@ -5518,7 +5525,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 		if (perspective == null)
 			return ""; //$NON-NLS-1$
 
-		String result = perspective.getPersistedState().get(ModeledPageLayout.HIDDEN_ITEMS_KEY);
+		String result = perspective.getPersistedState()
+.get(ModeledPageLayout.HIDDEN_ITEMS_KEY);
 		if (result == null)
 			return ""; //$NON-NLS-1$
 
@@ -5573,10 +5581,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 		if (persp == null)
 			return;
 
+		List<String> tags = persp.getTags();
 		List<String> existingNewWizards = new ArrayList<>();
-		for (String tag : persp.getTags()) {
-			if (tag.contains(tagPrefix))
-				existingNewWizards.add(tag);
+		for (String string : tags) {
+			if (string.contains(tagPrefix))
+				existingNewWizards.add(string);
 		}
 
 		List<String> newWizards = new ArrayList<>(wizards.size());

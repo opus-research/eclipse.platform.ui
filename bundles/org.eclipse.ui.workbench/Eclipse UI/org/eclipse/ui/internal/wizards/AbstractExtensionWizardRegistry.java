@@ -133,13 +133,16 @@ public abstract class AbstractExtensionWizardRegistry extends
 	private void registerWizards(WizardCollectionElement collection) {
 		registerWizards(collection.getWorkbenchWizardElements());
 
-		for (WizardCollectionElement wizardCollectionElement : collection.getCollectionElements()) {
-			IConfigurationElement configurationElement = wizardCollectionElement.getConfigurationElement();
+		WizardCollectionElement[] collections = collection
+				.getCollectionElements();
+		for (WizardCollectionElement collection2 : collections) {
+			IConfigurationElement configurationElement = collection2
+					.getConfigurationElement();
 			if (configurationElement != null) {
 				register(configurationElement.getDeclaringExtension(),
-						wizardCollectionElement);
+						collection2);
 			}
-			registerWizards(wizardCollectionElement);
+			registerWizards(collection2);
 		}
 	}
 

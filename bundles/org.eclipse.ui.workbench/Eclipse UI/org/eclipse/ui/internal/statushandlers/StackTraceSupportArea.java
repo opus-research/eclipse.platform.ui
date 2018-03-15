@@ -150,8 +150,9 @@ public class StackTraceSupportArea extends AbstractStatusAreaProvider {
 			return;
 		}
 		list.add(t.toString());
-		for (StackTraceElement stackTraceElement : t.getStackTrace()) {
-			list.add(stackTraceElement.toString());
+		StackTraceElement[] ste = t.getStackTrace();
+		for (StackTraceElement element : ste) {
+			list.add(element.toString());
 		}
 		if (t.getCause() != null) {
 			list.add(WorkbenchMessages.StackTraceSupportArea_CausedBy);

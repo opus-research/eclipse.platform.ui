@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 511198
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -120,8 +121,8 @@ public class SaveableHelper {
 							WorkbenchMessages.Save_Resource, null, message,
 							MessageDialog.QUESTION,
 							0,
-							IDialogConstants.YES_LABEL,
-							IDialogConstants.NO_LABEL,
+							WorkbenchMessages.Save, 
+							WorkbenchMessages.Dont_Save,
 							IDialogConstants.CANCEL_LABEL) {
 						@Override
 						protected int getShellStyle() {
@@ -169,8 +170,9 @@ public class SaveableHelper {
 	 *   was canceled or an error occurred while saving.
 	 */
 	private static boolean saveModels(ISaveablesSource modelSource, final IWorkbenchWindow window, final boolean confirm) {
+		Saveable[] selectedModels = modelSource.getActiveSaveables();
 		final ArrayList<Saveable> dirtyModels = new ArrayList<>();
-		for (Saveable model : modelSource.getActiveSaveables()) {
+		for (Saveable model : selectedModels) {
 			if (model.isDirty()) {
 				dirtyModels.add(model);
 			}
@@ -305,7 +307,9 @@ public class SaveableHelper {
 	 * @since 3.2
 	 */
 	public static boolean needsSave(ISaveablesSource modelSource) {
-		for (Saveable model : modelSource.getActiveSaveables()) {
+		Saveable[] selectedModels = modelSource.getActiveSaveables();
+		for (Saveable selectedModel : selectedModels) {
+			Saveable model = selectedModel;
 			if (model.isDirty() && !((InternalSaveable)model).isSavingInBackground()) {
 				return true;
 			}

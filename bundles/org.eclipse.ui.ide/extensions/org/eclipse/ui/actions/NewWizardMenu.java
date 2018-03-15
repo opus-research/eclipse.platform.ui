@@ -106,7 +106,8 @@ public class NewWizardMenu extends BaseNewWizardMenu {
         // Remove all.
         innerMgr.removeAll();
 
-		for (IContributionItem item : getContributionItems()) {
+        IContributionItem[] items = getContributionItems();
+        for (IContributionItem item : items) {
             innerMgr.add(item);
         }
     }
@@ -152,8 +153,9 @@ public class NewWizardMenu extends BaseNewWizardMenu {
 				}
 			}
 		}
-		for (IWizardCategory wizardCategory : category.getCategories()) {
-			if (hasWizards(wizardCategory)) {
+		IWizardCategory[] categories = category.getCategories();
+		for (IWizardCategory categorie : categories) {
+			if (hasWizards(categorie)) {
 				return true;
 			}
 		}

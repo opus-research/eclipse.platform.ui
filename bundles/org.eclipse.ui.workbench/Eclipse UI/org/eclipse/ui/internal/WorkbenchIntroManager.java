@@ -244,9 +244,12 @@ public class WorkbenchIntroManager implements IIntroManager {
      * cannot be found.
      */
     /*package*/ViewIntroAdapterPart getViewIntroAdapterPart() {
-		for (IWorkbenchWindow iWorkbenchWindow : this.workbench.getWorkbenchWindows()) {
-			WorkbenchWindow window = (WorkbenchWindow) iWorkbenchWindow;
-			MUIElement introPart = window.modelService.find(IIntroConstants.INTRO_VIEW_ID, window.getModel());
+		IWorkbenchWindow[] windows = this.workbench.getWorkbenchWindows();
+		for (IWorkbenchWindow window2 : windows) {
+			WorkbenchWindow window = (WorkbenchWindow) window2;
+			MUIElement introPart = window.modelService
+.find(IIntroConstants.INTRO_VIEW_ID,
+					window.getModel());
 			if (introPart instanceof MPlaceholder) {
 				MPlaceholder introPH = (MPlaceholder) introPart;
 				MPart introModelPart = (MPart) introPH.getRef();

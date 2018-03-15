@@ -178,8 +178,10 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 			memento.putString(AbstractWorkingSet.TAG_AGGREGATE, Boolean.TRUE
 					.toString());
 
-			for (IWorkingSet workingSet : getComponentsInternal()) {
-				memento.createChild(IWorkbenchConstants.TAG_WORKING_SET, workingSet.getName());
+			IWorkingSet[] localComponents = getComponentsInternal();
+			for (IWorkingSet componentSet : localComponents) {
+				memento.createChild(IWorkbenchConstants.TAG_WORKING_SET,
+						componentSet.getName());
 			}
 		}
 	}
@@ -256,8 +258,8 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 				.getChildren(IWorkbenchConstants.TAG_WORKING_SET);
 		ArrayList list = new ArrayList(workingSetReferences.length);
 
-		for (IMemento memento : workingSetReferences) {
-			String setId = memento.getID();
+		for (IMemento setReference : workingSetReferences) {
+			String setId = setReference.getID();
 			IWorkingSet set = manager.getWorkingSet(setId);
 			if (set != null) {
 				list.add(set);

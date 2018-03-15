@@ -126,8 +126,8 @@ public class MultiEditorInput implements IEditorInput {
         for (String editor : editors) {
             hash = hash * 37 + editor.hashCode();
         }
-        for (IEditorInput editorInput : input) {
-            hash = hash * 37 + editorInput.hashCode();
+        for (IEditorInput element : input) {
+            hash = hash * 37 + element.hashCode();
         }
         return hash;
     }

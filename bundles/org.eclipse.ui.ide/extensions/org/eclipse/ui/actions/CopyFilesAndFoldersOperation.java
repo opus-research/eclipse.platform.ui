@@ -216,9 +216,12 @@ public class CopyFilesAndFoldersOperation {
 
 		for (IFileStore store : stores) {
 			if (store.fetchInfo().exists() == false) {
-				String message = NLS.bind(IDEWorkbenchMessages.CopyFilesAndFoldersOperation_resourceDeleted,
+				String message = NLS
+						.bind(
+								IDEWorkbenchMessages.CopyFilesAndFoldersOperation_resourceDeleted,
 								store.getName());
-				IStatus status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, IStatus.OK, message, null);
+				IStatus status = new Status(IStatus.ERROR,
+						PlatformUI.PLUGIN_ID, IStatus.OK, message, null);
 				multiStatus.add(status);
 			}
 		}
@@ -236,7 +239,8 @@ public class CopyFilesAndFoldersOperation {
 		MultiStatus multiStatus = new MultiStatus(PlatformUI.PLUGIN_ID,
 				IStatus.OK, getProblemsMessage(), null);
 
-		for (IResource resource : resources) {
+		for (IResource resource2 : resources) {
+			IResource resource = resource2;
 			if (resource != null && !resource.isVirtual()) {
 				URI location = resource.getLocationURI();
 				String message = null;
@@ -373,9 +377,10 @@ public class CopyFilesAndFoldersOperation {
 			IResource[] copyResources, ArrayList existing) {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
-		for (IResource resource : copyResources) {
-			IPath newDestinationPath = destinationPath.append(resource.getName());
-			IResource newDestination = workspaceRoot.findMember(newDestinationPath);
+		for (IResource source : copyResources) {
+			IPath newDestinationPath = destinationPath.append(source.getName());
+			IResource newDestination = workspaceRoot
+					.findMember(newDestinationPath);
 			IFolder folder;
 
 			if (newDestination == null) {
@@ -383,7 +388,7 @@ public class CopyFilesAndFoldersOperation {
 			}
 			folder = getFolder(newDestination);
 			if (folder != null) {
-				IFolder sourceFolder = getFolder(resource);
+				IFolder sourceFolder = getFolder(source);
 
 				if (sourceFolder != null) {
 					try {
@@ -401,7 +406,7 @@ public class CopyFilesAndFoldersOperation {
 						existing.add(file);
 					}
 					if (getValidateConflictSource()) {
-						IFile sourceFile = getFile(resource);
+						IFile sourceFile = getFile(source);
 						if (sourceFile != null) {
 							existing.add(sourceFile);
 						}
@@ -431,29 +436,29 @@ public class CopyFilesAndFoldersOperation {
 		SubMonitor subMonitor = SubMonitor.convert(monitor,
 				IDEWorkbenchMessages.CopyFilesAndFoldersOperation_CopyResourcesTask, resources.length);
 
-		for (IResource resource : resources) {
+		for (IResource source : resources) {
 			SubMonitor iterationMonitor = subMonitor.split(1).setWorkRemaining(100);
-			IPath destinationPath = destination.append(resource.getName());
-			IWorkspace workspace = resource.getWorkspace();
+			IPath destinationPath = destination.append(source.getName());
+			IWorkspace workspace = source.getWorkspace();
 			IWorkspaceRoot workspaceRoot = workspace.getRoot();
 			IResource existing = workspaceRoot.findMember(destinationPath);
-			if (resource.getType() == IResource.FOLDER && existing != null) {
+			if (source.getType() == IResource.FOLDER && existing != null) {
 				// the resource is a folder and it exists in the destination,
 				// copy the
 				// children of the folder.
-				if (homogenousResources(resource, existing)) {
-					IResource[] children = ((IContainer) resource).members();
+				if (homogenousResources(source, existing)) {
+					IResource[] children = ((IContainer) source).members();
 					copy(children, destinationPath, iterationMonitor.split(100));
 				} else {
 					// delete the destination folder, copying a linked folder
 					// over an unlinked one or vice versa. Fixes bug 28772.
 					delete(existing, iterationMonitor.split(10));
-					resource.copy(destinationPath, IResource.SHALLOW, iterationMonitor.split(90));
+					source.copy(destinationPath, IResource.SHALLOW, iterationMonitor.split(90));
 				}
 			} else {
 				if (existing != null) {
-					if (homogenousResources(resource, existing)) {
-						copyExisting(resource, existing, iterationMonitor.split(100));
+					if (homogenousResources(source, existing)) {
+						copyExisting(source, existing, iterationMonitor.split(100));
 					} else {
 						if (existing != null) {
 							// Copying a linked resource over unlinked or vice
@@ -463,25 +468,25 @@ public class CopyFilesAndFoldersOperation {
 						}
 						iterationMonitor.setWorkRemaining(100);
 
-						if ((createLinks || createVirtualFoldersAndLinks) && (resource.isLinked() == false)
-								&& (resource.isVirtual() == false)) {
-							if (resource.getType() == IResource.FILE) {
+						if ((createLinks || createVirtualFoldersAndLinks) && (source.isLinked() == false)
+								&& (source.isVirtual() == false)) {
+							if (source.getType() == IResource.FILE) {
 								IFile file = workspaceRoot.getFile(destinationPath);
-								file.createLink(createRelativePath(resource.getLocationURI(), file), 0,
+								file.createLink(createRelativePath(source.getLocationURI(), file), 0,
 										iterationMonitor.split(100));
 							} else {
 								IFolder folder = workspaceRoot.getFolder(destinationPath);
 								if (createVirtualFoldersAndLinks) {
 									folder.create(IResource.VIRTUAL, true, iterationMonitor.split(1));
-									IResource[] members = ((IContainer) resource).members();
+									IResource[] members = ((IContainer) source).members();
 									if (members.length > 0)
 										copy(members, destinationPath, iterationMonitor.split(99));
 								} else
-									folder.createLink(createRelativePath(resource.getLocationURI(), folder), 0,
+									folder.createLink(createRelativePath(source.getLocationURI(), folder), 0,
 											iterationMonitor.split(100));
 							}
 						} else
-							resource.copy(destinationPath, IResource.SHALLOW, iterationMonitor.split(100));
+							source.copy(destinationPath, IResource.SHALLOW, iterationMonitor.split(100));
 					}
 				}
 			}
@@ -1241,13 +1246,14 @@ public class CopyFilesAndFoldersOperation {
 			IContainer destination) {
 		IPath destinationLocation = destination.getLocation();
 
-		for (IResource resource : sourceResources) {
-			if (resource.getParent().equals(destination)) {
+		for (IResource sourceResource : sourceResources) {
+			if (sourceResource.getParent().equals(destination)) {
 				return true;
 			} else if (destinationLocation != null) {
 				// do thorough check to catch linked resources. Fixes bug 29913.
-				IPath sourceLocation = resource.getLocation();
-				IPath destinationResource = destinationLocation.append(resource.getName());
+				IPath sourceLocation = sourceResource.getLocation();
+				IPath destinationResource = destinationLocation
+						.append(sourceResource.getName());
 				if (sourceLocation != null
 						&& sourceLocation.isPrefixOf(destinationResource)) {
 					return true;
@@ -1486,7 +1492,8 @@ public class CopyFilesAndFoldersOperation {
 		}
 		IContainer firstParent = null;
 		URI destinationLocation = destination.getLocationURI();
-		for (IResource sourceResource : sourceResources) {
+		for (IResource sourceResource2 : sourceResources) {
+			IResource sourceResource = sourceResource2;
 			if (firstParent == null) {
 				firstParent = sourceResource.getParent();
 			} else if (firstParent.equals(sourceResource.getParent()) == false) {
@@ -1639,21 +1646,21 @@ public class CopyFilesAndFoldersOperation {
 								IDEWorkbenchMessages.CopyFilesAndFoldersOperation_internalError,
 								exception.getLocalizedMessage());
 			}
-			for (IFileStore fileStore : sourceStores) {
-				IFileStore parentFileStore = fileStore.getParent();
+			for (IFileStore sourceStore : sourceStores) {
+				IFileStore sourceParentStore = sourceStore.getParent();
 
-				if (fileStore != null) {
-					if (destinationStore.equals(fileStore)
-							|| (parentFileStore != null && destinationStore
-							.equals(parentFileStore))) {
+				if (sourceStore != null) {
+					if (destinationStore.equals(sourceStore)
+							|| (sourceParentStore != null && destinationStore
+							.equals(sourceParentStore))) {
 						return NLS
 								.bind(
 										IDEWorkbenchMessages.CopyFilesAndFoldersOperation_importSameSourceAndDest,
-										fileStore.getName());
+										sourceStore.getName());
 					}
 					// work around bug 16202. replacement for
 					// sourcePath.isPrefixOf(destinationPath)
-					if (fileStore.isParentOf(destinationStore)) {
+					if (sourceStore.isParentOf(destinationStore)) {
 						return IDEWorkbenchMessages.CopyFilesAndFoldersOperation_destinationDescendentError;
 					}
 				}
@@ -1691,8 +1698,10 @@ public class CopyFilesAndFoldersOperation {
 			// prevent merging linked folders that point to the same
 			// file system folder
 			try {
-				for (IResource resource : destination.members()) {
-					if (sourceLocation.equals(resource.getLocation()) && source.getName().equals(resource.getName())) {
+				IResource[] members = destination.members();
+				for (IResource member : members) {
+					if (sourceLocation.equals(member.getLocation())
+							&& source.getName().equals(member.getName())) {
 						return NLS
 								.bind(
 										IDEWorkbenchMessages.CopyFilesAndFoldersOperation_sameSourceAndDest,
@@ -1728,10 +1737,10 @@ public class CopyFilesAndFoldersOperation {
 
 		// Check to see if we would be overwriting a parent folder.
 		// Cancel entire copy operation if we do.
-		for (final IResource resource : sourceResources) {
+		for (final IResource sourceResource : sourceResources) {
 			final IPath destinationPath = destination.getFullPath().append(
-					resource.getName());
-			final IPath sourcePath = resource.getFullPath();
+					sourceResource.getName());
+			final IPath sourcePath = sourceResource.getFullPath();
 
 			IResource newResource = workspaceRoot.findMember(destinationPath);
 			if (newResource != null && destinationPath.isPrefixOf(sourcePath)) {
@@ -1745,26 +1754,26 @@ public class CopyFilesAndFoldersOperation {
 			}
 		}
 		// Check for overwrite conflicts
-		for (final IResource resource : sourceResources) {
+		for (final IResource source : sourceResources) {
 			final IPath destinationPath = destination.getFullPath().append(
-					resource.getName());
+					source.getName());
 
 			IResource newResource = workspaceRoot.findMember(destinationPath);
 			if (newResource != null) {
 				if (overwrite != IDialogConstants.YES_TO_ALL_ID
 						|| (newResource.getType() == IResource.FOLDER && homogenousResources(
-								resource, destination) == false)) {
-					overwrite = checkOverwrite(resource, newResource);
+								source, destination) == false)) {
+					overwrite = checkOverwrite(source, newResource);
 				}
 				if (overwrite == IDialogConstants.YES_ID
 						|| overwrite == IDialogConstants.YES_TO_ALL_ID) {
-					copyItems.add(resource);
+					copyItems.add(source);
 				} else if (overwrite == IDialogConstants.CANCEL_ID) {
 					canceled = true;
 					return null;
 				}
 			} else {
-				copyItems.add(resource);
+				copyItems.add(source);
 			}
 		}
 		return (IResource[]) copyItems.toArray(new IResource[copyItems.size()]);

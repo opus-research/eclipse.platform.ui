@@ -71,6 +71,7 @@ import org.eclipse.ui.internal.themes.IThemeRegistry;
 import org.eclipse.ui.internal.themes.ThemeRegistry;
 import org.eclipse.ui.internal.themes.ThemeRegistryReader;
 import org.eclipse.ui.internal.util.BundleUtility;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.internal.wizards.ExportWizardRegistry;
 import org.eclipse.ui.internal.wizards.ImportWizardRegistry;
 import org.eclipse.ui.internal.wizards.NewWizardRegistry;
@@ -846,7 +847,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			}
 		}
 		if (bidiParams != null) {
-			String[] bidiProps = bidiParams.split(";"); //$NON-NLS-1$
+			String[] bidiProps = Util.getArrayFromList(bidiParams, ";"); //$NON-NLS-1$
 			for (String bidiProp : bidiProps) {
 				int eqPos = bidiProp.indexOf("="); //$NON-NLS-1$
 				if ((eqPos > 0) && (eqPos < bidiProp.length() - 1)) {

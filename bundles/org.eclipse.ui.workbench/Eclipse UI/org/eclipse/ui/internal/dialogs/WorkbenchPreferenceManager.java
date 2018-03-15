@@ -53,9 +53,11 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 				event -> {
 					if (event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
 							IWorkbenchRegistryConstants.PL_KEYWORDS).length > 0) {
-						for (Object element : getElements(PreferenceManager.POST_ORDER)) {
-							((WorkbenchPreferenceNode) element).clearKeywords();
-						}
+						for (Object element : getElements(
+								PreferenceManager.POST_ORDER)) {
+((WorkbenchPreferenceNode) element)
+							.clearKeywords();
+}
 					}
 				});
 	}
@@ -91,7 +93,8 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 		PlatformUI.getWorkbench().getExtensionTracker().registerObject(
 				node.getConfigurationElement().getDeclaringExtension(), node,
 				IExtensionTracker.REF_WEAK);
-		for (IPreferenceNode subNode : node.getSubNodes()) {
+		IPreferenceNode[] subNodes = node.getSubNodes();
+		for (IPreferenceNode subNode : subNodes) {
 			registerNode((WorkbenchPreferenceNode) subNode);
 		}
 
@@ -99,9 +102,10 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
-		for (IConfigurationElement configElement : extension.getConfigurationElements()) {
+		IConfigurationElement[] elements = extension.getConfigurationElements();
+		for (IConfigurationElement element2 : elements) {
 			WorkbenchPreferenceNode node = PreferencePageRegistryReader
-					.createNode(configElement);
+					.createNode(element2);
 			if (node == null) {
 				continue;
 			}
@@ -111,12 +115,13 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 				addToRoot(node);
 			} else {
 				IPreferenceNode parent = null;
-				for (IPreferenceNode element : getElements(PreferenceManager.POST_ORDER)) {
-					if (category.equals(element.getId())) {
-						parent = element;
-						break;
-					}
-				}
+				for (Object element3 : getElements(PreferenceManager.POST_ORDER)) {
+IPreferenceNode element = (IPreferenceNode) element3;
+if (category.equals(element.getId())) {
+				parent = element;
+				break;
+}
+}
 				if (parent == null) {
 					// Could not find the parent - log
 					String message = "Invalid preference category path: " + category + " (bundle: " + node.getPluginId() + ", page: " + node.getId() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -167,7 +172,8 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 			return true;
 		}
 
-		for (IPreferenceNode subNode : parent.getSubNodes()) {
+		IPreferenceNode[] subNodes = parent.getSubNodes();
+		for (IPreferenceNode subNode : subNodes) {
 			if (deepRemove(subNode, nodeToRemove)) {
 				return true;
 			}
