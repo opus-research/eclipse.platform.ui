@@ -20,6 +20,7 @@ import org.eclipse.swt.graphics.ImageDataProvider;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * Abstract base class for image descriptors that synthesize an image from other
@@ -104,9 +105,29 @@ public abstract class CompositeImageDescriptor extends ImageDescriptor {
 			if (zoom == cachedZoom) {
 				return cached;
 			}
-			cached = baseImage.getImageData(zoom);
+			// Workaround for the missing API Image#getImageData(int zoom) (bug 496409).
+			// Can't use zoom == getZoomLevel() because SWT on Cocoa asks for
+			// 100% image even on Retina screen (and vice-versa)!
+			if (zoom == 100) {
+				cached = baseImage.getImageData();
+			} else {
+				cached = baseImage.getImageDataAtCurrentZoom();
+				Rectangle bounds = baseImage.getBounds();
+				// TODO: Probably has off-by-one problems at fractional zoom levels:
+				if (bounds.width != scaleDown(cached.width, zoom) && bounds.height == scaleDown(cached.height, zoom)) {
+					// strange zoom value, should not happen
+					zoom = 0;
+					cached = null;
+				}
+			}
 			cachedZoom = zoom;
 			return cached;
+		}
+
+		private /*static*/ int scaleDown(int value, int zoom) {
+			// @see SWT's internal DPIUtil#autoScaleDown(int)
+			float scaleFactor = zoom / 100f;
+			return Math.round(value / scaleFactor);
 		}
 	}
 
@@ -347,13 +368,16 @@ public abstract class CompositeImageDescriptor extends ImageDescriptor {
 		if (!supportsZoomLevel(zoom)) {
 			return null;
 		}
+		/* Assign before calling getSize(), just in case an implementer of
+		 * getSize() already uses a CachedImageDataProvider. */
+		compositeZoom = zoom;
+
 		Point size = getSize();
 
 		/* Create a 24 bit image data with alpha channel */
 		imageData = new ImageData(scaleUp(size.x, zoom), scaleUp(size.y, zoom), 24,
 				new PaletteData(0xFF, 0xFF00, 0xFF0000));
 		imageData.alphaData = new byte[imageData.width * imageData.height];
-		compositeZoom = zoom;
 
 		drawCompositeImage(size.x, size.y);
 
