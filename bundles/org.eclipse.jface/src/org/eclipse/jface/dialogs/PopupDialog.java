@@ -873,7 +873,8 @@ public class PopupDialog extends Window {
 				SWT.BEGINNING).applyTo(infoLabel);
 		Display display = parent.getDisplay();
 		infoColor = new Color(display, blend(
-				getBackground().getRGB(), getForeground().getRGB(),
+				display.getSystemColor(SWT.COLOR_INFO_BACKGROUND).getRGB(),
+				display.getSystemColor(SWT.COLOR_INFO_FOREGROUND).getRGB(),
 				0.56f));
 		infoLabel.setForeground(infoColor);
 		return infoLabel;
@@ -1404,10 +1405,8 @@ public class PopupDialog extends Window {
 	 * @return the default foreground color.
 	 */
 	private Color getDefaultForeground() {
-		if ((getShellStyle() & SWT.NO_FOCUS) != 0) {
-			return getShell().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-		}
-		return getShell().getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND);
+		return getShell().getDisplay()
+				.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 	}
 
 	/**
@@ -1416,10 +1415,8 @@ public class PopupDialog extends Window {
 	 * @return the default background color
 	 */
 	private Color getDefaultBackground() {
-		if ((getShellStyle() & SWT.NO_FOCUS) != 0) {
-			return getShell().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-		}
-		return getShell().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+		return getShell().getDisplay()
+				.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 	}
 
 	/**
