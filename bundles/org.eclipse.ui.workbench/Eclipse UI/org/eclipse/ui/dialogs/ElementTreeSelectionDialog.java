@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
-import static org.eclipse.swt.events.SelectionListener.widgetDefaultSelectedAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.core.runtime.IStatus;
@@ -34,6 +32,8 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -312,12 +312,15 @@ public class ElementTreeSelectionDialog extends SelectionStatusDialog {
 
         if (fDoubleClickSelects) {
             Tree tree = fViewer.getTree();
-            tree.addSelectionListener(widgetDefaultSelectedAdapter(e -> {
-			    updateOKStatus();
-			    if (fCurrStatus.isOK()) {
-					access$superButtonPressed(IDialogConstants.OK_ID);
-				}
-			}));
+            tree.addSelectionListener(new SelectionAdapter() {
+                @Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+                    updateOKStatus();
+                    if (fCurrStatus.isOK()) {
+						access$superButtonPressed(IDialogConstants.OK_ID);
+					}
+                }
+            });
         }
         fViewer.addDoubleClickListener(event -> {
 		    updateOKStatus();
