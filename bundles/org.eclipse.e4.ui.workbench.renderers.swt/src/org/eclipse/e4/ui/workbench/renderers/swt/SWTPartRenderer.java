@@ -64,9 +64,11 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 			// being rendered.
 			// this is *not* the correct place for this
 			// hope that the ADD event will pick up the new part.
-			IPresentationEngine renderer = context.get(IPresentationEngine.class);
-			for (int i = 0; i < parts.size(); i++) {
-				MUIElement childME = parts.get(i);
+			IPresentationEngine renderer = (IPresentationEngine) context
+					.get(IPresentationEngine.class.getName());
+			MUIElement[] plist = parts.toArray(new MUIElement[parts.size()]);
+			for (int i = 0; i < plist.length; i++) {
+				MUIElement childME = plist[i];
 				renderer.createGui(childME);
 			}
 		}
@@ -318,7 +320,8 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 	}
 
 	@Override
-	public void childRendered(MElementContainer<MUIElement> parentElement, MUIElement element) {
+	public void childRendered(MElementContainer<MUIElement> parentElement,
+			MUIElement element) {
 	}
 
 	@Override
