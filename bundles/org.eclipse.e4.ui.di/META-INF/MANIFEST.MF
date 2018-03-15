@@ -20,4 +20,3 @@ Export-Package: org.eclipse.e4.ui.di,
 Service-Component: OSGI-INF/org.eclipse.e4.ui.internal.di.UIEventObjectSupplier.xml
 Require-Capability: osgi.extender;
   filter:="(&(osgi.extender=osgi.component)(version>=1.2)(!(version>=2.0)))"
-Automatic-Module-Name: org.eclipse.e4.ui.di
