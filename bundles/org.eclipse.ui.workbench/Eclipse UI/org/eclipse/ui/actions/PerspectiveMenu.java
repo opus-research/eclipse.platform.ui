@@ -87,12 +87,14 @@ public abstract class PerspectiveMenu extends ContributionItem {
 	    dirty = true;
 	};
 
-	private Comparator<IPerspectiveDescriptor> comparator = new Comparator<IPerspectiveDescriptor>() {
+    private Comparator comparator = new Comparator() {
         private Collator collator = Collator.getInstance();
 
         @Override
-		public int compare(IPerspectiveDescriptor ob1, IPerspectiveDescriptor ob2) {
-			return collator.compare(ob1.getLabel(), ob2.getLabel());
+		public int compare(Object ob1, Object ob2) {
+            IPerspectiveDescriptor d1 = (IPerspectiveDescriptor) ob1;
+            IPerspectiveDescriptor d2 = (IPerspectiveDescriptor) ob2;
+            return collator.compare(d1.getLabel(), d2.getLabel());
         }
     };
 
@@ -110,7 +112,7 @@ public abstract class PerspectiveMenu extends ContributionItem {
      *
      * @since 3.1
      */
-	private Map<String, IAction> actions = new HashMap<>();
+    private Map actions = new HashMap();
 
     /**
      * The action for that allows the user to choose any perspective to open.
@@ -179,16 +181,16 @@ public abstract class PerspectiveMenu extends ContributionItem {
         manager.removeAll();
 
         // Collect and sort perspective descriptors.
-		final List<IPerspectiveDescriptor> persps = getPerspectiveItems();
+        final List persps = getPerspectiveItems();
         Collections.sort(persps, comparator);
 
         /*
          * Convert the perspective descriptors to actions, and filter out
          * actions using the activity/capability mechanism.
          */
-		final List<IAction> actions = new ArrayList<>(persps.size());
-		for (Iterator<IPerspectiveDescriptor> i = persps.iterator(); i.hasNext();) {
-			final IPerspectiveDescriptor descriptor = i
+        final List actions = new ArrayList(persps.size());
+        for (Iterator i = persps.iterator(); i.hasNext();) {
+            final IPerspectiveDescriptor descriptor = (IPerspectiveDescriptor) i
                     .next();
             final IAction action = getAction(descriptor.getId());
             if (action != null) {
@@ -200,8 +202,8 @@ public abstract class PerspectiveMenu extends ContributionItem {
         }
 
         // Go through and add each of the actions to the menu manager.
-		for (Iterator<IAction> i = actions.iterator(); i.hasNext();) {
-			manager.add(i.next());
+        for (Iterator i = actions.iterator(); i.hasNext();) {
+            manager.add((IAction) i.next());
         }
 
         if (PrefUtil
@@ -229,7 +231,7 @@ public abstract class PerspectiveMenu extends ContributionItem {
      * @since 3.1
      */
     private final IAction getAction(final String id) {
-		IAction action = actions.get(id);
+        IAction action = (IAction) actions.get(id);
         if (action == null) {
             IPerspectiveDescriptor descriptor = reg.findPerspectiveWithId(id);
             if (descriptor != null) {
@@ -246,8 +248,8 @@ public abstract class PerspectiveMenu extends ContributionItem {
      *
      * @return a list of <code>IPerspectiveDescriptor</code> items
      */
-	private ArrayList<IPerspectiveDescriptor> getPerspectiveShortcuts() {
-		ArrayList<IPerspectiveDescriptor> list = new ArrayList<>();
+    private ArrayList getPerspectiveShortcuts() {
+		ArrayList list = new ArrayList();
 
         IWorkbenchPage page = window.getActivePage();
         if (page == null) {
@@ -280,11 +282,11 @@ public abstract class PerspectiveMenu extends ContributionItem {
      *
      * @return an <code>ArrayList<code> of perspective items <code>IPerspectiveDescriptor</code>
      */
-	protected ArrayList<IPerspectiveDescriptor> getPerspectiveItems() {
+    protected ArrayList getPerspectiveItems() {
         /* Allow the user to see all the perspectives they have
          * selected via Customize Perspective. Bugzilla bug #23445 */
-		ArrayList<IPerspectiveDescriptor> shortcuts = getPerspectiveShortcuts();
-		ArrayList<IPerspectiveDescriptor> list = new ArrayList<>(shortcuts.size());
+        ArrayList shortcuts = getPerspectiveShortcuts();
+        ArrayList list = new ArrayList(shortcuts.size());
 
         // Add perspective shortcuts from the active perspective
         int size = shortcuts.size();
@@ -361,7 +363,19 @@ public abstract class PerspectiveMenu extends ContributionItem {
 				.getService(IHandlerService.class);
 		try {
 			handlerService.executeCommand(IWorkbenchCommandConstants.PERSPECTIVES_SHOW_PERSPECTIVE, null);
-		} catch (ExecutionException | NotDefinedException | NotEnabledException | NotHandledException e) {
+		} catch (ExecutionException e) {
+			StatusManager.getManager().handle(
+					new Status(IStatus.WARNING, WorkbenchPlugin.PI_WORKBENCH,
+							"Failed to execute " + IWorkbenchCommandConstants.PERSPECTIVES_SHOW_PERSPECTIVE, e)); //$NON-NLS-1$
+		} catch (NotDefinedException e) {
+			StatusManager.getManager().handle(
+					new Status(IStatus.WARNING, WorkbenchPlugin.PI_WORKBENCH,
+							"Failed to execute " + IWorkbenchCommandConstants.PERSPECTIVES_SHOW_PERSPECTIVE, e)); //$NON-NLS-1$
+		} catch (NotEnabledException e) {
+			StatusManager.getManager().handle(
+					new Status(IStatus.WARNING, WorkbenchPlugin.PI_WORKBENCH,
+							"Failed to execute " + IWorkbenchCommandConstants.PERSPECTIVES_SHOW_PERSPECTIVE, e)); //$NON-NLS-1$
+		} catch (NotHandledException e) {
 			StatusManager.getManager().handle(
 					new Status(IStatus.WARNING, WorkbenchPlugin.PI_WORKBENCH,
 							"Failed to execute " + IWorkbenchCommandConstants.PERSPECTIVES_SHOW_PERSPECTIVE, e)); //$NON-NLS-1$
