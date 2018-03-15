@@ -894,8 +894,8 @@ public final class BindingManager extends HandleObjectManager implements
 		}
 
 		final Object[] listeners = getListeners();
-		for (Object listener2 : listeners) {
-			final IBindingManagerListener listener = (IBindingManagerListener) listener2;
+		for (Object l : listeners) {
+			final IBindingManagerListener listener = (IBindingManagerListener) l;
 			listener.bindingManagerChanged(event);
 		}
 	}
@@ -1647,8 +1647,8 @@ public final class BindingManager extends HandleObjectManager implements
 			return true; // shortcut a common case
 		}
 
-		for (String locale2 : locales) {
-			if (Util.equals(locale2, locale)) {
+		for (String localString : locales) {
+			if (Util.equals(localString, locale)) {
 				matches = true;
 				break;
 			}
@@ -1680,8 +1680,8 @@ public final class BindingManager extends HandleObjectManager implements
 			return true; // shortcut a common case
 		}
 
-		for (String platform2 : platforms) {
-			if (Util.equals(platform2, platform)) {
+		for (String platformString : platforms) {
+			if (Util.equals(platformString, platform)) {
 				matches = true;
 				break;
 			}
