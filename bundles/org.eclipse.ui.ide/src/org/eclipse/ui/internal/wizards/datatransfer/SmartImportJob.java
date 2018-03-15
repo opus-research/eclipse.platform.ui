@@ -522,11 +522,7 @@ public class SmartImportJob extends Job {
 
 	private IProject projectAlreadyExistsInWorkspace(File directory) {
 		for (IProject project : workspaceRoot.getProjects()) {
-			IPath location = project.getLocation();
-			if (location == null) {
-				continue;
-			}
-			if (location.toFile().getAbsoluteFile().equals(directory.getAbsoluteFile())) {
+			if (project.getLocation().toFile().getAbsoluteFile().equals(directory.getAbsoluteFile())) {
 				return project;
 			}
 		}
