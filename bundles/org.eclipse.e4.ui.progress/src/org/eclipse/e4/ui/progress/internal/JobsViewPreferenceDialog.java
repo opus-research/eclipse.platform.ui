@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 public class JobsViewPreferenceDialog extends ViewSettingsDialog {
 
 	private BooleanFieldEditor showSystemJob;
+	private BooleanFieldEditor runInBackground;
 	private IPreferenceStore preferenceStore;
 
 
@@ -56,6 +57,11 @@ public class JobsViewPreferenceDialog extends ViewSettingsDialog {
 		editArea.setLayout(new GridLayout());
 		editArea.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 
+		runInBackground = new BooleanFieldEditor(IProgressConstants.RUN_IN_BACKGROUND, ProgressMessages.JobsViewPreferenceDialog_RunInBackground, editArea);
+		runInBackground.setPreferenceName(IProgressConstants.RUN_IN_BACKGROUND);
+		runInBackground.setPreferenceStore(preferenceStore);
+		runInBackground.load();
+
 		showSystemJob = new BooleanFieldEditor(IProgressConstants.SHOW_SYSTEM_JOBS, ProgressMessages.JobsViewPreferenceDialog_ShowSystemJobs, editArea);
 		showSystemJob.setPreferenceName(IProgressConstants.SHOW_SYSTEM_JOBS);
 		showSystemJob.setPreferenceStore(preferenceStore);
@@ -68,12 +74,14 @@ public class JobsViewPreferenceDialog extends ViewSettingsDialog {
 
 	@Override
 	protected void okPressed() {
+		runInBackground.store();
 		showSystemJob.store();
 		super.okPressed();
 	}
 
 	@Override
 	protected void performDefaults() {
+		runInBackground.loadDefault();
 		showSystemJob.loadDefault();
 	}
 }

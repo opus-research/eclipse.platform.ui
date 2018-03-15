@@ -60,6 +60,11 @@ public interface IPreferenceConstants {
     // (int) If > 0, an editor will be reused once 'N' editors are opened.
     public static final String REUSE_EDITORS = "REUSE_OPEN_EDITORS"; //$NON-NLS-1$
 
+    //Boolean: true = replace dirty editor if no other editors to reuse
+    // (prompt for save);
+	// false = open a new editor if no other editors to reuse
+    public static final String REUSE_DIRTY_EDITORS = "REUSE_DIRTY_EDITORS"; //$NON-NLS-1$
+
     //On/Off option for the two preceding options.
     public static final String REUSE_EDITORS_BOOLEAN = "REUSE_OPEN_EDITORS_BOOLEAN"; //$NON-NLS-1$
 
@@ -188,6 +193,11 @@ public interface IPreferenceConstants {
      * @since 3.3
      */
     public static String USE_IPERSISTABLE_EDITORS = "USE_IPERSISTABLE_EDITORS"; //$NON-NLS-1$
+
+    /**
+     * Preference to show user jobs in a dialog.
+     */
+    public static String RUN_IN_BACKGROUND = "RUN_IN_BACKGROUND"; //$NON-NLS-1$
 
     /**
      * Workbench preference id for determining whether the user will be prompted
