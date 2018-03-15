@@ -398,7 +398,7 @@ HeapStatus {
 }
 
 Table {
-	swt-table-header-foreground-color: #CCC;
+	swt-table-header-color: #CCC;
 	swt-table-header-background-color: #383D3F;
 }
 
