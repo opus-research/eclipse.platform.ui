@@ -33,7 +33,8 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.IShellProvider;
@@ -45,12 +46,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.BuildAction;
 import org.eclipse.ui.actions.GlobalBuildAction;
+import org.eclipse.ui.dialogs.FilteredTree;
+import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.actions.BuildUtilities;
@@ -91,17 +92,14 @@ public class CleanDialog extends MessageDialog {
     private static final String BUILD_NOW = "BUILD_NOW"; //$NON-NLS-1$
     private static final String BUILD_ALL = "BUILD_ALL"; //$NON-NLS-1$
 
-	private Button selectAllButton, deselectAllButton, alwaysCleanButton, buildNowButton, globalBuildButton,
+	private Button alwaysCleanButton, buildNowButton, globalBuildButton,
 			projectBuildButton;
-
-    private CheckboxTableViewer projectNames;
 
     private Object[] selection;
 
     private IWorkbenchWindow window;
 
-	private Text filterText;
-	private String filterRegexPattern = ".*"; //$NON-NLS-1$
+	private FilteredTree filteredTree;
 
     /**
      * Gets the text of the clean dialog, depending on whether the
@@ -191,55 +189,31 @@ public class CleanDialog extends MessageDialog {
         Composite area = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout();
         layout.marginWidth = layout.marginHeight = 0;
-        layout.numColumns = 2;
-		layout.makeColumnsEqualWidth = false;
+		layout.numColumns = 1;
         area.setLayout(layout);
         area.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		IDialogSettings settings = getDialogSettings(DIALOG_SETTINGS_SECTION);
-
-        //first row
-		filterText = new Text(area, SWT.SEARCH | SWT.ICON_CANCEL);
-		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		filterText.setLayoutData(gd);
-		filterText.setFocus();
-		filterText.addModifyListener(e -> {
-			filterRegexPattern = ".*" + filterText.getText() + ".*"; //$NON-NLS-1$ //$NON-NLS-2$
-			projectNames.refresh();
-		});
-
-		selectAllButton = new Button(area, SWT.PUSH);
-		gd = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		selectAllButton.setLayoutData(gd);
-		selectAllButton.setText(IDEWorkbenchMessages.CleanDialog_selectAllButton);
-		selectAllButton.addSelectionListener(widgetSelectedAdapter(e -> {
-			projectNames.setAllChecked(true);
-			selection = projectNames.getCheckedElements();
-			updateEnablement();
-		}));
-
-		// third row
-		createProjectSelectionTable(area);
-
-		deselectAllButton = new Button(area, SWT.PUSH);
-		gd = new GridData(SWT.FILL, SWT.TOP, false, false);
-		deselectAllButton.setLayoutData(gd);
-		deselectAllButton.setText(IDEWorkbenchMessages.CleanDialog_deselectedAllButton);
-		deselectAllButton.addSelectionListener(widgetSelectedAdapter(e -> {
-			projectNames.setAllChecked(false);
-			selection = projectNames.getCheckedElements();
-			updateEnablement();
-		}));
-
-		// fourth row
+		// first row
 		alwaysCleanButton = new Button(area, SWT.CHECK);
-		alwaysCleanButton.setText(IDEWorkbenchMessages.CleanDialog_alwaysCleanAllButton);
-		alwaysCleanButton.setSelection(settings.getBoolean(TOGGLE_SELECTED));
+		alwaysCleanButton.setText(IDEWorkbenchMessages.CleanDialog_cleanAllButton);
+		alwaysCleanButton.setSelection(!settings.getBoolean(TOGGLE_SELECTED));
 		alwaysCleanButton.addSelectionListener(widgetSelectedAdapter(e -> updateEnablement()));
 
-		new Label(area, SWT.NONE);
+		// second row
+		filteredTree = new FilteredTree(area, SWT.BORDER, getPatternFilter(), true) {
+			@Override
+			protected TreeViewer doCreateTreeViewer(Composite parentComposite, int style) {
+				return createProjectSelectionTreeViewer(parentComposite, style);
+			}
+		};
 
-		// fifth row
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridData.widthHint = 200;
+		gridData.heightHint = 200;
+		filteredTree.setLayoutData(gridData);
+
+		// third row
         //only prompt for immediate build if autobuild is off
         if (!ResourcesPlugin.getWorkspace().isAutoBuilding()) {
 			SelectionListener updateEnablement = widgetSelectedAdapter(e -> updateEnablement());
@@ -284,44 +258,63 @@ public class CleanDialog extends MessageDialog {
     	return contents;
     }
 
-    private void createProjectSelectionTable(Composite radioGroup) {
-        projectNames = CheckboxTableViewer.newCheckList(radioGroup, SWT.BORDER);
-        projectNames.setContentProvider(new WorkbenchContentProvider());
-        projectNames.setLabelProvider(new WorkbenchLabelProvider());
-        projectNames.setComparator(new ResourceComparator(ResourceComparator.NAME));
-        projectNames.addFilter(new ViewerFilter() {
-            private final IProject[] projectHolder = new IProject[1];
-            @Override
+	private PatternFilter getPatternFilter() {
+		return new PatternFilter() {
+			// if the element is not a project, we exclude the element from the
+			// list
+			@Override
+			protected boolean isParentMatch(Viewer viewer, Object element) {
+				if (!(element instanceof IProject)) {
+					return false;
+				}
+				return super.isParentMatch(viewer, element);
+			}
+
+			@Override
+			protected boolean isLeafMatch(Viewer viewer, Object element) {
+				if (!(element instanceof IProject)) {
+					return false;
+				}
+				return super.isLeafMatch(viewer, element);
+			}
+		};
+	}
+
+	private CheckboxTreeViewer createProjectSelectionTreeViewer(Composite parent, int style) {
+		CheckboxTreeViewer treeViewer = new CheckboxTreeViewer(parent, style);
+		treeViewer.setExpandPreCheckFilters(true);
+		treeViewer.setContentProvider(new WorkbenchContentProvider());
+		treeViewer.setLabelProvider(new WorkbenchLabelProvider());
+		treeViewer.setComparator(new ResourceComparator(ResourceComparator.NAME));
+		treeViewer.addFilter(new ViewerFilter() {
+			private final IProject[] projectHolder = new IProject[1];
+
+			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
-                if (!(element instanceof IProject)) {
-                    return false;
-                }
-                IProject project = (IProject) element;
-				boolean isProjectNameMatchingPattern = project.getName().matches(filterRegexPattern);
-				if (!project.isAccessible() || !isProjectNameMatchingPattern) {
-                    return false;
-                }
-                projectHolder[0] = project;
-                return BuildUtilities.isEnabled(projectHolder, IncrementalProjectBuilder.CLEAN_BUILD);
-            }
-        });
-        projectNames.setInput(ResourcesPlugin.getWorkspace().getRoot());
-        GridData data = new GridData(GridData.FILL_BOTH);
-		data.horizontalSpan = 1;
-        data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH;
-        data.heightHint = IDialogConstants.ENTRY_FIELD_WIDTH;
-        projectNames.getTable().setLayoutData(data);
-        projectNames.setCheckedElements(selection);
-        Object[] checked = projectNames.getCheckedElements();
+				if (!(element instanceof IProject)) {
+					return false;
+				}
+				IProject project = (IProject) element;
+				if (!project.isAccessible()) {
+					return false;
+				}
+				projectHolder[0] = project;
+				return BuildUtilities.isEnabled(projectHolder, IncrementalProjectBuilder.CLEAN_BUILD);
+			}
+		});
+		treeViewer.setInput(ResourcesPlugin.getWorkspace().getRoot());
+		treeViewer.setCheckedElements(selection);
+		Object[] checked = treeViewer.getCheckedElements();
 		// reveal first checked project
 		if (checked.length > 0) {
-            projectNames.reveal(checked[0]);
-        }
-        projectNames.addCheckStateListener(event -> {
-		    selection = projectNames.getCheckedElements();
-		    updateEnablement();
+			treeViewer.reveal(checked[0]);
+		}
+		treeViewer.addCheckStateListener(event -> {
+			selection = treeViewer.getCheckedElements();
+			updateEnablement();
 		});
-    }
+		return treeViewer;
+	}
 
     /**
      * Performs the actual clean operation.
@@ -348,11 +341,8 @@ public class CleanDialog extends MessageDialog {
 	 * choices in the dialog.
 	 */
     protected void updateEnablement() {
-		projectNames.getTable().setEnabled(!alwaysCleanButton.getSelection());
-		selectAllButton.setEnabled(!alwaysCleanButton.getSelection());
-		deselectAllButton.setEnabled(!alwaysCleanButton.getSelection());
-		filterText.setEnabled(!alwaysCleanButton.getSelection());
-
+		filteredTree.setEnabled(!alwaysCleanButton.getSelection());
+		filteredTree.getViewer().getTree().setEnabled(!alwaysCleanButton.getSelection());
 		boolean enabled = selection.length > 0 || alwaysCleanButton.getSelection();
         getButton(OK).setEnabled(enabled);
         if (globalBuildButton != null) {
@@ -440,7 +430,7 @@ public class CleanDialog extends MessageDialog {
             settings.put(BUILD_ALL, globalBuildButton.getSelection());
         }
 
-		settings.put(TOGGLE_SELECTED, alwaysCleanButton.getSelection());
+		settings.put(TOGGLE_SELECTED, !alwaysCleanButton.getSelection());
     }
 
     /**
