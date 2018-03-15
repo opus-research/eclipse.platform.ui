@@ -59,7 +59,6 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
@@ -502,7 +501,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			IContributionManagerOverrides overrides = null;
 			MApplicationElement parentElement = element.getParent();
 			if (parentElement == null) {
-				parentElement = (MApplicationElement) ((EObject) element).eContainer();
+				parentElement = modelService.getContainer(element);
 			}
 
 			if (parentElement != null) {
