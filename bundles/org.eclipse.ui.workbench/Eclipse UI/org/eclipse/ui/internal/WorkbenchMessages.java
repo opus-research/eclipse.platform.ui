@@ -635,10 +635,6 @@ public class WorkbenchMessages extends NLS {
 	public static String Save_All;
 	public static String Dont_Save;
 
-	public static String SaveableHelper_Save;
-	public static String SaveableHelper_Cancel;
-	public static String SaveableHelper_Dont_Save;
-
 
 	// ==============================================================================
 	// Perspective Framework
@@ -984,7 +980,6 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkbenchSettings_CouldNotFindLocation;
 	public static String WorkingSets_Name;
 	public static String WorkingSets_CannotSave;
-	public static String WorkbenchPreferences_Name;
 
 	// StatusDialog
 	public static String WorkbenchStatusDialog_SupportTooltip;
