@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
+import com.ibm.icu.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,8 +43,6 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.StringMatcher;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-
-import com.ibm.icu.text.Collator;
 
 /**
  * Shows a list of resources to the user with a text entry field
@@ -619,7 +618,7 @@ public class ResourceListSelectionDialog extends SelectionDialog {
             }
         }
 
-		final ArrayList<IResource> resources = new ArrayList<>();
+        final ArrayList resources = new ArrayList();
         BusyIndicator.showWhile(getShell().getDisplay(), () -> {
 		    getMatchingResources(resources);
 		    IResource resourcesArray[] = new IResource[resources.size()];
@@ -683,7 +682,7 @@ public class ResourceListSelectionDialog extends SelectionDialog {
      *
      * @param resources resources that match
      */
-	private void getMatchingResources(final ArrayList<IResource> resources) {
+    private void getMatchingResources(final ArrayList resources) {
         try {
             container.accept(proxy -> {
 			    // optionally exclude derived resources (bugs 38085 and 81333)
