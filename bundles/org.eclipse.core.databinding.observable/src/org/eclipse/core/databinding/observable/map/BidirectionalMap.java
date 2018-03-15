@@ -36,12 +36,7 @@ import org.eclipse.core.databinding.observable.Realm;
 @Deprecated
 // OK to ignore warnings in deprecated class
 public class BidirectionalMap<K, V> extends ObservableMap<K, V> {
-	private IMapChangeListener<K, V> mapListener = new IMapChangeListener<K, V>() {
-		@Override
-		public void handleMapChange(MapChangeEvent<? extends K, ? extends V> event) {
-			fireMapChange(Diffs.unmodifiableDiff(event.diff));
-		}
-	};
+	private IMapChangeListener<K, V> mapListener = event -> fireMapChange(Diffs.unmodifiableDiff(event.diff));
 
 	/**
 	 * @param wrappedMap

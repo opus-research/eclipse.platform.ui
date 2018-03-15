@@ -44,12 +44,7 @@ public class DecoratingObservable extends AbstractObservable implements
 		super(decorated.getRealm());
 		this.decorated = decorated;
 		this.disposedDecoratedOnDispose = disposeDecoratedOnDispose;
-		decorated.addDisposeListener(new IDisposeListener() {
-			@Override
-			public void handleDispose(DisposeEvent staleEvent) {
-				dispose();
-			}
-		});
+		decorated.addDisposeListener(staleEvent -> dispose());
 	}
 
 	@Override
@@ -70,12 +65,7 @@ public class DecoratingObservable extends AbstractObservable implements
 	@Override
 	protected void firstListenerAdded() {
 		if (staleListener == null) {
-			staleListener = new IStaleListener() {
-				@Override
-				public void handleStale(StaleEvent staleEvent) {
-					DecoratingObservable.this.handleStaleEvent(staleEvent);
-				}
-			};
+			staleListener = staleEvent -> DecoratingObservable.this.handleStaleEvent(staleEvent);
 		}
 		decorated.addStaleListener(staleListener);
 	}

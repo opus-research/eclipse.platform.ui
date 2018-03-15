@@ -20,18 +20,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.Diffs;
-import org.eclipse.core.databinding.observable.DisposeEvent;
-import org.eclipse.core.databinding.observable.IDisposeListener;
 import org.eclipse.core.databinding.observable.IObserving;
 import org.eclipse.core.databinding.observable.ObservableTracker;
 import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.set.ISetChangeListener;
 import org.eclipse.core.databinding.observable.set.ObservableSet;
-import org.eclipse.core.databinding.observable.set.SetChangeEvent;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
-import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.runtime.Assert;
 
 /**
@@ -46,12 +42,9 @@ public class DetailObservableSet<M, E> extends ObservableSet<E>implements IObser
 
 	private boolean updating = false;
 
-	private ISetChangeListener<E> innerChangeListener = new ISetChangeListener<E>() {
-		@Override
-		public void handleSetChange(SetChangeEvent<? extends E> event) {
-			if (!updating) {
-				fireSetChange(Diffs.<E> unmodifiableDiff(event.diff));
-			}
+	private ISetChangeListener<E> innerChangeListener = event -> {
+		if (!updating) {
+			fireSetChange(Diffs.<E> unmodifiableDiff(event.diff));
 		}
 	};
 
@@ -79,12 +72,7 @@ public class DetailObservableSet<M, E> extends ObservableSet<E>implements IObser
 		this.factory = factory;
 		this.outerObservableValue = outerObservableValue;
 
-		outerObservableValue.addDisposeListener(new IDisposeListener() {
-			@Override
-			public void handleDispose(DisposeEvent disposeEvent) {
-				dispose();
-			}
-		});
+		outerObservableValue.addDisposeListener(disposeEvent -> dispose());
 
 		ObservableTracker.setIgnore(true);
 		try {
@@ -95,19 +83,16 @@ public class DetailObservableSet<M, E> extends ObservableSet<E>implements IObser
 		outerObservableValue.addValueChangeListener(outerChangeListener);
 	}
 
-	IValueChangeListener<M> outerChangeListener = new IValueChangeListener<M>() {
-		@Override
-		public void handleValueChange(ValueChangeEvent<? extends M> event) {
-			if (isDisposed())
-				return;
-			ObservableTracker.setIgnore(true);
-			try {
-				Set<E> oldSet = new HashSet<>(wrappedSet);
-				updateInnerObservableSet();
-				fireSetChange(Diffs.computeSetDiff(oldSet, wrappedSet));
-			} finally {
-				ObservableTracker.setIgnore(false);
-			}
+	IValueChangeListener<M> outerChangeListener = event -> {
+		if (isDisposed())
+			return;
+		ObservableTracker.setIgnore(true);
+		try {
+			Set<E> oldSet = new HashSet<>(wrappedSet);
+			updateInnerObservableSet();
+			fireSetChange(Diffs.computeSetDiff(oldSet, wrappedSet));
+		} finally {
+			ObservableTracker.setIgnore(false);
 		}
 	};
 

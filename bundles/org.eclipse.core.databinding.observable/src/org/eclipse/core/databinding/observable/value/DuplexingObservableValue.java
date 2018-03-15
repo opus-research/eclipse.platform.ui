@@ -224,16 +224,13 @@ public abstract class DuplexingObservableValue<T> extends AbstractObservableValu
 	 * do with those notifications.
 	 */
 	private void computeValueForListeners() {
-		getRealm().exec(new Runnable() {
-			@Override
-			public void run() {
-				// We are not currently listening.
-				if (hasListeners()) {
-					// But someone is listening for changes. Call getValue()
-					// to make sure we start listening to the observables we
-					// depend on.
-					getValue();
-				}
+		getRealm().exec(() -> {
+			// We are not currently listening.
+			if (hasListeners()) {
+				// But someone is listening for changes. Call getValue()
+				// to make sure we start listening to the observables we
+				// depend on.
+				getValue();
 			}
 		});
 	}
