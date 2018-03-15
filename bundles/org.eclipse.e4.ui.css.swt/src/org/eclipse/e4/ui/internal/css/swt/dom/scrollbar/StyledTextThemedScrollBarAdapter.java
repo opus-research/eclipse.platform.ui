@@ -13,19 +13,12 @@ package org.eclipse.e4.ui.internal.css.swt.dom.scrollbar;
 import org.eclipse.e4.ui.internal.css.swt.CSSActivator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.custom.StyledTextContent;
-import org.eclipse.swt.custom.TextChangeListener;
-import org.eclipse.swt.custom.TextChangedEvent;
-import org.eclipse.swt.custom.TextChangingEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Scrollable;
 import org.osgi.service.log.LogService;
 
@@ -63,98 +56,12 @@ public class StyledTextThemedScrollBarAdapter extends AbstractThemedScrollBarAda
 	}
 
 	/**
-	 * Ideally this whole class wouldn't be needed (i.e.: if we knew when the
-	 * scroll max/selection changed), but unfortunately, these notifications
-	 * aren't reliable, so, this class is used to poll such a change when the
-	 * text on the StyledText changes.
-	 */
-	static abstract class AbstractStyledTextScrollHandler extends AbstractScrollHandler
-	implements ModifyListener, TextChangeListener {
-
-		private final StyledText fStyledText;
-		private AbstractThemedScrollBarAdapter fAbstractThemedScrollBarAdapter;
-		private StyledTextContent fTextContent;
-		private int fLastMax;
-		private int fLastSelection;
-
-		protected AbstractStyledTextScrollHandler(StyledText styledText, ScrollBar scrollBar,
-				IScrollBarSettings scrollBarSettings) {
-			super(scrollBar, scrollBarSettings);
-			this.fStyledText = styledText;
-		}
-
-		@Override
-		public void install(AbstractThemedScrollBarAdapter abstractThemedScrollBarAdapter) {
-			super.install(abstractThemedScrollBarAdapter);
-			fStyledText.addModifyListener(this);
-			this.fAbstractThemedScrollBarAdapter = abstractThemedScrollBarAdapter;
-			fTextContent = fStyledText.getContent();
-			fTextContent.addTextChangeListener(this);
-			fLastMax = fScrollBar.getMaximum();
-			fLastSelection = fScrollBar.getSelection();
-		}
-
-		@Override
-		public void uninstall(AbstractThemedScrollBarAdapter abstractThemedScrollBarAdapter, boolean disposing) {
-			super.uninstall(abstractThemedScrollBarAdapter, disposing);
-			fStyledText.removeModifyListener(this);
-			if (fTextContent != null) {
-				fTextContent.removeTextChangeListener(this);
-				fTextContent = null;
-			}
-			this.fAbstractThemedScrollBarAdapter = null;
-		}
-
-		private void checkNeedUpdate() {
-			if (fLastMax != fScrollBar.getMaximum() || fLastSelection != fScrollBar.getSelection()) {
-				this.fAbstractThemedScrollBarAdapter.fPainter.redrawScrollBars();
-			}
-		}
-
-		@Override
-		public void modifyText(ModifyEvent e) {
-			checkNeedUpdate();
-		}
-
-		@Override
-		public void textSet(TextChangedEvent event) {
-			checkNeedUpdate();
-		}
-
-		@Override
-		public void textChanged(TextChangedEvent event) {
-			checkNeedUpdate();
-		}
-
-		@Override
-		public void textChanging(TextChangingEvent event) {
-
-		}
-
-		@Override
-		public void paintControl(GC gc, Rectangle currClientArea, Scrollable scrollable) {
-			// At each paint, check if the content changed and keep the last
-			// max/selection (unfortunately, it doesn't provide a reliable way
-			// to listen such changes, so, we must poll it).
-			fLastMax = fScrollBar.getMaximum();
-			fLastSelection = fScrollBar.getSelection();
-
-			if (fTextContent != null && fStyledText.getContent() != fTextContent) {
-				fTextContent.removeTextChangeListener(this);
-				fTextContent = fStyledText.getContent();
-				fTextContent.addTextChangeListener(this);
-			}
-			super.paintControl(gc, currClientArea, scrollable);
-		}
-	}
-
-	/**
 	 * Handles the scroll vertically.
 	 */
-	static class StyledTextVerticalScrollHandler extends AbstractStyledTextScrollHandler {
+	static class StyledTextVerticalScrollHandler extends AbstractScrollHandler {
 
 		public StyledTextVerticalScrollHandler(StyledText styledText, IScrollBarSettings scrollBarSettings) {
-			super(styledText, styledText.getVerticalBar(), scrollBarSettings);
+			super(styledText.getVerticalBar(), scrollBarSettings);
 		}
 
 		@Override
@@ -245,10 +152,10 @@ public class StyledTextThemedScrollBarAdapter extends AbstractThemedScrollBarAda
 	/**
 	 * Handles the scroll horizontally.
 	 */
-	/* default */ static class StyledTextHorizontalScrollHandler extends AbstractStyledTextScrollHandler {
+	/* default */ static class StyledTextHorizontalScrollHandler extends AbstractScrollHandler {
 
 		public StyledTextHorizontalScrollHandler(StyledText styledText, IScrollBarSettings scrollBarSettings) {
-			super(styledText, styledText.getHorizontalBar(), scrollBarSettings);
+			super(styledText.getHorizontalBar(), scrollBarSettings);
 		}
 
 		@Override
