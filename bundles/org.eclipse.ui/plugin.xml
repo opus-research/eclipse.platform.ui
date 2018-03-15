@@ -1929,6 +1929,12 @@
       		name="org.eclipse.ui.workbench.ACTIVE_TAB_HIGHLIGHT" value="false">
 		 </data>
       </theme>
+      <colorDefinition
+            categoryId="org.eclipse.ui.workbenchMisc"
+            colorFactory="org.eclipse.ui.internal.themes.DocumentationHoverColorFactory"
+            id="org.eclipse.ui.workbench.DOCUMENTATION_HOVER"
+            label="%Color.documentation_hover">
+      </colorDefinition>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
