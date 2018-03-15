@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2013, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -200,7 +200,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 */
 	private TreeViewer treeViewer;
 
-	private ListenerList<IPageChangedListener> pageChangedListeners = new ListenerList<>();
+    private ListenerList pageChangedListeners = new ListenerList();
 
     /**
      *  Composite with a FormLayout to contain the title area
@@ -333,14 +333,14 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	protected void createButtonsForButtonBar(Composite parent) {
 		// create OK and Cancel buttons by default
 		okButton = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
-		parent.getShell().setDefaultButton(okButton);
+		getShell().setDefaultButton(okButton);
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
 	@Override
 	protected Control createContents(final Composite parent) {
 		final Control[] control = new Control[1];
-		BusyIndicator.showWhile(parent.getShell().getDisplay(), () -> {
+		BusyIndicator.showWhile(getShell().getDisplay(), () -> {
 			control[0] = PreferenceDialog.super.createContents(parent);
 			// Add the first page
 			selectSavedItem();
@@ -650,7 +650,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 			public void selectionChanged(SelectionChangedEvent event) {
 				final Object selection = getSingleSelection(event.getSelection());
 				if (selection instanceof IPreferenceNode) {
-					BusyIndicator.showWhile(viewer.getControl().getDisplay(), () -> {
+					BusyIndicator.showWhile(getShell().getDisplay(), () -> {
 						if (!isCurrentPageValid()) {
 							handleError();
 						} else if (!showPage((IPreferenceNode) selection)) {
@@ -1228,7 +1228,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		// first page is inserted since computing the dialog's
 		// size is done by calling dialog.open().
 		// Also prevent auto resize if the user has manually resized
-		Shell shell = pageContainer.getShell();
+		Shell shell = getShell();
 		Point shellSize = shell.getSize();
 		if (oldPage != null) {
 			Rectangle rect = pageContainer.getClientArea();
@@ -1317,9 +1317,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	@Override
 	public void updateButtons() {
-		if (okButton != null && !okButton.isDisposed()) {
-			okButton.setEnabled(isCurrentPageValid());
-		}
+		okButton.setEnabled(isCurrentPageValid());
 	}
 
 	@Override
@@ -1473,7 +1471,9 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
      * @since 3.1
      */
     protected void firePageChanged(final PageChangedEvent event) {
-		for (IPageChangedListener l : pageChangedListeners) {
+        Object[] listeners = pageChangedListeners.getListeners();
+        for (int i = 0; i < listeners.length; i++) {
+            final IPageChangedListener l = (IPageChangedListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
 				public void run() {

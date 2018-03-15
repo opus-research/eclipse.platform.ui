@@ -24,11 +24,6 @@ import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -48,7 +43,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IPreferenceConstants;
-import org.eclipse.ui.internal.IPreferenceConstants.PREFERENCE_FACADE_MODE;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -82,11 +76,7 @@ public class WorkbenchPreferencePage extends PreferencePage implements
 
 	private Button showHeapStatusButton;
 
-	private PREFERENCE_FACADE_MODE preferenceMode;
-
 	protected static int MAX_SAVE_INTERVAL = 9999;
-
-	private ComboViewer preferenceFacadeViewer;
 
     @Override
 	protected Control createContents(Composite parent) {
@@ -383,7 +373,6 @@ public class WorkbenchPreferencePage extends PreferencePage implements
         selectOnHover = store.getBoolean(IPreferenceConstants.SELECT_ON_HOVER);
         openAfterDelay = store
                 .getBoolean(IPreferenceConstants.OPEN_AFTER_DELAY);
-		preferenceMode = PREFERENCE_FACADE_MODE.valueOf(store.getString(IPreferenceConstants.PREFERENCE_FACADE));
     }
 
     /**
@@ -401,7 +390,6 @@ public class WorkbenchPreferencePage extends PreferencePage implements
                 .getDefaultBoolean(IPreferenceConstants.SELECT_ON_HOVER);
         openAfterDelay = store
                 .getDefaultBoolean(IPreferenceConstants.OPEN_AFTER_DELAY);
-        preferenceMode = PREFERENCE_FACADE_MODE.valueOf(store.getDefaultString(IPreferenceConstants.PREFERENCE_FACADE));
         singleClickButton.setSelection(openOnSingleClick);
         doubleClickButton.setSelection(!openOnSingleClick);
         selectOnHoverButton.setSelection(selectOnHover);
@@ -414,7 +402,6 @@ public class WorkbenchPreferencePage extends PreferencePage implements
                 IPreferenceConstants.RUN_IN_BACKGROUND));
         showHeapStatusButton.setSelection(PrefUtil.getAPIPreferenceStore().getDefaultBoolean(
                 IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR));
-		preferenceFacadeViewer.setSelection(new StructuredSelection(preferenceMode));
 
         super.performDefaults();
     }
@@ -436,7 +423,6 @@ public class WorkbenchPreferencePage extends PreferencePage implements
         store.setValue(IPreferenceConstants.RUN_IN_BACKGROUND,
                 showUserDialogButton.getSelection());
 		store.setValue(IPreferenceConstants.WORKBENCH_SAVE_INTERVAL, saveInterval.getIntValue());
-		store.setValue(IPreferenceConstants.PREFERENCE_FACADE, preferenceMode.toString());
         PrefUtil.getAPIPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, showHeapStatusButton.getSelection());
         updateHeapStatus(showHeapStatusButton.getSelection());
 
@@ -469,35 +455,5 @@ public class WorkbenchPreferencePage extends PreferencePage implements
 			}
 		}
 
-	}
-
-	/**
-	 * @param composite
-	 */
-	protected void createPreferenceMode(Composite composite) {
-		Composite res = new Composite(composite, SWT.NONE);
-		res.setLayout(new GridLayout(2, false));
-		createLabel(res, WorkbenchMessages.WorkbenchPreference_preferencePresentation);
-		Combo combo = createCombo(res);
-		preferenceFacadeViewer = new ComboViewer(combo);
-		preferenceFacadeViewer.setContentProvider(new ArrayContentProvider());
-		preferenceFacadeViewer.setLabelProvider(new LabelProvider() {
-			@Override
-			public String getText(Object element) {
-				switch ((PREFERENCE_FACADE_MODE) element) {
-				case DIALOG:
-					return WorkbenchMessages.WorkbenchPreference_preferencePresentation_dialog;
-				case EDITOR:
-					return WorkbenchMessages.WorkbenchPreference_preferencePresentation_editor;
-				}
-				return super.getText(element);
-			}
-		});
-		preferenceFacadeViewer.setInput(PREFERENCE_FACADE_MODE.values());
-		preferenceFacadeViewer.setSelection(new StructuredSelection(preferenceMode));
-		preferenceFacadeViewer.addSelectionChangedListener(event -> {
-			preferenceMode = (PREFERENCE_FACADE_MODE) ((IStructuredSelection) preferenceFacadeViewer.getSelection())
-					.getFirstElement();
-		});
 	}
 }

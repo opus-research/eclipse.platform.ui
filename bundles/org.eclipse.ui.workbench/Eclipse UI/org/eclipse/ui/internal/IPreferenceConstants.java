@@ -60,6 +60,11 @@ public interface IPreferenceConstants {
     // (int) If > 0, an editor will be reused once 'N' editors are opened.
     public static final String REUSE_EDITORS = "REUSE_OPEN_EDITORS"; //$NON-NLS-1$
 
+    //Boolean: true = replace dirty editor if no other editors to reuse
+    // (prompt for save);
+    //			false = open a new editor if no other editors to resuse
+    public static final String REUSE_DIRTY_EDITORS = "REUSE_DIRTY_EDITORS"; //$NON-NLS-1$
+
     //On/Off option for the two preceding options.
     public static final String REUSE_EDITORS_BOOLEAN = "REUSE_OPEN_EDITORS_BOOLEAN"; //$NON-NLS-1$
 
@@ -280,24 +285,5 @@ public interface IPreferenceConstants {
 	 * @since 3.8
 	 */
 	public static final String SAVE_AUTOMATICALLY_INTERVAL = "SAVE_AUTOMATICALLY_INTERVAL"; //$NON-NLS-1$
-
-	/**
-	 * Preference id of how to show preferences to users
-	 * <p>
-	 * The String default value for this preference is: <code>dialog</code>.
-	 * </p>
-	 *
-	 * @since 3.109
-	 */
-	public static final String PREFERENCE_FACADE = "PREFERENCE_FACADE"; //$NON-NLS-1$
-
-	/**
-	 * Possible values for preference KEYS_PREFERENCE_FACADE
-	 *
-	 * @since 3.109
-	 */
-	public enum PREFERENCE_FACADE_MODE {
-		DIALOG, EDITOR
-	}
 
 }
