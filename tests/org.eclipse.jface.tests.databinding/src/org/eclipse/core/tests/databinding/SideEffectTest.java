@@ -13,7 +13,7 @@ package org.eclipse.core.tests.databinding;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.core.databinding.observable.ISideEffect;
+import org.eclipse.core.databinding.observable.sideeffect.ISideEffect;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
