@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.decorators;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
@@ -38,32 +39,19 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 * applied.
 	 */
 
-	private static class LightweightRunnable implements ISafeRunnable {
+	private class LightweightRunnable implements ISafeRunnable {
+		private Object element;
 
-		static class RunnableData {
+		private DecorationBuilder decoration;
 
-			final DecorationBuilder builder;
+		private LightweightDecoratorDefinition decorator;
 
-			final LightweightDecoratorDefinition decorator;
-
-			final Object element;
-
-			public RunnableData(Object object, DecorationBuilder builder, LightweightDecoratorDefinition definition) {
-				this.element = object;
-				this.builder = builder;
-				this.decorator = definition;
-			}
-
-			boolean isConsistent() {
-				return builder != null && decorator != null && element != null;
-			}
-		}
-
-		private volatile RunnableData data = new RunnableData(null, null, null);
-
-		synchronized void setValues(Object object, DecorationBuilder builder,
+		void setValues(Object object, DecorationBuilder builder,
 				LightweightDecoratorDefinition definition) {
-			data = new RunnableData(object, builder, definition);
+			element = object;
+			decoration = builder;
+			decorator = definition;
+
 		}
 
 		/*
@@ -74,9 +62,6 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 			IStatus status = StatusUtil.newStatus(IStatus.ERROR, exception
 					.getMessage(), exception);
 			String message;
-			// Copy to local variables, see
-			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=300358
-			LightweightDecoratorDefinition decorator = data.decorator;
 			if (decorator == null) {
 				message = WorkbenchMessages.DecoratorError;
 			} else {
@@ -95,12 +80,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		 */
 		@Override
 		public void run() throws Exception {
-			// Copy to local variables, see
-			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=300358
-			RunnableData data = this.data;
-			if (data.isConsistent()) {
-				data.decorator.decorate(data.element, data.builder);
-			}
+			decorator.decorate(element, decoration);
 			clearReferences();
 		}
 
@@ -110,7 +90,9 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		 * @since 3.1
 		 */
 		void clearReferences() {
-			data = new RunnableData(null, null, null);
+			decorator = null;
+			element = null;// Clear the element
+			decoration = null;
 		}
 	}
 
