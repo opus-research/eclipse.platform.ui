@@ -245,7 +245,8 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 		setValueValid(isValid);
 
 		if (!isValid) {
-			MessageFormat.format(getErrorMessage(), selectedValue);
+			MessageFormat.format(getErrorMessage(),
+					new Object[] { selectedValue });
 		}
 
 		fireApplyEditorValue();

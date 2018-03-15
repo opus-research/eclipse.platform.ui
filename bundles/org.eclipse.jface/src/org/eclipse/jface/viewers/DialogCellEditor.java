@@ -252,7 +252,8 @@ public abstract class DialogCellEditor extends CellEditor {
                         doSetValue(newValue);
                     } else {
                         // try to insert the current value into the error message.
-                        setErrorMessage(MessageFormat.format(getErrorMessage(), newValue.toString()));
+                        setErrorMessage(MessageFormat.format(getErrorMessage(),
+                                new Object[] { newValue.toString() }));
                     }
                     fireApplyEditorValue();
                 }
