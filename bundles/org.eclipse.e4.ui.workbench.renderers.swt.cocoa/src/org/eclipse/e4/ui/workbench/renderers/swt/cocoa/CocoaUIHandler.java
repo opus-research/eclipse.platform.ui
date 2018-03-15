@@ -17,6 +17,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,7 @@ import org.eclipse.swt.internal.cocoa.NSControl;
 import org.eclipse.swt.internal.cocoa.NSString;
 import org.eclipse.swt.internal.cocoa.NSToolbar;
 import org.eclipse.swt.internal.cocoa.NSWindow;
-import org.eclipse.swt.internal.gtk.OS;
+import org.eclipse.swt.internal.cocoa.OS;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -93,6 +94,7 @@ public class CocoaUIHandler {
 	private static final String COMMAND_ID_ABOUT = "org.eclipse.ui.help.aboutAction"; //$NON-NLS-1$
 	private static final String COMMAND_ID_PREFERENCES = "org.eclipse.ui.window.preferences"; //$NON-NLS-1$
 	private static final String COMMAND_ID_QUIT = "org.eclipse.ui.file.exit"; //$NON-NLS-1$
+	private static final String COMMAND_PARAMETER_ID_MAY_PROMPT = "mayPrompt"; //$NON-NLS-1$
 	// toggle coolbar isn't actually defined anywhere
 	private static final String COMMAND_ID_TOGGLE_COOLBAR = "org.eclipse.ui.ToggleCoolbarAction"; //$NON-NLS-1$
 
@@ -612,7 +614,7 @@ public class CocoaUIHandler {
 			statusReporter.get()
 					.report(new Status(IStatus.WARNING, CocoaUIProcessor.FRAGMENT_ID,
 							"Unhandled menu type: " + item.getClass() + ": " + item), //$NON-NLS-1$ //$NON-NLS-2$
-							StatusReporter.LOG);
+					StatusReporter.LOG);
 		}
 	}
 
@@ -633,8 +635,9 @@ public class CocoaUIHandler {
 		if (commandService == null || handlerService == null) {
 			return false;
 		}
-
-		ParameterizedCommand cmd = commandService.createCommand(commandId, null);
+		Map<String, Object> params = COMMAND_ID_QUIT.equals(commandId)
+				? Collections.singletonMap(COMMAND_PARAMETER_ID_MAY_PROMPT, (Object) "true") : null; //$NON-NLS-1$
+		ParameterizedCommand cmd = commandService.createCommand(commandId, params);
 		if (cmd == null) {
 			return false;
 		}
