@@ -64,7 +64,9 @@ public class FileSystemExporter {
     protected void writeChildren(IContainer folder, IPath destinationPath)
             throws CoreException, IOException {
         if (folder.isAccessible()) {
-			for (IResource child : folder.members()) {
+            IResource[] children = folder.members();
+            for (int i = 0; i < children.length; i++) {
+                IResource child = children[i];
                 writeResource(child, destinationPath.append(child.getName()));
             }
         }

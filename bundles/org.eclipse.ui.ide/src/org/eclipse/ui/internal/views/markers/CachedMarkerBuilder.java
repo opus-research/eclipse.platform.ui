@@ -215,8 +215,8 @@ public class CachedMarkerBuilder {
 			return elements.length;
 		}
 		int length = 0;
-		for (MarkerSupportItem markerSupportItem : elements) {
-			length += markerSupportItem.getChildren().length;
+		for (int i = 0; i < elements.length; i++) {
+			length += elements[i].getChildren().length;
 		}
 
 		return length;

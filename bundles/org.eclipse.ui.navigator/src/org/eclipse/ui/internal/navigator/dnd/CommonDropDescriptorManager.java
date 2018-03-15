@@ -12,6 +12,7 @@
 package org.eclipse.ui.internal.navigator.dnd;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,11 +68,17 @@ public class CommonDropDescriptorManager {
 	public CommonDropAdapterDescriptor[] findCommonDropAdapterAssistants(Object aDropTarget, INavigatorContentService aContentService) {
 
 		Set<CommonDropAdapterDescriptor> foundDescriptors = new LinkedHashSet<CommonDropAdapterDescriptor>();
-		for (INavigatorContentDescriptor contentDescriptor : dropDescriptors.keySet()) {
+		for (Iterator<INavigatorContentDescriptor> iter = dropDescriptors.keySet().iterator(); iter
+				.hasNext();) {
+			INavigatorContentDescriptor contentDescriptor = iter
+					.next();
 			if (aContentService.isVisible(contentDescriptor.getId())
 					&& aContentService.isActive(contentDescriptor.getId())) {
 				List<CommonDropAdapterDescriptor> dropDescriptors = getDropDescriptors(contentDescriptor);
-				for (CommonDropAdapterDescriptor dropDescriptor : dropDescriptors) {
+				for (Iterator<CommonDropAdapterDescriptor> iterator = dropDescriptors.iterator(); iterator
+						.hasNext();) {
+					CommonDropAdapterDescriptor dropDescriptor = iterator
+							.next();
 					if (dropDescriptor.isDropElementSupported(aDropTarget)) {
 						foundDescriptors.add(dropDescriptor);
 					}
@@ -137,9 +144,9 @@ public class CommonDropDescriptorManager {
 						IConfigurationElement[] commonDropAdapters = element
 								.getChildren(TAG_COMMON_DROP_ADAPTER);
 
-						for (IConfigurationElement commonDropAdapter : commonDropAdapters) {
+						for (int i = 0; i < commonDropAdapters.length; i++) {
 							addCommonDropAdapter(contentDescriptor,
-									new CommonDropAdapterDescriptor(commonDropAdapter, contentDescriptor));
+									new CommonDropAdapterDescriptor(commonDropAdapters[i], contentDescriptor));
 						}
 					}
 				}

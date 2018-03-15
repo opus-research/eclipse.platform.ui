@@ -147,8 +147,10 @@ class QuickAccessEntry {
 			if (firstInCategory || providerMatchRegions.length > 0) {
 				textLayout.setText(provider.getName());
 				if (boldStyle != null) {
-					for (int[] matchRegion : providerMatchRegions) {
-						textLayout.setStyle(boldStyle, matchRegion[0], matchRegion[1]);
+					for (int i = 0; i < providerMatchRegions.length; i++) {
+						int[] matchRegion = providerMatchRegions[i];
+						textLayout.setStyle(boldStyle, matchRegion[0],
+								matchRegion[1]);
 					}
 				}
 			} else {
@@ -173,7 +175,8 @@ class QuickAccessEntry {
 			event.height = Math.max(event.height, iconSize + 3);
 			event.width += iconSize + 4;
 			if (boldStyle != null) {
-				for (int[] matchRegion : elementMatchRegions) {
+				for (int i = 0; i < elementMatchRegions.length; i++) {
+					int[] matchRegion = elementMatchRegions[i];
 					textLayout.setStyle(boldStyle, matchRegion[0], matchRegion[1]);
 				}
 			}
@@ -193,7 +196,8 @@ class QuickAccessEntry {
 			if (firstInCategory || providerMatchRegions.length > 0) {
 				textLayout.setText(provider.getName());
 				if (boldStyle != null) {
-					for (int[] matchRegion : providerMatchRegions) {
+					for (int i = 0; i < providerMatchRegions.length; i++) {
+						int[] matchRegion = providerMatchRegions[i];
 						textLayout.setStyle(boldStyle, matchRegion[0],
 								matchRegion[1]);
 					}
@@ -217,9 +221,9 @@ class QuickAccessEntry {
 							StyledString.QUALIFIER_STYLER, new StyledString(commandElement
 									.getCommand()));
 					StyleRange[] styleRanges = styledString.getStyleRanges();
-					for (StyleRange styleRange : styleRanges) {
-						textLayout.setStyle(styleRange, styleRange.start,
-								styleRange.start + styleRange.length);
+					for (int i = 0; i < styleRanges.length; i++) {
+						textLayout.setStyle(styleRanges[i], styleRanges[i].start,
+								styleRanges[i].start + styleRanges[i].length);
 					}
 				}
 			}
@@ -242,7 +246,8 @@ class QuickAccessEntry {
 					destWidth, destHeight);
 			textLayout.setText(label);
 			if (boldStyle != null) {
-				for (int[] matchRegion : elementMatchRegions) {
+				for (int i = 0; i < elementMatchRegions.length; i++) {
+					int[] matchRegion = elementMatchRegions[i];
 					textLayout.setStyle(boldStyle, matchRegion[0], matchRegion[1]);
 				}
 			}

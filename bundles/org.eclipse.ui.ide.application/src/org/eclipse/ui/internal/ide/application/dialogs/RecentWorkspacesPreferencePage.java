@@ -146,7 +146,8 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 			});
 
 		String[] recentWorkspaces = workspacesData.getRecentWorkspaces();
-		for (String aWorkspace : recentWorkspaces) {
+		for (int i = 0; i < recentWorkspaces.length; i++) {
+			String aWorkspace = recentWorkspaces[i];
 			if (aWorkspace != null) {
 				workspacesList.add(TextProcessor.process(aWorkspace));
 			}

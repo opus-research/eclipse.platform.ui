@@ -172,10 +172,11 @@ public class ThemeRegistry implements IThemeRegistry {
      */
     private IThemeElementDefinition[] overlay(IThemeElementDefinition[] defs,
             IThemeElementDefinition[] overrides) {
-        for (IThemeElementDefinition override : overrides) {
-			int idx = Arrays.binarySearch(defs, override, IThemeRegistry.ID_COMPARATOR);
+        for (int i = 0; i < overrides.length; i++) {
+            int idx = Arrays.binarySearch(defs, overrides[i],
+                    IThemeRegistry.ID_COMPARATOR);
             if (idx >= 0) {
-                defs[idx] = overlay(defs[idx], override);
+                defs[idx] = overlay(defs[idx], overrides[i]);
             }
         }
         return defs;

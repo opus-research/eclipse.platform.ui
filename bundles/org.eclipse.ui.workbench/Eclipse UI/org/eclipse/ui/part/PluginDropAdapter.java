@@ -92,14 +92,14 @@ public class PluginDropAdapter extends ViewerDropAdapter {
         IExtensionPoint xpt = registry.getExtensionPoint(PlatformUI.PLUGIN_ID,
                 IWorkbenchRegistryConstants.PL_DROP_ACTIONS);
         IExtension[] extensions = xpt.getExtensions();
-        for (IExtension extension : extensions) {
-            IConfigurationElement[] configs = extension.getConfigurationElements();
+        for (int i = 0; i < extensions.length; i++) {
+            IConfigurationElement[] configs = extensions[i].getConfigurationElements();
             if (configs != null && configs.length > 0) {
-                for (IConfigurationElement config : configs) {
-                	String id = config.getAttribute("id");//$NON-NLS-1$
+                for (int j=0; j < configs.length; j++) {
+                	String id = configs[j].getAttribute("id");//$NON-NLS-1$
                     if (id != null && id.equals(adapterName)) {
                         return (IDropActionDelegate) WorkbenchPlugin
-                                .createExtension(config, ATT_CLASS);
+                                .createExtension(configs[j], ATT_CLASS);
                     }
                 }
             }

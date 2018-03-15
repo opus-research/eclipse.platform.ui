@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
-import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
@@ -139,10 +138,8 @@ public class ActionSet {
 			for (IConfigurationElement part : children) {
 				String id = MenuHelper.getId(part);
 				if (id != null && id.length() > 0) {
-					if (Policy.DEBUG_MENUS) {
-						MenuHelper.trace(IWorkbenchRegistryConstants.PL_ACTION_SET_PART_ASSOCIATIONS + ':' + actionSetId
-								+ ':' + id, null);
-					}
+					MenuHelper.trace(IWorkbenchRegistryConstants.PL_ACTION_SET_PART_ASSOCIATIONS
+							+ ':' + actionSetId + ':' + id, null);
 					result.add(id);
 				}
 			}

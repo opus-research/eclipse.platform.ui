@@ -213,9 +213,10 @@ public class TypesConfigurationArea extends GroupFilterConfigurationArea {
 	@Override
 	public void apply(MarkerFieldFilter filter) {
 		Collection<MarkerType> selectedTypes = new ArrayList<>();
-		for (Object checkedElement : typesViewer.getCheckedElements()) {
-			if (checkedElement instanceof MarkerTypeEntry) {
-				selectedTypes.add(((MarkerTypeEntry) checkedElement).getMarkerType());
+		Object[] elements = typesViewer.getCheckedElements();
+		for (int i = 0; i < elements.length; i++) {
+			if (elements[i] instanceof MarkerTypeEntry) {
+				selectedTypes.add(((MarkerTypeEntry) elements[i]).getMarkerType());
 			}
 		}
 		MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) typesViewer.getInput();
@@ -284,8 +285,8 @@ public class TypesConfigurationArea extends GroupFilterConfigurationArea {
 			private void setChildrenChecked(Object element, boolean checked) {
 				Object[] children = typesContentProvider.getChildren(element);
 				if (children.length > 0) {
-					for (Object child : children) {
-						typesViewer.setChecked(child, checked);
+					for (int i = 0; i < children.length; i++) {
+						typesViewer.setChecked(children[i], checked);
 					}
 				}
 			}
@@ -302,9 +303,10 @@ public class TypesConfigurationArea extends GroupFilterConfigurationArea {
 					return;
 				}
 
-				for (Object child : typesContentProvider.getChildren(parentType)) {
-					// At least one different
-					if (typesViewer.getChecked(child) != checked) {
+				Object[] children = typesContentProvider.getChildren(parentType);
+				for (int i = 0; i < children.length; i++) {// At least one
+					// different
+					if (typesViewer.getChecked(children[i]) != checked) {
 						typesViewer.setGrayChecked(parentType, true);
 						return;
 					}
@@ -360,8 +362,9 @@ public class TypesConfigurationArea extends GroupFilterConfigurationArea {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				for (Object element : typesContentProvider.getElements(typesViewer.getInput())) {
-					typesViewer.setSubtreeChecked(element, checked);
+				Object[] elements = typesContentProvider.getElements(typesViewer.getInput());
+				for (int i = 0; i < elements.length; i++) {
+					typesViewer.setSubtreeChecked(elements[i], checked);
 				}
 			}
 		};

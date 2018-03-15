@@ -58,12 +58,12 @@ public class ProgramImageDescriptor extends ImageDescriptor {
      * in this descriptor.
      */
     @Override
-	public ImageData getImageData(int zoom) {
+	public ImageData getImageData() {
         /*This is a user defined offset into the file which always
          *returns us the defualt - return the default regardless*/
 
         return WorkbenchImages.getImageDescriptor(ISharedImages.IMG_OBJ_FILE)
-				.getImageData(zoom);
+                .getImageData();
     }
 
     /**

@@ -151,13 +151,14 @@ public final class EditorAssociationOverrideDescriptor {
 
 	private static EditorAssociationOverrideDescriptor[] createDescriptors(IConfigurationElement[] elements) {
 		List result= new ArrayList(elements.length);
-		for (IConfigurationElement configElement : elements) {
-			if (EDITOR_ASSOCIATION_OVERRIDE_ELEMENT.equals(configElement.getName())) {
-				EditorAssociationOverrideDescriptor desc= new EditorAssociationOverrideDescriptor(configElement);
+		for (int i= 0; i < elements.length; i++) {
+			IConfigurationElement element= elements[i];
+			if (EDITOR_ASSOCIATION_OVERRIDE_ELEMENT.equals(element.getName())) {
+				EditorAssociationOverrideDescriptor desc= new EditorAssociationOverrideDescriptor(element);
 				result.add(desc);
 			} else {
 				String message= MessageFormat.format(IDEWorkbenchMessages.editorAssociationOverride_error_invalidElementName_message,
-						configElement.getContributor().getName(), configElement.getName());
+						element.getContributor().getName(), element.getName());
 				IDEWorkbenchPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, IStatus.OK, message, null));
 			}
 		}

@@ -11,13 +11,9 @@
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
-import static org.eclipse.e4.ui.internal.workbench.Policy.*;
-
-import java.util.Hashtable;
 import java.util.List;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.service.debug.DebugOptions;
-import org.eclipse.osgi.service.debug.DebugOptionsListener;
 import org.eclipse.osgi.service.debug.DebugTrace;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
@@ -30,7 +26,7 @@ import org.osgi.util.tracker.ServiceTracker;
 /**
  * BundleActivator to access the required OSGi services.
  */
-public class Activator implements BundleActivator, DebugOptionsListener {
+public class Activator implements BundleActivator {
 	/**
 	 * The bundle symbolic name.
 	 */
@@ -88,9 +84,6 @@ public class Activator implements BundleActivator, DebugOptionsListener {
 	public void start(BundleContext context) throws Exception {
 		activator = this;
 		this.context = context;
-		Hashtable<String, String> props = new Hashtable<>(2);
-		props.put(DebugOptions.LISTENER_SYMBOLICNAME, PI_WORKBENCH);
-		context.registerService(DebugOptionsListener.class, this, props);
 
 		// track required bundles
 		resolvedBundles = new BundleTracker<>(context, Bundle.RESOLVED
@@ -120,23 +113,33 @@ public class Activator implements BundleActivator, DebugOptionsListener {
 		}
 	}
 
-	@Override
-	public void optionsChanged(DebugOptions options) {
-		trace = options.newDebugTrace(PI_WORKBENCH);
-		DEBUG = options.getBooleanOption(PI_WORKBENCH + DEBUG_FLAG, false);
-		DEBUG_CMDS = options.getBooleanOption(PI_WORKBENCH + DEBUG_CMDS_FLAG, false);
-		DEBUG_CONTEXTS = options.getBooleanOption(PI_WORKBENCH + DEBUG_CONTEXTS_FLAG, false);
-		DEBUG_CONTEXTS_VERBOSE = options.getBooleanOption(PI_WORKBENCH + DEBUG_CONTEXTS_VERBOSE_FLAG, false);
-		DEBUG_MENUS = options.getBooleanOption(PI_WORKBENCH + DEBUG_MENUS_FLAG, false);
-		DEBUG_RENDERER = options.getBooleanOption(PI_WORKBENCH + DEBUG_RENDERER_FLAG, false);
-		DEBUG_WORKBENCH = options.getBooleanOption(PI_WORKBENCH + DEBUG_WORKBENCH_FLAG, false);
+	public DebugOptions getDebugOptions() {
+		if (debugTracker == null) {
+			if (context == null)
+				return null;
+			debugTracker = new ServiceTracker<>(context,
+					DebugOptions.class.getName(), null);
+			debugTracker.open();
+		}
+		return debugTracker.getService();
 	}
 
 	public DebugTrace getTrace() {
+		if (trace == null) {
+			trace = getDebugOptions().newDebugTrace(PI_WORKBENCH);
+		}
 		return trace;
 	}
 
 	public static void trace(String option, String msg, Throwable error) {
+		final DebugOptions debugOptions = activator.getDebugOptions();
+		if (debugOptions.isDebugEnabled()
+				&& debugOptions.getBooleanOption(PI_WORKBENCH + option, false)) {
+			System.out.println(msg);
+			if (error != null) {
+				error.printStackTrace(System.out);
+			}
+		}
 		activator.getTrace().trace(option, msg, error);
 	}
 
@@ -192,37 +195,16 @@ public class Activator implements BundleActivator, DebugOptionsListener {
 		return logService;
 	}
 
-	/**
-	 * @param level
-	 *            one from {@code LogService} constants
-	 * @param message
-	 * @see LogService#LOG_ERROR
-	 * @see LogService#LOG_WARNING
-	 * @see LogService#LOG_INFO
-	 * @see LogService#LOG_DEBUG
-	 */
 	public static void log(int level, String message) {
 		LogService logService = activator.getLogService();
-		if (logService != null) {
+		if (logService != null)
 			logService.log(level, message);
-		}
 	}
 
-	/**
-	 * @param level
-	 *            one from {@code LogService} constants
-	 * @param message
-	 * @param exception
-	 * @see LogService#LOG_ERROR
-	 * @see LogService#LOG_WARNING
-	 * @see LogService#LOG_INFO
-	 * @see LogService#LOG_DEBUG
-	 */
 	public static void log(int level, String message, Throwable exception) {
 		LogService logService = activator.getLogService();
-		if (logService != null) {
+		if (logService != null)
 			logService.log(level, message, exception);
-		}
 	}
 
 }

@@ -12,8 +12,6 @@
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -21,6 +19,8 @@ import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -271,7 +271,12 @@ public abstract class PreferencePage extends DialogPage implements
 				GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
 				data.widthHint = Math.max(widthHint, minButtonSize.x);
 				defaultsButton.setLayoutData(data);
-				defaultsButton.addSelectionListener(widgetSelectedAdapter(e -> performDefaults()));
+				defaultsButton.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						performDefaults();
+					}
+				});
 			}
 			if (createApplyButton) {
 				String label = JFaceResources.getString("apply"); //$NON-NLS-1$
@@ -283,7 +288,12 @@ public abstract class PreferencePage extends DialogPage implements
 				GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
 				data.widthHint = Math.max(widthHint, minButtonSize.x);
 				applyButton.setLayoutData(data);
-				applyButton.addSelectionListener(widgetSelectedAdapter(e -> performApply()));
+				applyButton.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						performApply();
+					}
+				});
 				applyButton.setEnabled(isValid());
 			}
 			applyDialogFont(buttonBar);

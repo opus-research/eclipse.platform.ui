@@ -157,8 +157,8 @@ public class EditorInputTransfer extends ByteArrayTransfer {
             dataOut.writeInt(editorInputCount);
 
             //write each resource
-            for (EditorInputData editorInput : editorInputs) {
-                writeEditorInput(dataOut, editorInput);
+            for (int i = 0; i < editorInputs.length; i++) {
+                writeEditorInput(dataOut, editorInputs[i]);
             }
 
             //cleanup

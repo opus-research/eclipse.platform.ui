@@ -50,7 +50,8 @@ public class ResourceSaveableFilter implements ISaveableFilter {
 			return true;
 		}
 		// For backwards compatibility, we need to check the parts
-		for (IWorkbenchPart workbenchPart : containingParts) {
+		for (int i = 0; i < containingParts.length; i++) {
+			IWorkbenchPart workbenchPart = containingParts[i];
 			if (workbenchPart instanceof IEditorPart) {
 				IEditorPart editorPart = (IEditorPart) workbenchPart;
 				if (isEditingDescendantOf(editorPart)) {
@@ -76,9 +77,11 @@ public class ResourceSaveableFilter implements ISaveableFilter {
 			try {
 				ResourceTraversal[] traversals = mapping.getTraversals(
 						ResourceMappingContext.LOCAL_CONTEXT, null);
-				for (ResourceTraversal traversal : traversals) {
+				for (int i = 0; i < traversals.length; i++) {
+					ResourceTraversal traversal = traversals[i];
 					IResource[] resources = traversal.getResources();
-					for (IResource resource : resources) {
+					for (int j = 0; j < resources.length; j++) {
+						IResource resource = resources[j];
 						if (isDescendantOfRoots(resource)) {
 							return true;
 						}
@@ -110,7 +113,8 @@ public class ResourceSaveableFilter implements ISaveableFilter {
 	 *         roots
 	 */
 	private boolean isDescendantOfRoots(IResource resource) {
-		for (IResource root : roots) {
+		for (int l = 0; l < roots.length; l++) {
+			IResource root = roots[l];
 			if (root.getFullPath().isPrefixOf(resource.getFullPath())) {
 				return true;
 			}

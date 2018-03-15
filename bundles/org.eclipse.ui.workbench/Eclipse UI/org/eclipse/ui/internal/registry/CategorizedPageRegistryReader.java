@@ -144,7 +144,9 @@ public abstract class CategorizedPageRegistryReader extends RegistryReader {
 			//reset the flag
 			workDone = false;
 			List deferred = new ArrayList();
-			for (CategoryNode categoryNode : nodes) {
+			for (int i = 0; i < nodes.length; i++) {
+				// Iterate through all the nodes
+				CategoryNode categoryNode = nodes[i];
 				Object node = categoryNode.getNode();
 
 				String category = getCategory(node);
@@ -185,7 +187,8 @@ public abstract class CategorizedPageRegistryReader extends RegistryReader {
 		} while (nodes.length > 0 && workDone); // loop while we still have nodes to work on and the list is shrinking
 
 		// log anything left over.
-		for (CategoryNode categoryNode : nodes) {
+		for (int i = 0; i < nodes.length; i++) {
+			CategoryNode categoryNode = nodes[i];
 			// Could not find the parent - log
 			WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.WARNING,
 					invalidCategoryNodeMessage(categoryNode), null));

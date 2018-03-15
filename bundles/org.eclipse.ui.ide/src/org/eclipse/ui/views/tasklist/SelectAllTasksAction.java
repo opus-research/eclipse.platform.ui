@@ -37,6 +37,6 @@ class SelectAllTasksAction extends TaskAction {
         TableViewer viewer = getTaskList().getTableViewer();
         viewer.getTable().selectAll();
         // force viewer selection change
-		viewer.setSelection(viewer.getStructuredSelection());
+        viewer.setSelection(viewer.getSelection());
     }
 }

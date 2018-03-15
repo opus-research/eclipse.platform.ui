@@ -79,8 +79,8 @@ public class DelayedEventsProcessor implements Listener {
 		filesToOpen.toArray(filePaths);
 		filesToOpen.clear();
 
-		for (String filePath : filePaths) {
-			openFile(display, filePath);
+		for(int i = 0; i < filePaths.length; i++) {
+			openFile(display, filePaths[i]);
 		}
 	}
 

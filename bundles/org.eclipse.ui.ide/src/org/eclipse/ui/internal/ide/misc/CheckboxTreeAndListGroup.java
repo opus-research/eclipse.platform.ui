@@ -122,10 +122,10 @@ public class CheckboxTreeAndListGroup extends EventManager implements
     		ILabelProvider treeLabelProvider,
     		ViewerComparator treeComparator,
     		IStructuredContentProvider listContentProvider,
-    		ILabelProvider listLabelProvider,
+    		ILabelProvider listLabelProvider, 
     		ViewerComparator listComparator,
     		int style, int width, int height) {
-
+    	
     	root = rootObject;
     	this.treeContentProvider = treeContentProvider;
     	this.listContentProvider = listContentProvider;
@@ -219,7 +219,8 @@ public class CheckboxTreeAndListGroup extends EventManager implements
      *	time and check each one in the tree viewer as appropriate
      */
     protected void checkNewTreeElements(Object[] elements) {
-		for (Object currentElement : elements) {
+        for (int i = 0; i < elements.length; ++i) {
+            Object currentElement = elements[i];
             boolean checked = checkedStateStore.containsKey(currentElement);
             treeViewer.setChecked(currentElement, checked);
             treeViewer.setGrayed(currentElement, checked
@@ -335,8 +336,9 @@ public class CheckboxTreeAndListGroup extends EventManager implements
 
         // if any children of treeElement are still gray-checked then treeElement
         // must remain gray-checked as well
-		for (Object child : treeContentProvider.getChildren(treeElement)) {
-			if (checkedStateStore.containsKey(child)) {
+        Object[] children = treeContentProvider.getChildren(treeElement);
+        for (int i = 0; i < children.length; ++i) {
+            if (checkedStateStore.containsKey(children[i])) {
 				return true;
 			}
         }
@@ -366,8 +368,9 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         // always go through all children first since their white-checked
         // statuses will be needed to determine the white-checked status for
         // this tree element
-		for (Object child : treeContentProvider.getElements(treeElement)) {
-			determineWhiteCheckedDescendents(child);
+        Object[] children = treeContentProvider.getElements(treeElement);
+        for (int i = 0; i < children.length; ++i) {
+			determineWhiteCheckedDescendents(children[i]);
 		}
 
         // now determine the white-checked status for this tree element
@@ -534,12 +537,13 @@ public class CheckboxTreeAndListGroup extends EventManager implements
      */
     protected void notifyCheckStateChangeListeners(
             final CheckStateChangedEvent event) {
-		for (Object listener : getListeners()) {
-			final ICheckStateListener checkStateListener = (ICheckStateListener) listener;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final ICheckStateListener l = (ICheckStateListener) array[i];
             SafeRunner.run(new SafeRunnable() {
                 @Override
 				public void run() {
-					checkStateListener.checkStateChanged(event);
+                    l.checkStateChanged(event);
                 }
             });
         }
@@ -655,9 +659,10 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         }
 
         if (state) {
+            Object[] listItems = listContentProvider.getElements(treeElement);
             List listItemsChecked = new ArrayList();
-			for (Object listItem : listContentProvider.getElements(treeElement)) {
-				listItemsChecked.add(listItem);
+            for (int i = 0; i < listItems.length; ++i) {
+				listItemsChecked.add(listItems[i]);
 			}
 
             checkedStateStore.put(treeElement, listItemsChecked);
@@ -670,8 +675,9 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         treeViewer.setGrayed(treeElement, false);
 
         // now logically check/uncheck all children as well
-		for (Object child : treeContentProvider.getChildren(treeElement)) {
-			setTreeChecked(child, state);
+        Object[] children = treeContentProvider.getChildren(treeElement);
+        for (int i = 0; i < children.length; ++i) {
+            setTreeChecked(children[i], state);
         }
     }
 

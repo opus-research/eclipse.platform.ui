@@ -282,7 +282,9 @@ public final class Descriptors {
             ResourceMethod[] data = (ResourceMethod[]) list.toArray(new ResourceMethod[list.size()]);
 
             // Clear out the images
-            for (ResourceMethod method : data) {
+            for (int i = 0; i < data.length; i++) {
+                ResourceMethod method = data[i];
+
                 method.dispose();
             }
         }

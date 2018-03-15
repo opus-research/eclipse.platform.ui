@@ -106,7 +106,9 @@ public class PageBook extends Composite {
 
 		// hide old (and all others) *after* new page has been made visible in
 		// order to avoid flashing
-		for (Control child : getChildren()) {
+		Control[] children = getChildren();
+		for (int i = 0; i < children.length; i++) {
+			Control child = children[i];
 			if (child != page && !child.isDisposed()) {
 				child.setVisible(false);
 			}

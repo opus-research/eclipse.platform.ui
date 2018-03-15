@@ -14,8 +14,6 @@
 
 package org.eclipse.ui.internal.progress;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import com.ibm.icu.text.DateFormat;
 import java.net.URL;
 import java.util.ArrayList;
@@ -48,6 +46,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -252,10 +252,13 @@ public class ProgressInfoItem extends Composite {
 		actionButton = new ToolItem(actionBar, SWT.NONE);
 		actionButton
 				.setToolTipText(ProgressMessages.NewProgressView_CancelJobToolTip);
-		actionButton.addSelectionListener(widgetSelectedAdapter(e -> {
-			actionButton.setEnabled(false);
-			cancelOrRemove();
-		}));
+		actionButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				actionButton.setEnabled(false);
+				cancelOrRemove();
+			}
+		});
 		actionBar.addListener(SWT.Traverse, event -> {
 			if (indexListener == null) {
 				return;
@@ -505,9 +508,9 @@ public class ProgressInfoItem extends Composite {
 					// Only do it if there is an indeterminate task
 					// There may be no task so we don't want to create it
 					// until we know for sure
-					for (JobInfo jobInfo : infos) {
-						if (jobInfo.hasTaskInfo()
-								&& jobInfo.getTaskInfo().totalWork == IProgressMonitor.UNKNOWN) {
+					for (int i = 0; i < infos.length; i++) {
+						if (infos[i].hasTaskInfo()
+								&& infos[i].getTaskInfo().totalWork == IProgressMonitor.UNKNOWN) {
 							createProgressBar(SWT.INDETERMINATE);
 							break;
 						}
@@ -606,8 +609,8 @@ public class ProgressInfoItem extends Composite {
 	private boolean isCompleted() {
 
 		JobInfo[] infos = getJobInfos();
-		for (JobInfo jobInfo : infos) {
-			if (jobInfo.getJob().getState() != Job.NONE) {
+		for (int i = 0; i < infos.length; i++) {
+			if (infos[i].getJob().getState() != Job.NONE) {
 				return false;
 			}
 		}
@@ -637,8 +640,9 @@ public class ProgressInfoItem extends Composite {
 	 */
 	private boolean isRunning() {
 
-		for (JobInfo jobInfo : getJobInfos()) {
-			int state = jobInfo.getJob().getState();
+		JobInfo[] infos = getJobInfos();
+		for (int i = 0; i < infos.length; i++) {
+			int state = infos[i].getJob().getState();
 			if (state == Job.WAITING || state == Job.RUNNING)
 				return true;
 		}
@@ -687,10 +691,11 @@ public class ProgressInfoItem extends Composite {
 					.getImage(DISABLED_STOP_IMAGE_KEY));
 
 		}
+		JobInfo[] infos = getJobInfos();
 
-		for (JobInfo jobInfo : getJobInfos()) {
+		for (int i = 0; i < infos.length; i++) {
 			// Only disable if there is an unresponsive operation
-			if (jobInfo.isCanceled() && !isCompleted()) {
+			if (infos[i].isCanceled() && !isCompleted()) {
 				actionButton.setEnabled(false);
 				return;
 			}
@@ -769,7 +774,12 @@ public class ProgressInfoItem extends Composite {
 
 			link.setLayoutData(linkData);
 
-			link.addSelectionListener(widgetSelectedAdapter(e -> executeTrigger()));
+			link.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					executeTrigger();
+				}
+			});
 
 			link.addListener(SWT.Resize, event -> {
 

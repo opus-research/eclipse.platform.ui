@@ -68,15 +68,15 @@ public class ObservableMapLabelProvider extends LabelProvider implements ITableL
 		System.arraycopy(attributeMaps, 0,
 				this.attributeMaps = new IObservableMap[attributeMaps.length],
 				0, attributeMaps.length);
-		for (IObservableMap attributeMap : attributeMaps) {
-			attributeMap.addMapChangeListener(mapChangeListener);
+		for (int i = 0; i < attributeMaps.length; i++) {
+			attributeMaps[i].addMapChangeListener(mapChangeListener);
 		}
 	}
 
 	@Override
 	public void dispose() {
-		for (IObservableMap attributeMap : attributeMaps) {
-			attributeMap.removeMapChangeListener(mapChangeListener);
+		for (int i = 0; i < attributeMaps.length; i++) {
+			attributeMaps[i].removeMapChangeListener(mapChangeListener);
 		}
 		super.dispose();
 		this.attributeMaps = null;

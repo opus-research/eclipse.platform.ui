@@ -86,7 +86,8 @@ public class ResourceWorkingSetFilter extends ViewerFilter {
 			workingSetElements = workingSet.getElements();
 		}
 
-        for (IAdaptable workingSetElement : workingSetElements) {
+        for (int i = 0; i < workingSetElements.length; i++) {
+            IAdaptable workingSetElement = workingSetElements[i];
             IContainmentAdapter containmentAdapter = workingSetElement.getAdapter(IContainmentAdapter.class);
 
             // if there is no IContainmentAdapter defined for the working

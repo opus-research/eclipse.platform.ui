@@ -71,7 +71,9 @@ public class PropertyUtil {
     public static IPropertyMap union(IPropertyMap[] sources) {
         PropertyMapUnion result = new PropertyMapUnion();
 
-        for (IPropertyMap map : sources) {
+        for (int i = 0; i < sources.length; i++) {
+            IPropertyMap map = sources[i];
+
             result.addMap(map);
         }
 

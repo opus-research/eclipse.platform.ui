@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -39,14 +40,16 @@ public class StatusUtil {
         List result = new ArrayList();
 
         if (aStatus.isMultiStatus()) {
-			for (IStatus status : aStatus.getChildren()) {
-				if (status.isMultiStatus()) {
-					Iterator childStatiiEnum = flatten(status).iterator();
+            IStatus[] children = aStatus.getChildren();
+            for (int i = 0; i < children.length; i++) {
+                IStatus currentChild = children[i];
+                if (currentChild.isMultiStatus()) {
+                    Iterator childStatiiEnum = flatten(currentChild).iterator();
                     while (childStatiiEnum.hasNext()) {
 						result.add(childStatiiEnum.next());
 					}
                 } else {
-					result.add(status);
+					result.add(currentChild);
 				}
             }
         } else {

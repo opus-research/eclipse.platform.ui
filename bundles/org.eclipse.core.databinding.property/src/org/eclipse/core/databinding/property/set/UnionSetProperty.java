@@ -59,8 +59,8 @@ public class UnionSetProperty<S, E> extends SetProperty<S, E> {
 	@Override
 	protected Set<E> doGetSet(S source) {
 		Set<E> set = new HashSet<>();
-		for (ISetProperty<S, E> property : properties)
-			set.addAll(property.getSet(source));
+		for (int i = 0; i < properties.length; i++)
+			set.addAll(properties[i].getSet(source));
 		return set;
 	}
 

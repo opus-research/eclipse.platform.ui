@@ -16,6 +16,7 @@ package org.eclipse.core.databinding.observable.map;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,7 +68,8 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 	protected void firstListenerAdded() {
 		valuesToSingleKeys = new HashMap<>();
 		valuesToSetsOfKeys = new HashMap<>();
-		for (Entry<K, V> entry : entrySet()) {
+		for (Iterator<Entry<K, V>> it = entrySet().iterator(); it.hasNext();) {
+			Map.Entry<K, V> entry = it.next();
 			addMapping(entry.getKey(), entry.getValue());
 		}
 		super.firstListenerAdded();
@@ -187,7 +189,8 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 	 */
 	private Set<K> findKeys(Object value) {
 		Set<K> keys = new HashSet<>();
-		for (Entry<K, V> entry : entrySet()) {
+		for (Iterator<Entry<K, V>> it = entrySet().iterator(); it.hasNext();) {
+			Map.Entry<K, V> entry = it.next();
 			if (Util.equals(entry.getValue(), value))
 				keys.add(entry.getKey());
 		}

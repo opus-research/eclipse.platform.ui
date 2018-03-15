@@ -240,12 +240,13 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		 */
 		public void selectionChanged(final SelectionChangedEvent event) {
 			// pass on the notification to listeners
-			for (Object listener : getListeners()) {
-				final ISelectionChangedListener selectionChangedListener = (ISelectionChangedListener) listener;
+			Object[] listeners = getListeners();
+			for (int i = 0; i < listeners.length; ++i) {
+				final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
 				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() {
-						selectionChangedListener.selectionChanged(event);
+						l.selectionChanged(event);
 					}
 				});
 			}
@@ -1100,8 +1101,8 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		if (viewStack == null) {
 			return false;
 		}
-		for (IViewPart viewPart : viewStack) {
-			if (viewPart == part) {
+		for (int i = 0; i < viewStack.length; i++) {
+			if (viewStack[i] == part) {
 				return true;
 			}
 		}

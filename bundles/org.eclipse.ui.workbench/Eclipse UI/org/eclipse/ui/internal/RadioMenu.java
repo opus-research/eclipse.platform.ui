@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
@@ -35,11 +35,14 @@ public class RadioMenu implements IChangeListener {
 
     private List items = new ArrayList();
 
-	SelectionListener selectionAdapter = widgetSelectedAdapter(e -> {
-	    Object newState = e.widget.getData();
+    SelectionAdapter selectionAdapter = new SelectionAdapter() {
+        @Override
+		public void widgetSelected(SelectionEvent e) {
+            Object newState = e.widget.getData();
 
-	    data.setState(newState, RadioMenu.this);
-	});
+            data.setState(newState, RadioMenu.this);
+        }
+    };
 
     /**
      * Creates a set of radio menu items on the given menu.

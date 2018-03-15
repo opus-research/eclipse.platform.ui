@@ -264,8 +264,8 @@ public class RefreshAction extends WorkspaceAction {
 			checkLocationDeleted((IProject) resource);
 		} else if (resource.getType() == IResource.ROOT) {
 			IProject[] projects = ((IWorkspaceRoot) resource).getProjects();
-			for (IProject project : projects) {
-				checkLocationDeleted(project);
+			for (int i = 0; i < projects.length; i++) {
+				checkLocationDeleted(projects[i]);
 			}
 		}
 		resource.refreshLocal(IResource.DEPTH_INFINITE, monitor);

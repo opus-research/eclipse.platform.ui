@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.time.Duration;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
@@ -32,6 +30,8 @@ import org.eclipse.swt.accessibility.AccessibleListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -336,7 +336,12 @@ public class ProgressAnimationItem extends AnimationItem implements
 		toolbar.setVisible(false);
 
 		toolButton = new ToolItem(toolbar, SWT.NONE);
-		toolButton.addSelectionListener(widgetSelectedAdapter(e -> doAction()));
+		toolButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				doAction();
+			}
+		});
 
 		if (isCarbon) {
 			new Label(top, SWT.NONE).setLayoutData(new GridData(4, 4));

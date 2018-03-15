@@ -145,14 +145,14 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		Set<Object> newItems = new HashSet<>(elements.length);
 
 		Control[] existingChildren = control.getChildren();
-		for (Control element : existingChildren) {
-			if (element.getData() != null)
-				newItems.add(element.getData());
+		for (int i = 0; i < existingChildren.length; i++) {
+			if (existingChildren[i].getData() != null)
+				newItems.add(existingChildren[i].getData());
 		}
 
-		for (Object element : elements) {
-			if (element != null)
-				newItems.add(element);
+		for (int i = 0; i < elements.length; i++) {
+			if (elements[i] != null)
+				newItems.add(elements[i]);
 		}
 
 		JobTreeElement[] infos = new JobTreeElement[newItems.size()];
@@ -163,8 +163,8 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		}
 
 		// Update with the new elements to prevent flash
-		for (Control element : existingChildren) {
-			((ProgressInfoItem) element).dispose();
+		for (int i = 0; i < existingChildren.length; i++) {
+			((ProgressInfoItem) existingChildren[i]).dispose();
 		}
 
 		int totalSize = Math.min(newItems.size(), MAX_DISPLAYED);
@@ -216,8 +216,8 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 			public void select() {
 
 				Control[] children = control.getChildren();
-				for (Control element : children) {
-					ProgressInfoItem child = (ProgressInfoItem) element;
+				for (int i = 0; i < children.length; i++) {
+					ProgressInfoItem child = (ProgressInfoItem) children[i];
 					if (!item.equals(child)) {
 						child.selectWidgets(false);
 					}
@@ -289,13 +289,13 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 	@Override
 	protected Widget doFindItem(Object element) {
 		Control[] existingChildren = control.getChildren();
-		for (Control controlElement : existingChildren) {
-			if (controlElement.isDisposed()
-					|| controlElement.getData() == null) {
+		for (int i = 0; i < existingChildren.length; i++) {
+			if (existingChildren[i].isDisposed()
+					|| existingChildren[i].getData() == null) {
 				continue;
 			}
-			if (controlElement.getData().equals(element)) {
-				return controlElement;
+			if (existingChildren[i].getData().equals(element)) {
+				return existingChildren[i];
 			}
 		}
 		return null;
@@ -355,11 +355,11 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 	@Override
 	public void remove(Object[] elements) {
 
-		for (Object element : elements) {
-			JobTreeElement treeElement = (JobTreeElement) element;
+		for (int i = 0; i < elements.length; i++) {
+			JobTreeElement treeElement = (JobTreeElement) elements[i];
 			// Make sure we are not keeping this one
 			if (finishedJobs.isKept(treeElement)) {
-				Widget item = doFindItem(element);
+				Widget item = doFindItem(elements[i]);
 				if (item != null) {
 					((ProgressInfoItem) item).refresh();
 				}
@@ -373,7 +373,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 						item = doFindItem(parent);
 				}
 				if (item != null) {
-					unmapElement(element);
+					unmapElement(elements[i]);
 					item.dispose();
 				}
 			}
@@ -427,8 +427,8 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		Object[] infos = getSortedChildren(getRoot());
 		Control[] existingChildren = control.getChildren();
 
-		for (Control element : existingChildren) {
-			element.dispose();
+		for (int i = 0; i < existingChildren.length; i++) {
+			existingChildren[i].dispose();
 
 		}
 
@@ -452,8 +452,8 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		Control[] children = control.getChildren();
 		int top = scrolled.getOrigin().y;
 		int bottom = top + scrolled.getParent().getBounds().height;
-		for (Control element : children) {
-			ProgressInfoItem item = (ProgressInfoItem) element;
+		for (int i = 0; i < children.length; i++) {
+			ProgressInfoItem item = (ProgressInfoItem) children[i];
 			item.setDisplayed(top, bottom);
 
 		}

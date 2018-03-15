@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.preferences;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +31,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -284,13 +284,16 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		descriptionData.heightHint = convertHeightInCharsToPixels(3);
 		descText.setLayoutData(descriptionData);
 
-		transferAllButton.addSelectionListener(widgetSelectedAdapter(e -> {
-			if (transferAllButton.getSelection()) {
-				viewer.setAllChecked(false);
+		transferAllButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (transferAllButton.getSelection()) {
+					viewer.setAllChecked(false);
+				}
+				updateEnablement();
+				updatePageCompletion();
 			}
-			updateEnablement();
-			updatePageCompletion();
-		}));
+		});
 
 		viewer.addSelectionChangedListener(event -> updateDescription());
 
@@ -354,10 +357,13 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		selectAllButton.setData(Integer.valueOf(IDialogConstants.SELECT_ALL_ID));
 		setButtonLayoutData(selectAllButton);
 
-		SelectionListener listener = widgetSelectedAdapter(e -> {
-			viewer.setAllChecked(true);
-			updatePageCompletion();
-		});
+		SelectionListener listener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				viewer.setAllChecked(true);
+				updatePageCompletion();
+			}
+		};
 		selectAllButton.addSelectionListener(listener);
 		selectAllButton.setFont(parentFont);
 
@@ -366,10 +372,13 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		deselectAllButton.setData(Integer.valueOf(IDialogConstants.DESELECT_ALL_ID));
 		setButtonLayoutData(deselectAllButton);
 
-		listener = widgetSelectedAdapter(e -> {
-			viewer.setAllChecked(false);
-			updatePageCompletion();
-		});
+		listener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				viewer.setAllChecked(false);
+				updatePageCompletion();
+			}
+		};
 		deselectAllButton.addSelectionListener(listener);
 		deselectAllButton.setFont(parentFont);
 	}
@@ -859,10 +868,10 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 						.getArray(TRANSFER_PREFERENCES_NAMES_ID);
 				if (preferenceIds != null) {
 					PreferenceTransferElement[] transfers = getTransfers();
-					for (PreferenceTransferElement transfer : transfers) {
-						for (String preferenceId : preferenceIds) {
-							if (transfer.getID().equals(preferenceId)) {
-								viewer.setChecked(transfer, true);
+					for (int i = 0; i < transfers.length; i++) {
+						for (int j = 0; j < preferenceIds.length; j++) {
+							if (transfers[i].getID().equals(preferenceIds[j])) {
+								viewer.setChecked(transfers[i], true);
 								break;
 							}
 						}
@@ -880,8 +889,8 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 			if (directoryNames != null) {
 				// destination
 				setDestinationValue(directoryNames[0]);
-				for (String directoryName : directoryNames) {
-					addDestinationItem(directoryName);
+				for (int i = 0; i < directoryNames.length; i++) {
+					addDestinationItem(directoryNames[i]);
 				}
 
 				String current = settings.get(STORE_DESTINATION_ID);

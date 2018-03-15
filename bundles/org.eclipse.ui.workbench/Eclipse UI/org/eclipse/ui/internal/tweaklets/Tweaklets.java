@@ -100,16 +100,17 @@ public class Tweaklets {
 		IConfigurationElement[] elements = Platform
 				.getExtensionRegistry()
 				.getConfigurationElementsFor("org.eclipse.ui.internalTweaklets"); //$NON-NLS-1$
-		for (IConfigurationElement element : elements) {
+		for (int i = 0; i < elements.length; i++) {
 			if (definition.tweakClass.getName().equals(
-					element.getAttribute("definition"))) { //$NON-NLS-1$
+					elements[i].getAttribute("definition"))) { //$NON-NLS-1$
 				try {
-					Object tweaklet = element.createExecutableExtension("implementation"); //$NON-NLS-1$
+					Object tweaklet = elements[i].createExecutableExtension("implementation"); //$NON-NLS-1$
 					tweaklets.put(definition, tweaklet);
 					return tweaklet;
 				} catch (CoreException e) {
 					StatusManager.getManager().handle(
-							StatusUtil.newStatus(IStatus.ERROR, "Error with extension " + element, e), //$NON-NLS-1$
+							StatusUtil.newStatus(IStatus.ERROR,
+									"Error with extension " + elements[i], e), //$NON-NLS-1$
 							StatusManager.LOG);
 				}
 			}

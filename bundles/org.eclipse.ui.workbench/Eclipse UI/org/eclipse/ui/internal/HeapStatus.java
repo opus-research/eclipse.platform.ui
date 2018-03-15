@@ -207,6 +207,7 @@ public class HeapStatus extends Composite {
 	public void setBackground(Color color) {
 		bgCol = color;
 		button.redraw();
+		button.update();
 	}
 
 	@Override
@@ -218,6 +219,7 @@ public class HeapStatus extends Composite {
 		}
 
 		button.redraw();
+		button.update();
 	}
 
 	@Override
@@ -289,6 +291,7 @@ public class HeapStatus extends Composite {
 		}
         this.armed = armed;
         button.redraw();
+        button.update();
     }
 
 	private void gcRunning(boolean isInGC) {
@@ -297,6 +300,7 @@ public class HeapStatus extends Composite {
 		}
 		this.isInGC = isInGC;
 		 button.redraw();
+		 button.update();
 	}
 
     /**
@@ -445,9 +449,7 @@ public class HeapStatus extends Composite {
         int tw = (int) (sw * totalMem / maxMem); // current total mem width
         int tx = x + 1 + tw; // current total mem right edge
 
-		if (bgCol != null) {
-			gc.setBackground(bgCol);
-		}
+        gc.setBackground(bgCol);
         gc.fillRectangle(rect);
         gc.setForeground(sepCol);
 		gc.drawLine(dx, y, dx, y + h);

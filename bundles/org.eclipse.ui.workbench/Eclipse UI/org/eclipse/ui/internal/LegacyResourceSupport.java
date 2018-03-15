@@ -340,8 +340,8 @@ public final class LegacyResourceSupport {
      * @since 3.1
      */
     public static boolean isResourceType(String objectClassName) {
-        for (String resourceClassName : resourceClassNames) {
-            if (resourceClassName.equals(objectClassName)) {
+        for (int i = 0; i < resourceClassNames.length; i++) {
+            if (resourceClassNames[i].equals(objectClassName)) {
                 return true;
             }
         }
@@ -376,8 +376,8 @@ public final class LegacyResourceSupport {
 			return true;
 		}
 		Class[] interfaces= clazz.getInterfaces();
-		for (Class currentInterface : interfaces) {
-			if (isInstanceOf(currentInterface, type)) {
+		for (int i= 0; i < interfaces.length; i++) {
+			if (isInstanceOf(interfaces[i], type)) {
 				return true;
 			}
 		}

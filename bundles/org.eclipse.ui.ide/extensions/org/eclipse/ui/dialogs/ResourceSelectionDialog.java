@@ -158,8 +158,8 @@ public class ResourceSelectionDialog extends SelectionDialog {
                 //Also try and reset the size of the columns as appropriate
                 TableColumn[] columns = selectionGroup.getListTable()
                         .getColumns();
-                for (TableColumn column : columns) {
-                    column.pack();
+                for (int i = 0; i < columns.length; i++) {
+                    columns[i].pack();
                 }
             }
         });
@@ -186,10 +186,10 @@ public class ResourceSelectionDialog extends SelectionDialog {
 
                     //filter out the desired resource types
                     ArrayList results = new ArrayList();
-                    for (IResource member : members) {
+                    for (int i = 0; i < members.length; i++) {
                         //And the test bits with the resource types to see if they are what we want
-                        if ((member.getType() & resourceType) > 0) {
-                            results.add(member);
+                        if ((members[i].getType() & resourceType) > 0) {
+                            results.add(members[i]);
                         }
                     }
                     return results.toArray();

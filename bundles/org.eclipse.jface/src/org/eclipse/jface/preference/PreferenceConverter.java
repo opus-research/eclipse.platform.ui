@@ -92,12 +92,15 @@ public class PreferenceConverter {
 
 	static {
 		Display display = Display.getDefault();
-		display.asyncExec(() -> {
-			// Ensure that the deprecated FONTDATA_DEFAULT_DEFAULT and
-			// FONTDATA_ARRAY_DEFAULT values
-			// are initialized as soon as possible
-			FONTDATA_ARRAY_DEFAULT_DEFAULT = getFontDataArrayDefaultDefault();
-			FONTDATA_DEFAULT_DEFAULT = getFontDataArrayDefaultDefault()[0];
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				// Ensure that the deprecated FONTDATA_DEFAULT_DEFAULT and
+				// FONTDATA_ARRAY_DEFAULT values
+				// are initialized as soon as possible
+				FONTDATA_ARRAY_DEFAULT_DEFAULT = getFontDataArrayDefaultDefault();
+				FONTDATA_DEFAULT_DEFAULT = getFontDataArrayDefaultDefault()[0];
+			}
 		});
 	}
 

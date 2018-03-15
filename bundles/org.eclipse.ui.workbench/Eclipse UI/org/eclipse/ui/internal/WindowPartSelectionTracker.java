@@ -49,8 +49,9 @@ public class WindowPartSelectionTracker extends AbstractPartSelectionTracker
         super(partId);
         setWindow(window);
         window.addPageListener(this);
-		for (IWorkbenchPage page : window.getPages()) {
-            pageOpened(page);
+        IWorkbenchPage[] pages = window.getPages();
+        for (int i = 0; i < pages.length; i++) {
+            pageOpened(pages[i]);
         }
     }
 

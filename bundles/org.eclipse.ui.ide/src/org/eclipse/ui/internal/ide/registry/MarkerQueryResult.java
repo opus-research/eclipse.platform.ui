@@ -78,8 +78,8 @@ public class MarkerQueryResult {
     public void computeHashCode() {
         hashCode = 19;
 
-        for (String value : values) {
-            hashCode = hashCode * 37 + value.hashCode();
+        for (int i = 0; i < values.length; i++) {
+            hashCode = hashCode * 37 + values[i].hashCode();
         }
     }
 }

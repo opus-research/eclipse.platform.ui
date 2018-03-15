@@ -217,8 +217,8 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
 		if (currentInfo.updateAll) {
 			currentInfo.reset();
-			for (IProgressUpdateCollector collector : collectors) {
-				collector.refresh();
+			for (int i = 0; i < collectors.length; i++) {
+				collectors[i].refresh();
 			}
 
 		} else {
@@ -234,7 +234,9 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
 			currentInfo.reset();
 
-			for (IProgressUpdateCollector collector : collectors) {
+			for (int v = 0; v < collectors.length; v++) {
+				IProgressUpdateCollector collector = collectors[v];
+
 				if (updateItems.length > 0) {
 					collector.refresh(updateItems);
 				}

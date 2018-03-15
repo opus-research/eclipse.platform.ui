@@ -322,7 +322,7 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	 * <!-- begin-model-doc -->
 	 * <p>
 	 * The collection of TrimBars associated with the part represented by this descriptor.
-	 * @since 2.0
+	 * @since 1.3
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Trim Bars</em>' containment reference list.

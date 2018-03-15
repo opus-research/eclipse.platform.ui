@@ -14,8 +14,6 @@
  *******************************************************************************/
 package org.eclipse.jface.wizard;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +44,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -142,7 +141,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 
 	private Button helpButton;
 
-	private SelectionListener cancelListener;
+	private SelectionAdapter cancelListener;
 
 	private boolean isMovingToPreviousPage = false;
 
@@ -311,7 +310,12 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 		setWizard(newWizard);
 		// since VAJava can't initialize an instance var with an anonymous
 		// class outside a constructor we do it here:
-		cancelListener = widgetSelectedAdapter(e -> cancelPressed());
+		cancelListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				cancelPressed();
+			}
+		};
 	}
 
 	/**

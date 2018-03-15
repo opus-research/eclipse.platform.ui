@@ -193,8 +193,8 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 	        INavigatorFilterService filterService = commonViewer
 					.getNavigatorContentService().getFilterService();
 			ViewerFilter[] visibleFilters = filterService.getVisibleFilters(true);
-			for (ViewerFilter visibleFilter : visibleFilters) {
-				commonViewer.addFilter(visibleFilter);
+			for (int i = 0; i < visibleFilters.length; i++) {
+				commonViewer.addFilter(visibleFilters[i]);
 			}
 
 			commonViewer.setSorter(new CommonViewerSorter());
@@ -651,8 +651,8 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 	@Override
 	public boolean isDirty() {
 		Saveable[] saveables = getSaveables();
-		for (Saveable saveable : saveables) {
-			if(saveable.isDirty()) {
+		for (int i = 0; i < saveables.length; i++) {
+			if(saveables[i].isDirty()) {
 				return true;
 			}
 		}

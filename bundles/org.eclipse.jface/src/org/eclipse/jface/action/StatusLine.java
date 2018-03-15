@@ -13,8 +13,6 @@
 
 package org.eclipse.jface.action;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -29,6 +27,8 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -292,16 +292,19 @@ import org.eclipse.swt.widgets.ToolItem;
 		fMessageLabel.setMenu(menu);
 		copyMenuItem = new MenuItem(menu, SWT.PUSH);
 		copyMenuItem.setText(JFaceResources.getString("copy")); //$NON-NLS-1$
-		copyMenuItem.addSelectionListener(widgetSelectedAdapter(e -> {
-			String text = fMessageLabel.getText();
-			if (text != null && text.length() > 0) {
-				text = LegacyActionTools.removeMnemonics(text);
-				Clipboard cp = new Clipboard(e.display);
-				cp.setContents(new Object[] { text },
-						new Transfer[] { TextTransfer.getInstance() });
-				cp.dispose();
+		copyMenuItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String text = fMessageLabel.getText();
+				if (text != null && text.length() > 0) {
+					text = LegacyActionTools.removeMnemonics(text);
+					Clipboard cp = new Clipboard(e.display);
+					cp.setContents(new Object[] { text },
+							new Transfer[] { TextTransfer.getInstance() });
+					cp.dispose();
+				}
 			}
-		}));
+		});
 
 		fProgressIsVisible = false;
 		fCancelEnabled = false;
@@ -311,7 +314,12 @@ import org.eclipse.swt.widgets.ToolItem;
 		fCancelButton.setImage(fgStopImage.createImage());
 		fCancelButton.setToolTipText(JFaceResources
 				.getString("Cancel_Current_Operation")); //$NON-NLS-1$
-		fCancelButton.addSelectionListener(widgetSelectedAdapter(e -> setCanceled(true)));
+		fCancelButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setCanceled(true);
+			}
+		});
 		fCancelButton.addDisposeListener(e -> {
 			Image i = fCancelButton.getImage();
 			if ((i != null) && (!i.isDisposed())) {

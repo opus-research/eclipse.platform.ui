@@ -53,8 +53,11 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 				event -> {
 					if (event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
 							IWorkbenchRegistryConstants.PL_KEYWORDS).length > 0) {
-						for (Object element : getElements(PreferenceManager.POST_ORDER)) {
-							((WorkbenchPreferenceNode) element).clearKeywords();
+						for (Iterator j = getElements(
+								PreferenceManager.POST_ORDER).iterator(); j
+								.hasNext();) {
+							((WorkbenchPreferenceNode) j.next())
+									.clearKeywords();
 						}
 					}
 				});
@@ -91,17 +94,19 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 		PlatformUI.getWorkbench().getExtensionTracker().registerObject(
 				node.getConfigurationElement().getDeclaringExtension(), node,
 				IExtensionTracker.REF_WEAK);
-		for (IPreferenceNode subNode : node.getSubNodes()) {
-			registerNode((WorkbenchPreferenceNode) subNode);
+		IPreferenceNode[] subNodes = node.getSubNodes();
+		for (int i = 0; i < subNodes.length; i++) {
+			registerNode((WorkbenchPreferenceNode) subNodes[i]);
 		}
 
 	}
 
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
-		for (IConfigurationElement configElement : extension.getConfigurationElements()) {
+		IConfigurationElement[] elements = extension.getConfigurationElements();
+		for (int i = 0; i < elements.length; i++) {
 			WorkbenchPreferenceNode node = PreferencePageRegistryReader
-					.createNode(configElement);
+					.createNode(elements[i]);
 			if (node == null) {
 				continue;
 			}
@@ -111,7 +116,10 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 				addToRoot(node);
 			} else {
 				IPreferenceNode parent = null;
-				for (IPreferenceNode element : getElements(PreferenceManager.POST_ORDER)) {
+				for (Iterator j = getElements(PreferenceManager.POST_ORDER)
+						.iterator(); j.hasNext();) {
+					IPreferenceNode element = (IPreferenceNode) j
+							.next();
 					if (category.equals(element.getId())) {
 						parent = element;
 						break;
@@ -136,9 +144,9 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (Object object : objects) {
-			if (object instanceof IPreferenceNode) {
-				IPreferenceNode wNode = (IPreferenceNode) object;
+		for (int i = 0; i < objects.length; i++) {
+			if (objects[i] instanceof IPreferenceNode) {
+				IPreferenceNode wNode = (IPreferenceNode) objects[i];
 				wNode.disposeResources();
 				deepRemove(getRoot(), wNode);
 			}
@@ -167,8 +175,9 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 			return true;
 		}
 
-		for (IPreferenceNode subNode : parent.getSubNodes()) {
-			if (deepRemove(subNode, nodeToRemove)) {
+		IPreferenceNode[] subNodes = parent.getSubNodes();
+		for (int i = 0; i < subNodes.length; i++) {
+			if (deepRemove(subNodes[i], nodeToRemove)) {
 				return true;
 			}
 		}

@@ -41,7 +41,8 @@ public final class ColorUtil {
 	private static RGB process(String value) {
 		Field [] fields = getFields();
 		try {
-			for (Field field : fields) {
+			for (int i = 0; i < fields.length; i++) {
+				Field field = fields[i];
 				if (field.getName().equals(value)) {
 					return getSystemColor(field.getInt(null));
 				}
@@ -68,7 +69,8 @@ public final class ColorUtil {
 			Field[] allFields = clazz.getDeclaredFields();
 			ArrayList<Field> applicableFields = new ArrayList<>(allFields.length);
 
-			for (Field field : allFields) {
+			for (int i = 0; i < allFields.length; i++) {
+				Field field = allFields[i];
 				if (field.getType() == Integer.TYPE
 						&& Modifier.isStatic(field.getModifiers())
 						&& Modifier.isPublic(field.getModifiers())

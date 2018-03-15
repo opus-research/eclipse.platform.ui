@@ -178,9 +178,10 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 				return new Status(IStatus.ERROR, pluginId, IStatus.ERROR,
 						IDEResourceInfoUtils.EMPTY_STRING, null);
 			}
-			for (Object currentSelection : selection) {
-				if (currentSelection instanceof IFileStore) {
-					IFileStore file = (IFileStore) currentSelection;
+			for (int i = 0; i < selection.length; i++) {
+				Object curr = selection[i];
+				if (curr instanceof IFileStore) {
+					IFileStore file = (IFileStore) curr;
 					if (acceptFolders == false
 							&& file.fetchInfo().isDirectory()) {
 						return new Status(IStatus.ERROR, pluginId,
