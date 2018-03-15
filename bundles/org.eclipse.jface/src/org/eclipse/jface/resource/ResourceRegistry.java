@@ -65,9 +65,9 @@ public abstract class ResourceRegistry extends EventManager {
         if (myListeners.length > 0) {
             PropertyChangeEvent event = new PropertyChangeEvent(this, name,
                     oldValue, newValue);
-            for (Object myListener : myListeners) {
+            for (int i = 0; i < myListeners.length; ++i) {
                 try {
-                    ((IPropertyChangeListener) myListener)
+                    ((IPropertyChangeListener) myListeners[i])
                             .propertyChange(event);
                 } catch (Exception e) {
                     // TODO: how to log?

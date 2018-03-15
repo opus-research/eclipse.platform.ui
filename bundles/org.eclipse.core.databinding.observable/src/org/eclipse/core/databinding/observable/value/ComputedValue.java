@@ -199,7 +199,8 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 					privateInterface, privateInterface, null);
 
 			stale = false;
-			for (IObservable observable : newDependencies) {
+			for (int i = 0; i < newDependencies.length; i++) {
+				IObservable observable = newDependencies[i];
 				// Add a change listener to the new dependency.
 				if (observable.isStale()) {
 					stale = true;
@@ -257,7 +258,9 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	private void stopListening() {
 		// Stop listening for dependency changes.
 		if (dependencies != null) {
-			for (IObservable observable : dependencies) {
+			for (int i = 0; i < dependencies.length; i++) {
+				IObservable observable = dependencies[i];
+
 				observable.removeChangeListener(privateInterface);
 				observable.removeStaleListener(privateInterface);
 			}

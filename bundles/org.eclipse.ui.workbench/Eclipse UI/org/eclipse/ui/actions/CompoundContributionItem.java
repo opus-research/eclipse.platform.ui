@@ -55,7 +55,8 @@ public abstract class CompoundContributionItem extends ContributionItem {
 		if (index > menu.getItemCount()) {
 			index = menu.getItemCount();
 		}
-        for (IContributionItem item : items) {
+        for (int i = 0; i < items.length; i++) {
+            IContributionItem item = items[i];
             int oldItemCount = menu.getItemCount();
             if (item.isVisible()) {
                 item.fill(menu, index);
@@ -83,7 +84,8 @@ public abstract class CompoundContributionItem extends ContributionItem {
 
 	private void disposeOldItems() {
         if (oldItems != null) {
-            for (IContributionItem oldItem : oldItems) {
+            for (int i = 0; i < oldItems.length; i++) {
+                IContributionItem oldItem = oldItems[i];
                 oldItem.dispose();
             }
             oldItems = null;

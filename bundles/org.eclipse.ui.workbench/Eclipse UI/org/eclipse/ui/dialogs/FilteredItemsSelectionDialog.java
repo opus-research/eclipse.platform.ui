@@ -17,8 +17,6 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -63,7 +61,6 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILazyContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -84,6 +81,8 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -524,7 +523,12 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 				.getImage(IWorkbenchGraphicConstants.IMG_LCL_VIEW_MENU));
 		toolItem
 				.setToolTipText(WorkbenchMessages.FilteredItemsSelectionDialog_menu);
-		toolItem.addSelectionListener(widgetSelectedAdapter(e -> showViewMenu()));
+		toolItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				showViewMenu();
+			}
+		});
 
 		menuManager = new MenuManager();
 
@@ -594,7 +598,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 	private void createPopupMenu() {
 		removeHistoryItemAction = new RemoveHistoryItemAction();
-		removeHistoryActionContributionItem = new ActionContributionItem(removeHistoryItemAction);
+		removeHistoryActionContributionItem = new ActionContributionItem(
+				removeHistoryItemAction);
 
 		contextMenuManager = new MenuManager();
 		contextMenuManager.setRemoveAllWhenShown(true);
@@ -680,7 +685,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		});
 
 		list.addSelectionChangedListener(event -> {
-			StructuredSelection selection = (StructuredSelection) event.getSelection();
+			StructuredSelection selection = (StructuredSelection) event
+					.getSelection();
 			handleSelected(selection);
 		});
 
@@ -714,7 +720,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 				if (e.keyCode == SWT.ARROW_UP && (e.stateMask & SWT.SHIFT) != 0
 						&& (e.stateMask & SWT.CTRL) != 0) {
-					IStructuredSelection selection = list.getStructuredSelection();
+					StructuredSelection selection = (StructuredSelection) list
+							.getSelection();
 
 					if (selection.size() == 1) {
 						Object element = selection.getFirstElement();
@@ -725,7 +732,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 								.getSelectionIndex() - 1) instanceof ItemsListSeparator)
 							list.getTable().setSelection(
 									list.getTable().getSelectionIndex() - 1);
-						list.getTable().notifyListeners(SWT.Selection, new Event());
+						list.getTable().notifyListeners(SWT.Selection,
+								new Event());
 
 					}
 				}
@@ -1073,7 +1081,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 	 */
 	protected StructuredSelection getSelectedItems() {
 
-		StructuredSelection selection = (StructuredSelection) list.getStructuredSelection();
+		StructuredSelection selection = (StructuredSelection) list
+				.getSelection();
 
 		List selectedItems = selection.toList();
 		Object itemToRemove = null;
@@ -1484,7 +1493,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		@Override
 		public void run() {
-			List selectedElements = ((StructuredSelection) list.getSelection()).toList();
+			List selectedElements = ((StructuredSelection) list.getSelection())
+					.toList();
 			removeSelectedItems(selectedElements);
 		}
 	}
@@ -1493,7 +1503,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		return PlatformUI.getPreferenceStore().getBoolean(IWorkbenchPreferenceConstants.USE_COLORED_LABELS);
 	}
 
-	private class ItemsListLabelProvider extends StyledCellLabelProvider implements ILabelProviderListener {
+	private class ItemsListLabelProvider extends StyledCellLabelProvider
+			implements ILabelProviderListener {
 		private ILabelProvider provider;
 
 		private ILabelDecorator selectionDecorator;
@@ -1584,8 +1595,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		private boolean isSelected(Object element) {
 			if (element != null && currentSelection != null) {
-				for (Object entry : currentSelection) {
-					if (element.equals(entry))
+				for (int i = 0; i < currentSelection.length; i++) {
+					if (element.equals(currentSelection[i]))
 						return true;
 				}
 			}
@@ -1594,7 +1605,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		private String getText(Object element) {
 			if (element instanceof ItemsListSeparator) {
-				return getSeparatorLabel(((ItemsListSeparator) element).getName());
+				return getSeparatorLabel(((ItemsListSeparator) element)
+						.getName());
 			}
 
 			String str = provider.getText(element);
@@ -1605,11 +1617,13 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			return str;
 		}
 
-		private StyledString getStyledText(Object element, IStyledLabelProvider provider) {
+		private StyledString getStyledText(Object element,
+				IStyledLabelProvider provider) {
 			StyledString string = provider.getStyledText(element);
 
 			if (selectionDecorator != null && isSelected(element)) {
-				String decorated = selectionDecorator.decorateText(string.getString(), element);
+				String decorated = selectionDecorator.decorateText(string
+						.getString(), element);
 				return StyledCellLabelProvider.styleDecoratedString(decorated, null, string);
 				// no need to add colors when element is selected
 			}
@@ -2173,7 +2187,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 			IMemento[] mementoElements = historyMemento
 					.getChildren(infoNodeName);
-			for (IMemento mementoElement : mementoElements) {
+			for (int i = 0; i < mementoElements.length; ++i) {
+				IMemento mementoElement = mementoElements[i];
 				Object object = restoreItemFromMemento(mementoElement);
 				if (object != null) {
 					historyList.add(object);
@@ -2192,7 +2207,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			IMemento historyMemento = memento.createChild(rootNodeName);
 
 			Object[] items = getHistoryItems();
-			for (Object item : items) {
+			for (int i = 0; i < items.length; i++) {
+				Object item = items[i];
 				IMemento elementMemento = historyMemento
 						.createChild(infoNodeName);
 				storeItemToMemento(item, elementMemento);
@@ -2561,7 +2577,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		public void addHistoryItems(ItemsFilter itemsFilter) {
 			if (this.selectionHistory != null) {
 				Object[] items = this.selectionHistory.getHistoryItems();
-				for (Object item : items) {
+				for (int i = 0; i < items.length; i++) {
+					Object item = items[i];
 					if (itemsFilter == filter) {
 						if (itemsFilter != null) {
 							if (itemsFilter.matchItem(item)) {
@@ -3034,8 +3051,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 				return;
 			}
 			Object input = getInput();
-			for (Object obj : objs) {
-				if (obj.equals(input)) {
+			for (int i = 0; i < objs.length; i++) {
+				if (objs[i].equals(input)) {
 					refresh();
 					break;
 				}

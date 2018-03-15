@@ -73,9 +73,9 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
 
         IExtensionPoint point = getExtensionPointFilter();
         IExtension[] extensions = point.getExtensions();
-        for (IExtension extension : extensions) {
+        for (int i = 0; i < extensions.length; i++) {
             addExtension(tracker,
-                    extension);
+                    extensions[i]);
         }
     }
 
@@ -91,7 +91,8 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
 
     @Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-        for (Object object : objects) {
+        for (int i = 0; i < objects.length; i++) {
+            Object object = objects[i];
             if (object instanceof RegistryTriggerPoint) {
                 triggerMap.remove(((RegistryTriggerPoint) object).getId());
             }
@@ -101,7 +102,8 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
     @Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
-        for (IConfigurationElement element : elements) {
+        for (int i = 0; i < elements.length; i++) {
+            IConfigurationElement element = elements[i];
             if (element.getName().equals(
                     IWorkbenchRegistryConstants.TAG_TRIGGERPOINT)) {
                 String id = element
