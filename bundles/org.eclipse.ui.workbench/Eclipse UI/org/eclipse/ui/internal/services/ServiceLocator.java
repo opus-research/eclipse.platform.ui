@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.services.AbstractServiceFactory;
@@ -168,6 +169,7 @@ public final class ServiceLocator implements IDisposable, INestable,
 		} else if (IEclipseContext.class.equals(key)) {
 			return (T) e4Context;
 		}
+		checkUiThread();
 
 		Object service = e4Context.get(key.getName());
 		if (service == null) {
@@ -239,6 +241,8 @@ public final class ServiceLocator implements IDisposable, INestable,
 					"The service does not implement the given interface"); //$NON-NLS-1$
 		}
 
+		checkUiThread();
+
 		if (service instanceof INestable && activated) {
 			((INestable) service).activate();
 		}
@@ -255,6 +259,14 @@ public final class ServiceLocator implements IDisposable, INestable,
 	 */
 	public boolean isDisposed() {
 		return disposed;
+	}
+
+	void checkUiThread() {
+		if (Display.getCurrent() == null) {
+			IllegalStateException e = new IllegalStateException(
+					"Unexpected access to ServiceLocator from non-UI thread " + Thread.currentThread().getName()); //$NON-NLS-1$
+			WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.WARNING, e.getMessage(), e));
+		}
 	}
 
 	/**
