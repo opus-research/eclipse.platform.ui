@@ -17,7 +17,6 @@
 package org.eclipse.ui.internal.keys;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -34,6 +33,7 @@ import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.DeviceResourceException;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -41,12 +41,12 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -184,6 +184,8 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 	private KeySequenceText fKeySequenceText;
 
 	private TableViewer conflictViewer;
+
+	private TableViewer overrideViewer;
 
 	private ICommandImageService commandImageService;
 
@@ -778,113 +780,63 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		rightDataArea.setLayoutData(gridData);
 
-		new Label(rightDataArea, SWT.NONE); // filler
+		createConflictViewer(rightDataArea);
+		createOverrideViewer(rightDataArea);
+	}
 
-		// The description label.
-		final Label descriptionLabel = new Label(rightDataArea, SWT.NONE);
-		descriptionLabel.setText(NewKeysPreferenceMessages.ConflictsLabel_Text);
-		gridData = new GridData();
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.horizontalAlignment = SWT.FILL;
-		descriptionLabel.setLayoutData(gridData);
+	private void createConflictViewer(final Composite rightDataArea) {
 
-		conflictViewer = new TableViewer(rightDataArea, SWT.SINGLE | SWT.V_SCROLL
-				| SWT.BORDER | SWT.FULL_SELECTION);
-		Table table = conflictViewer.getTable();
-		table.setHeaderVisible(true);
-		TableColumn bindingNameColumn = new TableColumn(table, SWT.LEAD);
-		bindingNameColumn.setText(NewKeysPreferenceMessages.CommandNameColumn_Text);
-		bindingNameColumn.setWidth(150);
-		TableColumn bindingContextNameColumn = new TableColumn(table, SWT.LEAD);
-		bindingContextNameColumn.setText(NewKeysPreferenceMessages.WhenColumn_Text);
-		bindingContextNameColumn.setWidth(150);
-		gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		//gridData.horizontalIndent = 10;
-		table.setLayoutData(gridData);
-		TableLayout tableLayout = new TableLayout();
-		tableLayout.addColumnData(new ColumnWeightData(60));
-		tableLayout.addColumnData(new ColumnWeightData(40));
-		table.setLayout(tableLayout);
-		conflictViewer.setContentProvider(new IStructuredContentProvider() {
+		conflictViewer = createBasicConflictViewer(rightDataArea, NewKeysPreferenceMessages.ConflictsLabel_Text);
 
+		conflictViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
+			// When the conflict viewer's selection changes, update the
+			// model's current selection
 			@Override
-			public Object[] getElements(Object inputElement) {
-				if (inputElement instanceof Collection) {
-					return ((Collection) inputElement).toArray();
-				}
-				return new Object[0];
-			}
+			public void selectionChanged(SelectionChangedEvent event) {
+				ModelElement binding = (ModelElement) ((IStructuredSelection) event.getSelection()).getFirstElement();
+				BindingModel bindingModel = keyController.getBindingModel();
+				if (binding != null && binding != bindingModel.getSelectedElement()) {
+					StructuredSelection selection = new StructuredSelection(binding);
 
-		});
-		conflictViewer.setLabelProvider(new BindingElementLabelProvider() {
-			@Override
-			public String getColumnText(Object o, int index) {
-				BindingElement element = (BindingElement) o;
-				if (index == 0) {
-					return element.getName();
-				}
-				return element.getContext().getName();
-			}
-		});
-		conflictViewer
-				.addSelectionChangedListener(new ISelectionChangedListener() {
+					bindingModel.setSelectedElement(binding);
+					conflictViewer.setSelection(selection);
 
-					// When the conflict viewer's selection changes, update the
-					// model's current selection
-					@Override
-					public void selectionChanged(SelectionChangedEvent event) {
-						ModelElement binding = (ModelElement) ((IStructuredSelection) event.getSelection())
-								.getFirstElement();
-						BindingModel bindingModel = keyController
-								.getBindingModel();
-						if (binding != null
-								&& binding != bindingModel.getSelectedElement()) {
-							StructuredSelection selection = new StructuredSelection(
-									binding);
-
-							bindingModel.setSelectedElement(binding);
-							conflictViewer.setSelection(selection);
-
-							boolean selectionVisible = false;
-							TreeItem[] items = fFilteredTree.getViewer()
-									.getTree().getItems();
-							for (int i = 0; i < items.length; i++) {
-								if (items[i].getData().equals(binding)) {
-									selectionVisible = true;
-									break;
-								}
-							}
-
-							if (!selectionVisible) {
-								fFilteredTree.getFilterControl().setText(""); //$NON-NLS-1$
-								fFilteredTree.getViewer().refresh();
-								bindingModel.setSelectedElement(binding);
-								conflictViewer.setSelection(selection);
-							}
+					boolean selectionVisible = false;
+					TreeItem[] items = fFilteredTree.getViewer().getTree().getItems();
+					for (int i = 0; i < items.length; i++) {
+						if (items[i].getData().equals(binding)) {
+							selectionVisible = true;
+							break;
 						}
 					}
-				});
+
+					if (!selectionVisible) {
+						fFilteredTree.getFilterControl().setText(""); //$NON-NLS-1$
+						fFilteredTree.getViewer().refresh();
+						bindingModel.setSelectedElement(binding);
+						conflictViewer.setSelection(selection);
+					}
+				}
+			}
+		});
 
 		IPropertyChangeListener conflictsListener = new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == keyController.getConflictModel()
-						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
-								.getProperty())) {
+						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event.getProperty())) {
 					if (keyController.getConflictModel().getConflicts() != null) {
 						Object newVal = event.getNewValue();
-						StructuredSelection structuredSelection = newVal == null ? null
-								: new StructuredSelection(newVal);
+						StructuredSelection structuredSelection = newVal == null ? null : new StructuredSelection(
+								newVal);
 						conflictViewer.setSelection(structuredSelection, true);
 					}
-				} else if (ConflictModel.PROP_CONFLICTS.equals(event
-						.getProperty())) {
+				} else if (ConflictModel.PROP_CONFLICTS.equals(event.getProperty())) {
 					conflictViewer.setInput(event.getNewValue());
-				} else if (ConflictModel.PROP_CONFLICTS_ADD.equals(event
-						.getProperty())) {
+				} else if (ConflictModel.PROP_CONFLICTS_ADD.equals(event.getProperty())) {
 					conflictViewer.add(event.getNewValue());
-				} else if (ConflictModel.PROP_CONFLICTS_REMOVE.equals(event
-						.getProperty())) {
+				} else if (ConflictModel.PROP_CONFLICTS_REMOVE.equals(event.getProperty())) {
 					conflictViewer.remove(event.getNewValue());
 				}
 			}
@@ -898,14 +850,11 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 				BindingElement bindingElement = null;
 				boolean weCare = false;
 				if (event.getSource() == keyController.getBindingModel()
-						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
-								.getProperty())) {
+						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event.getProperty())) {
 					bindingElement = (BindingElement) event.getNewValue();
 					weCare = true;
-				} else if (event.getSource() == keyController.getBindingModel()
-						.getSelectedElement()
-						&& ModelElement.PROP_MODEL_OBJECT.equals(event
-								.getProperty())) {
+				} else if (event.getSource() == keyController.getBindingModel().getSelectedElement()
+						&& ModelElement.PROP_MODEL_OBJECT.equals(event.getProperty())) {
 					bindingElement = (BindingElement) event.getSource();
 					weCare = true;
 				}
@@ -916,15 +865,72 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 				} else if (bindingElement != null) {
 					commandNameValueLabel.setText(bindingElement.getName());
 					String desc = bindingElement.getDescription();
-					fDescriptionText.setText(desc==null?"":desc); //$NON-NLS-1$
-					KeySequence trigger = (KeySequence) bindingElement
-							.getTrigger();
+					fDescriptionText.setText(desc == null ? "" : desc); //$NON-NLS-1$
+					KeySequence trigger = (KeySequence) bindingElement.getTrigger();
 					fKeySequenceText.setKeySequence(trigger);
 				}
 			}
 		};
 		keyController.addPropertyChangeListener(dataUpdateListener);
+	}
 
+	private void createOverrideViewer(final Composite rightDataArea) {
+		overrideViewer = createBasicConflictViewer(rightDataArea, NewKeysPreferenceMessages.OverrriddenBy_Text);
+		overrideViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			// When the override viewer's selection changes, update the
+			// model's current selection
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				ModelElement binding = (ModelElement) ((IStructuredSelection) event.getSelection()).getFirstElement();
+				BindingModel bindingModel = keyController.getBindingModel();
+				if (binding != null && binding != bindingModel.getSelectedElement()) {
+					bindingModel.setSelectedElement(binding);
+					overrideViewer.setSelection(StructuredSelection.EMPTY);
+				}
+			}
+		});
+		IPropertyChangeListener overridesListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (ConflictModel.PROP_OVERRIDES.equals(event.getProperty())) {
+					overrideViewer.setInput(event.getNewValue());
+				}
+			}
+		};
+		keyController.addPropertyChangeListener(overridesListener);
+	}
+
+	private TableViewer createBasicConflictViewer(Composite parent, String labelText) {
+		// The description label.
+		final Label descriptionLabel = new Label(parent, SWT.NONE);
+		descriptionLabel.setText(labelText);
+		descriptionLabel.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+		TableViewer viewer = new TableViewer(parent, SWT.SINGLE | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
+		Table table = viewer.getTable();
+		table.setHeaderVisible(true);
+		TableColumn bindingNameColumn = new TableColumn(table, SWT.LEAD);
+		bindingNameColumn.setText(NewKeysPreferenceMessages.CommandNameColumn_Text);
+		bindingNameColumn.setWidth(150);
+		TableColumn bindingContextNameColumn = new TableColumn(table, SWT.LEAD);
+		bindingContextNameColumn.setText(NewKeysPreferenceMessages.WhenColumn_Text);
+		bindingContextNameColumn.setWidth(150);
+		table.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 50).create());
+		TableLayout tableLayout = new TableLayout();
+		tableLayout.addColumnData(new ColumnWeightData(60));
+		tableLayout.addColumnData(new ColumnWeightData(40));
+		table.setLayout(tableLayout);
+		viewer.setContentProvider(new ArrayContentProvider());
+		viewer.setLabelProvider(new BindingElementLabelProvider() {
+			@Override
+			public String getColumnText(Object o, int index) {
+				BindingElement element = (BindingElement) o;
+				if (index == 0) {
+					return element.getName();
+				}
+				return element.getContext().getName();
+			}
+		});
+		return viewer;
 	}
 
 	private void createTree(Composite parent) {
