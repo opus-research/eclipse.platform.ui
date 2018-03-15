@@ -404,11 +404,7 @@ public class ModelAssembler {
 				if (importObject.eContainmentFeature() == FragmentPackageImpl.Literals.MODEL_FRAGMENTS__IMPORTS) {
 					EStructuralFeature feature = featureIterator.feature();
 
-					MApplicationElement el = null;
-					if (importObject instanceof MApplicationElement) {
-						el = importMaps.get((MApplicationElement) importObject);
-					}
-
+					MApplicationElement el = importMaps.get(importObject);
 					if (el == null) {
 						logger.warn("Could not resolve import for " + el); //$NON-NLS-1$
 					}
