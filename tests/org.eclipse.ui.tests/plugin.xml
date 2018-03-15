@@ -493,11 +493,6 @@
             name="Text Control view"
             restorable="true">
       </view>
-      <view
-            class="org.eclipse.ui.tests.propertysheet.AdaptingSaveableView"
-            id="org.eclipse.ui.tests.propertysheet.AdaptingSaveableView"
-            name="AdaptingSaveableView">
-      </view>
 
    </extension>
    <extension
@@ -4410,18 +4405,6 @@
               </dynamic>
               </toolbar>
    </menuContribution>
-   </extension>
-   <extension
-         point="org.eclipse.ui.ide.projectConfigurators">
-      <projectConfigurator
-            class="org.eclipse.ui.tests.datatransfer.contributions.ImportMeProjectConfigurator"
-            label="Example project detector">
-         <activeWhen>
-            <hasFileRecursively
-                  filename="importme">
-            </hasFileRecursively>
-         </activeWhen>
-      </projectConfigurator>
    </extension>
    
 </plugin>
