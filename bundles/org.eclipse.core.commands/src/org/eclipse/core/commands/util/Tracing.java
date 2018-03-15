@@ -46,7 +46,7 @@ public final class Tracing {
 	 */
 	public static final void printTrace(final String component,
 			final String message) {
-		StringBuilder buffer = new StringBuilder();
+		StringBuffer buffer = new StringBuffer();
 		if (component != null) {
 			buffer.append(component);
 		}
