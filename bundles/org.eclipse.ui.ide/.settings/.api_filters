@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <component id="org.eclipse.ui.ide" version="2">
-    <resource path="META-INF/MANIFEST.MF" type="org.eclipse.ui.views.tasklist.TaskList">
-        <filter comment="Planned removal of TaskList, for details see bug 436506" id="305324134">
+    <resource path="META-INF/MANIFEST.MF">
+        <filter comment="API got backported from 4.8" id="924844039">
             <message_arguments>
-                <message_argument value="org.eclipse.ui.views.tasklist.TaskList"/>
-                <message_argument value="org.eclipse.ui.ide_3.14.0"/>
+                <message_argument value="3.13.1"/>
+                <message_argument value="3.13.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="extensions/org/eclipse/ui/IMarkerResolutionRelevance.java" type="org.eclipse.ui.IMarkerResolutionRelevance">
+        <filter comment="This API got backported from 4.8" id="1108344834">
+            <message_arguments>
+                <message_argument value="3.14"/>
+                <message_argument value="3.13"/>
+                <message_argument value="org.eclipse.ui.IMarkerResolutionRelevance"/>
             </message_arguments>
         </filter>
     </resource>

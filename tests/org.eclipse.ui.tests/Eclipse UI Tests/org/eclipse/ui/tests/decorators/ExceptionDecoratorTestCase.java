@@ -16,6 +16,7 @@ import java.util.Iterator;
 
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.decorators.DecoratorDefinition;
 import org.eclipse.ui.internal.decorators.DecoratorManager;
@@ -23,8 +24,9 @@ import org.eclipse.ui.internal.decorators.DecoratorManager;
 /**
  * @version 	1.0
  */
-public class ExceptionDecoratorTestCase extends DecoratorEnablementTestCase {
-	private Collection<DecoratorDefinition> problemDecorators = new ArrayList<>();
+public class ExceptionDecoratorTestCase extends DecoratorEnablementTestCase
+        implements ILabelProviderListener {
+    private Collection problemDecorators = new ArrayList();
 
     private DecoratorDefinition light;
 
@@ -78,9 +80,9 @@ public class ExceptionDecoratorTestCase extends DecoratorEnablementTestCase {
         }
 
         //Be sure that the decorators were all disabled on errors.
-		Iterator<DecoratorDefinition> problemIterator = problemDecorators.iterator();
+        Iterator problemIterator = problemDecorators.iterator();
         while (problemIterator.hasNext()) {
-            DecoratorDefinition next = problemIterator
+            DecoratorDefinition next = (DecoratorDefinition) problemIterator
                     .next();
             assertFalse("Enabled " + next.getName(), next.isEnabled());
         }
