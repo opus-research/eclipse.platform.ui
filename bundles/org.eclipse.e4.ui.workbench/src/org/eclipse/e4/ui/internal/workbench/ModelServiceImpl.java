@@ -1071,9 +1071,7 @@ public class ModelServiceImpl implements EModelService {
 		part.getProperties().putAll(descriptor.getProperties());
 		part.getPersistedState().putAll(descriptor.getPersistedState());
 		part.getBindingContexts().addAll(descriptor.getBindingContexts());
-		if (descriptor.getTrimBars() != null) {
-			part.getTrimBars().addAll(EcoreUtil.copyAll(descriptor.getTrimBars()));
-		}
+		part.getTrimBars().addAll(descriptor.getTrimBars());
 		return part;
 	}
 
