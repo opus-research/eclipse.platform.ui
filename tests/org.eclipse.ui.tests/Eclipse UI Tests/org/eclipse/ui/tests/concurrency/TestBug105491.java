@@ -11,21 +11,14 @@
 package org.eclipse.ui.tests.concurrency;
 
 import java.lang.reflect.InvocationTargetException;
-
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
+import junit.framework.*;
+import org.eclipse.core.resources.*;
+import org.eclipse.core.runtime.*;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IThreadListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
-
-import junit.framework.TestCase;
 
 /**
  * Tests the following sequence of events:
@@ -84,9 +77,6 @@ public class TestBug105491 extends TestCase {
 	 * Performs the test
 	 */
 	public void testBug() throws CoreException {
-		if (Thread.interrupted()) {
-			fail("Thread was interrupted at start of test");
-		}
 		workspace.run(new IWorkspaceRunnable() {
 			@Override
 			public void run(IProgressMonitor monitor) {
@@ -101,8 +91,5 @@ public class TestBug105491 extends TestCase {
 				}
 			}
 		}, workspace.getRoot(), IResource.NONE, null);
-		if (Thread.interrupted()) {
-			fail("Thread was interrupted at end of test");
-		}
 	}
 }
