@@ -335,15 +335,13 @@ StatusLine, ImageBasedFrame{
     color: #9ac9d8;
 }
 
-/* On the windows dark theme, the default is having the scrollbar themed */
+/* On the windows dark theme, the default is having the scrollbar themed
+ * Note that the user may also set -Dswt.enable.themedScrollBar=false to force
+ * it to false regardless of the CSS value.
+ */
 StyledText {
-	/* 
-	 * swt-scrollbar-themed may be a boolean
-	 * Note that the user may also set -Dswt.enable.themedScrollBar=true/false to force 
-	 * it to true/false regardless of the CSS value.
-	 */
 	swt-scrollbar-themed: true;
-	
+
 	swt-scrollbar-background-color: #383838;
 	swt-scrollbar-foreground-color: #494949;
 	swt-scrollbar-width: 4px;
