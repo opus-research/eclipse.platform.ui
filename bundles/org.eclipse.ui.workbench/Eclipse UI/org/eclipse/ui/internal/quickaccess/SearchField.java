@@ -164,8 +164,8 @@ public class SearchField {
 				new EditorProvider(), new ViewProvider(application, window),
 				new PerspectiveProvider(), commandProvider, new ActionProvider(),
 				new WizardProvider(), new PreferenceProvider(), new PropertiesProvider() };
-		for (QuickAccessProvider provider : providers) {
-			providerMap.put(provider.getId(), provider);
+		for (int i = 0; i < providers.length; i++) {
+			providerMap.put(providers[i].getId(), providers[i]);
 		}
 		restoreDialog();
 
@@ -438,17 +438,19 @@ public class SearchField {
 		Monitor[] monitors = toSearch.getMonitors();
 		Monitor result = monitors[0];
 
-		for (Monitor currentMonitor : monitors) {
-			Rectangle clientArea = currentMonitor.getClientArea();
+		for (int idx = 0; idx < monitors.length; idx++) {
+			Monitor current = monitors[idx];
+
+			Rectangle clientArea = current.getClientArea();
 
 			if (clientArea.contains(toFind)) {
-				return currentMonitor;
+				return current;
 			}
 
 			int distance = Geometry.distanceSquared(Geometry.centerPoint(clientArea), toFind);
 			if (distance < closest) {
 				closest = distance;
-				result = currentMonitor;
+				result = current;
 			}
 		}
 

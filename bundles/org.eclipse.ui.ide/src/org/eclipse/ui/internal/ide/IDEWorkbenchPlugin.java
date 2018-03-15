@@ -293,9 +293,10 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
         // add an entry for each bundle group
         IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
         if (providers != null) {
-			for (IBundleGroupProvider provider : providers) {
-				for (IBundleGroup bundleGroup : provider.getBundleGroups()) {
-					infos.add(new AboutInfo(bundleGroup));
+			for (int i = 0; i < providers.length; ++i) {
+                IBundleGroup[] bundleGroups = providers[i].getBundleGroups();
+                for (int j = 0; j < bundleGroups.length; ++j) {
+					infos.add(new AboutInfo(bundleGroups[j]));
 				}
             }
 		}
@@ -353,11 +354,15 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 					return;
 				}
 
-				for (IWorkbenchWindow window : workbench.getWorkbenchWindows()) {
+				IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
+				for (int i= 0; i < windows.length; i++) {
+					IWorkbenchWindow window= windows[i];
 					IWorkbenchPage activePage= window.getActivePage();
 					if (activePage == null)
 						continue;
-					for (IViewReference viewReference : activePage.getViewReferences()) {
+					IViewReference[] refs= activePage.getViewReferences();
+					for (int j= 0; j < refs.length; j++) {
+						IViewReference viewReference= refs[j];
 						if (IPageLayout.ID_PROBLEM_VIEW.equals(viewReference.getId()))
 							try {
 								activePage.showView(viewReference.getId(), viewReference.getSecondaryId(), IWorkbenchPage.VIEW_CREATE);

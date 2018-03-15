@@ -1037,8 +1037,9 @@ public final class URI
       //iri = iri || containsNonASCII(fragment);
     }
 
-    for (String segment : segments) {
-      hashCode ^= segment.hashCode();
+    for (int i = 0, len = segments.length; i < len; i++)
+    {
+      hashCode ^= segments[i].hashCode();
       //iri = iri || containsNonASCII(segments[i]);
     }
 

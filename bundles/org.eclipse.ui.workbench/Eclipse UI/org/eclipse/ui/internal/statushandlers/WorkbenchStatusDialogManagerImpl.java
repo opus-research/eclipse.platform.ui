@@ -97,8 +97,8 @@ public class WorkbenchStatusDialogManagerImpl {
 		if (children == null || children.length == 0) {
 			return status.matches(mask) || (handleOKStatuses && status.isOK());
 		}
-		for (IStatus child : children) {
-			if (child.matches(mask)) {
+		for (int i = 0; i < children.length; i++) {
+			if (children[i].matches(mask)) {
 				return true;
 			}
 		}

@@ -113,7 +113,8 @@ public class CSSSerializer {
 
 			if (configuration != null) {
 				String[] attributesFilter = configuration.getAttributesFilter();
-				for (String attributeFilter : attributesFilter) {
+				for (int i = 0; i < attributesFilter.length; i++) {
+					String attributeFilter = attributesFilter[i];
 					String value = elt.getAttribute(attributeFilter);
 					if (value != null && value.length() > 0) {
 						selectorName.append("[");

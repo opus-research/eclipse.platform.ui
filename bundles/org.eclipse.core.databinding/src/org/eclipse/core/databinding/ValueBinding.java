@@ -53,14 +53,18 @@ class ValueBinding extends Binding {
 		this.model = modelObservableValue;
 		this.targetToModel = targetToModel;
 		this.modelToTarget = modelToTarget;
-		modelChangeListener = event -> {
-			if (!updatingModel && !Util.equals(event.diff.getOldValue(), event.diff.getNewValue())) {
-				doUpdate(model, target, modelToTarget, false, false);
+		targetChangeListener = event -> {
+			if (!updatingTarget
+					&& !Util.equals(event.diff.getOldValue(), event.diff
+							.getNewValue())) {
+				doUpdate(target, model, targetToModel, false, false);
 			}
 		};
-		targetChangeListener = event -> {
-			if (!updatingTarget && !Util.equals(event.diff.getOldValue(), event.diff.getNewValue())) {
-				doUpdate(target, model, targetToModel, false, false);
+		modelChangeListener = event -> {
+			if (!updatingModel
+					&& !Util.equals(event.diff.getOldValue(), event.diff
+							.getNewValue())) {
+				doUpdate(model, target, modelToTarget, false, false);
 			}
 		};
 	}
@@ -158,22 +162,27 @@ class ValueBinding extends Binding {
 				Object value = source.getValue();
 
 				// Validate after get
-				IStatus status = updateValueStrategy.validateAfterGet(value);
+				IStatus status = updateValueStrategy
+						.validateAfterGet(value);
 				if (!mergeStatus(multiStatus, status))
 					return;
 
 				// Convert value
-				final Object convertedValue = updateValueStrategy.convert(value);
+				final Object convertedValue = updateValueStrategy
+						.convert(value);
 
 				// Validate after convert
-				status = updateValueStrategy.validateAfterConvert(convertedValue);
+				status = updateValueStrategy
+						.validateAfterConvert(convertedValue);
 				if (!mergeStatus(multiStatus, status))
 					return;
-				if (policy == UpdateValueStrategy.POLICY_CONVERT && !explicit)
+				if (policy == UpdateValueStrategy.POLICY_CONVERT
+						&& !explicit)
 					return;
 
 				// Validate before set
-				status = updateValueStrategy.validateBeforeSet(convertedValue);
+				status = updateValueStrategy
+						.validateBeforeSet(convertedValue);
 				if (!mergeStatus(multiStatus, status))
 					return;
 				if (validateOnly)
@@ -188,7 +197,8 @@ class ValueBinding extends Binding {
 						updatingModel = true;
 					}
 					try {
-						IStatus setterStatus = updateValueStrategy.doSet(destination, convertedValue);
+						IStatus setterStatus = updateValueStrategy
+								.doSet(destination, convertedValue);
 
 						mergeStatus(multiStatus, setterStatus);
 					} finally {
@@ -203,10 +213,12 @@ class ValueBinding extends Binding {
 			} catch (Exception ex) {
 				// This check is necessary as in 3.2.2 Status
 				// doesn't accept a null message (bug 177264).
-				String message = (ex.getMessage() != null) ? ex.getMessage() : ""; //$NON-NLS-1$
+				String message = (ex.getMessage() != null) ? ex
+						.getMessage() : ""; //$NON-NLS-1$
 
-				mergeStatus(multiStatus,
-						new Status(IStatus.ERROR, Policy.JFACE_DATABINDING, IStatus.ERROR, message, ex));
+				mergeStatus(multiStatus, new Status(IStatus.ERROR,
+						Policy.JFACE_DATABINDING, IStatus.ERROR, message,
+						ex));
 			} finally {
 				if (!destinationRealmReached) {
 					setValidationStatus(multiStatus);

@@ -96,9 +96,10 @@ public final class CommonDropAdapter extends PluginDropAdapter {
 		if (Policy.DEBUG_DND) {
 			System.out.println("CommonDropAdapter.dragEnter: " + event); //$NON-NLS-1$
 		}
-		for (TransferData dataType : event.dataTypes) {
-			if (LocalSelectionTransfer.getTransfer().isSupportedType(dataType)) {
-				event.currentDataType = dataType;
+		for (int i = 0; i < event.dataTypes.length; i++) {
+			if (LocalSelectionTransfer.getTransfer().isSupportedType(
+					event.dataTypes[i])) {
+				event.currentDataType = event.dataTypes[i];
 				if (Policy.DEBUG_DND) {
 					System.out.println("CommonDropAdapter.dragEnter: local selection: " + event.currentDataType); //$NON-NLS-1$
 				}
@@ -107,9 +108,9 @@ public final class CommonDropAdapter extends PluginDropAdapter {
 			}
 		}
 
-		for (TransferData dataType : event.dataTypes) {
-			if (FileTransfer.getInstance().isSupportedType(dataType)) {
-				event.currentDataType = dataType;
+		for (int i = 0; i < event.dataTypes.length; i++) {
+			if (FileTransfer.getInstance().isSupportedType(event.dataTypes[i])) {
+				event.currentDataType = event.dataTypes[i];
 				event.detail = DND.DROP_COPY;
 				if (Policy.DEBUG_DND) {
 					System.out.println("CommonDropAdapter.dragEnter: file: " + event.currentDataType); //$NON-NLS-1$
@@ -119,9 +120,10 @@ public final class CommonDropAdapter extends PluginDropAdapter {
 			}
 		}
 
-		for (TransferData dataType : event.dataTypes) {
-			if (PluginTransfer.getInstance().isSupportedType(dataType)) {
-				event.currentDataType = dataType;
+		for (int i = 0; i < event.dataTypes.length; i++) {
+			if (PluginTransfer.getInstance()
+					.isSupportedType(event.dataTypes[i])) {
+				event.currentDataType = event.dataTypes[i];
 				if (Policy.DEBUG_DND) {
 					System.out.println("CommonDropAdapter.dragEnter: plugin: " + event.currentDataType); //$NON-NLS-1$
 				}
@@ -170,7 +172,8 @@ public final class CommonDropAdapter extends PluginDropAdapter {
 				getCurrentTransfer());
 
 		final boolean[] retValue = new boolean[1];
-		for (final CommonDropAdapterAssistant localAssistant : assistants) {
+		for (int i = 0; i < assistants.length; i++) {
+			final CommonDropAdapterAssistant localAssistant = assistants[i];
 			SafeRunner.run(new NavigatorSafeRunnable() {
 				@Override
 				public void run() throws Exception {
@@ -220,11 +223,13 @@ public final class CommonDropAdapter extends PluginDropAdapter {
 			}
 			CommonDropAdapterAssistant[] assistants = dndService.findCommonDropAdapterAssistants(
 					target, theTransferData);
-			for (final CommonDropAdapterAssistant assistantLocal : assistants) {
+			for (int i = 0; i < assistants.length; i++) {
 				if (Policy.DEBUG_DND) {
 					System.out
-							.println("CommonDropAdapter.validateDrop checking assistant: \"" + assistantLocal); //$NON-NLS-1$
+							.println("CommonDropAdapter.validateDrop checking assistant: \"" + assistants[i]); //$NON-NLS-1$
 				}
+				final CommonDropAdapterAssistant assistantLocal = assistants[i];
+
 				SafeRunner.run(new NavigatorSafeRunnable() {
 					@Override
 					public void run() throws Exception {
