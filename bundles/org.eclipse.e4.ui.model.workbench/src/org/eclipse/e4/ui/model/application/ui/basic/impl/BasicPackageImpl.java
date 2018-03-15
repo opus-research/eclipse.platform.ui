@@ -206,6 +206,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int PART__ELEMENT_ID = UiPackageImpl.UI_ELEMENT__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PART__EXPLANATION = UiPackageImpl.UI_ELEMENT__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -556,6 +565,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int COMPOSITE_PART__ELEMENT_ID = PART__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__EXPLANATION = PART__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -927,6 +945,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int INPUT_PART__ELEMENT_ID = PART__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int INPUT_PART__EXPLANATION = PART__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1278,6 +1305,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int PART_STACK__ELEMENT_ID = UiPackageImpl.GENERIC_STACK__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PART_STACK__EXPLANATION = UiPackageImpl.GENERIC_STACK__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1465,6 +1501,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int PART_SASH_CONTAINER__ELEMENT_ID = UiPackageImpl.GENERIC_TILE__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PART_SASH_CONTAINER__EXPLANATION = UiPackageImpl.GENERIC_TILE__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -1663,6 +1708,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int WINDOW__ELEMENT_ID = UiPackageImpl.ELEMENT_CONTAINER__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WINDOW__EXPLANATION = UiPackageImpl.ELEMENT_CONTAINER__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -2014,6 +2068,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int TRIMMED_WINDOW__ELEMENT_ID = WINDOW__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TRIMMED_WINDOW__EXPLANATION = WINDOW__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -2376,6 +2439,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int TRIM_ELEMENT__ELEMENT_ID = UiPackageImpl.UI_ELEMENT__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TRIM_ELEMENT__EXPLANATION = UiPackageImpl.UI_ELEMENT__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2545,6 +2617,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int PART_SASH_CONTAINER_ELEMENT__ELEMENT_ID = UiPackageImpl.UI_ELEMENT__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PART_SASH_CONTAINER_ELEMENT__EXPLANATION = UiPackageImpl.UI_ELEMENT__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -2718,6 +2799,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int WINDOW_ELEMENT__ELEMENT_ID = UiPackageImpl.UI_ELEMENT__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WINDOW_ELEMENT__EXPLANATION = UiPackageImpl.UI_ELEMENT__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2887,6 +2977,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int TRIM_BAR__ELEMENT_ID = UiPackageImpl.GENERIC_TRIM_CONTAINER__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TRIM_BAR__EXPLANATION = UiPackageImpl.GENERIC_TRIM_CONTAINER__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -3096,6 +3195,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int STACK_ELEMENT__ELEMENT_ID = UiPackageImpl.UI_ELEMENT__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int STACK_ELEMENT__EXPLANATION = UiPackageImpl.UI_ELEMENT__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3275,6 +3383,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int DIALOG__ELEMENT_ID = WINDOW__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__EXPLANATION = WINDOW__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -3636,6 +3753,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int WIZARD_DIALOG__ELEMENT_ID = DIALOG__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__EXPLANATION = DIALOG__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.

@@ -35,6 +35,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationElementImpl#getElementId <em>Element Id</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationElementImpl#getExplanation <em>Explanation</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationElementImpl#getPersistedState <em>Persisted State</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationElementImpl#getTags <em>Tags</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationElementImpl#getContributorURI <em>Contributor URI</em>}</li>
@@ -63,6 +64,26 @@ public abstract class ApplicationElementImpl extends org.eclipse.emf.ecore.impl.
 	 * @ordered
 	 */
 	protected String elementId = ELEMENT_ID_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getExplanation() <em>Explanation</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getExplanation()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String EXPLANATION_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getExplanation() <em>Explanation</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getExplanation()
+	 * @generated
+	 * @ordered
+	 */
+	protected String explanation = EXPLANATION_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getPersistedState() <em>Persisted State</em>}' map.
@@ -159,6 +180,27 @@ public abstract class ApplicationElementImpl extends org.eclipse.emf.ecore.impl.
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public String getExplanation() {
+		return explanation;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setExplanation(String newExplanation) {
+		String oldExplanation = explanation;
+		explanation = newExplanation;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ApplicationPackageImpl.APPLICATION_ELEMENT__EXPLANATION, oldExplanation, explanation));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public Map<String, String> getPersistedState() {
 		if (persistedState == null) {
 			persistedState = new EcoreEMap<String,String>(ApplicationPackageImpl.Literals.STRING_TO_STRING_MAP, StringToStringMapImpl.class, this, ApplicationPackageImpl.APPLICATION_ELEMENT__PERSISTED_STATE);
@@ -236,6 +278,8 @@ public abstract class ApplicationElementImpl extends org.eclipse.emf.ecore.impl.
 		switch (featureID) {
 			case ApplicationPackageImpl.APPLICATION_ELEMENT__ELEMENT_ID:
 				return getElementId();
+			case ApplicationPackageImpl.APPLICATION_ELEMENT__EXPLANATION:
+				return getExplanation();
 			case ApplicationPackageImpl.APPLICATION_ELEMENT__PERSISTED_STATE:
 				if (coreType) return ((EMap.InternalMapView<String, String>)getPersistedState()).eMap();
 				else return getPersistedState();
@@ -261,6 +305,9 @@ public abstract class ApplicationElementImpl extends org.eclipse.emf.ecore.impl.
 		switch (featureID) {
 			case ApplicationPackageImpl.APPLICATION_ELEMENT__ELEMENT_ID:
 				setElementId((String)newValue);
+				return;
+			case ApplicationPackageImpl.APPLICATION_ELEMENT__EXPLANATION:
+				setExplanation((String)newValue);
 				return;
 			case ApplicationPackageImpl.APPLICATION_ELEMENT__PERSISTED_STATE:
 				((EStructuralFeature.Setting)((EMap.InternalMapView<String, String>)getPersistedState()).eMap()).set(newValue);
@@ -290,6 +337,9 @@ public abstract class ApplicationElementImpl extends org.eclipse.emf.ecore.impl.
 			case ApplicationPackageImpl.APPLICATION_ELEMENT__ELEMENT_ID:
 				setElementId(ELEMENT_ID_EDEFAULT);
 				return;
+			case ApplicationPackageImpl.APPLICATION_ELEMENT__EXPLANATION:
+				setExplanation(EXPLANATION_EDEFAULT);
+				return;
 			case ApplicationPackageImpl.APPLICATION_ELEMENT__PERSISTED_STATE:
 				getPersistedState().clear();
 				return;
@@ -316,6 +366,8 @@ public abstract class ApplicationElementImpl extends org.eclipse.emf.ecore.impl.
 		switch (featureID) {
 			case ApplicationPackageImpl.APPLICATION_ELEMENT__ELEMENT_ID:
 				return ELEMENT_ID_EDEFAULT == null ? elementId != null : !ELEMENT_ID_EDEFAULT.equals(elementId);
+			case ApplicationPackageImpl.APPLICATION_ELEMENT__EXPLANATION:
+				return EXPLANATION_EDEFAULT == null ? explanation != null : !EXPLANATION_EDEFAULT.equals(explanation);
 			case ApplicationPackageImpl.APPLICATION_ELEMENT__PERSISTED_STATE:
 				return persistedState != null && !persistedState.isEmpty();
 			case ApplicationPackageImpl.APPLICATION_ELEMENT__TAGS:
@@ -340,6 +392,8 @@ public abstract class ApplicationElementImpl extends org.eclipse.emf.ecore.impl.
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (elementId: "); //$NON-NLS-1$
 		result.append(elementId);
+		result.append(", explanation: "); //$NON-NLS-1$
+		result.append(explanation);
 		result.append(", tags: "); //$NON-NLS-1$
 		result.append(tags);
 		result.append(", contributorURI: "); //$NON-NLS-1$

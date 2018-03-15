@@ -118,6 +118,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int ITEM__ELEMENT_ID = UiPackageImpl.UI_ELEMENT__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int ITEM__EXPLANATION = UiPackageImpl.UI_ELEMENT__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -369,6 +378,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int HANDLED_ITEM__ELEMENT_ID = ITEM__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_ITEM__EXPLANATION = ITEM__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -651,6 +669,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_ELEMENT__ELEMENT_ID = UiPackageImpl.UI_ELEMENT__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_ELEMENT__EXPLANATION = UiPackageImpl.UI_ELEMENT__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -893,6 +920,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int MENU_ITEM__ELEMENT_ID = ITEM__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_ITEM__EXPLANATION = ITEM__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -1166,6 +1202,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_SEPARATOR__ELEMENT_ID = MENU_ELEMENT__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_SEPARATOR__EXPLANATION = MENU_ELEMENT__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1408,6 +1453,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int MENU__ELEMENT_ID = MENU_ELEMENT__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU__EXPLANATION = MENU_ELEMENT__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -1681,6 +1735,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_CONTRIBUTION__ELEMENT_ID = UiPackageImpl.ELEMENT_CONTAINER__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_CONTRIBUTION__EXPLANATION = UiPackageImpl.ELEMENT_CONTAINER__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1896,6 +1959,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int POPUP_MENU__ELEMENT_ID = MENU__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int POPUP_MENU__EXPLANATION = MENU__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -2196,6 +2268,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int DIRECT_MENU_ITEM__ELEMENT_ID = MENU_ITEM__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIRECT_MENU_ITEM__EXPLANATION = MENU_ITEM__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2483,6 +2564,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int HANDLED_MENU_ITEM__ELEMENT_ID = MENU_ITEM__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_MENU_ITEM__EXPLANATION = MENU_ITEM__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -2783,6 +2873,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_ITEM__ELEMENT_ID = ITEM__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TOOL_ITEM__EXPLANATION = ITEM__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3045,6 +3144,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR__ELEMENT_ID = UiPackageImpl.ELEMENT_CONTAINER__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TOOL_BAR__EXPLANATION = UiPackageImpl.ELEMENT_CONTAINER__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3244,6 +3352,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_ELEMENT__ELEMENT_ID = UiPackageImpl.UI_ELEMENT__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TOOL_BAR_ELEMENT__EXPLANATION = UiPackageImpl.UI_ELEMENT__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3423,6 +3540,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int TOOL_CONTROL__ELEMENT_ID = TOOL_BAR_ELEMENT__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TOOL_CONTROL__EXPLANATION = TOOL_BAR_ELEMENT__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -3622,6 +3748,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int HANDLED_TOOL_ITEM__ELEMENT_ID = TOOL_ITEM__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_TOOL_ITEM__EXPLANATION = TOOL_ITEM__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -3913,6 +4048,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int DIRECT_TOOL_ITEM__ELEMENT_ID = TOOL_ITEM__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIRECT_TOOL_ITEM__EXPLANATION = TOOL_ITEM__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4193,6 +4337,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_SEPARATOR__ELEMENT_ID = TOOL_BAR_ELEMENT__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TOOL_BAR_SEPARATOR__EXPLANATION = TOOL_BAR_ELEMENT__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4409,6 +4562,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int TOOL_BAR_CONTRIBUTION__ELEMENT_ID = UiPackageImpl.ELEMENT_CONTAINER__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TOOL_BAR_CONTRIBUTION__EXPLANATION = UiPackageImpl.ELEMENT_CONTAINER__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -4665,6 +4827,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TRIM_CONTRIBUTION__ELEMENT_ID = UiPackageImpl.ELEMENT_CONTAINER__ELEMENT_ID;
 
 	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TRIM_CONTRIBUTION__EXPLANATION = UiPackageImpl.ELEMENT_CONTAINER__EXPLANATION;
+
+	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4917,6 +5088,15 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int DYNAMIC_MENU_CONTRIBUTION__ELEMENT_ID = MENU_ITEM__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DYNAMIC_MENU_CONTRIBUTION__EXPLANATION = MENU_ITEM__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
