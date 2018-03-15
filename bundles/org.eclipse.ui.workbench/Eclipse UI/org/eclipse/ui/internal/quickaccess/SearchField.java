@@ -489,9 +489,10 @@ public class SearchField {
 		Display display = txtQuickAccess.getDisplay();
 		Rectangle tempBounds = txtQuickAccess.getBounds();
 		Rectangle compBounds = display.map(txtQuickAccess, null, tempBounds);
-		int preferredWidth = dialogWidth == -1 ? 350 : dialogWidth;
+		int preferredWidth = dialogWidth == -1 ? (int) (txtQuickAccess.getShell().getBounds().width * 0.6)
+				: dialogWidth;
 		int width = Math.max(preferredWidth, compBounds.width);
-		int height = dialogHeight == -1 ? 250 : dialogHeight;
+		int height = dialogHeight == -1 ? (int) (txtQuickAccess.getShell().getBounds().height * 0.9) : dialogHeight;
 
 		// If size would extend past the right edge of the shell, try to move it
 		// to the left of the text
