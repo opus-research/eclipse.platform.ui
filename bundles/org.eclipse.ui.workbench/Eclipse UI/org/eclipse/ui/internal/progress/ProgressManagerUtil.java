@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Comparator;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.jobs.Job;
@@ -49,10 +48,9 @@ import org.eclipse.ui.views.IViewDescriptor;
 
 public class ProgressManagerUtil {
 
-	@SuppressWarnings("unchecked")
 	static class ProgressViewerComparator extends ViewerComparator {
 		@Override
-		@SuppressWarnings("rawtypes")
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public int compare(Viewer testViewer, Object e1, Object e2) {
 			return ((Comparable) e1).compareTo(e2);
 		}
@@ -73,12 +71,7 @@ public class ProgressManagerUtil {
 			 */
 			for (int retries = 3; retries > 0; retries--) {
 				try {
-					Arrays.sort(elements, new Comparator<Object>() {
-						@Override
-						public int compare(Object a, Object b) {
-							return ProgressViewerComparator.this.compare(viewer, a, b);
-						}
-					});
+					Arrays.sort(elements, (a, b) -> ProgressViewerComparator.this.compare(viewer, a, b));
 					return; // success
 				} catch (IllegalArgumentException e) {
 					// retry
@@ -101,9 +94,6 @@ public class ProgressManagerUtil {
 	static final QualifiedName KEEPONE_PROPERTY = IProgressConstants.KEEPONE_PROPERTY;
 
 	static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
-
-	static final QualifiedName INFRASTRUCTURE_PROPERTY = new QualifiedName(
-			WorkbenchPlugin.PI_WORKBENCH, "INFRASTRUCTURE_PROPERTY");//$NON-NLS-1$
 
 	private static String ellipsis = ProgressMessages.ProgressFloatingWindow_EllipsisValue;
 
@@ -179,39 +169,165 @@ public class ProgressManagerUtil {
 	 * @param control
 	 * @return String
 	 */
-
 	static String shortenText(String textValue, Control control) {
 		if (textValue == null) {
 			return null;
 		}
-		GC gc = new GC(control);
 		int maxWidth = control.getBounds().width - 5;
-		int maxExtent = gc.textExtent(textValue).x;
-		if (maxExtent < maxWidth) {
+		String ellipsisString = ellipsis;
+		GC gc = new GC(control);
+		try {
+			return clipToSize(gc, textValue, ellipsisString, maxWidth);
+		} finally {
 			gc.dispose();
-			return textValue;
 		}
+	}
+
+	private static String clipToSize(GC gc, String textValue, String ellipsisString, int maxWidth) {
+		int averageCharWidth = gc.getFontMetrics().getAverageCharWidth();
 		int length = textValue.length();
-		int charsToClip = Math.round(0.95f * length
-				* (1 - ((float) maxWidth / maxExtent)));
+
 		int secondWord = findSecondWhitespace(textValue, gc, maxWidth);
 		int pivot = ((length - secondWord) / 2) + secondWord;
-		int start = pivot - (charsToClip / 2);
-		int end = pivot + (charsToClip / 2) + 1;
-		while (start >= 0 && end < length) {
-			String s1 = textValue.substring(0, start);
-			String s2 = textValue.substring(end, length);
-			String s = s1 + ellipsis + s2;
-			int l = gc.textExtent(s).x;
-			if (l < maxWidth) {
-				gc.dispose();
-				return s;
+
+		int currentLength;
+		int upperBoundWidth;
+		int upperBoundLength = 0;
+
+		// Now use newton's method to search for the correct string size
+		int lowerBoundLength = 0;
+		int lowerBoundWidth = 0;
+
+		// Try to guess the size of the string based on the font's average
+		// character width
+		int estimatedCharactersThatWillFit = maxWidth / averageCharWidth;
+
+		if (estimatedCharactersThatWillFit >= length) {
+			int maxExtent = gc.textExtent(textValue).x;
+			if (maxExtent <= maxWidth) {
+				return textValue;
 			}
-			start--;
-			end++;
+			currentLength = Math.max(0,
+					Math.round(length * ((float) maxWidth / maxExtent)) - ellipsisString.length());
+			upperBoundWidth = maxExtent;
+			upperBoundLength = length;
+		} else {
+			currentLength = Math.min(length, Math.max(0, estimatedCharactersThatWillFit - ellipsisString.length()));
+			for (;;) {
+				String s = clipToLength(textValue, ellipsisString, pivot, currentLength);
+				int currentExtent = gc.textExtent(s).x;
+				if (currentExtent > maxWidth) {
+					upperBoundWidth = currentExtent;
+					upperBoundLength = currentLength;
+					break;
+				}
+				if (currentLength == length) {
+					// No need to clip the string if the whole thing fits.
+					return textValue;
+				}
+				lowerBoundWidth = currentExtent;
+				lowerBoundLength = currentLength;
+				currentLength = Math.min(length, currentLength * 2 + 1);
+			}
 		}
-		gc.dispose();
-		return textValue;
+
+		String s;
+		for (;;) {
+			int oldLength = currentLength;
+			s = clipToLength(textValue, ellipsisString, pivot, currentLength);
+
+			int l = gc.textExtent(s).x;
+			int tooBigBy = l - maxWidth;
+			if (tooBigBy == 0) {
+				// If this was exactly the right size, stop the binary
+				// search
+				break;
+			} else if (tooBigBy > 0) {
+				// The string is too big. Need to clip more.
+				upperBoundLength = currentLength;
+				upperBoundWidth = l;
+				if (currentLength <= lowerBoundLength + 1) {
+					// We're one character away from a value that is known
+					// to clip too much, so opt for clipping slightly too
+					// much
+					currentLength = lowerBoundLength;
+					break;
+				}
+				if (tooBigBy <= averageCharWidth * 2) {
+					currentLength--;
+				} else {
+					int spaceToRightOfLowerBound = maxWidth - lowerBoundWidth;
+					currentLength = lowerBoundLength
+							+ (currentLength - lowerBoundLength) * spaceToRightOfLowerBound / (l - lowerBoundWidth);
+					if (currentLength >= oldLength) {
+						currentLength = oldLength - 1;
+					} else if (currentLength <= lowerBoundLength) {
+						currentLength = lowerBoundLength + 1;
+					}
+				}
+			} else {
+				// The string is too small. Need to clip less.
+				lowerBoundLength = currentLength;
+				lowerBoundWidth = l;
+				if (currentLength >= upperBoundLength - 1) {
+					// We're one character away from a value that is known
+					// to clip too little, so opt for clipping slightly
+					// too much
+					currentLength = upperBoundLength - 1;
+					break;
+				}
+				if (-tooBigBy <= averageCharWidth * 2) {
+					currentLength++;
+				} else {
+					currentLength = currentLength
+							+ (upperBoundLength - currentLength) * (-tooBigBy) / (upperBoundWidth - l);
+					if (currentLength <= oldLength) {
+						currentLength = oldLength + 1;
+					} else if (currentLength >= upperBoundLength) {
+						currentLength = upperBoundLength - 1;
+					}
+				}
+			}
+		}
+
+		s = clipToLength(textValue, ellipsisString, pivot, currentLength);
+		return s;
+	}
+
+	private static String clipToLength(String textValue, String ellipsisString, int pivot, int newLength) {
+		return getClippedString(textValue, ellipsisString, pivot, textValue.length() - newLength);
+	}
+
+	private static String getClippedString(String textValue, String ellipsisString, int pivot, int charsToClip) {
+		int length = textValue.length();
+		if (charsToClip <= 0) {
+			return textValue;
+		}
+		if (charsToClip >= length) {
+			return ""; //$NON-NLS-1$
+		}
+		String s;
+		int start = pivot - charsToClip / 2;
+		int end = pivot + (charsToClip + 1) / 2;
+
+		if (start < 0) {
+			end -= start;
+			start = 0;
+		}
+		if (end < 0) {
+			start -= end;
+			end = 0;
+		}
+
+		String s1 = textValue.substring(0, start);
+		String s2;
+		if (end < length) {
+			s2 = textValue.substring(end, length);
+		} else {
+			s2 = ""; //$NON-NLS-1$
+		}
+		s = s1 + ellipsisString + s2;
+		return s;
 	}
 
 	/**
@@ -488,13 +604,7 @@ public class ProgressManagerUtil {
 	 * @return IShellProvider
 	 */
 	static IShellProvider getShellProvider() {
-		return new IShellProvider() {
-
-			@Override
-			public Shell getShell() {
-				return getDefaultParent();
-			}
-		};
+		return () -> getDefaultParent();
 	}
 
 	/**

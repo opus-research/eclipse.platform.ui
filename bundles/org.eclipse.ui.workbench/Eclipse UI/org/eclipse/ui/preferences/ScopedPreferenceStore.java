@@ -13,6 +13,7 @@
 package org.eclipse.ui.preferences;
 
 import java.io.IOException;
+import java.util.Objects;
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
@@ -22,7 +23,6 @@ import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -162,24 +162,21 @@ public class ScopedPreferenceStore extends EventManager implements
 	 */
 	private void initializePreferencesListener() {
 		if (preferencesListener == null) {
-			preferencesListener = new IEclipsePreferences.IPreferenceChangeListener() {
-				@Override
-				public void preferenceChange(PreferenceChangeEvent event) {
+			preferencesListener = event -> {
 
-					if (silentRunning) {
-						return;
-					}
-
-					Object oldValue = event.getOldValue();
-					Object newValue = event.getNewValue();
-					String key = event.getKey();
-					if (newValue == null) {
-						newValue = getDefault(key, oldValue);
-					} else if (oldValue == null) {
-						oldValue = getDefault(key, newValue);
-					}
-					firePropertyChangeEvent(event.getKey(), oldValue, newValue);
+				if (silentRunning) {
+					return;
 				}
+
+				Object oldValue = event.getOldValue();
+				Object newValue = event.getNewValue();
+				String key = event.getKey();
+				if (newValue == null) {
+					newValue = getDefault(key, oldValue);
+				} else if (oldValue == null) {
+					oldValue = getDefault(key, newValue);
+				}
+				firePropertyChangeEvent(event.getKey(), oldValue, newValue);
 			};
 			getStorePreferences().addPreferenceChangeListener(
 					preferencesListener);
@@ -210,7 +207,7 @@ public class ScopedPreferenceStore extends EventManager implements
 		} else if (obj instanceof Float) {
 			return new Float(defaults.getFloat(key, FLOAT_DEFAULT_DEFAULT));
 		} else if (obj instanceof Long) {
-			return new Long(defaults.getLong(key, LONG_DEFAULT_DEFAULT));
+			return Long.valueOf(defaults.getLong(key, LONG_DEFAULT_DEFAULT));
 		} else if (obj instanceof Boolean) {
 			return defaults.getBoolean(key, BOOLEAN_DEFAULT_DEFAULT) ? Boolean.TRUE
 					: Boolean.FALSE;
@@ -311,8 +308,8 @@ public class ScopedPreferenceStore extends EventManager implements
 
 		// Assert that the default was not included (we automatically add it to
 		// the end)
-		for (int i = 0; i < scopes.length; i++) {
-			if (scopes[i].equals(defaultContext)) {
+		for (IScopeContext scope : scopes) {
+			if (scope.equals(defaultContext)) {
 				Assert
 						.isTrue(
 								false,
@@ -335,21 +332,19 @@ public class ScopedPreferenceStore extends EventManager implements
 			Object newValue) {
 		// important: create intermediate array to protect against listeners
 		// being added/removed during the notification
-		final Object[] list = getListeners();
-		if (list.length == 0) {
+		final Object[] listeners = getListeners();
+		if (listeners.length == 0) {
 			return;
 		}
-		final PropertyChangeEvent event = new PropertyChangeEvent(this, name,
-				oldValue, newValue);
-		for (int i = 0; i < list.length; i++) {
-			final IPropertyChangeListener listener = (IPropertyChangeListener) list[i];
-			SafeRunner.run(new SafeRunnable(JFaceResources
-					.getString("PreferenceStore.changeError")) { //$NON-NLS-1$
-						@Override
-						public void run() {
-							listener.propertyChange(event);
-						}
-					});
+		final PropertyChangeEvent event = new PropertyChangeEvent(this, name, oldValue, newValue);
+		for (Object listener : listeners) {
+			final IPropertyChangeListener propertyChangeListener = (IPropertyChangeListener) listener;
+			SafeRunner.run(new SafeRunnable(JFaceResources.getString("PreferenceStore.changeError")) { //$NON-NLS-1$
+				@Override
+				public void run() {
+					propertyChangeListener.propertyChange(event);
+				}
+			});
 		}
 	}
 
@@ -538,7 +533,7 @@ public class ScopedPreferenceStore extends EventManager implements
 			// removing a non-existing preference is a no-op so call the Core
 			// API directly
 			getStorePreferences().remove(name);
-			if (oldValue != defaultValue){
+			if (!Objects.equals(oldValue, defaultValue)) {
 				dirty = true;
 				firePropertyChangeEvent(name, oldValue, defaultValue);
 			}
@@ -624,7 +619,7 @@ public class ScopedPreferenceStore extends EventManager implements
 				getStorePreferences().putLong(name, value);
 			}
 			dirty = true;
-			firePropertyChangeEvent(name, new Long(oldValue), new Long(value));
+			firePropertyChangeEvent(name, Long.valueOf(oldValue), Long.valueOf(value));
 		} finally {
 			silentRunning = false;// Restart listening to preferences
 		}

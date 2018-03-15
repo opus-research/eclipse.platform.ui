@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.Diffs;
@@ -96,21 +95,14 @@ public final class UnionSet<E> extends ObservableSet<E> {
 		this.stalenessTracker = new StalenessTracker(childSets.toArray(new IObservableSet[0]), stalenessConsumer);
 	}
 
-	private ISetChangeListener<E> childSetChangeListener = new ISetChangeListener<E>() {
-		@Override
-		public void handleSetChange(SetChangeEvent<? extends E> event) {
-			processAddsAndRemoves(event.diff.getAdditions(), event.diff.getRemovals());
-		}
-	};
+	private ISetChangeListener<E> childSetChangeListener = event -> processAddsAndRemoves(event.diff.getAdditions(),
+			event.diff.getRemovals());
 
-	private IStalenessConsumer stalenessConsumer = new IStalenessConsumer() {
-		@Override
-		public void setStale(boolean stale) {
-			boolean oldStale = UnionSet.this.stale;
-			UnionSet.this.stale = stale;
-			if (stale && !oldStale) {
-				fireStale();
-			}
+	private IStalenessConsumer stalenessConsumer = stale -> {
+		boolean oldStale = UnionSet.this.stale;
+		UnionSet.this.stale = stale;
+		if (stale && !oldStale) {
+			fireStale();
 		}
 	};
 
@@ -133,9 +125,7 @@ public final class UnionSet<E> extends ObservableSet<E> {
 		Set<E> addsToFire = new HashSet<>();
 		Set<E> removesToFire = new HashSet<>();
 
-		for (Iterator<? extends E> iter = adds.iterator(); iter.hasNext();) {
-			E added = iter.next();
-
+		for (E added : adds) {
 			Integer refCount = refCounts.get(added);
 			if (refCount == null) {
 				refCounts.put(added, Integer.valueOf(1));
@@ -147,9 +137,7 @@ public final class UnionSet<E> extends ObservableSet<E> {
 			}
 		}
 
-		for (Iterator<? extends E> iter = removes.iterator(); iter.hasNext();) {
-			E removed = iter.next();
-
+		for (E removed : removes) {
 			Integer refCount = refCounts.get(removed);
 			if (refCount != null) {
 				int refs = refCount.intValue();
@@ -201,9 +189,7 @@ public final class UnionSet<E> extends ObservableSet<E> {
 	private ArrayList<E> incrementRefCounts(Collection<? extends E> added) {
 		ArrayList<E> adds = new ArrayList<>();
 
-		for (Iterator<? extends E> iter = added.iterator(); iter.hasNext();) {
-			E next = iter.next();
-
+		for (E next : added) {
 			Integer refCount = refCounts.get(next);
 			if (refCount == null) {
 				adds.add(next);

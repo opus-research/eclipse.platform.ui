@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.model.application.MAddon;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.commands.MBindingContext;
@@ -118,6 +119,10 @@ public class ModelServiceImpl implements EModelService {
 
 		this.appContext = appContext;
 		IEventBroker eventBroker = appContext.get(IEventBroker.class);
+		if (eventBroker == null) {
+			throw new IllegalStateException(
+					"Could not get an IEventBroker instance. Please check your configuration that a providing bundle is present and active."); //$NON-NLS-1$
+		}
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, hostedElementHandler);
 
 		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(
@@ -169,6 +174,8 @@ public class ModelServiceImpl implements EModelService {
 					children.addAll(app.getBindingContexts());
 				} else if (clazz.equals(MBindingTable.class) || clazz.equals(MKeyBinding.class)) {
 					children.addAll(app.getBindingTables());
+				} else if (clazz.equals(MAddon.class)) {
+					children.addAll(app.getAddons());
 				}
 				// } else { only look for these if specifically asked.
 				// children.addAll(app.getHandlers());
@@ -1043,6 +1050,35 @@ public class ModelServiceImpl implements EModelService {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public MPart createPart(MPartDescriptor descriptor) {
+		if (descriptor == null) {
+			return null;
+		}
+		MPart part = createModelElement(MPart.class);
+		part.setElementId(descriptor.getElementId());
+		part.getMenus().addAll(EcoreUtil.copyAll(descriptor.getMenus()));
+		if (descriptor.getToolbar() != null) {
+			part.setToolbar((MToolBar) EcoreUtil.copy((EObject) descriptor.getToolbar()));
+		}
+		part.setContributorURI(descriptor.getContributorURI());
+		part.setCloseable(descriptor.isCloseable());
+		part.setContributionURI(descriptor.getContributionURI());
+		part.setLabel(descriptor.getLabel());
+		part.setIconURI(descriptor.getIconURI());
+		part.setTooltip(descriptor.getTooltip());
+		part.getHandlers().addAll(EcoreUtil.copyAll(descriptor.getHandlers()));
+		part.getTags().addAll(descriptor.getTags());
+		part.getVariables().addAll(descriptor.getVariables());
+		part.getProperties().putAll(descriptor.getProperties());
+		part.getPersistedState().putAll(descriptor.getPersistedState());
+		part.getBindingContexts().addAll(descriptor.getBindingContexts());
+		if (descriptor.getTrimBars() != null) {
+			part.getTrimBars().addAll(EcoreUtil.copyAll(descriptor.getTrimBars()));
+		}
+		return part;
 	}
 
 	@Override

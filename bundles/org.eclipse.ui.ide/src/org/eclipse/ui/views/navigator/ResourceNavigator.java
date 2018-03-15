@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -36,7 +37,6 @@ import org.eclipse.jface.commands.ActionHandler;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ILabelDecorator;
@@ -534,7 +534,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         IFile file = ResourceUtil.getFile(editor.getEditorInput());
         if (file != null) {
             ISelection newSelection = new StructuredSelection(file);
-            if (getTreeViewer().getSelection().equals(newSelection)) {
+			if (getTreeViewer().getStructuredSelection().equals(newSelection)) {
                 getTreeViewer().getTree().showSelection();
             } else {
                 getTreeViewer().setSelection(newSelection, true);
@@ -1021,16 +1021,14 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             // check if first element has new tag defined, indicates new version
             if (children.length > 0
                     && children[0].getString(TAG_IS_ENABLED) != null) {
-                ArrayList selectedFilters = new ArrayList();
+				ArrayList<String> selectedFilters = new ArrayList<>();
                 ArrayList unSelectedFilters = new ArrayList();
-                for (int i = 0; i < children.length; i++) {
-                    if (children[i].getString(TAG_IS_ENABLED).equals(
-                            String.valueOf(true))) {
-						selectedFilters.add(children[i].getString(TAG_ELEMENT));
+				for (IMemento memento : children) {
+					if (memento.getString(TAG_IS_ENABLED).equals(String.valueOf(true))) {
+						selectedFilters.add(memento.getString(TAG_ELEMENT));
 					} else {
 						//enabled == false
-                        unSelectedFilters.add(children[i]
-                                .getString(TAG_ELEMENT));
+						unSelectedFilters.add(memento.getString(TAG_ELEMENT));
 					}
                 }
 
@@ -1084,10 +1082,8 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             IMemento childMem = memento.getChild(TAG_EXPANDED);
             if (childMem != null) {
                 ArrayList elements = new ArrayList();
-                IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
-                for (int i = 0; i < elementMem.length; i++) {
-                    Object element = container.findMember(elementMem[i]
-                            .getString(TAG_PATH));
+				for (IMemento mem : childMem.getChildren(TAG_ELEMENT)) {
+					Object element = container.findMember(mem.getString(TAG_PATH));
                     if (element != null) {
                         elements.add(element);
                     }
@@ -1097,10 +1093,8 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             childMem = memento.getChild(TAG_SELECTION);
             if (childMem != null) {
                 ArrayList list = new ArrayList();
-                IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
-                for (int i = 0; i < elementMem.length; i++) {
-                    Object element = container.findMember(elementMem[i]
-                            .getString(TAG_PATH));
+				for (IMemento mem : childMem.getChildren(TAG_ELEMENT)) {
+					Object element = container.findMember(mem.getString(TAG_PATH));
                     if (element != null) {
                         list.add(element);
                     }
@@ -1164,12 +1158,12 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             Object expandedElements[] = viewer.getVisibleExpandedElements();
             if (expandedElements.length > 0) {
                 IMemento expandedMem = memento.createChild(TAG_EXPANDED);
-                for (int i = 0; i < expandedElements.length; i++) {
-                    if (expandedElements[i] instanceof IResource) {
+                for (Object expandedElement : expandedElements) {
+                    if (expandedElement instanceof IResource) {
                         IMemento elementMem = expandedMem
                                 .createChild(TAG_ELEMENT);
                         elementMem.putString(TAG_PATH,
-                                ((IResource) expandedElements[i]).getFullPath()
+                                ((IResource) expandedElement).getFullPath()
                                         .toString());
                     }
                 }
@@ -1179,13 +1173,10 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
                     .toArray();
             if (elements.length > 0) {
                 IMemento selectionMem = memento.createChild(TAG_SELECTION);
-                for (int i = 0; i < elements.length; i++) {
-                    if (elements[i] instanceof IResource) {
-                        IMemento elementMem = selectionMem
-                                .createChild(TAG_ELEMENT);
-                        elementMem.putString(TAG_PATH,
-                                ((IResource) elements[i]).getFullPath()
-                                        .toString());
+                for (Object selectionElement : elements) {
+                    if (selectionElement instanceof IResource) {
+						IMemento elementMem = selectionMem.createChild(TAG_ELEMENT);
+						elementMem.putString(TAG_PATH, ((IResource) selectionElement).getFullPath().toString());
                     }
                 }
             }
@@ -1223,7 +1214,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     @Override
 	public void setFiltersPreference(String[] patterns) {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < patterns.length; i++) {
             if (i != 0) {
@@ -1348,7 +1339,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 	public void setWorkingSet(IWorkingSet workingSet) {
         TreeViewer treeViewer = getTreeViewer();
         Object[] expanded = treeViewer.getExpandedElements();
-        ISelection selection = treeViewer.getSelection();
+		IStructuredSelection structuredSelection = treeViewer.getStructuredSelection();
 
         boolean refreshNeeded = internalSetWorkingSet(workingSet);
 
@@ -1363,9 +1354,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         	treeViewer.refresh();
         }
         treeViewer.setExpandedElements(expanded);
-        if (selection.isEmpty() == false
-                && selection instanceof IStructuredSelection) {
-            IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+		if (structuredSelection.isEmpty() == false) {
             treeViewer.reveal(structuredSelection.getFirstElement());
         }
     }
@@ -1378,7 +1367,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 	 * @since 3.2
 	 */
 	private boolean internalSetWorkingSet(IWorkingSet workingSet) {
-		boolean refreshNeeded = !Util.equals(this.workingSet, workingSet);
+		boolean refreshNeeded = !Objects.equals(this.workingSet, workingSet);
 		this.workingSet = workingSet;
 		emptyWorkingSet = workingSet != null && workingSet.isAggregateWorkingSet()
 				&& workingSet.isEmpty();

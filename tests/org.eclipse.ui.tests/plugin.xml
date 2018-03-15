@@ -493,6 +493,11 @@
             name="Text Control view"
             restorable="true">
       </view>
+      <view
+            class="org.eclipse.ui.tests.propertysheet.AdaptingSaveableView"
+            id="org.eclipse.ui.tests.propertysheet.AdaptingSaveableView"
+            name="AdaptingSaveableView">
+      </view>
 
    </extension>
    <extension
@@ -764,6 +769,10 @@
             name="Bug 356116 Editor"
             id="org.eclipse.ui.tests.editor.bug356116">
       </editor>
+      <editorContentTypeBinding
+            contentTypeId="org.eclipse.ui.tests.contentType.bug502837"
+            editorId="org.eclipse.ui.tests.api.MockEditorPart1">
+      </editorContentTypeBinding>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">
@@ -1123,6 +1132,12 @@
            file-extensions="bug356116"
            name="Bug 356116 B content type"
            id="org.eclipse.ui.tests.contentType.bug356116.b">
+     </content-type>
+     <content-type
+           priority="normal"
+           file-extensions="bug502837"
+           name="ContentType for bug502837"
+           id="org.eclipse.ui.tests.contentType.bug502837">
      </content-type>
    </extension>
    		
@@ -3715,6 +3730,13 @@
             id="org.eclipse.ui.tests.LifecycleView"
             name="Lifecycle View">
       </view>
+      <view
+            class="org.eclipse.ui.tests.api.workbenchpart.DependencyInjectionView"
+            id="org.eclipse.ui.tests.dependencyinjectionview"
+            inject="true"
+            name="Dependency Injection View"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.statusHandlers">
@@ -4406,5 +4428,63 @@
               </toolbar>
    </menuContribution>
    </extension>
-   
+   <extension
+         point="org.eclipse.ui.ide.projectConfigurators">
+      <projectConfigurator
+            class="org.eclipse.ui.tests.datatransfer.contributions.ImportMeProjectConfigurator"
+            label="Example project detector">
+         <activeWhen>
+            <hasFileRecursively
+                  filename="importme">
+            </hasFileRecursively>
+         </activeWhen>
+      </projectConfigurator>
+   </extension>
+
+	<!-- Bug 517068 -->
+	<extension point="org.eclipse.ui.commands">
+		<command
+			name="testCommand1"
+			description="testCommand1"
+			id="org.eclipse.ui.tests.testCommand1"/>
+		<command
+			name="testCommand2"
+			description="testCommand2"
+			id="org.eclipse.ui.tests.testCommand2"/>
+	</extension>
+	<extension point="org.eclipse.ui.bindings">
+		<key
+			commandId="org.eclipse.ui.tests.testCommand1"
+			schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+			sequence="Ctrl+O" />
+		<key
+			commandId="org.eclipse.ui.tests.testCommand2"
+			schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+			sequence="Ctrl+O" />
+	</extension>
+	<extension point="org.eclipse.ui.handlers">
+		<handler
+			class="org.eclipse.ui.tests.commands.CheckInvokedHandler"
+			commandId="org.eclipse.ui.tests.testCommand1">
+			<activeWhen>
+				<with variable="activeEditorInput">
+					<adapt type="org.eclipse.core.resources.IFile">
+						<test property="org.eclipse.core.resources.contentTypeId" value="org.eclipse.ui.tests.content-type1" />
+					</adapt>
+				</with>
+			</activeWhen>
+		</handler>
+		<handler
+			class="org.eclipse.ui.tests.commands.CheckInvokedHandler"
+			commandId="org.eclipse.ui.tests.testCommand2">
+			<activeWhen>
+				<with variable="activeEditorInput">
+					<adapt type="org.eclipse.core.resources.IFile">
+						<test property="org.eclipse.core.resources.contentTypeId" value="org.eclipse.ui.tests.content-type2" />
+    				</adapt>
+				</with>
+			</activeWhen>
+		</handler>
+	</extension>
+
 </plugin>

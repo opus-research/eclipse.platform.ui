@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 IBM Corporation and others.
+ * Copyright (c) 2012, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -150,19 +150,18 @@ public final class EditorAssociationOverrideDescriptor {
 	}
 
 	private static EditorAssociationOverrideDescriptor[] createDescriptors(IConfigurationElement[] elements) {
-		List result= new ArrayList(elements.length);
-		for (int i= 0; i < elements.length; i++) {
-			IConfigurationElement element= elements[i];
-			if (EDITOR_ASSOCIATION_OVERRIDE_ELEMENT.equals(element.getName())) {
-				EditorAssociationOverrideDescriptor desc= new EditorAssociationOverrideDescriptor(element);
+		List<EditorAssociationOverrideDescriptor> result = new ArrayList<>(elements.length);
+		for (IConfigurationElement configElement : elements) {
+			if (EDITOR_ASSOCIATION_OVERRIDE_ELEMENT.equals(configElement.getName())) {
+				EditorAssociationOverrideDescriptor desc= new EditorAssociationOverrideDescriptor(configElement);
 				result.add(desc);
 			} else {
 				String message= MessageFormat.format(IDEWorkbenchMessages.editorAssociationOverride_error_invalidElementName_message,
-						element.getContributor().getName(), element.getName());
+						configElement.getContributor().getName(), configElement.getName());
 				IDEWorkbenchPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, IStatus.OK, message, null));
 			}
 		}
-		return (EditorAssociationOverrideDescriptor[])result.toArray(new EditorAssociationOverrideDescriptor[result.size()]);
+		return result.toArray(new EditorAssociationOverrideDescriptor[result.size()]);
 	}
 
 }

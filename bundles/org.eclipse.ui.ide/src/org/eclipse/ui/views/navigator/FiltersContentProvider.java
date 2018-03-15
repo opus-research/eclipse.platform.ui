@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,9 +30,9 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 /* package */class FiltersContentProvider implements
         IStructuredContentProvider {
 
-    private static List definedFilters;
+	private static List<String> definedFilters;
 
-    private static List defaultFilters;
+	private static List<String> defaultFilters;
 
     private ResourcePatternFilter resourceFilter;
 
@@ -55,7 +55,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
      *
      * @return a list of strings
      */
-    public static List getDefaultFilters() {
+	public static List<String> getDefaultFilters() {
         if (defaultFilters == null) {
             readFilters();
         }
@@ -67,7 +67,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
      *
      * @return a list of strings
      */
-    public static List getDefinedFilters() {
+	public static List<String> getDefinedFilters() {
         if (definedFilters == null) {
             readFilters();
         }
@@ -96,23 +96,20 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
      * Reads the filters currently defined for the workbench.
      */
     private static void readFilters() {
-		definedFilters = new ArrayList();
-		defaultFilters = new ArrayList();
+		definedFilters = new ArrayList<>();
+		defaultFilters = new ArrayList<>();
 		IExtensionPoint extension = Platform.getExtensionRegistry()
 				.getExtensionPoint(IDEWorkbenchPlugin.IDE_WORKBENCH + '.'
 						+ ResourcePatternFilter.FILTERS_TAG);
 		if (extension != null) {
-			IExtension[] extensions = extension.getExtensions();
-			for (int i = 0; i < extensions.length; i++) {
-				IConfigurationElement[] configElements = extensions[i]
-						.getConfigurationElements();
-				for (int j = 0; j < configElements.length; j++) {
-					String pattern = configElements[j].getAttribute("pattern");//$NON-NLS-1$
+			for (IExtension currentExtension : extension.getExtensions()) {
+				IConfigurationElement[] configElements = currentExtension.getConfigurationElements();
+				for (IConfigurationElement configElement : configElements) {
+					String pattern = configElement.getAttribute("pattern");//$NON-NLS-1$
 					if (pattern != null) {
 						definedFilters.add(pattern);
 					}
-					String selected = configElements[j]
-							.getAttribute("selected");//$NON-NLS-1$
+					String selected = configElement.getAttribute("selected");//$NON-NLS-1$
 					if (selected != null && selected.equalsIgnoreCase("true")) { //$NON-NLS-1$
 						defaultFilters.add(pattern);
 					}

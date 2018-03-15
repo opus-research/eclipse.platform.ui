@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,12 +25,12 @@ public abstract class AbstractPartSelectionTracker {
     /**
      * List of selection listeners for this tracker
      */
-    private ListenerList fListeners = new ListenerList();
+	private ListenerList<ISelectionListener> fListeners = new ListenerList<>();
 
     /**
      * List of post selection listeners for this tracker
      */
-    private ListenerList postListeners = new ListenerList();
+	private ListenerList<ISelectionListener> postListeners = new ListenerList<>();
 
     /**
      * The id of the part this tracls
@@ -93,10 +93,9 @@ public abstract class AbstractPartSelectionTracker {
      */
     public void dispose() {
         synchronized (fListeners) {
-            Object[] listeners = fListeners.getListeners();
-            for (int i = 0; i < listeners.length; i++) {
-                fListeners.remove(listeners[i]);
-                postListeners.remove(listeners[i]);
+			for (Object listener : fListeners.getListeners()) {
+                fListeners.remove(listener);
+                postListeners.remove(listener);
             }
         }
     }
@@ -109,9 +108,7 @@ public abstract class AbstractPartSelectionTracker {
      * @param listeners the list of listeners to notify
      */
     protected void fireSelection(final IWorkbenchPart part, final ISelection sel) {
-        Object[] array = fListeners.getListeners();
-        for (int i = 0; i < array.length; i++) {
-            final ISelectionListener l = (ISelectionListener) array[i];
+		for (final ISelectionListener l : fListeners) {
             if ((part != null && sel != null)
                     || l instanceof INullSelectionListener) {
                 SafeRunner.run(new SafeRunnable() {
@@ -133,9 +130,7 @@ public abstract class AbstractPartSelectionTracker {
      */
     protected void firePostSelection(final IWorkbenchPart part,
             final ISelection sel) {
-        Object[] array = postListeners.getListeners();
-        for (int i = 0; i < array.length; i++) {
-            final ISelectionListener l = (ISelectionListener) array[i];
+		for (final ISelectionListener l : postListeners) {
             if ((part != null && sel != null)
                     || l instanceof INullSelectionListener) {
                 SafeRunner.run(new SafeRunnable() {

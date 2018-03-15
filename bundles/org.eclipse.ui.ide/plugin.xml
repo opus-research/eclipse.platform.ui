@@ -548,6 +548,14 @@
       <keyword
             id="org.eclipse.ui.ide.save"
             label="%PreferenceKeywords.Save"/>
+      <keyword
+            id="org.eclipse.ui.ide.open"
+            label="%PreferenceKeywords.Open">
+      </keyword>
+      <keyword
+            id="org.eclipse.ui.ide.nature"
+            label="%PreferenceKeywords.Nature">
+      </keyword>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -605,6 +613,9 @@
          <keywordReference id="org.eclipse.ui.ide.editing"/>
          <keywordReference id="org.eclipse.ui.ide.editors"/>
          <keywordReference id="org.eclipse.ui.ide.unassociated"/>
+         <keywordReference
+               id="org.eclipse.ui.ide.open">
+         </keywordReference>
       </page>
       <page
             name="%PreferencePages.Views"
@@ -645,6 +656,10 @@
             name="%PreferencePages.Workspace">
          <keywordReference id="org.eclipse.ui.ide.workspace"/>
          <keywordReference id="org.eclipse.ui.ide.encoding"/>
+         <keywordReference id="org.eclipse.ui.ide.project"/>
+         <keywordReference
+               id="org.eclipse.ui.ide.nature">
+         </keywordReference>
       </page>
       <page
             category="org.eclipse.ui.preferencePages.Workspace"
@@ -681,6 +696,7 @@
             name="%PreferencePages.ContentTypes">
          <keywordReference id="org.eclipse.ui.ide.editing"/>
          <keywordReference id="org.eclipse.ui.ide.encoding"/>
+         <keywordReference id="org.eclipse.ui.ide.editors"/>
       </page>
    </extension>
    <extension
@@ -1038,6 +1054,20 @@
                optional="true">
          </commandParameter>
       </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            description="%command.copyDescription.description"
+            id="org.eclipse.ui.ide.markers.copyDescription"
+            name="%command.copyDescription.name"
+            defaultHandler="org.eclipse.ui.internal.views.markers.CopyMarkerDescriptionHandler">            
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            description="%command.copyMarkerResourceQualifiedName.description"
+            id="org.eclipse.ui.ide.markers.copyMarkerResourceQualifiedName"
+            name="%command.copyMarkerResourceQualifiedName.name"
+            defaultHandler="org.eclipse.ui.internal.views.markers.CopyMarkerResourceQualifiedNameHandler">            
+      </command>          
    </extension>
 
    <extension
@@ -1179,14 +1209,14 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
       <key
             commandId="org.eclipse.ui.window.fullscreenmode"
-            contextId="org.eclipse.ui.contexts.window"
+            contextId="org.eclipse.ui.contexts.dialogAndWindow"
             platform="win32"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+F11">
       </key>
       <key
             commandId="org.eclipse.ui.window.fullscreenmode"
-            contextId="org.eclipse.ui.contexts.window"
+            contextId="org.eclipse.ui.contexts.dialogAndWindow"
             platform="gtk"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+F11">
@@ -1393,20 +1423,12 @@
          <markerTypeReference
                id="org.eclipse.core.resources.problemmarker">
          </markerTypeReference>
-         <markerFieldConfiguration
+          <markerFieldConfiguration
                enabled="false"
-               id="org.eclipse.ui.ide.errorsFilter"
-               name="%MarkerFilterGrouping.AllErrors"
-               scope="ON_ANY"
-               values="org.eclipse.ui.internal.views.markers.AllErrorsParameters">
-         </markerFieldConfiguration>
-
-         <markerFieldConfiguration
-               enabled="false"
-               id="org.eclipse.ui.ide.selectedWarningsGrouping"
-               name="%MarkerFilterGrouping.SelectedWarnings"
-               scope="ON_SELECTED_AND_CHILDREN"
-               values="org.eclipse.ui.internal.views.markers.SelectedWarningsParameters">
+               id="org.eclipse.ui.ide.projectErrorsWarningsGrouping"
+               name="%MarkerFilterGrouping.ProjectErrorsWarnings"
+               scope="ON_ANY_IN_SAME_CONTAINER"
+               values="org.eclipse.ui.internal.views.markers.ErrorsWarningsParameters">
          </markerFieldConfiguration>
 
          <markerFieldConfiguration
@@ -1416,12 +1438,20 @@
                scope="ON_SELECTED_AND_CHILDREN"
                values="org.eclipse.ui.internal.views.markers.ErrorsWarningsParameters">
          </markerFieldConfiguration>
-          <markerFieldConfiguration
+
+         <markerFieldConfiguration
                enabled="false"
-               id="org.eclipse.ui.ide.projectErrorsWarningsGrouping"
-               name="%MarkerFilterGrouping.ProjectErrorsWarnings"
-               scope="ON_ANY_IN_SAME_CONTAINER"
-               values="org.eclipse.ui.internal.views.markers.ErrorsWarningsParameters">
+               id="org.eclipse.ui.ide.selectedWarningsGrouping"
+               name="%MarkerFilterGrouping.SelectedWarnings"
+               scope="ON_SELECTED_AND_CHILDREN"
+               values="org.eclipse.ui.internal.views.markers.SelectedWarningsParameters">
+         </markerFieldConfiguration>
+         <markerFieldConfiguration
+               enabled="false"
+               id="org.eclipse.ui.ide.errorsFilter"
+               name="%MarkerFilterGrouping.AllErrors"
+               scope="ON_ANY"
+               values="org.eclipse.ui.internal.views.markers.AllErrorsParameters">
          </markerFieldConfiguration>
 
          <markerFieldReference
@@ -1718,6 +1748,27 @@
                   style="push"
                   tooltip="%menu.toggleCoolbar.tooltip">
             </command>
+            <command
+                  commandId="org.eclipse.ui.window.togglestatusbar"
+                  style="push"
+                  tooltip="%menu.toggleStatusBar.tooltip">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.window.fullscreenmode"
+                  style="push">
+            </command>
+            <separator
+                  name="org.eclipse.ui.window.appearance.separator1"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.ui.window.maximizePart"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.window.minimizePart"
+                  style="push">
+            </command>
          </menu>
       </menuContribution>
 
@@ -1734,13 +1785,33 @@
                visible="true">
          </separator>
          <command
-               commandId="org.eclipse.ui.edit.copy">
+               commandId="org.eclipse.ui.edit.copy"
+               mnemonic="%command.edit.copy.mnemonic">
          </command>
+         <menu
+               id="org.eclipse.ui.ide.markers.copyDetailsMenu"
+               label="%menu.copyDetails.label">
+            <command
+                  commandId="org.eclipse.ui.ide.markers.copyDescription"
+                  label="%command.copyDescription.label"
+                  mnemonic="%command.copyDescription.mnemonic"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.ide.markers.copyMarkerResourceQualifiedName"
+                  icon="icons/full/elcl16/cpyqual_menu.png"
+                  label="%command.copyMarkerResourceQualifiedName.label"
+                  mnemonic="%command.copyMarkerResourceQualifiedName.mnemonic"
+                  style="push">
+            </command>
+         </menu>
          <command
-               commandId="org.eclipse.ui.edit.delete">
+               commandId="org.eclipse.ui.edit.delete"
+               mnemonic="%command.edit.delete.mnemonic">
          </command>
            <command
-               commandId="org.eclipse.ui.edit.selectAll">
+               commandId="org.eclipse.ui.edit.selectAll"
+               mnemonic="%command.edit.selectAll.mnemonic">
          </command>
          <separator
                name="org.eclipse.ui.ide.markersSeperator1"
@@ -1840,7 +1911,8 @@
                visible="true">
          </separator>
           <command
-               commandId="org.eclipse.ui.file.properties">
+               commandId="org.eclipse.ui.file.properties"
+               mnemonic="%command.file.properties.mnemonic">
              <visibleWhen
                    checkEnabled="false">
                 <and>
@@ -2285,6 +2357,13 @@
                      forcePluginActivation="false"
                      property="org.eclipse.ui.ide.editable">
                </test>
+               <adapt
+                     type="org.eclipse.core.resources.IMarker">
+                  <test
+                        property="org.eclipse.ui.ide.marker.done"
+                        value="false">
+                  </test>
+               </adapt>
             </iterate>
          </enabledWhen>
       </handler>
@@ -2449,26 +2528,35 @@
               disable "print" button which is defined by org.eclipse.ui.actions.ActionFactory.PRINT
               and contributed by org.eclipse.ui.internal.ide.WorkbenchActionBuilder
          -->
-         <hiddenToolBarItem id="print">
-         </hiddenToolBarItem>
+         <hiddenToolBarItem id="print" />
+         <!--
+              disable "undo" button which is defined by org.eclipse.ui.actions.ActionFactory.UNDO
+              and contributed by org.eclipse.ui.internal.ide.WorkbenchActionBuilder
+         -->
+         <hiddenToolBarItem id="org.eclipse.ui.edit.undo" />
+         <!--
+              disable "redo" button which is defined by org.eclipse.ui.actions.ActionFactory.REDO
+              and contributed by org.eclipse.ui.internal.ide.WorkbenchActionBuilder
+         -->
+         <hiddenToolBarItem id="org.eclipse.ui.edit.redo" />
       </perspectiveExtension>
    </extension>
    <extension
          point="org.eclipse.ui.ide.unassociatedEditorStrategy">
       <strategy
-            class="org.eclipse.ui.internal.ide.SystemEditorOrTextEditorStrategy"
+            class="org.eclipse.ui.internal.ide.registry.SystemEditorOrTextEditorStrategy"
             id="org.eclipse.ui.ide.systemEditorThenTextEditor"
             interactive="false"
             label="%systemEditorThenTextEditor">
       </strategy>
       <strategy
-            class="org.eclipse.ui.internal.ide.TextEditorStrategy"
+            class="org.eclipse.ui.internal.ide.registry.TextEditorStrategy"
             id="org.eclipse.ui.ide.textEditor"
             interactive="false"
             label="%textEditor">
       </strategy>
       <strategy
-            class="org.eclipse.ui.internal.ide.AskUserViaPopupUnassociatedEditorStrategy"
+            class="org.eclipse.ui.internal.ide.registry.AskUserViaPopupUnassociatedEditorStrategy"
             id="org.eclipse.ui.ide.askUserForUnassociatedEditor"
             interactive="true"
             label="%askUserViaPopup">
@@ -2511,27 +2599,6 @@
 					</iterate>
 				</with>
 	       	  </visibleWhen>
-         </command>
-      </menuContribution>
-      <menuContribution
-            allPopups="false"
-            locationURI="menu:org.eclipse.ui.appearance?after=org.eclipse.ui.ToggleCoolbarAction">
-         <command
-               commandId="org.eclipse.ui.window.fullscreenmode"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <!--
-                 bug 492811: remove test in 4.7 once
-                 org.eclipse.ui.cocoa.fullscreenWindow is removed
-                -->
-               <not>
-                  <systemTest
-                        property="osgi.ws"
-                        value="cocoa">
-                  </systemTest>
-               </not>
-            </visibleWhen>
          </command>
       </menuContribution>
    </extension>

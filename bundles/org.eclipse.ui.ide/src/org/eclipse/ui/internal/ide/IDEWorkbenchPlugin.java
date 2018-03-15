@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 
 package org.eclipse.ui.internal.ide;
@@ -20,8 +21,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IBundleGroup;
 import org.eclipse.core.runtime.IBundleGroupProvider;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -37,6 +41,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.ide.registry.MarkerImageProviderRegistry;
 import org.eclipse.ui.internal.ide.registry.ProjectImageRegistry;
+import org.eclipse.ui.internal.ide.registry.UnassociatedEditorStrategyRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -208,9 +213,9 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
      * @param t
      *            The throwable from where the problem actually occurred.
      */
-    public static void log(Class clazz, String methodName, Throwable t) {
+	public static void log(Class<?> clazz, String methodName, Throwable t) {
         String msg = MessageFormat.format("Exception in {0}.{1}: {2}", //$NON-NLS-1$
-                new Object[] { clazz.getName(), methodName, t });
+				clazz.getName(), methodName, t);
         log(msg, t);
     }
 
@@ -287,20 +292,19 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
      */
     public AboutInfo[] getFeatureInfos() {
         // cannot be cached since bundle groups come and go
-        List infos = new ArrayList();
+		List<AboutInfo> infos = new ArrayList<>();
 
         // add an entry for each bundle group
         IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
         if (providers != null) {
-			for (int i = 0; i < providers.length; ++i) {
-                IBundleGroup[] bundleGroups = providers[i].getBundleGroups();
-                for (int j = 0; j < bundleGroups.length; ++j) {
-					infos.add(new AboutInfo(bundleGroups[j]));
+			for (IBundleGroupProvider provider : providers) {
+				for (IBundleGroup bundleGroup : provider.getBundleGroups()) {
+					infos.add(new AboutInfo(bundleGroup));
 				}
             }
 		}
 
-        return (AboutInfo[]) infos.toArray(new AboutInfo[infos.size()]);
+        return infos.toArray(new AboutInfo[infos.size()]);
     }
 	/**
 	 * Get the workbench image with the given path relative to
@@ -345,23 +349,27 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 			@Override
 			public void run() {
 				IWorkbench workbench = PlatformUI.isWorkbenchRunning() ? PlatformUI.getWorkbench() : null;
-				if (workbench != null && (workbench.getDisplay().isDisposed() || PlatformUI.getWorkbench().isClosing()))
+				if (workbench != null && (workbench.getDisplay().isDisposed() || workbench.isClosing()))
 					return;
 
 				if (workbench == null || workbench.isStarting()) {
 					Display.getCurrent().timerExec(PROBLEMS_VIEW_CREATION_DELAY, this);
 					return;
 				}
-
-				IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
-				for (int i= 0; i < windows.length; i++) {
-					IWorkbenchWindow window= windows[i];
+				// We can't access preferences store before scheduling the job
+				// because this would cause instance area to be initialized
+				// before user selected the workspace location.
+				// See bug 514297 and
+				// org.eclipse.core.internal.runtime.DataArea.assertLocationInitialized()
+				if (!getDefault().getPreferenceStore()
+						.getBoolean(IDEInternalPreferences.SHOW_PROBLEMS_VIEW_DECORATIONS_ON_STARTUP)) {
+					return;
+				}
+				for (IWorkbenchWindow window : workbench.getWorkbenchWindows()) {
 					IWorkbenchPage activePage= window.getActivePage();
 					if (activePage == null)
 						continue;
-					IViewReference[] refs= activePage.getViewReferences();
-					for (int j= 0; j < refs.length; j++) {
-						IViewReference viewReference= refs[j];
+					for (IViewReference viewReference : activePage.getViewReferences()) {
 						if (IPageLayout.ID_PROBLEM_VIEW.equals(viewReference.getId()))
 							try {
 								activePage.showView(viewReference.getId(), viewReference.getSecondaryId(), IWorkbenchPage.VIEW_CREATE);
@@ -373,9 +381,29 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 			}
 		};
 		Display display = Display.getCurrent();
-		if (display != null)
+		if (display != null) {
 			display.timerExec(PROBLEMS_VIEW_CREATION_DELAY, r);
-		else
-			Display.getDefault().asyncExec(r);
+		} else {
+			Job job = new Job("Initializing Problems view") { //$NON-NLS-1$
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					IWorkbench workbench = PlatformUI.isWorkbenchRunning() ? PlatformUI.getWorkbench() : null;
+					if (workbench == null) {
+						// Workbench not created yet, so avoid using display to
+						// avoid crash like in bug 513901
+						schedule(PROBLEMS_VIEW_CREATION_DELAY);
+						return Status.OK_STATUS;
+					}
+					if (workbench.isClosing()) {
+						return Status.CANCEL_STATUS;
+					}
+					PlatformUI.getWorkbench().getDisplay().asyncExec(r);
+					return Status.OK_STATUS;
+				}
+			};
+			job.setSystem(true);
+			job.setUser(false);
+			job.schedule(PROBLEMS_VIEW_CREATION_DELAY);
+		}
 	}
 }

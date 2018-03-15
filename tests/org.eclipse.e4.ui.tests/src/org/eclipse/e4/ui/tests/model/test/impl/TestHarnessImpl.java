@@ -1358,7 +1358,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 				return getVariables();
 			case MTestPackage.TEST_HARNESS__PROPERTIES:
 				if (coreType) return ((EMap.InternalMapView<String, String>)getProperties()).eMap();
-				else return getProperties();
+				return getProperties();
 			case MTestPackage.TEST_HARNESS__CONTRIBUTION_URI:
 				return getContributionURI();
 			case MTestPackage.TEST_HARNESS__OBJECT:
@@ -1980,7 +1980,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (commandName: ");
 		result.append(commandName);
 		result.append(", description: ");

@@ -61,8 +61,8 @@ public class DecorationResult {
 	 * @return <code>true</code> if there are some non-null overlays
 	 */
 	private boolean hasOverlays(ImageDescriptor[] imageDescriptors) {
-		for (int i = 0; i < imageDescriptors.length; i++) {
-			if (imageDescriptors[i] != null) {
+		for (ImageDescriptor imageDescriptor : imageDescriptors) {
+			if (imageDescriptor != null) {
 				return true;
 			}
 		}
@@ -103,7 +103,7 @@ public class DecorationResult {
 			return text;
 		}
 
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 
 		ListIterator prefixIterator = prefixes.listIterator();
 

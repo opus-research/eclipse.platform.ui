@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -143,8 +143,8 @@ public class CopyResourcesOperation extends
 		SubMonitor subMonitor = SubMonitor.convert(monitor,
 				resources.length + (resourceDescriptions != null ? resourceDescriptions.length : 0));
 		subMonitor.setTaskName(UndoMessages.AbstractResourcesOperation_CopyingResourcesProgress);
-		List resourcesAtDestination = new ArrayList();
-		List overwrittenResources = new ArrayList();
+		List<IResource> resourcesAtDestination = new ArrayList<>();
+		List<ResourceDescription> overwrittenResources = new ArrayList<>();
 
 		for (int i = 0; i < resources.length; i++) {
 			// Copy the resources and record the overwrites that would
@@ -154,27 +154,27 @@ public class CopyResourcesOperation extends
 					resourcesAtDestination, subMonitor.split(1), uiInfo, true, fCreateGroups, fCreateLinks,
 					fRelativeToVariable);
 			// Accumulate the overwrites into the full list
-			for (int j = 0; j < overwrites.length; j++) {
-				overwrittenResources.add(overwrites[j]);
+			for (ResourceDescription overwrite : overwrites) {
+				overwrittenResources.add(overwrite);
 			}
 		}
 
 		// Are there any previously overwritten resources to restore now?
 		if (resourceDescriptions != null) {
-			for (int i = 0; i < resourceDescriptions.length; i++) {
-				if (resourceDescriptions[i] != null) {
-					resourceDescriptions[i].createResource(subMonitor.split(1));
+			for (ResourceDescription resourceDescription : resourceDescriptions) {
+				if (resourceDescription != null) {
+					resourceDescription.createResource(subMonitor.split(1));
 				}
 			}
 		}
 
 		// Reset resource descriptions to the just overwritten resources
-		setResourceDescriptions((ResourceDescription[]) overwrittenResources
+		setResourceDescriptions(overwrittenResources
 				.toArray(new ResourceDescription[overwrittenResources.size()]));
 
 		// Reset the target resources to refer to the resources in their new
 		// location.
-		setTargetResources((IResource[]) resourcesAtDestination
+		setTargetResources(resourcesAtDestination
 				.toArray(new IResource[resourcesAtDestination.size()]));
 	}
 
@@ -204,16 +204,14 @@ public class CopyResourcesOperation extends
 			IResourceChangeDescriptionFactory factory, int operation) {
 		boolean update = false;
 		if (operation == UNDO) {
-			for (int i = 0; i < resources.length; i++) {
+			for (IResource resource : resources) {
 				update = true;
-				IResource resource = resources[i];
 				factory.delete(resource);
 			}
-			for (int i = 0; i < resourceDescriptions.length; i++) {
-				if (resourceDescriptions[i] != null) {
+			for (ResourceDescription resourceDescription : resourceDescriptions) {
+				if (resourceDescription != null) {
 					update = true;
-					IResource resource = resourceDescriptions[i]
-							.createResourceHandle();
+					IResource resource = resourceDescription.createResourceHandle();
 					factory.create(resource);
 				}
 			}

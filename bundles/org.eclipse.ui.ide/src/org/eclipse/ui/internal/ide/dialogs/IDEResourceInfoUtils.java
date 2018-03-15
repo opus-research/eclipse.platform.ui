@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -438,7 +438,7 @@ public class IDEResourceInfoUtils {
 	 */
 	public static IFileStore[] listFileStores(IFileStore store,
 			IFileStoreFilter fileFilter, IProgressMonitor monitor) {
-		ArrayList result = new ArrayList();
+		ArrayList<IFileStore> result = new ArrayList<>();
 		IFileStore[] children;
 		try {
 			children = store.childStores(EFS.NONE, monitor);
@@ -446,9 +446,9 @@ public class IDEResourceInfoUtils {
 			log(e);
 			return new IFileStore[0];
 		}
-		for (int i = 0; i < children.length; i++) {
-			if (fileFilter.accept(children[i])) {
-				result.add(children[i]);
+		for (IFileStore fileStore : children) {
+			if (fileFilter.accept(fileStore)) {
+				result.add(fileStore);
 			}
 		}
 		IFileStore[] stores = new IFileStore[result.size()];

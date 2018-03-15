@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,15 +73,18 @@ public class NavigatorFilterService implements INavigatorFilterService {
 					String activatedFiltersPreferenceValue = prefs.get(
 							getFilterActivationPreferenceKey(), null);
 					String[] activeFilterIds = activatedFiltersPreferenceValue.split(DELIM);
-					for (int i = 0; i < activeFilterIds.length; i++) {
-						activeFilters.add(activeFilterIds[i]);
+					for (String activeFilterId : activeFilterIds) {
+						if (activeFilterId.isEmpty()) {
+							continue;
+						}
+						activeFilters.add(activeFilterId);
 					}
 
 				} else {
 					ICommonFilterDescriptor[] visibleFilterDescriptors = getVisibleFilterDescriptors();
-					for (int i = 0; i < visibleFilterDescriptors.length; i++) {
-						if (visibleFilterDescriptors[i].isActiveByDefault()) {
-							activeFilters.add(visibleFilterDescriptors[i].getId());
+					for (ICommonFilterDescriptor visibleFilterDescriptor : visibleFilterDescriptors) {
+						if (visibleFilterDescriptor.isActiveByDefault()) {
+							activeFilters.add(visibleFilterDescriptor.getId());
 						}
 					}
 				}
@@ -98,15 +100,16 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			.getInstance();
 
 			/*
-			 * by creating a StringBuffer with DELIM, we ensure the string is
-			 * not empty when persisted.
+			 * by creating a StringBuilder with DELIM, we ensure the string is not empty
+			 * when persisted.
 			 */
-			StringBuffer activatedFiltersPreferenceValue = new StringBuffer(DELIM);
+			StringBuilder activatedFiltersPreferenceValue = new StringBuilder(DELIM);
 
-			for (Iterator<String> activeItr = activeFilters.iterator(); activeItr.hasNext();) {
-				String id = activeItr.next().toString();
-				if (!dm.getFilterById(id).isVisibleInUi())
+			for (String id : activeFilters) {
+				CommonFilterDescriptor filterDescriptor = dm.getFilterById(id);
+				if (filterDescriptor == null || !filterDescriptor.isVisibleInUi()) {
 					continue;
+				}
 				activatedFiltersPreferenceValue.append(id).append(DELIM);
 			}
 
@@ -141,9 +144,9 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		List<ViewerFilter> filters = new ArrayList<ViewerFilter>();
 
 		ViewerFilter instance;
-		for (int i = 0; i < descriptors.length; i++) {
-			if (!toReturnOnlyActiveFilters || isActive(descriptors[i].getId())) {
-				instance = getViewerFilter(descriptors[i]);
+		for (CommonFilterDescriptor descriptor : descriptors) {
+			if (!toReturnOnlyActiveFilters || isActive(descriptor.getId())) {
+				instance = getViewerFilter(descriptor);
 				if (instance != null) {
 					filters.add(instance);
 				}
@@ -245,8 +248,8 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		/* If so, update */
 		if (updateFilterActivation) {
 			if (nonUiVisible != null) {
-				for (int i = 0; i < filterIdsToActivate.length; i++)
-					nonUiVisible.add(filterIdsToActivate[i]);
+				for (String filterIdToActivate : filterIdsToActivate)
+					nonUiVisible.add(filterIdToActivate);
 				filterIdsToActivate = nonUiVisible.toArray(new String[]{});
 			}
 
@@ -294,9 +297,9 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			boolean isActive = activeFilters.contains(aFilterId);
 			if(isActive ^ toMakeActive) {
 				if(toMakeActive)
-					activeFilters.remove(aFilterId);
-				else
 					activeFilters.add(aFilterId);
+				else
+					activeFilters.remove(aFilterId);
 
 			}
 

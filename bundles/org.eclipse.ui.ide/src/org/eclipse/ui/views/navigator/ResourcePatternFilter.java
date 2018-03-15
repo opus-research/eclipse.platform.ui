@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -94,7 +94,7 @@ public class ResourcePatternFilter extends ViewerFilter {
         if (storedPatterns.length() == 0) {
             // revert to all filter extensions with selected == "true"
             // if there are no filters in the preference store
-            List defaultFilters = FiltersContentProvider.getDefaultFilters();
+			List<String> defaultFilters = FiltersContentProvider.getDefaultFilters();
             String[] patterns = new String[defaultFilters.size()];
             defaultFilters.toArray(patterns);
             setPatterns(patterns);
@@ -103,10 +103,10 @@ public class ResourcePatternFilter extends ViewerFilter {
 
         //Get the strings separated by a comma and filter them from the currently
         //defined ones
-        List definedFilters = FiltersContentProvider.getDefinedFilters();
+		List<String> definedFilters = FiltersContentProvider.getDefinedFilters();
         StringTokenizer entries = new StringTokenizer(storedPatterns,
                 COMMA_SEPARATOR);
-        List patterns = new ArrayList();
+		List<String> patterns = new ArrayList<>();
 
         while (entries.hasMoreElements()) {
             String nextToken = entries.nextToken();
@@ -127,9 +127,8 @@ public class ResourcePatternFilter extends ViewerFilter {
 		IResource resource = Adapters.adapt(element, IResource.class);
         if (resource != null) {
             String name = resource.getName();
-            StringMatcher[] testMatchers = getMatchers();
-            for (int i = 0; i < testMatchers.length; i++) {
-                if (testMatchers[i].match(name)) {
+			for (StringMatcher testMatcher : getMatchers()) {
+                if (testMatcher.match(name)) {
 					return false;
 				}
             }

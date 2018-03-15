@@ -18,17 +18,21 @@
 package org.eclipse.ui.dialogs;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -74,6 +78,18 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 		setTitle(PROJECT_LOCATION_SELECTION_TITLE);
 		setStatusLineAboveButtons(true);
 		project = existingProject;
+	}
+
+	/**
+	 * @since 3.14
+	 */
+	@Override
+	protected Button createButton(Composite parent, int id, String label, boolean defaultButton) {
+		if (id == IDialogConstants.OK_ID) {
+			return super.createButton(parent, id, IDEWorkbenchMessages.ProjectLocationSelectionDialog_copyButtonLabel,
+					defaultButton);
+		}
+		return super.createButton(parent, id, label, defaultButton);
 	}
 
 	/**
@@ -231,24 +247,25 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 			return projectName;
 		}
 
-		int counter = 1;
+		String newName = computeNewName(projectName);
 		while (true) {
-			String nameSegment;
-			if (counter > 1) {
-				nameSegment = NLS.bind(IDEWorkbenchMessages.CopyProjectAction_copyNameTwoArgs, counter, projectName);
-			} else {
-				nameSegment = NLS.bind(
-						IDEWorkbenchMessages.CopyProjectAction_copyNameOneArg,
-						projectName);
+			if (!workspace.getRoot().getProject(newName).exists()) {
+				return newName;
 			}
-
-			if (!workspace.getRoot().getProject(nameSegment).exists()) {
-				return nameSegment;
-			}
-
-			counter++;
+			newName = computeNewName(newName);
 		}
+	}
 
+	private static String computeNewName(String str) {
+		String fileNameNoExtension = str;
+		Pattern p = Pattern.compile("[0-9]+$"); //$NON-NLS-1$
+		Matcher m = p.matcher(fileNameNoExtension);
+		if (m.find()) {
+			// String ends with a number: increment it by 1
+			int newNumber = Integer.parseInt(m.group()) + 1;
+			return m.replaceFirst(Integer.toString(newNumber));
+		}
+		return fileNameNoExtension + "2"; //$NON-NLS-1$
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,38 +56,18 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	private IWorkbenchPart activePart;
 
-	private ListenerList listeners = new ListenerList();
-	private ListenerList postSelectionListeners = new ListenerList();
+	private ListenerList<ISelectionListener> listeners = new ListenerList<>();
+	private ListenerList<ISelectionListener> postSelectionListeners = new ListenerList<>();
 	private Map<String, Set<ISelectionListener>> targetedListeners = new HashMap<>();
 	private Map<String, Set<ISelectionListener>> targetedPostSelectionListeners = new HashMap<>();
 
-	private org.eclipse.e4.ui.workbench.modeling.ISelectionListener listener = new org.eclipse.e4.ui.workbench.modeling.ISelectionListener() {
-		@Override
-		public void selectionChanged(MPart part, Object selection) {
-			handleSelectionChanged(part, selection, false);
-		}
-	};
+	private org.eclipse.e4.ui.workbench.modeling.ISelectionListener listener = (part, selection) -> handleSelectionChanged(part, selection, false);
 
-	private org.eclipse.e4.ui.workbench.modeling.ISelectionListener targetedListener = new org.eclipse.e4.ui.workbench.modeling.ISelectionListener() {
-		@Override
-		public void selectionChanged(MPart part, Object selection) {
-			handleSelectionChanged(part, selection, true);
-		}
-	};
+	private org.eclipse.e4.ui.workbench.modeling.ISelectionListener targetedListener = (part, selection) -> handleSelectionChanged(part, selection, true);
 
-	private org.eclipse.e4.ui.workbench.modeling.ISelectionListener postListener = new org.eclipse.e4.ui.workbench.modeling.ISelectionListener() {
-		@Override
-		public void selectionChanged(MPart part, Object selection) {
-			handlePostSelectionChanged(part, selection, false);
-		}
-	};
+	private org.eclipse.e4.ui.workbench.modeling.ISelectionListener postListener = (part, selection) -> handlePostSelectionChanged(part, selection, false);
 
-	private org.eclipse.e4.ui.workbench.modeling.ISelectionListener targetedPostListener = new org.eclipse.e4.ui.workbench.modeling.ISelectionListener() {
-		@Override
-		public void selectionChanged(MPart part, Object selection) {
-			handlePostSelectionChanged(part, selection, true);
-		}
-	};
+	private org.eclipse.e4.ui.workbench.modeling.ISelectionListener targetedPostListener = (part, selection) -> handlePostSelectionChanged(part, selection, true);
 
 	private void handleSelectionChanged(MPart part, Object selection, boolean targeted) {
 		selection = createCompatibilitySelection(selection);
@@ -253,10 +233,10 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 	}
 
 	private void notifyListeners(IWorkbenchPart workbenchPart, ISelection selection,
-			ListenerList listenerList) {
-		for (Object listener : listenerList.getListeners()) {
+			ListenerList<ISelectionListener> listenerList) {
+		for (ISelectionListener listener : listenerList) {
 			if (selection != null || listener instanceof INullSelectionListener) {
-				((ISelectionListener) listener).selectionChanged(workbenchPart, selection);
+				listener.selectionChanged(workbenchPart, selection);
 			}
 		}
 	}
@@ -370,8 +350,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 	@Override
 	public void selectionChanged(SelectionChangedEvent e) {
 		MPart part = page.findPart(activePart);
-		ESelectionService selectionService = (ESelectionService) part.getContext().get(
-				ESelectionService.class.getName());
+		ESelectionService selectionService = part.getContext().get(ESelectionService.class);
 		selectionService.setSelection(e.getSelection());
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -385,10 +385,9 @@ public class ObjectActionContributor extends PluginActionBuilder implements
      */
     @Override
 	public String toString() {
-    	StringBuffer buffer = new StringBuffer();
+    	StringBuilder buffer = new StringBuilder();
     	IConfigurationElement[] children = config.getChildren();
-    	for (int i = 0; i < children.length; i++) {
-			IConfigurationElement element = children[i];
+    	for (IConfigurationElement element : children) {
 			String label = element.getAttribute(IWorkbenchRegistryConstants.ATT_LABEL);
 			if(label != null) {
 				buffer.append(label);
@@ -399,9 +398,9 @@ public class ObjectActionContributor extends PluginActionBuilder implements
     }
 
 	@Override
-	public Object getAdapter(Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
 		if (adapter.equals(IConfigurationElement.class)) {
-			return config;
+			return adapter.cast(config);
 		}
 		return null;
 	}

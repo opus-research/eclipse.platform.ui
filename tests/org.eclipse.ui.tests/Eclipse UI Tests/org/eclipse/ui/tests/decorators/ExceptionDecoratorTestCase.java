@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,8 +15,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.decorators.DecoratorDefinition;
 import org.eclipse.ui.internal.decorators.DecoratorManager;
@@ -24,9 +23,8 @@ import org.eclipse.ui.internal.decorators.DecoratorManager;
 /**
  * @version 	1.0
  */
-public class ExceptionDecoratorTestCase extends DecoratorEnablementTestCase
-        implements ILabelProviderListener {
-    private Collection problemDecorators = new ArrayList();
+public class ExceptionDecoratorTestCase extends DecoratorEnablementTestCase {
+	private Collection<DecoratorDefinition> problemDecorators = new ArrayList<>();
 
     private DecoratorDefinition light;
 
@@ -74,16 +72,15 @@ public class ExceptionDecoratorTestCase extends DecoratorEnablementTestCase
         //Need to wait for decoration to end to allow for all
         //errors to occur
         try {
-            Platform.getJobManager().join(DecoratorManager.FAMILY_DECORATE,
-                    null);
+			Job.getJobManager().join(DecoratorManager.FAMILY_DECORATE, null);
         } catch (OperationCanceledException e) {
         } catch (InterruptedException e) {
         }
 
         //Be sure that the decorators were all disabled on errors.
-        Iterator problemIterator = problemDecorators.iterator();
+		Iterator<DecoratorDefinition> problemIterator = problemDecorators.iterator();
         while (problemIterator.hasNext()) {
-            DecoratorDefinition next = (DecoratorDefinition) problemIterator
+            DecoratorDefinition next = problemIterator
                     .next();
             assertFalse("Enabled " + next.getName(), next.isEnabled());
         }

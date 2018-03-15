@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,14 +45,14 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 	static {
 		Bundle bundle = org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator
 				.getDefault().getBundle();
-		IPath path = new Path("$nl$/icons/full/obj16/fldr_obj.gif");
+		IPath path = new Path("$nl$/icons/full/obj16/fldr_obj.png");
 		URL url = FileLocator.find(bundle, path, null);
 		ImageDescriptor enabledDesc = ImageDescriptor.createFromURL(url);
 		if (enabledDesc != null)
 			JFaceResources.getImageRegistry().put(FOLDER_ICON, enabledDesc);
 	}
 
-	private Map<String, Image> imageMap = new HashMap<String, Image>();
+	private Map<String, Image> imageMap = new HashMap<>();
 
 	private IEclipseContext context;
 
@@ -83,7 +83,7 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 				Image image = imageMap.get(iconURI);
 				if (image == null) {
 					ISWTResourceUtilities resUtils = (ISWTResourceUtilities) context
-							.get(IResourceUtilities.class.getName());
+							.get(IResourceUtilities.class);
 					image = resUtils.imageDescriptorFromURI(
 							URI.createURI(iconURI)).createImage();
 					imageMap.put(iconURI, image);

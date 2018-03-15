@@ -79,7 +79,7 @@ public class TabbedPropertyRegistryClassSectionFilter {
 						.hasNext();) {
 					Object object = i.next();
 
-					if (filter != null && filter.select(object) == false) {
+					if (filter.select(object) == false) {
 						/**
 						 * filter fails so section does not apply to the
 						 * selection, do not display section.
@@ -179,8 +179,7 @@ public class TabbedPropertyRegistryClassSectionFilter {
 	private void internalComputeInterfaceOrder(Class[] interfaces, List result,
 			Map seen) {
 		List newInterfaces = new ArrayList(seen.size());
-		for (int i = 0; i < interfaces.length; i++) {
-			Class interfac = interfaces[i];
+		for (Class interfac : interfaces) {
 			if (seen.get(interfac) == null) {
 				result.add(interfac.getName());
 				seen.put(interfac, interfac);

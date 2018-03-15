@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,11 +15,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -27,6 +25,9 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.tests.internal.TestMemento;
 import org.eclipse.ui.views.markers.internal.MarkerType;
 import org.eclipse.ui.views.markers.internal.ProblemFilter;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  * Testing for https://bugs.eclipse.org/bugs/show_bug.cgi?id=75909 .
@@ -67,7 +68,7 @@ public class Bug75909Test extends TestCase {
 		ProblemFilter filter = new ProblemFilter("Bug75909Test");
 		filter.resetState();
 
-		List allTypes = new ArrayList();
+		List<MarkerType> allTypes = new ArrayList<>();
 		filter.addAllSubTypes(allTypes);
 		int num_types = allTypes.size();
 
@@ -95,7 +96,7 @@ public class Bug75909Test extends TestCase {
 		ProblemFilter filter = new ProblemFilter("Bug75909Test");
 		filter.restoreFilterSettings(getFilterSettings(settings));
 
-		List selected = filter.getSelectedTypes();
+		List<MarkerType> selected = filter.getSelectedTypes();
 		assertEquals(Bug75909Test.OLD_SETTINGS_SELECTED, selected.size());
 
 		MarkerType marker = getType(filter, Bug75909Test.INCLUDED_MARKER_ID);
@@ -121,10 +122,10 @@ public class Bug75909Test extends TestCase {
 		ProblemFilter filter = new ProblemFilter("Bug75909Test");
 		filter.restoreState(settings);
 
-		List included = new ArrayList();
+		List<MarkerType> included = new ArrayList<>();
 		filter.addAllSubTypes(included);
 
-		List selected = filter.getSelectedTypes();
+		List<MarkerType> selected = filter.getSelectedTypes();
 		assertEquals(included.size() - 1, selected.size());
 
 		MarkerType marker = getType(filter, Bug75909Test.INCLUDED_MARKER_ID);
@@ -177,7 +178,7 @@ public class Bug75909Test extends TestCase {
 		ProblemFilter filter = new ProblemFilter("Bug75909Test");
 		filter.resetState();
 
-		List allTypes = new ArrayList();
+		List<MarkerType> allTypes = new ArrayList<>();
 		filter.addAllSubTypes(allTypes);
 
 		MarkerType removed = getType(filter, Bug75909Test.REMOVED_MARKER_ID);
@@ -200,16 +201,9 @@ public class Bug75909Test extends TestCase {
 
 	private void loadSettings(IDialogSettings settings, String resource)
 			throws UnsupportedEncodingException, IOException {
-		InputStream io = null;
-		try {
-			io = getClass().getResourceAsStream(resource);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					io, "utf-8"));
+		try (InputStream io = getClass().getResourceAsStream(resource)) {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(io, StandardCharsets.UTF_8));
 			settings.load(reader);
-		} finally {
-			if (io != null) {
-				io.close();
-			}
 		}
 	}
 

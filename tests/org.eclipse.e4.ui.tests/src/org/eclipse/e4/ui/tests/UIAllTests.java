@@ -15,6 +15,7 @@ package org.eclipse.e4.ui.tests;
 import org.eclipse.e4.ui.tests.application.Bug299755Test;
 import org.eclipse.e4.ui.tests.application.Bug308220Test;
 import org.eclipse.e4.ui.tests.application.Bug320857Test;
+import org.eclipse.e4.ui.tests.application.E4ResourceTest;
 import org.eclipse.e4.ui.tests.application.ModelElementTest;
 import org.eclipse.e4.ui.tests.application.ModelRobustnessTest;
 import org.eclipse.e4.ui.tests.application.ResourceHandlerTest;
@@ -34,8 +35,9 @@ import org.eclipse.e4.ui.tests.workbench.MSashTest;
 import org.eclipse.e4.ui.tests.workbench.MSaveablePartTest;
 import org.eclipse.e4.ui.tests.workbench.MToolItemTest;
 import org.eclipse.e4.ui.tests.workbench.MWindowTest;
+import org.eclipse.e4.ui.tests.workbench.ModelAssemblerFragmentOrderingTests;
 import org.eclipse.e4.ui.tests.workbench.ModelAssemblerTests;
-import org.eclipse.e4.ui.tests.workbench.PartFocusTest;
+import org.eclipse.e4.ui.tests.workbench.PartOnTopManagerTest;
 import org.eclipse.e4.ui.tests.workbench.PartRenderingEngineTests;
 import org.eclipse.e4.ui.tests.workbench.SashRendererTest;
 import org.eclipse.e4.ui.tests.workbench.TopoSortTests;
@@ -58,6 +60,7 @@ import org.junit.runners.Suite;
 		Bug299755Test.class,
 		Bug308220Test.class,
 		Bug320857Test.class,
+		PartOnTopManagerTest.class,
 		PartRenderingEngineTests.class,
 		SashRendererTest.class,
 		MApplicationCommandAccessTest.class,
@@ -73,7 +76,8 @@ import org.junit.runners.Suite;
 		Bug308317Test.class,
 		ModelRobustnessTest.class,
 		ResourceHandlerTest.class,
-		PartFocusTest.class,
+		// Commented out due the bug 505678
+		// PartFocusTest.class,
 		ModelElementTest.class,
 		StackRendererTest.class,
 		TabStateHandlerTest.class,
@@ -81,7 +85,8 @@ import org.junit.runners.Suite;
 		TopoSortTests.class,
 		ExtensionsSortTests.class,
 		HandlerActivationTest.class,
-		ModelAssemblerTests.class
+		ModelAssemblerTests.class,
+		ModelAssemblerFragmentOrderingTests.class, E4ResourceTest.class
 		// SWTPartRendererTest.class,
 })
 public class UIAllTests {

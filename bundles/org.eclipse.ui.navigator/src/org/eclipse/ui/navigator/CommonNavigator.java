@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -193,8 +193,8 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 	        INavigatorFilterService filterService = commonViewer
 					.getNavigatorContentService().getFilterService();
 			ViewerFilter[] visibleFilters = filterService.getVisibleFilters(true);
-			for (int i = 0; i < visibleFilters.length; i++) {
-				commonViewer.addFilter(visibleFilters[i]);
+			for (ViewerFilter visibleFilter : visibleFilters) {
+				commonViewer.addFilter(visibleFilter);
 			}
 
 			commonViewer.setSorter(new CommonViewerSorter());
@@ -226,6 +226,9 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 
 		commonActionGroup = createCommonActionGroup();
 		commonActionGroup.fillActionBars(getViewSite().getActionBars());
+		if (memento != null && commonActionGroup instanceof IMementoAware) {
+			((IMementoAware) commonActionGroup).restoreState(memento);
+		}
 
 		ISaveablesLifecycleListener saveablesLifecycleListener = new ISaveablesLifecycleListener() {
 			ISaveablesLifecycleListener siteSaveablesLifecycleListener = getSite()
@@ -335,7 +338,6 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 					.intValue() == 1
 					: false));
 		}
-
 	}
 
 	/**
@@ -353,6 +355,9 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 		super.saveState(aMemento);
 		commonManager.saveState(aMemento);
 		commonViewer.getNavigatorContentService().saveState(aMemento);
+		if (commonActionGroup instanceof IMementoAware) {
+			((IMementoAware) commonActionGroup).saveState(aMemento);
+		}
 	}
 
 	/**
@@ -442,16 +447,15 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 	 *    have an adapter for the given class
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public <T> T getAdapter(Class<T> adapter) {
 		if (adapter == CommonViewer.class) {
-			return (T) getCommonViewer();
+			return adapter.cast(getCommonViewer());
 		} else if (adapter == INavigatorContentService.class) {
-			return (T) getCommonViewer().getNavigatorContentService();
+			return adapter.cast(getCommonViewer().getNavigatorContentService());
 		} else if (adapter == IShowInTarget.class) {
-			return (T) this;
+			return adapter.cast(this);
 		} else if (adapter == IShowInSource.class) {
-			return (T) getShowInSource();
+			return adapter.cast(getShowInSource());
         }
 		return super.getAdapter(adapter);
 	}
@@ -646,8 +650,8 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 	@Override
 	public boolean isDirty() {
 		Saveable[] saveables = getSaveables();
-		for (int i = 0; i < saveables.length; i++) {
-			if(saveables[i].isDirty()) {
+		for (Saveable saveable : saveables) {
+			if(saveable.isDirty()) {
 				return true;
 			}
 		}

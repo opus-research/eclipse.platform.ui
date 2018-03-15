@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,7 +55,7 @@ public class IDEWorkbenchActivityHelper {
      * Mapping from composite nature ID to IPluginContribution.  Used for proper
      * activity mapping of natures.
      */
-    private Map natureMap;
+	private Map<String, IPluginContribution> natureMap;
 
     /**
      * Lock for the list of nature ids to be processed.
@@ -70,7 +70,7 @@ public class IDEWorkbenchActivityHelper {
 	/**
 	 * The collection of natures to process.
 	 */
-	private HashSet fPendingNatureUpdates= new HashSet();
+	private HashSet<String> fPendingNatureUpdates = new HashSet<>();
 
     /**
      * Singleton instance.
@@ -95,7 +95,7 @@ public class IDEWorkbenchActivityHelper {
      */
     private IDEWorkbenchActivityHelper() {
     	lock = this;
-        natureMap = new HashMap();
+		natureMap = new HashMap<>();
         // for dynamic UI
         Platform.getExtensionRegistry().addRegistryChangeListener(
                 event -> {
@@ -110,7 +110,7 @@ public class IDEWorkbenchActivityHelper {
         // crawl the initial projects to set up nature bindings
         IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
                 .getProjects();
-        processProjects(new HashSet(Arrays.asList(projects)));
+		processProjects(new HashSet<>(Arrays.asList(projects)));
     }
 
     /**
@@ -120,9 +120,7 @@ public class IDEWorkbenchActivityHelper {
         natureMap.clear();
         IExtensionPoint point = Platform.getExtensionRegistry()
                 .getExtensionPoint("org.eclipse.core.resources.natures"); //$NON-NLS-1$
-        IExtension[] extensions = point.getExtensions();
-        for (int i = 0; i < extensions.length; i++) {
-            IExtension extension = extensions[i];
+		for (IExtension extension : point.getExtensions()) {
             final String localId = extension.getSimpleIdentifier();
             final String pluginId = extension.getNamespaceIdentifier();
             String natureId = extension.getUniqueIdentifier();
@@ -159,10 +157,8 @@ public class IDEWorkbenchActivityHelper {
 		    if (mainDelta.getKind() == IResourceDelta.CHANGED
 					&& mainDelta.getResource().getType() == IResource.ROOT) {
 
-				IResourceDelta[] children = mainDelta.getAffectedChildren();
-				Set projectsToUpdate = new HashSet();
-				for (int i = 0; i < children.length; i++) {
-					IResourceDelta delta = children[i];
+				Set<IProject> projectsToUpdate = new HashSet<>();
+				for (IResourceDelta delta : mainDelta.getAffectedChildren()) {
 					if (delta.getResource().getType() == IResource.PROJECT) {
 						IProject project = (IProject) delta.getResource();
 
@@ -184,15 +180,14 @@ public class IDEWorkbenchActivityHelper {
 	protected void runPendingUpdates() {
 		String[] ids = null;
 		synchronized (lock) {
-			ids = (String[]) fPendingNatureUpdates
+			ids = fPendingNatureUpdates
 					.toArray(new String[fPendingNatureUpdates.size()]);
 			fPendingNatureUpdates.clear();
 		}
 		IWorkbenchActivitySupport workbenchActivitySupport = PlatformUI
 				.getWorkbench().getActivitySupport();
-		for (int j = 0; j < ids.length; j++) {
-			final IPluginContribution contribution = (IPluginContribution) natureMap
-					.get(ids[j]);
+		for (String id : ids) {
+			final IPluginContribution contribution = natureMap.get(id);
 			if (contribution == null) {
 				continue; // bad nature ID.
 			}
@@ -219,11 +214,11 @@ public class IDEWorkbenchActivityHelper {
 	/**
 	 * @param projectsToUpdate
 	 */
-	private void processProjects(Set projectsToUpdate) {
+	private void processProjects(Set<IProject> projectsToUpdate) {
 		boolean needsUpdate = false;
-		for (Iterator i = projectsToUpdate.iterator(); i.hasNext();) {
+		for (Iterator<IProject> i = projectsToUpdate.iterator(); i.hasNext();) {
 			try {
-				IProject project = (IProject) i.next();
+				IProject project = i.next();
 				String[] ids = project.getDescription().getNatureIds();
 				if (ids.length == 0) {
 					continue;

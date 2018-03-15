@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2017 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     Matthew Hall - initial API and implementation (bug 207858)
  *     Matthew Hall - bugs 226765, 239015, 222991, 263693, 263956, 226292,
  *                    266038
+ *     Conrad Groth - Bug 371756
  ******************************************************************************/
 
 package org.eclipse.jface.internal.databinding.viewers;
@@ -17,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.IObservable;
@@ -32,7 +34,6 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.viewers.TreeStructureAdvisor;
-import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.IElementComparer;
@@ -135,8 +136,8 @@ public abstract class ObservableCollectionTreeContentProvider implements
 			// Ensure we flush any observable collection listeners
 			TreeNode[] oldNodes = new TreeNode[elementNodes.size()];
 			elementNodes.values().toArray(oldNodes);
-			for (int i = 0; i < oldNodes.length; i++)
-				oldNodes[i].dispose();
+			for (TreeNode oldNode : oldNodes)
+				oldNode.dispose();
 			elementNodes.clear();
 			elementNodes = null;
 		}
@@ -146,6 +147,11 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		knownElements.clear();
 		if (realizedElements != null)
 			realizedElements.clear();
+
+		if (newInput != null) {
+			getElements(newInput);
+		}
+
 	}
 
 	private void setViewer(Viewer viewer) {
@@ -197,9 +203,9 @@ public abstract class ObservableCollectionTreeContentProvider implements
 	private Object[] getChildren(Object element, boolean input) {
 		TreeNode node = getOrCreateNode(element, input);
 		Object[] children = node.getChildren().toArray();
-		for (int i = 0; i < children.length; i++)
-			getOrCreateNode(children[i], false).addParent(element);
-		knownElements.addAll(node.getChildren());
+		for (Object childElement : children) {
+			getOrCreateNode(childElement, false).addParent(element);
+		}
 		asyncUpdateRealizedElements();
 		return children;
 	}
@@ -277,8 +283,8 @@ public abstract class ObservableCollectionTreeContentProvider implements
 			if (!elementNodes.isEmpty()) {
 				TreeNode[] nodes = new TreeNode[elementNodes.size()];
 				elementNodes.values().toArray(nodes);
-				for (int i = 0; i < nodes.length; i++) {
-					nodes[i].dispose();
+				for (TreeNode node : nodes) {
+					node.dispose();
 				}
 				elementNodes.clear();
 			}
@@ -404,7 +410,7 @@ public abstract class ObservableCollectionTreeContentProvider implements
 
 	protected boolean equal(Object left, Object right) {
 		if (comparer == null)
-			return Util.equals(left, right);
+			return Objects.equals(left, right);
 		return comparer.equals(left, right);
 	}
 
@@ -480,10 +486,11 @@ public abstract class ObservableCollectionTreeContentProvider implements
 					children = Observables.emptyObservableSet(realm);
 				} else {
 					Assert
-							.isTrue(Util.equals(realm, children.getRealm()),
+							.isTrue(Objects.equals(realm, children.getRealm()),
 									"Children observable collection must be on the Display realm"); //$NON-NLS-1$
 					listener = createCollectionChangeListener(element);
 					addCollectionChangeListener(children, listener);
+					knownElements.addAll(children);
 				}
 			}
 		}

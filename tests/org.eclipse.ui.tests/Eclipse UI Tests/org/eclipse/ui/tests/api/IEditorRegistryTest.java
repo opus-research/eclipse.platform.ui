@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,9 +8,14 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 442043
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 527069
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertThat;
+
+import org.eclipse.core.internal.content.ContentTypeManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -33,6 +38,7 @@ import org.eclipse.ui.tests.TestPlugin;
 import org.eclipse.ui.tests.harness.util.ArrayUtil;
 import org.eclipse.ui.tests.harness.util.CallHistory;
 import org.eclipse.ui.tests.harness.util.FileUtil;
+import org.hamcrest.Matchers;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 
@@ -107,6 +113,21 @@ public class IEditorRegistryTest extends TestCase {
 		id = IConstants.FakeID;
 		editor = fReg.findEditor(id);
 		assertNull(editor);
+	}
+
+	/** Ensures that OS external editors can be found using {@link IEditorRegistry#findEditor(String)} */
+	public void testFindExternalEditor() {
+		IEditorDescriptor[] sortedEditorsFromOS = ((EditorRegistry) fReg).getSortedEditorsFromOS();
+		assertThat("The OS should have at least one external editor", sortedEditorsFromOS.length,
+				Matchers.greaterThan(1));
+		// cycle through external editors
+		for (IEditorDescriptor ied : sortedEditorsFromOS) {
+			EditorDescriptor ed = (EditorDescriptor) ied;
+			// find external editor from registry
+			EditorDescriptor found = (EditorDescriptor) fReg.findEditor(ed.getId());
+			assertNotNull("Found editor must not be null", found);
+			assertEquals("External editor should be found using find(id)", ed.getProgram(), found.getProgram());
+		}
 	}
 
 	/**
@@ -552,5 +573,28 @@ public class IEditorRegistryTest extends TestCase {
 			((EditorRegistry) fReg).setFileEditorMappings(src);
 			((EditorRegistry) fReg).saveAssociations();
 		}
+	}
+
+	public void testAddContentTypeBinding_bug502837() {
+		IEditorDescriptor[] editors = fReg.getEditors("blah.bug502837");
+		assertEquals(1, editors.length);
+		assertEquals(MockEditorPart.ID1, editors[0].getId());
+	}
+
+	public void testRemoveContentType_bug520239() throws CoreException {
+		ContentTypeManager contentTypeManager = (ContentTypeManager) Platform.getContentTypeManager();
+		IContentType contentType = contentTypeManager.addContentType("bug520239", "bug520239", null);
+		contentType.addFileSpec("bug520239", IContentType.FILE_EXTENSION_SPEC);
+		assertArrayEquals("No editor should be bound by default", new IEditorDescriptor[0],
+				fReg.getEditors("blah.bug520239"));
+
+		IEditorDescriptor anEditor = ((EditorRegistry) fReg).getSortedEditorsFromPlugins()[0];
+		((EditorRegistry) fReg).addUserAssociation(contentType, anEditor);
+		assertArrayEquals("Missing editor association", new IEditorDescriptor[] { anEditor },
+				fReg.getEditors("blah.bug520239"));
+
+		contentTypeManager.removeContentType(contentType.getId());
+		assertArrayEquals("No editor should be bound after contenttype removal", new IEditorDescriptor[0],
+				fReg.getEditors("blah.bug520239"));
 	}
 }

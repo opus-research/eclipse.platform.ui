@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 IBM Corporation and others.
+ * Copyright (c) 2011, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,7 @@ import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.WorkbenchPartReference;
 
 public class APITestUtils {
-	private static Map<IEclipseContext, ISaveHandler> originalHandlers = new HashMap<IEclipseContext, ISaveHandler>();
+	private static Map<IEclipseContext, ISaveHandler> originalHandlers = new HashMap<>();
 	private static TestSaveHandler testSaveHandler = new TestSaveHandler();
 
 	static class TestSaveHandler extends PartServiceSaveHandler {
@@ -97,7 +97,6 @@ public class APITestUtils {
 		saveableHelperSetAutomatedResponse(response, context);
 
 		while (workbench.getDisplay().readAndDispatch()) {
-			;
 		}
 
 		for (MWindow window : application.getChildren()) {
@@ -105,13 +104,12 @@ public class APITestUtils {
 		}
 
 		while (workbench.getDisplay().readAndDispatch()) {
-			;
 		}
 	}
 
 	private static void saveableHelperSetAutomatedResponse(final int response,
 			IEclipseContext context) {
-		ISaveHandler saveHandler = (ISaveHandler) context.get(ISaveHandler.class.getName());
+		ISaveHandler saveHandler = context.get(ISaveHandler.class);
 		if (response == -1) {
 			context.set(ISaveHandler.class.getName(), originalHandlers.remove(context));
 		} else {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.eclipse.core.runtime.CoreException;
@@ -115,17 +114,16 @@ public final class Util {
 
             if (l != r) {
 				return l - r;
-			} else {
-                for (int i = 0; i < l; i++) {
-                    int compareTo = compare(left[i], right[i]);
+			}
+			for (int i = 0; i < l; i++) {
+				int compareTo = compare(left[i], right[i]);
 
-                    if (compareTo != 0) {
-						return compareTo;
-					}
-                }
+				if (compareTo != 0) {
+					return compareTo;
+				}
+			}
 
-                return 0;
-            }
+			return 0;
         }
     }
 
@@ -146,18 +144,16 @@ public final class Util {
 
             if (l != r) {
 				return l - r;
-			} else {
-                for (int i = 0; i < l; i++) {
-                    int compareTo = compare((Comparable) left.get(i),
-                            (Comparable) right.get(i));
+			}
+			for (int i = 0; i < l; i++) {
+				int compareTo = compare((Comparable) left.get(i), (Comparable) right.get(i));
 
-                    if (compareTo != 0) {
-						return compareTo;
-					}
-                }
+				if (compareTo != 0) {
+					return compareTo;
+				}
+			}
 
-                return 0;
-            }
+			return 0;
         }
     }
 
@@ -257,43 +253,41 @@ public final class Util {
     public static boolean endsWith(List left, List right, boolean equals) {
         if (left == null || right == null) {
 			return false;
-		} else {
-            int l = left.size();
-            int r = right.size();
+		}
+		int l = left.size();
+		int r = right.size();
 
-            if (r > l || !equals && r == l) {
+		if (r > l || !equals && r == l) {
+			return false;
+		}
+
+		for (int i = 0; i < r; i++) {
+			if (!equals(left.get(l - i - 1), right.get(r - i - 1))) {
 				return false;
 			}
+		}
 
-            for (int i = 0; i < r; i++) {
-				if (!equals(left.get(l - i - 1), right.get(r - i - 1))) {
-					return false;
-				}
-			}
-
-            return true;
-        }
+		return true;
     }
 
     public static boolean endsWith(Object[] left, Object[] right, boolean equals) {
         if (left == null || right == null) {
 			return false;
-		} else {
-            int l = left.length;
-            int r = right.length;
+		}
+		int l = left.length;
+		int r = right.length;
 
-            if (r > l || !equals && r == l) {
+		if (r > l || !equals && r == l) {
+			return false;
+		}
+
+		for (int i = 0; i < r; i++) {
+			if (!equals(left[l - i - 1], right[r - i - 1])) {
 				return false;
 			}
+		}
 
-            for (int i = 0; i < r; i++) {
-				if (!equals(left[l - i - 1], right[r - i - 1])) {
-					return false;
-				}
-			}
-
-            return true;
-        }
+		return true;
     }
 
     public static boolean equals(boolean left, boolean right) {
@@ -601,31 +595,6 @@ public final class Util {
 	}
 
 	/**
-	 * Returns the result of converting a list of comma-separated tokens into an array.
-	 * Used as a replacement for <code>String.split(String)</code>, to allow compilation
-	 * against JCL Foundation (bug 80053).
-	 *
-	 * @param prop the initial comma-separated string
-	 * @param separator the separator characters
-	 * @return the array of string tokens
-	 * @since 3.1
-	 */
-	public static String[] getArrayFromList(String prop, String separator) {
-		if (prop == null || prop.trim().equals("")) { //$NON-NLS-1$
-			return new String[0];
-		}
-		ArrayList list = new ArrayList();
-		StringTokenizer tokens = new StringTokenizer(prop, separator);
-		while (tokens.hasMoreTokens()) {
-			String token = tokens.nextToken().trim();
-			if (!token.equals("")) { //$NON-NLS-1$
-				list.add(token);
-			}
-		}
-		return list.isEmpty() ? new String[0] : (String[]) list.toArray(new String[list.size()]);
-	}
-
-	/**
 	 * Two {@link String}s presented in a list form.
 	 * This method can be used to form a longer list by providing a list for
 	 * <code>item1</code> and an item to append to the list for
@@ -670,11 +639,11 @@ public final class Util {
 	 */
 	public static String createList(Object[] items) {
 		String list = null;
-		for (int i = 0; i < items.length; i++) {
+		for (Object item : items) {
 			if(list == null) {
-				list = items[i].toString();
+				list = item.toString();
 			} else {
-				list = createList(list, items[i].toString());
+				list = createList(list, item.toString());
 			}
 		}
 		return safeString(list);
@@ -723,7 +692,7 @@ public final class Util {
 		IWorkbenchWindow windowToParentOn = activeWindow == null ? (workbench
 				.getWorkbenchWindowCount() > 0 ? workbench
 				.getWorkbenchWindows()[0] : null) : activeWindow;
-		return windowToParentOn == null ? null : activeWindow.getShell();
+		return windowToParentOn == null ? null : windowToParentOn.getShell();
 	}
 
 	/**

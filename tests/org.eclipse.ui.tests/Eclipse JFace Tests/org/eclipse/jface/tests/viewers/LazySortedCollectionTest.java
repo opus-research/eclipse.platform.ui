@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,12 +14,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import junit.framework.Assert;
+import org.eclipse.jface.viewers.deferred.LazySortedCollection;
+import org.junit.Assert;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import org.eclipse.jface.viewers.deferred.LazySortedCollection;
 
 /**
  * @since 3.1
@@ -40,7 +40,7 @@ public class LazySortedCollectionTest extends TestCase {
     // All operations will be done on both collections -- after each operation, the result
     // will be compared
     private LazySortedCollection collection;
-    private TreeSet comparisonCollection;
+	private TreeSet<Object> comparisonCollection;
 
     /**
      * Please don't add or remove from this set -- we rely on the exact insertion order
@@ -127,7 +127,7 @@ public class LazySortedCollectionTest extends TestCase {
         collection.enableDebug = true;
 
         comparisonComparator = new TestComparator();
-        comparisonCollection = new TreeSet(comparisonComparator);
+		comparisonCollection = new TreeSet<>(comparisonComparator);
 
         addAll(elements);
 
@@ -155,7 +155,7 @@ public class LazySortedCollectionTest extends TestCase {
     private Object[] computeExpectedElementsInRange(int start, int length) {
         int counter = 0;
 
-        Iterator iter = comparisonCollection.iterator();
+		Iterator<Object> iter = comparisonCollection.iterator();
         while(iter.hasNext() && counter < start) {
             iter.next();
             counter++;

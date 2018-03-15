@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,10 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
+import org.junit.Assert;
 
 /**
  * This view is used to test the creation and restoration of
@@ -77,7 +75,7 @@ public class SessionView extends MockViewPart {
     /**
      * Restore an IMemento.
      */
-    public void testMementoState(TestCase testCase) {
+	public void testMementoState() {
         // Verify that the memento was passed to us in
         // constructor.
         Assert.assertNotNull(memento);

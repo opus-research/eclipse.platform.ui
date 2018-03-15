@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,8 +33,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.Workbench;
@@ -86,18 +84,14 @@ public class WorkbenchThemeManager extends EventManager implements
 
 	private ITheme currentTheme;
 
-	private IPropertyChangeListener currentThemeListener = new IPropertyChangeListener() {
-
-		@Override
-		public void propertyChange(PropertyChangeEvent event) {
-			firePropertyChange(event);
-			if (event.getSource() instanceof FontRegistry) {
-				JFaceResources.getFontRegistry().put(event.getProperty(),
-						(FontData[]) event.getNewValue());
-			} else if (event.getSource() instanceof ColorRegistry) {
-				JFaceResources.getColorRegistry().put(event.getProperty(),
-						(RGB) event.getNewValue());
-			}
+	private IPropertyChangeListener currentThemeListener = event -> {
+		firePropertyChange(event);
+		if (event.getSource() instanceof FontRegistry) {
+			JFaceResources.getFontRegistry().put(event.getProperty(),
+					(FontData[]) event.getNewValue());
+		} else if (event.getSource() instanceof ColorRegistry) {
+			JFaceResources.getColorRegistry().put(event.getProperty(),
+					(RGB) event.getNewValue());
 		}
 	};
 
@@ -139,8 +133,8 @@ public class WorkbenchThemeManager extends EventManager implements
 
 		// copy the font values from preferences.
 		FontRegistry jfaceFonts = JFaceResources.getFontRegistry();
-		for (Iterator i = jfaceFonts.getKeySet().iterator(); i.hasNext();) {
-			String key = (String) i.next();
+		for (Object fontRegistryKey : jfaceFonts.getKeySet()) {
+			String key = (String) fontRegistryKey;
 			defaultThemeFontRegistry.put(key, jfaceFonts.getFontData(key));
 		}
 
@@ -153,12 +147,7 @@ public class WorkbenchThemeManager extends EventManager implements
 
 		final boolean highContrast = Display.getCurrent().getHighContrast();
 
-		Display.getCurrent().addListener(SWT.Settings, new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				updateThemes();
-			}
-		});
+		Display.getCurrent().addListener(SWT.Settings, event -> updateThemes());
 
 		// If in HC, *always* use the system default.
 		// This ignores any default theme set via plugin_customization.ini
@@ -168,8 +157,8 @@ public class WorkbenchThemeManager extends EventManager implements
 		PrefUtil.getAPIPreferenceStore().setDefault(
 				IWorkbenchPreferenceConstants.CURRENT_THEME_ID, themeId);
 
-		context = (IEclipseContext) Workbench.getInstance().getService(IEclipseContext.class);
-		eventBroker = (IEventBroker) Workbench.getInstance().getService(IEventBroker.class);
+		context = Workbench.getInstance().getService(IEclipseContext.class);
+		eventBroker = Workbench.getInstance().getService(IEventBroker.class);
 		if (eventBroker != null) {
 			eventBroker.subscribe(UIEvents.UILifeCycle.THEME_CHANGED, themeChangedHandler);
 			eventBroker.subscribe(IThemeEngine.Events.THEME_CHANGED, themeChangedHandler);
@@ -192,9 +181,8 @@ public class WorkbenchThemeManager extends EventManager implements
 
         IThemeDescriptor[] themeDescriptors = getThemeRegistry().getThemes();
 
-       	for (int i=0; i < themeDescriptors.length; i++) {
-        	IThemeDescriptor themeDescriptor = themeDescriptors[i];
-    		ITheme theme = (ITheme) themes.get(themeDescriptor);
+       	for (IThemeDescriptor themeDescriptor : themeDescriptors) {
+        	ITheme theme = (ITheme) themes.get(themeDescriptor);
     		//If theme is in our themes table then its already been populated
     		if (theme != null) {
                 ColorDefinition[] colorDefinitions = themeDescriptor.getColors();
@@ -239,10 +227,8 @@ public class WorkbenchThemeManager extends EventManager implements
 	}
 
 	protected void firePropertyChange(PropertyChangeEvent event) {
-		Object[] listeners = getListeners();
-
-		for (int i = 0; i < listeners.length; i++) {
-			((IPropertyChangeListener) listeners[i]).propertyChange(event);
+		for (Object listener : getListeners()) {
+			((IPropertyChangeListener) listener).propertyChange(event);
 		}
 	}
 
@@ -363,18 +349,16 @@ public class WorkbenchThemeManager extends EventManager implements
 			{
 				ColorRegistry jfaceColors = JFaceResources.getColorRegistry();
 				ColorRegistry themeColors = currentTheme.getColorRegistry();
-				for (Iterator i = themeColors.getKeySet().iterator(); i
-						.hasNext();) {
-					String key = (String) i.next();
+				for (Object themeColorKey : themeColors.getKeySet()) {
+					String key = (String) themeColorKey;
 					jfaceColors.put(key, themeColors.getRGB(key));
 				}
 			}
 			{
 				FontRegistry jfaceFonts = JFaceResources.getFontRegistry();
 				FontRegistry themeFonts = currentTheme.getFontRegistry();
-				for (Iterator i = themeFonts.getKeySet().iterator(); i
-						.hasNext();) {
-					String key = (String) i.next();
+				for (Object themeFontKey : themeFonts.getKeySet()) {
+					String key = (String) themeFontKey;
 					jfaceFonts.put(key, themeFonts.getFontData(key));
 				}
 			}
@@ -382,7 +366,7 @@ public class WorkbenchThemeManager extends EventManager implements
 				if (oldTheme != null && eventBroker != null) {
 					eventBroker.send(UIEvents.UILifeCycle.THEME_CHANGED, null);
 					eventBroker.send(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED,
-							context.get(MApplication.class.getName()));
+							context.get(MApplication.class));
 				}
 			}
 		}
@@ -405,11 +389,11 @@ public class WorkbenchThemeManager extends EventManager implements
 		}
 
 		protected IStylingEngine getStylingEngine() {
-			return (IStylingEngine) getContext().get(IStylingEngine.SERVICE_NAME);
+			return getContext().get(IStylingEngine.class);
 		}
 
 		protected ThemeRegistry getThemeRegistry() {
-			return (ThemeRegistry) getContext().get(IThemeRegistry.class.getName());
+			return (ThemeRegistry) getContext().get(IThemeRegistry.class);
 		}
 
 		protected FontRegistry getFontRegistry() {
@@ -421,8 +405,7 @@ public class WorkbenchThemeManager extends EventManager implements
 		}
 
 		protected void sendThemeRegistryRestyledEvent() {
-			IEventBroker eventBroker = (IEventBroker) getContext()
-					.get(IEventBroker.class.getName());
+			IEventBroker eventBroker = getContext().get(IEventBroker.class);
 			eventBroker.send(Events.THEME_REGISTRY_RESTYLED, null);
 		}
 
@@ -438,8 +421,7 @@ public class WorkbenchThemeManager extends EventManager implements
 			org.eclipse.e4.ui.css.swt.theme.ITheme theme = (org.eclipse.e4.ui.css.swt.theme.ITheme) event
 					.getProperty(IThemeEngine.Events.THEME);
 			if (theme == null) {
-				IThemeEngine themeEngine = (IThemeEngine) getContext().get(
-						IThemeEngine.class.getName());
+				IThemeEngine themeEngine = getContext().get(IThemeEngine.class);
 				theme = themeEngine != null ? themeEngine.getActiveTheme() : null;
 			}
 			return theme;
@@ -557,13 +539,12 @@ public class WorkbenchThemeManager extends EventManager implements
 		}
 
 		protected org.eclipse.e4.ui.css.swt.theme.ITheme getTheme() {
-			IThemeEngine themeEngine = (IThemeEngine) getContext()
-					.get(IThemeEngine.class.getName());
+			IThemeEngine themeEngine = getContext().get(IThemeEngine.class);
 			return themeEngine != null ? themeEngine.getActiveTheme() : null;
 		}
 
 		protected ThemeRegistry getThemeRegistry() {
-			return (ThemeRegistry) getContext().get(IThemeRegistry.class.getName());
+			return (ThemeRegistry) getContext().get(IThemeRegistry.class);
 		}
 
 		protected FontRegistry getFontRegistry() {
@@ -583,8 +564,7 @@ public class WorkbenchThemeManager extends EventManager implements
 		}
 
 		protected void sendThemeDefinitionChangedEvent() {
-			MApplication application = (MApplication) getContext()
-					.get(MApplication.class.getName());
+			MApplication application = getContext().get(MApplication.class);
 			getInstance().eventBroker.send(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED,
 					application);
 		}

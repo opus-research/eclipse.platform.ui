@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -140,48 +140,35 @@ public abstract class OperationHistoryActionHandler extends Action implements
 			case OperationHistoryEvent.UNDONE:
 			case OperationHistoryEvent.REDONE:
 				if (event.getOperation().hasContext(undoContext)) {
-					display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							update();
-						}
-					});
+					display.asyncExec(() -> update());
 				}
 				break;
 			case OperationHistoryEvent.OPERATION_NOT_OK:
 				if (event.getOperation().hasContext(undoContext)) {
-					display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							if (pruning) {
-								IStatus status = event.getStatus();
-								/*
-								 * Prune the history unless we can determine
-								 * that this was a cancelled attempt. See
-								 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=101215
-								 */
-								if (status == null
-										|| status.getSeverity() != IStatus.CANCEL) {
-									flush();
-								}
-								// not all flushes will trigger an update so
-								// force it here
-								update();
-							} else {
-								update();
+					display.asyncExec(() -> {
+						if (pruning) {
+							IStatus status = event.getStatus();
+							/*
+							 * Prune the history unless we can determine
+							 * that this was a cancelled attempt. See
+							 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=101215
+							 */
+							if (status == null
+									|| status.getSeverity() != IStatus.CANCEL) {
+								flush();
 							}
+							// not all flushes will trigger an update so
+							// force it here
+							update();
+						} else {
+							update();
 						}
 					});
 				}
 				break;
 			case OperationHistoryEvent.OPERATION_CHANGED:
 				if (event.getOperation() == getOperation()) {
-					display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							update();
-						}
-					});
+					display.asyncExec(() -> update());
 				}
 				break;
 			}
@@ -300,20 +287,16 @@ public abstract class OperationHistoryActionHandler extends Action implements
 		progressDialog = new TimeTriggeredProgressMonitorDialog(parent,
 				getWorkbenchWindow().getWorkbench().getProgressService()
 						.getLongOperationTime());
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			@Override
-			public void run(IProgressMonitor pm)
-					throws InvocationTargetException {
-				try {
-					runCommand(pm);
-				} catch (ExecutionException e) {
-					if (pruning) {
-						flush();
-					}
-					throw new InvocationTargetException(e);
-				}
-			}
-		};
+		IRunnableWithProgress runnable = pm -> {
+try {
+		runCommand(pm);
+} catch (ExecutionException e) {
+		if (pruning) {
+			flush();
+		}
+		throw new InvocationTargetException(e);
+}
+};
 		try {
 			boolean runInBackground = false;
 			if (getOperation() instanceof IAdvancedUndoableOperation2) {
@@ -341,26 +324,25 @@ public abstract class OperationHistoryActionHandler extends Action implements
 
 	abstract IStatus runCommand(IProgressMonitor pm) throws ExecutionException;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getAdapter(Class<T> adapter) {
 		if (adapter.equals(IUndoContext.class)) {
-			return (T) undoContext;
+			return adapter.cast(undoContext);
 		}
 		if (adapter.equals(IProgressMonitor.class)) {
 			if (progressDialog != null) {
-				return (T) progressDialog.getProgressMonitor();
+				return adapter.cast(progressDialog.getProgressMonitor());
 			}
 		}
 		if (site != null) {
 			if (adapter.equals(Shell.class)) {
-				return (T) getWorkbenchWindow().getShell();
+				return adapter.cast(getWorkbenchWindow().getShell());
 			}
 			if (adapter.equals(IWorkbenchWindow.class)) {
-				return (T) getWorkbenchWindow();
+				return adapter.cast(getWorkbenchWindow());
 			}
 			if (adapter.equals(IWorkbenchPart.class)) {
-				return (T) site.getPart();
+				return adapter.cast(site.getPart());
 			}
 			// Refer all other requests to the part itself.
 			// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=108144
@@ -460,7 +442,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 	private String shortenText(String message) {
 		int length = message.length();
 		if (length > MAX_LABEL_LENGTH) {
-			StringBuffer result = new StringBuffer();
+			StringBuilder result = new StringBuilder();
 			int end = MAX_LABEL_LENGTH / 2 - 1;
 			result.append(message.substring(0, end));
 			result.append("..."); //$NON-NLS-1$

@@ -11,11 +11,13 @@
 package org.eclipse.jface.viewers;
 
 import java.util.Arrays;
+import java.util.function.Supplier;
 
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageDataProvider;
 import org.eclipse.swt.graphics.Point;
 
 /**
@@ -23,51 +25,56 @@ import org.eclipse.swt.graphics.Point;
  * to overlay decoration images on to the 4 corner quadrants of a base image.
  * The four quadrants are {@link IDecoration#TOP_LEFT}, {@link IDecoration#TOP_RIGHT},
  * {@link IDecoration#BOTTOM_LEFT} and {@link IDecoration#BOTTOM_RIGHT}. Additionally,
- * the overlay can be used to provide an underlay corresponding to {@link IDecoration#UNDERLAY}.
+ * the overlay can be used to provide an underlay corresponding to {@link IDecoration#UNDERLAY},
+ * and to replace the base image with {@link IDecoration#REPLACE} (if supported by the context).
  *
  * @since 3.3
  * @see IDecoration
  */
 public class DecorationOverlayIcon extends CompositeImageDescriptor {
 
-    // the base image
-    private Image base;
+	private Object referenceImageOrDescriptor;
 
     // the overlay images
     private ImageDescriptor[] overlays;
 
-    // the size
-    private Point size;
+	private ImageDataProvider baseImageDataProvider;
+
+	/**
+	 * The size of the base image (that's also the size of this composite image)
+	 */
+	private Supplier<Point> size;
 
     /**
      * Create the decoration overlay for the base image using the array of
      * provided overlays. The indices of the array correspond to the values
-     * of the 5 overlay constants defined on {@link IDecoration}
+     * of the 6 overlay constants defined on {@link IDecoration}
      * ({@link IDecoration#TOP_LEFT}, {@link IDecoration#TOP_RIGHT},
-     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT}
-     * and{@link IDecoration#UNDERLAY}).
+     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT},
+     * {@link IDecoration#UNDERLAY}, and {@link IDecoration#REPLACE}).
      *
      * @param baseImage the base image
-     * @param overlaysArray the overlay images
+     * @param overlaysArray the overlay images, may contain null values
      * @param sizeValue the size of the resulting image
      */
     public DecorationOverlayIcon(Image baseImage,
             ImageDescriptor[] overlaysArray, Point sizeValue) {
-        this.base = baseImage;
+		this.referenceImageOrDescriptor = baseImage;
         this.overlays = overlaysArray;
-        this.size = sizeValue;
+		this.baseImageDataProvider = createCachedImageDataProvider(baseImage);
+		this.size = () -> sizeValue;
     }
 
     /**
      * Create the decoration overlay for the base image using the array of
      * provided overlays. The indices of the array correspond to the values
-     * of the 5 overlay constants defined on {@link IDecoration}
+     * of the 6 overlay constants defined on {@link IDecoration}
      * ({@link IDecoration#TOP_LEFT}, {@link IDecoration#TOP_RIGHT},
-     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT}
-     * and {@link IDecoration#UNDERLAY}).
+     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT},
+     * {@link IDecoration#UNDERLAY}, and {@link IDecoration#REPLACE}).
      *
      * @param baseImage the base image
-     * @param overlaysArray the overlay images
+     * @param overlaysArray the overlay images, may contain null values
      */
     public DecorationOverlayIcon(Image baseImage, ImageDescriptor[] overlaysArray) {
     	this(baseImage, overlaysArray, new Point(baseImage.getBounds().width, baseImage.getBounds().height));
@@ -85,6 +92,40 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 	 */
 	public DecorationOverlayIcon(Image baseImage, ImageDescriptor overlayImage, int quadrant) {
 		this(baseImage, createArrayFrom(overlayImage, quadrant));
+	}
+
+	/**
+	 * Create a decoration overlay icon that will place the given overlay icon
+	 * in the given quadrant of the base image descriptor.
+	 *
+	 * @param baseImageDescriptor
+	 *            the base image descriptor
+	 * @param overlayImageDescriptor
+	 *            the overlay image descriptor
+	 * @param quadrant
+	 *            the quadrant (one of {@link IDecoration}
+	 *            ({@link IDecoration#TOP_LEFT}, {@link IDecoration#TOP_RIGHT},
+	 *            {@link IDecoration#BOTTOM_LEFT},
+	 *            {@link IDecoration#BOTTOM_RIGHT} or
+	 *            {@link IDecoration#UNDERLAY})
+	 * @since 3.13
+	 */
+	public DecorationOverlayIcon(ImageDescriptor baseImageDescriptor, ImageDescriptor overlayImageDescriptor,
+			int quadrant) {
+		this.referenceImageOrDescriptor = baseImageDescriptor;
+		this.overlays = createArrayFrom(overlayImageDescriptor, quadrant);
+		this.baseImageDataProvider = createCachedImageDataProvider(baseImageDescriptor);
+		this.size = () -> {
+			int zoomLevel = getZoomLevel();
+			if (zoomLevel != 0) {
+				ImageData data = baseImageDataProvider.getImageData(zoomLevel);
+				if (data != null) {
+					return new Point(autoScaleDown(data.width), autoScaleDown(data.height));
+				}
+			}
+			ImageData data = baseImageDataProvider.getImageData(100);
+			return new Point(data.width, data.height);
+		};
 	}
 
 	/**
@@ -111,46 +152,45 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
             if (overlay == null) {
 				continue;
 			}
-            ImageData overlayData = overlay.getImageData();
-            //Use the missing descriptor if it is not there.
-            if (overlayData == null) {
-				overlayData = ImageDescriptor.getMissingImageDescriptor()
-                        .getImageData();
-			}
+            CachedImageDataProvider overlayImageProvider = createCachedImageDataProvider(overlay);
+
             switch (i) {
             case IDecoration.TOP_LEFT:
-                drawImage(overlayData, 0, 0);
+				drawImage(overlayImageProvider, 0, 0);
                 break;
             case IDecoration.TOP_RIGHT:
-                drawImage(overlayData, size.x - overlayData.width, 0);
+				int overlayWidth = overlayImageProvider.getWidth();
+				drawImage(overlayImageProvider, getSize().x - overlayWidth, 0);
                 break;
             case IDecoration.BOTTOM_LEFT:
-                drawImage(overlayData, 0, size.y - overlayData.height);
+				int overlayHeight = overlayImageProvider.getHeight();
+				drawImage(overlayImageProvider, 0, getSize().y - overlayHeight);
                 break;
             case IDecoration.BOTTOM_RIGHT:
-                drawImage(overlayData, size.x - overlayData.width, size.y
-                        - overlayData.height);
+				overlayWidth = overlayImageProvider.getWidth();
+				overlayHeight = overlayImageProvider.getHeight();
+				drawImage(overlayImageProvider, getSize().x - overlayWidth, getSize().y - overlayHeight);
                 break;
             }
         }
     }
 
-    @Override
+	@Override
 	public boolean equals(Object o) {
         if (!(o instanceof DecorationOverlayIcon)) {
 			return false;
 		}
         DecorationOverlayIcon other = (DecorationOverlayIcon) o;
-        return base.equals(other.base)
+		return referenceImageOrDescriptor.equals(other.referenceImageOrDescriptor)
                 && Arrays.equals(overlays, other.overlays);
     }
 
     @Override
 	public int hashCode() {
-        int code = System.identityHashCode(base);
-        for (int i = 0; i < overlays.length; i++) {
-            if (overlays[i] != null) {
-				code ^= overlays[i].hashCode();
+		int code = System.identityHashCode(referenceImageOrDescriptor);
+        for (ImageDescriptor overlay : overlays) {
+            if (overlay != null) {
+				code ^= overlay.hashCode();
 			}
         }
         return code;
@@ -161,25 +201,25 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
     	if (overlays.length > IDecoration.UNDERLAY) {
 	        ImageDescriptor underlay = overlays[IDecoration.UNDERLAY];
 	        if (underlay != null) {
-				drawImage(underlay.getImageData(), 0, 0);
+				drawImage(createCachedImageDataProvider(underlay), 0, 0);
 			}
     	}
     	if (overlays.length > IDecoration.REPLACE && overlays[IDecoration.REPLACE] != null) {
-    		drawImage(overlays[IDecoration.REPLACE].getImageData(), 0, 0);
+    		drawImage(createCachedImageDataProvider(overlays[IDecoration.REPLACE]), 0, 0);
     	} else {
-    		drawImage(base.getImageData(), 0, 0);
+			drawImage(baseImageDataProvider, 0, 0);
     	}
         drawOverlays(overlays);
     }
 
-    @Override
+	@Override
 	protected Point getSize() {
-        return size;
+		return size.get();
     }
 
     @Override
 	protected int getTransparentPixel() {
-    	return base.getImageData().transparentPixel;
+		return baseImageDataProvider.getImageData(100).transparentPixel;
     }
 
 }

@@ -158,8 +158,8 @@ public class CheckboxTreeViewerTest extends TreeViewerTest {
 
     	TestElement[] expected = fRootElement.getChildren();
 
-    	for (Iterator i = provider.isCheckedInvokedOn.iterator(); i.hasNext();) {
-			TestElement element = (TestElement) i.next();
+		for (TestElement testElement : provider.isCheckedInvokedOn) {
+			TestElement element = testElement;
 			boolean firstLevelElement = false;
 			for (int j = 0; j < expected.length && !firstLevelElement; j++) {
 				firstLevelElement = element.equals(expected[j]);
@@ -167,8 +167,8 @@ public class CheckboxTreeViewerTest extends TreeViewerTest {
 			assertTrue("The check provider should only be invoked with visible elements", firstLevelElement);
 		}
 
-    	for (Iterator i = provider.isGrayedInvokedOn.iterator(); i.hasNext();) {
-			TestElement element = (TestElement) i.next();
+		for (TestElement testElement : provider.isGrayedInvokedOn) {
+			TestElement element = testElement;
 			boolean firstLevelElement = false;
 			for (int j = 0; j < expected.length && !firstLevelElement; j++) {
 				firstLevelElement = element.equals(expected[j]);
@@ -262,13 +262,11 @@ public class CheckboxTreeViewerTest extends TreeViewerTest {
     	checkAllStates("Testing checkbox state with a sorter", ctv, 0);
 
     	//Check that the provider is only invoked on elements which pass the filter
-    	for (Iterator i = checkStateProvider.isCheckedInvokedOn.iterator(); i.hasNext();) {
-			TestElement element = (TestElement) i.next();
+		for (TestElement element : checkStateProvider.isCheckedInvokedOn) {
 			assertTrue("The check provider should not be invoked on elements which did not get through the filter", filter.select(ctv, null, element));
 		}
 
-    	for (Iterator i = checkStateProvider.isGrayedInvokedOn.iterator(); i.hasNext();) {
-			TestElement element = (TestElement) i.next();
+		for (TestElement element : checkStateProvider.isGrayedInvokedOn) {
 			assertTrue("The check provider should not be invoked on elements which did not get through the filter", filter.select(ctv, null, element));
 		}
     }
@@ -292,7 +290,7 @@ public class CheckboxTreeViewerTest extends TreeViewerTest {
     	checkAllStates("Testing checkbox state after setting new check provider", ctv, 1);
     }
 
-    private void collectElementsInBranch(TreeItem item, Collection treeItems, Collection testElements) {
+	private void collectElementsInBranch(TreeItem item, Collection<TreeItem> treeItems, Collection testElements) {
     	treeItems.add(item);
     	testElements.add(item.getData());
     	TreeItem[] children = item.getItems();
@@ -302,12 +300,12 @@ public class CheckboxTreeViewerTest extends TreeViewerTest {
     }
 
     private void checkAllStates(String comment, CheckboxTreeViewer ctv, int shift) {
-    	List items = new ArrayList();
-    	List elements = new ArrayList();
+		List<TreeItem> items = new ArrayList<>();
+		List<TestElement> elements = new ArrayList<>();
     	collectElementsInBranch(ctv.getTree().getItem(0), items, elements);
 
     	//Check that actual states were set properly
-    	for (Iterator i = items.iterator(), j = elements.iterator(); i.hasNext();) {
+		for (Iterator i = items.iterator(), j = elements.iterator(); i.hasNext();) {
     		TreeItem item = (TreeItem)i.next();
     		TestElement element = (TestElement)j.next();
 
@@ -345,7 +343,7 @@ public class CheckboxTreeViewerTest extends TreeViewerTest {
 
 		TestElement[] children = fRootElement.getChildren();
 
-		List checked = new ArrayList((children.length + 1) / 2);
+		List<TestElement> checked = new ArrayList<>((children.length + 1) / 2);
 
 		for (int i = 0; i < children.length; i+=2) {
 			ctv.setChecked(children[i], true);
@@ -366,7 +364,7 @@ public class CheckboxTreeViewerTest extends TreeViewerTest {
 
 		TestElement[] children = fRootElement.getChildren();
 
-		List toCheck = new ArrayList((children.length + 1) / 2);
+		List<TestElement> toCheck = new ArrayList<>((children.length + 1) / 2);
 
 		for (int i = 0; i < children.length; i+=2) {
 			toCheck.add(children[i]);
@@ -388,7 +386,7 @@ public class CheckboxTreeViewerTest extends TreeViewerTest {
 
 		TestElement[] children = fRootElement.getChildren();
 
-		List toGray = new ArrayList((children.length + 1) / 2);
+		List<TestElement> toGray = new ArrayList<>((children.length + 1) / 2);
 
 		for (int i = 0; i < children.length; i+=2) {
 			toGray.add(children[i]);

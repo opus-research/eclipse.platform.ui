@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,19 +32,9 @@ public class Mocks {
 		public boolean equals(Object o1, Object o2);
 	}
 
-	private static EqualityComparator defaultEqualityComparator = new EqualityComparator() {
-		@Override
-		public boolean equals(Object o1, Object o2) {
-			return o1 == null ? o2 == null : o1.equals(o2);
-		}
-	};
+	private static EqualityComparator defaultEqualityComparator = (o1, o2) -> o1 == null ? o2 == null : o1.equals(o2);
 
-	private static EqualityComparator indifferentEqualityComparator = new EqualityComparator() {
-		@Override
-		public boolean equals(Object o1, Object o2) {
-			return true;
-		}
-	};
+	private static EqualityComparator indifferentEqualityComparator = (o1, o2) -> true;
 
 	private static interface Mock {
 		public MockInvocationHandler getMockInvocationHandler();
@@ -118,7 +108,7 @@ public class Mocks {
 
 		List<MethodCall> previousCallHistory = null;
 
-		List<MethodCall> currentCallHistory = new ArrayList<MethodCall>();
+		List<MethodCall> currentCallHistory = new ArrayList<>();
 
 		private final boolean ordered;
 
@@ -177,25 +167,25 @@ public class Mocks {
 							: Boolean.FALSE;
 				} else if (returnType == byte.class) {
 					result = (returnValue != null) ? (Byte) returnValue
-							: new Byte((byte) 0);
+							: Byte.valueOf((byte) 0);
 				} else if (returnType == char.class) {
 					result = (returnValue != null) ? (Character) returnValue
-							: new Character((char) 0);
+							: Character.valueOf((char) 0);
 				} else if (returnType == short.class) {
 					result = (returnValue != null) ? (Short) returnValue
-							: new Short((short) 0);
+							: Short.valueOf((short) 0);
 				} else if (returnType == int.class) {
 					result = (returnValue != null) ? (Integer) returnValue
 							: Integer.valueOf(0);
 				} else if (returnType == long.class) {
 					result = (returnValue != null) ? (Long) returnValue
-							: new Long(0);
+							: Long.valueOf(0);
 				} else if (returnType == float.class) {
 					result = (returnValue != null) ? (Float) returnValue
-							: new Float(0);
+							: Float.valueOf(0);
 				} else if (returnType == double.class) {
 					result = (returnValue != null) ? (Double) returnValue
-							: new Double(0);
+							: Double.valueOf(0);
 				}
 
 				return result;
@@ -205,7 +195,7 @@ public class Mocks {
 
 		public void replay() {
 			previousCallHistory = currentCallHistory;
-			currentCallHistory = new ArrayList<MethodCall>();
+			currentCallHistory = new ArrayList<>();
 		}
 
 		public void verify() {
@@ -244,7 +234,7 @@ public class Mocks {
 
 		public void reset() {
 			previousCallHistory = null;
-			currentCallHistory = new ArrayList<MethodCall>();
+			currentCallHistory = new ArrayList<>();
 		}
 
 		public void setLastReturnValue(Object object) {
