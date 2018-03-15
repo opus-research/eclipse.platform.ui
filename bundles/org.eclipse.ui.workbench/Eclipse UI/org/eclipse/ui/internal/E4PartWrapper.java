@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016 David Berger <david.berger@logicals.com> and others.
+ * Copyright (c) 2014 David Berger <david.berger@logicals.com> and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,21 +21,9 @@ public class E4PartWrapper extends ViewPart {
 	public static final String E4_WRAPPER_KEY = "e4Wrapper"; //$NON-NLS-1$
 	MPart wrappedPart;
 
-	private E4PartWrapper(MPart part) {
+	public E4PartWrapper(MPart part) {
 		wrappedPart = part;
 		setPartName(part.getLabel());
-	}
-
-	public static E4PartWrapper getE4PartWarapper(MPart part) {
-		if (part != null) {
-			if (part.getTransientData().get(E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-				return (E4PartWrapper) part.getTransientData().get(E4_WRAPPER_KEY);
-			}
-			E4PartWrapper newWrapper = new E4PartWrapper(part);
-			part.getTransientData().put(E4_WRAPPER_KEY, newWrapper);
-			return newWrapper;
-		}
-		return null;
 	}
 
 	@Override
