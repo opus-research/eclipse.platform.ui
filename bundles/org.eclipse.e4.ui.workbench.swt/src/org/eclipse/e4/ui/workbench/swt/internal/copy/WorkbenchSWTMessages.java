@@ -10,7 +10,7 @@
  * Sebastian Davids - bug 128529
  * Semion Chichelnitsky (semion@il.ibm.com) - bug 278064
  *******************************************************************************/
-package org.eclipse.e4.ui.internal.workbench.swt;
+package org.eclipse.e4.ui.workbench.swt.internal.copy;
 
 import org.eclipse.osgi.util.NLS;
 
