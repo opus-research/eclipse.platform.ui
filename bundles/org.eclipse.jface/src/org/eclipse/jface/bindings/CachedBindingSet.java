@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.jface.bindings;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
@@ -221,13 +222,13 @@ final class CachedBindingSet {
 		if (!Util.equals(activeContextTree, other.activeContextTree)) {
 			return false;
 		}
-		if (!Util.equals(locales, other.locales)) {
+		if (!Arrays.equals(locales, other.locales)) {
 			return false;
 		}
-		if (!Util.equals(platforms, other.platforms)) {
+		if (!Arrays.equals(platforms, other.platforms)) {
 			return false;
 		}
-		return Util.equals(schemeIds, other.schemeIds);
+		return Arrays.equals(schemeIds, other.schemeIds);
 	}
 
 	/**
