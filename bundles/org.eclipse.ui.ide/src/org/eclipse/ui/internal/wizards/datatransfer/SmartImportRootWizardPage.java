@@ -121,7 +121,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 	private Label selectionSummary;
 	protected Map<File, List<ProjectConfigurator>> potentialProjects = Collections.emptyMap();
 	// Configuration part
-	private boolean importClosed = false;
 	private boolean detectNestedProjects = true;
 	private boolean configureProjects = true;
 	// Working sets
@@ -464,12 +463,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 	 * Creates the UI elements for the import options
 	 */
 	private void createConfigurationOptions(Composite parent) {
-		Button importClosedCheckbox = new Button(parent, SWT.CHECK);
-		importClosedCheckbox.setText(DataTransferMessages.SmartImportWizardPage_importClosed);
-		importClosedCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
-		importClosedCheckbox.addSelectionListener(
-				SelectionListener.widgetSelectedAdapter(e -> importClosed = importClosedCheckbox.getSelection()));
-
 		Link showDetectorsLink = new Link(parent, SWT.NONE);
 		showDetectorsLink.setText(DataTransferMessages.SmartImportWizardPage_showAvailableDetectors);
 		GridData layoutData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1);
@@ -518,6 +511,9 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 	}
 
+	/**
+	 * @param res
+	 */
 	private Composite createProposalsGroup(Composite parent) {
 		Composite res = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(res);
@@ -681,6 +677,10 @@ public class SmartImportRootWizardPage extends WizardPage {
 		return res;
 	}
 
+	/**
+	 * @param element
+	 * @return
+	 */
 	protected boolean isExistingProject(File element) {
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
 			IPath location = project.getLocation();
@@ -801,10 +801,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 	 */
 	public boolean isConfigureProjects() {
 		return this.configureProjects;
-	}
-
-	boolean getImportClosed() {
-		return importClosed;
 	}
 
 	private void refreshProposals() {

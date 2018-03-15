@@ -61,6 +61,10 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 		private File archive;
 		private File destination;
 
+		/**
+		 * @param archive
+		 * @param destination
+		 */
 		private ExpandArchiveIntoFilesystemOperation(File archive, File destination) {
 			this.archive = archive;
 			this.destination = destination;
@@ -136,7 +140,7 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 	private File initialSelection;
 	private Set<IWorkingSet> initialWorkingSets = new HashSet<>();
 	private SmartImportRootWizardPage projectRootPage;
-	private SmartImportJob smartImportJob;
+	private SmartImportJob easymportJob;
 	/**
 	 * the selected directory or the directory when archive got expanded
 	 */
@@ -181,12 +185,12 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 		if (selection != null) {
 			for (Object item : selection.toList()) {
 				File asFile = toFile(item);
-				if (asFile != null && initialSelection == null) {
-					initialSelection = asFile;
+				if (asFile != null && this.initialSelection == null) {
+					this.initialSelection = asFile;
 				} else {
 					IWorkingSet asWorkingSet = Adapters.adapt(item, IWorkingSet.class);
 					if (asWorkingSet != null) {
-						initialWorkingSets.add(asWorkingSet);
+						this.initialWorkingSets.add(asWorkingSet);
 					}
 				}
 			}
@@ -233,8 +237,8 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 
 	@Override
 	public void addPages() {
-		projectRootPage = new SmartImportRootWizardPage(this, initialSelection, initialWorkingSets);
-		addPage(projectRootPage);
+		this.projectRootPage = new SmartImportRootWizardPage(this, this.initialSelection, this.initialWorkingSets);
+		addPage(this.projectRootPage);
 	}
 
 	@Override
@@ -243,9 +247,9 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 		if (previousProposals == null) {
 			previousProposals = new String[0];
 		}
-		if (!Arrays.asList(previousProposals).contains(projectRootPage.getSelectedRoot().getAbsolutePath())) {
+		if (!Arrays.asList(previousProposals).contains(this.projectRootPage.getSelectedRoot().getAbsolutePath())) {
 			String[] newProposals = new String[previousProposals.length + 1];
-			newProposals[0] = projectRootPage.getSelectedRoot().getAbsolutePath();
+			newProposals[0] = this.projectRootPage.getSelectedRoot().getAbsolutePath();
 			System.arraycopy(previousProposals, 0, newProposals, 1, previousProposals.length);
 			getDialogSettings().put(SmartImportRootWizardPage.IMPORTED_SOURCES, newProposals);
 		}
@@ -267,31 +271,30 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 	 * @return the import job
 	 */
 	public SmartImportJob getImportJob() {
-		final File root = projectRootPage.getSelectedRoot();
+		final File root = this.projectRootPage.getSelectedRoot();
 		if (root == null) {
 			return null;
 		}
  		if (root.isDirectory()) {
-			directoryToImport = root;
+ 			this.directoryToImport = root;
 		} else if (SmartImportWizard.isValidArchive(root)) {
-			directoryToImport = getExpandDirectory(root);
+			this.directoryToImport = getExpandDirectory(root);
 			if (!directoryToImport.isDirectory()) {
 				throw new IllegalArgumentException("Archive wasn't expanded first"); //$NON-NLS-1$
 			}
 		} else {
 			return null;
  		}
-		if (smartImportJob == null || !matchesPage(smartImportJob, projectRootPage)) {
-			smartImportJob = new SmartImportJob(directoryToImport, projectRootPage.getSelectedWorkingSets(),
+		if (this.easymportJob == null || !matchesPage(this.easymportJob, this.projectRootPage)) {
+			this.easymportJob = new SmartImportJob(this.directoryToImport, projectRootPage.getSelectedWorkingSets(),
 					projectRootPage.isConfigureProjects(), projectRootPage.isDetectNestedProject());
 		}
-		if (smartImportJob != null) {
+		if (this.easymportJob != null) {
 			// always update working set on request as the job isn't updated on
 			// WS change automatically
-			smartImportJob.setWorkingSets(projectRootPage.getSelectedWorkingSets());
-			smartImportJob.setImportClosed(projectRootPage.getImportClosed());
+			this.easymportJob.setWorkingSets(projectRootPage.getSelectedWorkingSets());
 		}
-		return smartImportJob;
+		return this.easymportJob;
 	}
 
 	static boolean isValidArchive(File file) {
@@ -304,7 +307,7 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 		if (!isValidArchive(archive)) {
 			throw new IllegalArgumentException("Input must be an archive"); //$NON-NLS-1$
 		}
-		directoryToImport = getExpandDirectory(archive);
+		this.directoryToImport = getExpandDirectory(archive);
 		ExpandArchiveIntoFilesystemOperation expandOperation = new ExpandArchiveIntoFilesystemOperation(archive,
 				directoryToImport);
 		expandOperation.run(monitor);
