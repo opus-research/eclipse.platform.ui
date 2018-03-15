@@ -169,20 +169,9 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 			createRecentWorkspacesComposite = true;
 		}
         createWorkspaceBrowseRow(composite);
-
-		Composite checkboxPanel = new Composite(composite, SWT.NONE);
-		checkboxPanel.setFont(parent.getFont());
-		GridLayout layout = new GridLayout(1, false);
-		layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
-		checkboxPanel.setLayout(layout);
-		GridData data = new GridData(GridData.FILL_BOTH);
-		data.verticalAlignment = GridData.END;
-		checkboxPanel.setLayoutData(data);
-
         if (!suppressAskAgain) {
-			createShowDialogButton(checkboxPanel);
+			createShowDialogButton(composite);
 		}
-		createPromptForCopyPreferences(checkboxPanel);
 		if (createRecentWorkspacesComposite) {
 			createRecentWorkspacesComposite(composite);
 		}
@@ -198,26 +187,6 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
-	private void createPromptForCopyPreferences(Composite parent) {
-		Composite panel = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
-		layout.marginWidth = 0;
-		panel.setLayout(layout);
-
-		Button promptUserToCopyPreferencesButton = new Button(panel, SWT.CHECK);
-		promptUserToCopyPreferencesButton
-				.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_promptToImportPreferencesButtonLabel);
-
-		Link link = new Link(panel, SWT.WRAP);
-		link.setText("<a>" + "No workspace selected" + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		link.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				ImportPreferencesDialog copyPreferencesDialog = new ImportPreferencesDialog(getShell(), launchData);
-				copyPreferencesDialog.open();
-			}
-		});
-	}
 	/**
 	 * Returns the title that the dialog (or splash) should have.
 	 *
@@ -535,7 +504,18 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
      * The show dialog button allows the user to choose to neven be nagged again.
      */
     private void createShowDialogButton(Composite parent) {
-		Button button = new Button(parent, SWT.CHECK);
+        Composite panel = new Composite(parent, SWT.NONE);
+        panel.setFont(parent.getFont());
+
+        GridLayout layout = new GridLayout(1, false);
+        layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+        panel.setLayout(layout);
+
+        GridData data = new GridData(GridData.FILL_BOTH);
+        data.verticalAlignment = GridData.END;
+        panel.setLayoutData(data);
+
+        Button button = new Button(panel, SWT.CHECK);
         button.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_useDefaultMessage);
         button.setSelection(!launchData.getShowDialog());
         button.addSelectionListener(new SelectionAdapter() {
