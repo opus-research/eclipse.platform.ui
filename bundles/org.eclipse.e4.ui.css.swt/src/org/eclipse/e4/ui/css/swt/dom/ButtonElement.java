@@ -72,7 +72,7 @@ public class ButtonElement extends ControlElement {
 
 	@Override
 	public boolean isPseudoInstanceOf(String s) {
-		if ("checked".equals(s)) {
+		if ("checked".equalsIgnoreCase(s)) {
 			return this.isSelected;
 		}
 		return super.isPseudoInstanceOf(s);
