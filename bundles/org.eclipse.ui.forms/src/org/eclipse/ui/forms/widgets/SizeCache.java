@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Ralf Petter <ralf.petter@gmail.com> - Bug 510232
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -523,7 +524,7 @@ public class SizeCache {
     public void layoutIfNecessary() {
         if (dirtySize != null && control != null && control instanceof Composite) {
             if (control.getSize().equals(dirtySize)) {
-	            ((Composite)control).layout(flushChildren);
+				((Composite) control).layout();
 	            flushChildren = false;
             }
         }
