@@ -475,7 +475,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 						return false;
 					}
 
-					record.updateVisibility(parentContext.getActiveLeaf(), manager);
+					record.updateVisibility(parentContext.getActiveLeaf());
 					runExternalCode(() -> {
 						manager.update(false);
 						getUpdater().updateContributionItems(ALL_SELECTOR);
