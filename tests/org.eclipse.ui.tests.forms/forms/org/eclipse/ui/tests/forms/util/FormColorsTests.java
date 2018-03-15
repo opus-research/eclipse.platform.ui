@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Ralf M Petter<ralf.petter@gmail.com> - Bug 510241, 510830
+ *     Ralf M Petter<ralf.petter@gmail.com> - Bug 510241
  *******************************************************************************/
 
 package org.eclipse.ui.tests.forms.util;
@@ -23,7 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
-public class FormColorsTest {
+public class FormColorsTests {
 
 	// these keys should always return a Color until disposed
 	private static String[] KEYS_NON_NULL = {
@@ -70,11 +70,11 @@ public class FormColorsTest {
 		Assert.assertEquals("FormColors did not return the same instance for getForeground()", fg, fColors.getForeground());
 		Assert.assertEquals("FormColors did not return the same instance for getBorderColor()", bc, fColors.getBorderColor());
 		boolean testBorderDispose = !bc.equals(fColors.getColor(IFormColors.BORDER));
-		// Create a Color which is not used inside eclipse to test if this color
-		// is disposed reliable when the FormColors object is disposed.
-		Color testColor = fColors.createColor("test", 1, 2, 3);
 		fColors.dispose();
-		Assert.assertTrue("FormColors did not dispose key: test", testColor.isDisposed());
+		for (int i = 0; i < KEYS_NON_NULL.length; i++)
+			Assert.assertTrue("FormColors did not dispose key: " + KEYS_NON_NULL[i], colors[i].isDisposed());
+		for (int i = 0; i < KEYS_NULL.length; i++)
+			Assert.assertTrue("FormColors did not dispose key: " + KEYS_NULL[i], nullColors[i] == null || nullColors[i].isDisposed());
 		Assert.assertTrue("FormColors did not dispose getInactiveBackground()", inactiveBg.isDisposed());
 		Assert.assertFalse("FormColors disposed getBackground()", bg.isDisposed());
 		Assert.assertFalse("FormColors disposed getForeground()", fg.isDisposed());

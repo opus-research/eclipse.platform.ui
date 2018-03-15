@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.manual;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -19,15 +23,12 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.ISaveablesLifecycleListener;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -174,7 +175,7 @@ public class SaveablesView extends ViewPart {
 		printSourcesAction = new Action() {
 			@Override
 			public void run() {
-				Saveable saveable = (Saveable) viewer.getStructuredSelection().getFirstElement();
+				Saveable saveable = (Saveable) ((IStructuredSelection)viewer.getSelection()).getFirstElement();
 				SaveablesList manager = (SaveablesList) getSite().getService(ISaveablesLifecycleListener.class);
 				Object[] sources = manager.testGetSourcesForModel(saveable);
 				for (Object source : sources) {

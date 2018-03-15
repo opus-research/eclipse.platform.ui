@@ -161,10 +161,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 		}
 	};
 
-	private Button selectAllButton;
-
-	private Button deselectAllButton;
-
 	private class FolderForProjectsLabelProvider extends CellLabelProvider implements IColorProvider {
 		public String getText(Object o) {
 			File file = (File) o;
@@ -583,11 +579,11 @@ public class SmartImportRootWizardPage extends WizardPage {
 		ViewerColumn pathColumn = new TreeViewerColumn(tree, SWT.NONE);
 		pathColumn.setLabelProvider(new FolderForProjectsLabelProvider());
 		tree.getTree().getColumn(0).setText(DataTransferMessages.SmartImportProposals_folder);
-		tree.getTree().getColumn(0).setWidth(500);
+		tree.getTree().getColumn(0).setWidth(400);
 		ViewerColumn projectTypeColumn = new TreeViewerColumn(tree, SWT.NONE);
 		projectTypeColumn.setLabelProvider(new ProjectConfiguratorLabelProvider());
 		tree.getTree().getColumn(1).setText(DataTransferMessages.SmartImportProposals_importAs);
-		tree.getTree().getColumn(1).setWidth(150);
+		tree.getTree().getColumn(1).setWidth(250);
 
 		this.proposalSelectionDecorator = new ControlDecoration(tree.getTree(), SWT.TOP | SWT.LEFT);
 		Image errorImage = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
@@ -601,7 +597,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		Composite selectionButtonsGroup = new Composite(res, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(selectionButtonsGroup);
 		selectionButtonsGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
-		selectAllButton = new Button(selectionButtonsGroup, SWT.PUSH);
+		Button selectAllButton = new Button(selectionButtonsGroup, SWT.PUSH);
 		setButtonLayoutData(selectAllButton);
 		selectAllButton.setText(DataTransferMessages.DataTransfer_selectAll);
 		selectAllButton.addSelectionListener(new SelectionAdapter() {
@@ -619,7 +615,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 				proposalsSelectionChanged();
 			}
 		});
-		deselectAllButton = new Button(selectionButtonsGroup, SWT.PUSH);
+		Button deselectAllButton = new Button(selectionButtonsGroup, SWT.PUSH);
 		setButtonLayoutData(deselectAllButton);
 		deselectAllButton.setText(DataTransferMessages.DataTransfer_deselectAll);
 		deselectAllButton.addSelectionListener(new SelectionAdapter() {
@@ -709,9 +705,8 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 	@Override
 	public boolean isPageComplete() {
-		return sourceIsValid() && getWizard().getImportJob() != null && getWizard().getImportJob() != null
-				&& (getWizard().getImportJob().getDirectoriesToImport() == null
-						|| !getWizard().getImportJob().getDirectoriesToImport().isEmpty());
+		return sourceIsValid() && getWizard().getImportJob() != null
+				&& tree.getCheckedElements().length > 0;
 	}
 
 	private boolean sourceIsValid() {
@@ -767,7 +762,8 @@ public class SmartImportRootWizardPage extends WizardPage {
 			if (potentialProjects.size() == 1 && potentialProjects.values().iterator().next().isEmpty()) {
 				getWizard().getImportJob().setDirectoriesToImport(null);
 				getWizard().getImportJob().setExcludedDirectories(null);
-				selectionSummary.setText(NLS.bind(DataTransferMessages.SmartImportProposals_selectionSummary, 1, 1));
+				selectionSummary.setText(NLS.bind(DataTransferMessages.SmartImportProposals_selectionSummary,
+						0, tree.getCheckedElements().length));
 			} else {
 				Set<File> excludedDirectories = new HashSet(((Map<File, ?>) this.tree.getInput()).keySet());
 				for (Object item : this.directoriesToImport) {
@@ -805,8 +801,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 		// compute new state
 		if (sourceIsValid()) {
 			tree.getControl().setEnabled(false);
-			selectAllButton.setEnabled(false);
-			deselectAllButton.setEnabled(false);
 			TreeItem computingItem = new TreeItem(tree.getTree(), SWT.DEFAULT);
 			computingItem
 					.setText(NLS.bind(DataTransferMessages.SmartImportJob_inspecting, selection.getAbsolutePath()));
@@ -855,9 +849,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 								if (sourceIsValid() && getWizard().getImportJob() == importJob) {
 									proposalsUpdated();
 								}
-								tree.getTree().setEnabled(potentialProjects.size() > 1);
-								selectAllButton.setEnabled(potentialProjects.size() > 1);
-								deselectAllButton.setEnabled(potentialProjects.size() > 1);
+								tree.getTree().setEnabled(true);
 							} else if (result.getCode() == IStatus.CANCEL) {
 								computingItem.setText(DataTransferMessages.SmartImportProposals_inspecitionCanceled);
 							} else if (result.getCode() == IStatus.ERROR) {
