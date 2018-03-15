@@ -79,9 +79,7 @@ public class AboutDialog extends TrayDialog {
 
     private final static int DETAILS_ID = IDialogConstants.CLIENT_ID + 1;
 
-	private final static int EXPORT_ID = IDialogConstants.CLIENT_ID + 2;
-
-	private final static int IMPORT_ID = IDialogConstants.CLIENT_ID + 3;
+	private final static int EXPORT_ID = DETAILS_ID + 1;
 
     private String productName;
 
@@ -187,7 +185,6 @@ public class AboutDialog extends TrayDialog {
 
         createButton(parent, DETAILS_ID, WorkbenchMessages.AboutDialog_DetailsButton, false);
 		createButton(parent, EXPORT_ID, WorkbenchMessages.AboutDialog_ExportButton, false);
-		createButton(parent, IMPORT_ID, WorkbenchMessages.AboutDialog_ImportButton, false);
 
         Label l = new Label(parent, SWT.NONE);
         l.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
