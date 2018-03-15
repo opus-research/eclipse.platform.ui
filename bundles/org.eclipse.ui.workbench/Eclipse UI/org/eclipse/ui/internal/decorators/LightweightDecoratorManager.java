@@ -61,7 +61,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 		private volatile RunnableData data = new RunnableData(null, null, null);
 
-		synchronized void setValues(Object object, DecorationBuilder builder,
+		void setValues(Object object, DecorationBuilder builder,
 				LightweightDecoratorDefinition definition) {
 			data = new RunnableData(object, builder, definition);
 		}
@@ -73,19 +73,13 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		public void handleException(Throwable exception) {
 			IStatus status = StatusUtil.newStatus(IStatus.ERROR, exception
 					.getMessage(), exception);
-			String message;
-			// Copy to local variables, see
-			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=300358
 			LightweightDecoratorDefinition decorator = data.decorator;
+			String message;
 			if (decorator == null) {
 				message = WorkbenchMessages.DecoratorError;
 			} else {
-				String name = decorator.getName();
-				if (name == null) {
-					// decorator definition is not accessible anymore
-					name = decorator.getId();
-				}
-				message = NLS.bind(WorkbenchMessages.DecoratorWillBeDisabled, name);
+				message = NLS.bind(WorkbenchMessages.DecoratorWillBeDisabled,
+						decorator.getName());
 			}
 			WorkbenchPlugin.log(message, status);
 			if (decorator != null) {
