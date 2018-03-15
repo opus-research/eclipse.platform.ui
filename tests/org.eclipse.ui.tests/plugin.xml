@@ -773,10 +773,6 @@
             contentTypeId="org.eclipse.ui.tests.contentType.bug502837"
             editorId="org.eclipse.ui.tests.api.MockEditorPart1">
       </editorContentTypeBinding>
-      <editor
-            class="org.eclipse.ui.tests.multipageeditor.OpenMultiPageEditorTest$MultiPageEditorForTest"
-            id="org.eclipse.ui.tests.multipageeditor.OpenMultiPageEditorTest.MultiPageEditorForTest"
-            name="org.eclipse.ui.tests.multipageeditor.OpenMultiPageEditorTest.MultiPageEditorForTest"/>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">
