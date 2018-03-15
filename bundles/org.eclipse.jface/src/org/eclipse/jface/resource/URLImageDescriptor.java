@@ -39,33 +39,45 @@ import org.eclipse.swt.graphics.ImageFileNameProvider;
 class URLImageDescriptor extends ImageDescriptor {
 
 	private static class URLImageFileNameProvider implements ImageFileNameProvider {
-		private URL url;
+		private String url;
 
-		public URLImageFileNameProvider(URL url) {
+		public URLImageFileNameProvider(String url) {
 			this.url = url;
 		}
 
 		@Override
 		public String getImagePath(int zoom) {
-			URL xUrl = getxURL(url, zoom);
-			if (xUrl == null)
+			URL xUrl = null;
+			try {
+				xUrl = getxURL(new URL(url), zoom);
+			} catch (MalformedURLException e) {
+				Policy.getLog().log(new Status(IStatus.ERROR, Policy.JFACE, e.getLocalizedMessage(), e));
+			}
+			if (xUrl == null) {
 				return null;
+			}
 			return getFilePath(xUrl, zoom == 100); // can be null!
 		}
 	}
 
 	private static class URLImageDataProvider implements ImageDataProvider {
-		private URL url;
+		private String url;
 
-		public URLImageDataProvider(URL url) {
+		public URLImageDataProvider(String url) {
 			this.url = url;
 		}
 
 		@Override
 		public ImageData getImageData(int zoom) {
-			URL xUrl = getxURL(url, zoom);
-			if (xUrl == null)
+			URL xUrl = null;
+			try {
+				xUrl = getxURL(new URL(url), zoom);
+			} catch (MalformedURLException e) {
+				Policy.getLog().log(new Status(IStatus.ERROR, Policy.JFACE, e.getLocalizedMessage(), e));
+			}
+			if (xUrl == null) {
 				return null;
+			}
 			return URLImageDescriptor.getImageData(xUrl);
 		}
 	}
@@ -76,7 +88,7 @@ class URLImageDescriptor extends ImageDescriptor {
 	 * Constant for the file protocol for optimized loading
 	 */
 	private static final String FILE_PROTOCOL = "file";  //$NON-NLS-1$
-	private URL url;
+	private String url;
 
 	/**
 	 * Creates a new URLImageDescriptor.
@@ -85,7 +97,7 @@ class URLImageDescriptor extends ImageDescriptor {
 	 *            The URL to load the image from. Must be non-null.
 	 */
 	URLImageDescriptor(URL url) {
-		this.url = url;
+		this.url = url.toExternalForm();
 	}
 
 	@Override
@@ -93,12 +105,18 @@ class URLImageDescriptor extends ImageDescriptor {
 		if (!(o instanceof URLImageDescriptor)) {
 			return false;
 		}
-		return ((URLImageDescriptor) o).url.toExternalForm().equals(this.url.toExternalForm());
+		return ((URLImageDescriptor) o).url.equals(this.url);
 	}
 
 	@Override
 	public ImageData getImageData() {
-		return getImageData(url);
+		ImageData result = null;
+		try {
+			result = getImageData(new URL(url));
+		} catch (MalformedURLException e) {
+			Policy.getLog().log(new Status(IStatus.ERROR, Policy.JFACE, e.getLocalizedMessage(), e));
+		}
+		return result;
 	}
 
 	private static ImageData getImageData(URL url) {
@@ -125,7 +143,13 @@ class URLImageDescriptor extends ImageDescriptor {
 	 * @return the stream for loading the data
 	 */
 	protected InputStream getStream() {
-		return getStream(url);
+		InputStream result = null;
+		try {
+			result = getStream(new URL(url));
+		} catch (MalformedURLException e) {
+			Policy.getLog().log(new Status(IStatus.ERROR, Policy.JFACE, e.getLocalizedMessage(), e));
+		}
+		return result;
 	}
 
 	private static InputStream getStream(URL url) {
@@ -151,7 +175,7 @@ class URLImageDescriptor extends ImageDescriptor {
 
 	@Override
 	public int hashCode() {
-		return url.toExternalForm().hashCode();
+		return url.hashCode();
 	}
 
 	/**
@@ -274,7 +298,7 @@ class URLImageDescriptor extends ImageDescriptor {
 			}
 
 			// Try to see if we can optimize using SWTs file based image support.
-			String path = getFilePath(url, true);
+			String path = getFilePath(new URL(url), true);
 			if (path != null) {
 				try {
 					return new Image(device, path);
@@ -284,6 +308,9 @@ class URLImageDescriptor extends ImageDescriptor {
 			}
 			return super.createImage(returnMissingImageOnError, device);
 
+		} catch (MalformedURLException e) {
+			Policy.getLog().log(new Status(IStatus.ERROR, Policy.JFACE, e.getLocalizedMessage(), e));
+			return null;
 		} finally {
 			if (InternalPolicy.DEBUG_TRACE_URL_IMAGE_DESCRIPTOR) {
 				long time = System.nanoTime() - start;
