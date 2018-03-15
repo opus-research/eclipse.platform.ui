@@ -610,20 +610,23 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 			Assert.isTrue(contexts[i] instanceof String
 					|| contexts[i] instanceof IContext);
 		}
-		action.setHelpListener(event -> {
-			if (contexts != null && contexts.length > 0
-					&& getHelpUI() != null) {
-				// determine the context
-				IContext context = null;
-				if (contexts[0] instanceof String) {
-					context = HelpSystem.getContext((String) contexts[0]);
-				} else if (contexts[0] instanceof IContext) {
-					context = (IContext) contexts[0];
-				}
-				if (context != null) {
-					Point point = computePopUpLocation(event.widget
-							.getDisplay());
-					displayContext(context, point.x, point.y);
+		action.setHelpListener(new HelpListener() {
+			@Override
+			public void helpRequested(HelpEvent event) {
+				if (contexts != null && contexts.length > 0
+						&& getHelpUI() != null) {
+					// determine the context
+					IContext context = null;
+					if (contexts[0] instanceof String) {
+						context = HelpSystem.getContext((String) contexts[0]);
+					} else if (contexts[0] instanceof IContext) {
+						context = (IContext) contexts[0];
+					}
+					if (context != null) {
+						Point point = computePopUpLocation(event.widget
+								.getDisplay());
+						displayContext(context, point.x, point.y);
+					}
 				}
 			}
 		});
@@ -647,22 +650,25 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(IAction action, final IContextComputer computer) {
-		action.setHelpListener(event -> {
-			Object[] helpContexts = computer.computeContexts(event);
-			if (helpContexts != null && helpContexts.length > 0
-					&& getHelpUI() != null) {
-				// determine the context
-				IContext context = null;
-				if (helpContexts[0] instanceof String) {
-					context = HelpSystem
-							.getContext((String) helpContexts[0]);
-				} else if (helpContexts[0] instanceof IContext) {
-					context = (IContext) helpContexts[0];
-				}
-				if (context != null) {
-					Point point = computePopUpLocation(event.widget
-							.getDisplay());
-					displayContext(context, point.x, point.y);
+		action.setHelpListener(new HelpListener() {
+			@Override
+			public void helpRequested(HelpEvent event) {
+				Object[] helpContexts = computer.computeContexts(event);
+				if (helpContexts != null && helpContexts.length > 0
+						&& getHelpUI() != null) {
+					// determine the context
+					IContext context = null;
+					if (helpContexts[0] instanceof String) {
+						context = HelpSystem
+								.getContext((String) helpContexts[0]);
+					} else if (helpContexts[0] instanceof IContext) {
+						context = (IContext) helpContexts[0];
+					}
+					if (context != null) {
+						Point point = computePopUpLocation(event.widget
+								.getDisplay());
+						displayContext(context, point.x, point.y);
+					}
 				}
 			}
 		});
@@ -839,13 +845,16 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		// TODO Need a help ID from the context
 		// final String contextId = command.getHelpId();
 		final String contextId = ""; //$NON-NLS-1$
-		return event -> {
-			if (getHelpUI() != null) {
-				IContext context = HelpSystem.getContext(contextId);
-				if (context != null) {
-					Point point = computePopUpLocation(event.widget
-							.getDisplay());
-					displayContext(context, point.x, point.y);
+		return new HelpListener() {
+			@Override
+			public void helpRequested(HelpEvent event) {
+				if (getHelpUI() != null) {
+					IContext context = HelpSystem.getContext(contextId);
+					if (context != null) {
+						Point point = computePopUpLocation(event.widget
+								.getDisplay());
+						displayContext(context, point.x, point.y);
+					}
 				}
 			}
 		};
@@ -945,14 +954,17 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	public void setHelp(final IAction action, final String contextId) {
 		if (WorkbenchPlugin.DEBUG)
 			setHelpTrace(contextId);
-		action.setHelpListener(event -> {
-			if (getHelpUI() != null) {
-				IContext context = HelpSystem.getContext(contextId);
-				if (context != null) {
-					Point point = computePopUpLocation(event.widget
-							.getDisplay());
-					String title = LegacyActionTools.removeMnemonics(action.getText());
-					displayContext(new ContextWithTitle(context, title), point.x, point.y);
+		action.setHelpListener(new HelpListener() {
+			@Override
+			public void helpRequested(HelpEvent event) {
+				if (getHelpUI() != null) {
+					IContext context = HelpSystem.getContext(contextId);
+					if (context != null) {
+						Point point = computePopUpLocation(event.widget
+								.getDisplay());
+						String title = LegacyActionTools.removeMnemonics(action.getText());
+						displayContext(new ContextWithTitle(context, title), point.x, point.y);
+					}
 				}
 			}
 		});

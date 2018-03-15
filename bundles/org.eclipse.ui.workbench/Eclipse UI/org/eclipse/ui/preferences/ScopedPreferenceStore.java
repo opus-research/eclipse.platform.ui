@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -161,21 +162,24 @@ public class ScopedPreferenceStore extends EventManager implements
 	 */
 	private void initializePreferencesListener() {
 		if (preferencesListener == null) {
-			preferencesListener = event -> {
+			preferencesListener = new IEclipsePreferences.IPreferenceChangeListener() {
+				@Override
+				public void preferenceChange(PreferenceChangeEvent event) {
 
-				if (silentRunning) {
-					return;
-				}
+					if (silentRunning) {
+						return;
+					}
 
-				Object oldValue = event.getOldValue();
-				Object newValue = event.getNewValue();
-				String key = event.getKey();
-				if (newValue == null) {
-					newValue = getDefault(key, oldValue);
-				} else if (oldValue == null) {
-					oldValue = getDefault(key, newValue);
+					Object oldValue = event.getOldValue();
+					Object newValue = event.getNewValue();
+					String key = event.getKey();
+					if (newValue == null) {
+						newValue = getDefault(key, oldValue);
+					} else if (oldValue == null) {
+						oldValue = getDefault(key, newValue);
+					}
+					firePropertyChangeEvent(event.getKey(), oldValue, newValue);
 				}
-				firePropertyChangeEvent(event.getKey(), oldValue, newValue);
 			};
 			getStorePreferences().addPreferenceChangeListener(
 					preferencesListener);

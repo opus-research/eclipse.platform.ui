@@ -10,27 +10,20 @@
  ******************************************************************************/
 package org.eclipse.core.tests.databinding;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
-import org.eclipse.core.databinding.observable.sideeffect.ISideEffect;
+import org.eclipse.core.databinding.observable.ISideEffect;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.jface.tests.databinding.AbstractJUnit4RealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
+import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 
 /**
- * Test cases for the {@link ISideEffect}.
+ * Test cases for the {@link SideEffect} class
  *
  * @since 3.2
  */
-public class SideEffectTest extends AbstractJUnit4RealmTestCase {
+public class SideEffectTest extends AbstractDefaultRealmTestCase {
 	// TODO: Add test cases for {@link SideEffect#create(Runnable)},
 	// {@link SideEffect#create(java.util.function.Supplier,
 	// java.util.function.Consumer)}
@@ -45,8 +38,7 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 	private WritableValue<Boolean> useDefaultDependency;
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		defaultDependency = new WritableValue<>("", null);
@@ -63,28 +55,24 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		});
 	}
 
-	@Test
 	public void testSideEffectDoesntRunUntilResumed() throws Exception {
 		runAsync();
 		assertEquals(0, sideEffectInvocations);
 	}
 
-	@Test
 	public void testSideEffectRunsWhenResumed() throws Exception {
 		sideEffect.resume();
 		runAsync();
 		assertEquals(1, sideEffectInvocations);
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void testResumingSideEffectMultipleTimesThrowsIllegalStateException() throws Exception {
+	public void testResumingSideEffectMultipleTimesHasNoEffect() throws Exception {
 		sideEffect.resume();
 		sideEffect.resume();
 		runAsync();
 		assertEquals(1, sideEffectInvocations);
 	}
 
-	@Test
 	public void testSideEffectSelectsCorrectDependency() throws Exception {
 		// Run the side-effect once
 		sideEffect.resume();
@@ -118,7 +106,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		assertEquals(4, sideEffectInvocations);
 	}
 
-	@Test
 	public void testChangingMultipleDependenciesOnlyRunsTheSideEffectOnce() throws Exception {
 		sideEffect.resume();
 		runAsync();
@@ -132,7 +119,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		assertEquals(2, sideEffectInvocations);
 	}
 
-	@Test
 	public void testChangingDependencyRerunsSideEffect() throws Exception {
 		// Run the side-effect once
 		sideEffect.resume();
@@ -147,7 +133,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		assertEquals(2, sideEffectInvocations);
 	}
 
-	@Test
 	public void testChangingUnrelatedNodeDoesntRunSideEffect() throws Exception {
 		// Run the side-effect once
 		sideEffect.resume();
@@ -162,7 +147,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		assertEquals(1, sideEffectInvocations);
 	}
 
-	@Test
 	public void testDeactivatedSideEffectWontRunWhenTriggeredByDependency() throws Exception {
 		// Run the side-effect once
 		sideEffect.resume();
@@ -178,7 +162,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		assertEquals(1, sideEffectInvocations);
 	}
 
-	@Test
 	public void testDeactivatedSideEffectWontRunWhenRunIfDirtyInvoked() throws Exception {
 		// Run the side-effect once
 		sideEffect.resume();
@@ -194,7 +177,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		assertEquals(1, sideEffectInvocations);
 	}
 
-	@Test
 	public void testRunIfDirtyDoesNothingIfSideEffectNotDirty() throws Exception {
 		// Run the side-effect once
 		sideEffect.resume();
@@ -208,7 +190,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		assertEquals(1, sideEffectInvocations);
 	}
 
-	@Test
 	public void testRunIfDirty() throws Exception {
 		sideEffect.resume();
 		runAsync();
@@ -218,7 +199,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		assertEquals(2, sideEffectInvocations);
 	}
 
-	@Test
 	public void testNestedDependencyChangeAndRunIfDirtyCompletes() throws Exception {
 		AtomicBoolean hasRun = new AtomicBoolean();
 		WritableValue<Object> invalidator = new WritableValue<Object>(new Object(), null);
@@ -238,7 +218,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		assertTrue(hasRun.get());
 	}
 
-	@Test
 	public void testNestedInvalidateAndRunIfDirtyCompletes() throws Exception {
 		AtomicBoolean hasRun = new AtomicBoolean();
 		final WritableValue<Object> makesThingsDirty = new WritableValue<>(null, null);
@@ -260,7 +239,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		assertTrue(hasRun.get());
 	}
 
-	@Test
 	public void testConsumeOnceDoesntPassNullToConsumer() throws Exception {
 		AtomicBoolean consumerHasRun = new AtomicBoolean();
 		WritableValue<Object> makesThingsDirty = new WritableValue<>(null, null);
@@ -284,7 +262,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		consumeOnce.dispose();
 	}
 
-	@Test
 	public void testConsumeOnceDoesntRunTwice() throws Exception {
 		AtomicInteger numberOfRuns = new AtomicInteger();
 		WritableValue<Object> makesThingsDirty = new WritableValue<>(null, null);
@@ -315,7 +292,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		consumeOnce.dispose();
 	}
 
-	@Test
 	public void testConsumeOnceDoesntRunAtAllIfDisposed() throws Exception {
 		AtomicInteger numberOfRuns = new AtomicInteger();
 		WritableValue<Object> returnValue = new WritableValue<>("foo", null);
@@ -330,7 +306,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		assertEquals(0, numberOfRuns.get());
 	}
 
-	@Test
 	public void testConsumeOnceRunsIfInitialValueNonNull() throws Exception {
 		AtomicInteger numberOfRuns = new AtomicInteger();
 		WritableValue<Object> returnValue = new WritableValue<>("foo", null);
@@ -345,7 +320,6 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		consumeOnce.dispose();
 	}
 
-	@Test
 	public void testNestedSideEffectCreation() throws Exception {
 		AtomicBoolean hasRun = new AtomicBoolean();
 
@@ -361,47 +335,11 @@ public class SideEffectTest extends AbstractJUnit4RealmTestCase {
 		assertTrue(hasRun.get());
 	}
 
-	@Test
-	public void testSideEffectFiresDisposeEvent() throws Exception {
-		AtomicBoolean hasRun = new AtomicBoolean();
-
-		// Make sure that a dispose event is sent correctly.
-		ISideEffect disposeTest = ISideEffect.createPaused(() -> {
-		});
-		disposeTest.resume();
-		disposeTest.addDisposeListener(sideEffect -> {
-			assertTrue(disposeTest == sideEffect);
-			hasRun.set(true);
-		});
-		disposeTest.dispose();
-		runAsync();
-		assertTrue(hasRun.get());
-	}
-
-	@Test
-	public void testCanRemoveDisposeListener() throws Exception {
-		AtomicBoolean hasRun = new AtomicBoolean();
-
-		// Make sure that a dispose event is sent correctly.
-		ISideEffect disposeTest = ISideEffect.createPaused(() -> {
-		});
-		disposeTest.resume();
-		Consumer<ISideEffect> disposeListener = sideEffect -> {
-			hasRun.set(true);
-		};
-		disposeTest.addDisposeListener(disposeListener);
-		disposeTest.removeDisposeListener(disposeListener);
-		disposeTest.dispose();
-		runAsync();
-		assertFalse(hasRun.get());
-	}
-
 	// Doesn't currently work, but this would be a desirable property for
 	// SideEffect to have
 	// public void testInvalidateSelf() throws Exception {
 	// AtomicInteger runCount = new AtomicInteger();
-	// WritableValue<Object> invalidator = new WritableValue<>(null,
-	// null);
+	// WritableValue<Object> invalidator = new WritableValue<>(null, null);
 	// // Make sure that if a side effect invalidates it self, it will run at
 	// // least once more but eventually stop.
 	// ISideEffect[] sideEffect = new ISideEffect[1];

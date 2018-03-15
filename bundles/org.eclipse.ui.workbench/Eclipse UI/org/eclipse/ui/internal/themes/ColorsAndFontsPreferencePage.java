@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136, 472654
  *     Robert Roth <robert.roth.off@gmail.com> - Bugs 274005, 456291
  *     Mickael Istria (Red Hat Inc.) - Theme and fontregistry rather than pref
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -37,13 +36,17 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IColorProvider;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -51,6 +54,10 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -356,16 +363,19 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 
         private int usableImageSize = -1;
 
-        private IPropertyChangeListener listener = event -> {
-			if (event.getNewValue() != null) {
-				fireLabelProviderChanged(new LabelProviderChangedEvent(
-						PresentationLabelProvider.this));
-			} else {
-				// Some theme definition element has been modified and we
-				// need to refresh the viewer
-				refreshAllLabels();
-			}
-		};
+        private IPropertyChangeListener listener = new IPropertyChangeListener() {
+            @Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getNewValue() != null) {
+					fireLabelProviderChanged(new LabelProviderChangedEvent(
+							PresentationLabelProvider.this));
+				} else {
+					// Some theme definition element has been modified and we
+					// need to refresh the viewer
+					refreshAllLabels();
+				}
+            }
+        };
 
         private Image emptyImage;
 
@@ -500,22 +510,19 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
             if (element instanceof IHierarchalThemeElementDefinition) {
                 IHierarchalThemeElementDefinition themeElement = (IHierarchalThemeElementDefinition) element;
 				if (themeElement.getDefaultsTo() != null) {
-					String myCategory = ((ICategorizedThemeElementDefinition) themeElement).getCategoryId();
-					ICategorizedThemeElementDefinition def;
-					if (element instanceof ColorDefinition) {
+                    String myCategory = ((ICategorizedThemeElementDefinition) themeElement).getCategoryId();
+                    ICategorizedThemeElementDefinition def;
+                    if (element instanceof ColorDefinition)
 						def = themeRegistry.findColor(themeElement.getDefaultsTo());
-					} else {
+					else
 						def = themeRegistry.findFont(themeElement.getDefaultsTo());
-					}
-					if (def != null && !ColorsAndFontsPreferencePage.equals(def.getCategoryId(), myCategory)) {
-						if (isDefault(themeElement)) {
-							return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_default"), //$NON-NLS-1$
-									themeElement.getName(), def.getName());
-						}
-						return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_override"), //$NON-NLS-1$
-								themeElement.getName(), def.getName());
-					}
-				}
+
+                    if (!ColorsAndFontsPreferencePage.equals(def.getCategoryId(), myCategory)) {
+                    	if (isDefault(themeElement))
+							return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_default"), themeElement.getName(), def.getName() ); //$NON-NLS-1$
+               			return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_override"), themeElement.getName(), def.getName() ); //$NON-NLS-1$
+                    }
+                }
             }
             return ((IThemeElementDefinition) element).getName();
         }
@@ -866,10 +873,13 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	protected Control createContents(Composite parent) {
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IWorkbenchHelpContextIds.FONTS_PREFERENCE_PAGE);
 
-        parent.addDisposeListener(e -> {
-		    if (appliedDialogFont != null)
-				appliedDialogFont.dispose();
-		});
+        parent.addDisposeListener(new DisposeListener() {
+            @Override
+			public void widgetDisposed(DisposeEvent e) {
+                if (appliedDialogFont != null)
+					appliedDialogFont.dispose();
+            }
+        });
 
 		final SashForm advancedComposite = new SashForm(parent, SWT.VERTICAL);
 		GridData sashData = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -1014,23 +1024,26 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 			}
 		});
 		tree.getViewer().setInput(WorkbenchPlugin.getDefault().getThemeRegistry());
-		tree.getViewer().addDoubleClickListener(event -> {
-			IStructuredSelection s = (IStructuredSelection) event.getSelection();
-			Object element = s.getFirstElement();
-			if (tree.getViewer().isExpandable(element))
-				tree.getViewer().setExpandedState(element,
-						!tree.getViewer().getExpandedState(element));
+		tree.getViewer().addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				IStructuredSelection s = (IStructuredSelection) event.getSelection();
+				Object element = s.getFirstElement();
+				if (tree.getViewer().isExpandable(element))
+					tree.getViewer().setExpandedState(element,
+							!tree.getViewer().getExpandedState(element));
 
-			if (element instanceof ThemeElementDefinition) {
-				ThemeElementDefinition definition = (ThemeElementDefinition) element;
+				if (element instanceof ThemeElementDefinition) {
+					ThemeElementDefinition definition = (ThemeElementDefinition) element;
 
-				if (element instanceof FontDefinition) {
-					editFont(tree.getDisplay());
-				} else if (element instanceof ColorDefinition
-						&& isAvailableInCurrentTheme(definition)) {
-					editColor(tree.getDisplay());
+					if (element instanceof FontDefinition) {
+						editFont(tree.getDisplay());
+					} else if (element instanceof ColorDefinition
+							&& isAvailableInCurrentTheme(definition)) {
+						editColor(tree.getDisplay());
+					}
+					updateControls();
 				}
-				updateControls();
 			}
 		});
 
@@ -1212,7 +1225,12 @@ getPreferenceStore(),
      */
     private void hookListeners() {
         TreeViewer viewer = tree.getViewer();
-		viewer.addSelectionChangedListener(event -> updateTreeSelection(event.getSelection()));
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+				public void selectionChanged(SelectionChangedEvent event) {
+                    updateTreeSelection(event.getSelection());
+                }
+		});
 
         fontChangeButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -1305,23 +1323,26 @@ getPreferenceStore(),
     @Override
 	public void init(IWorkbench aWorkbench) {
         this.workbench = (Workbench) aWorkbench;
-		themeEngine = workbench.getService(IThemeEngine.class);
+		themeEngine = (IThemeEngine) workbench.getService(IThemeEngine.class);
         setPreferenceStore(PrefUtil.getInternalPreferenceStore());
 
         final IThemeManager themeManager = aWorkbench.getThemeManager();
-        themeChangeListener = event -> {
-		    if (event.getProperty().equals(
-		            IThemeManager.CHANGE_CURRENT_THEME)) {
-		        updateThemeInfo(themeManager);
-		        refreshCategory();
-				refreshAllLabels();
-		    }
-		};
+        themeChangeListener = new IPropertyChangeListener() {
+            @Override
+			public void propertyChange(PropertyChangeEvent event) {
+                if (event.getProperty().equals(
+                        IThemeManager.CHANGE_CURRENT_THEME)) {
+                    updateThemeInfo(themeManager);
+                    refreshCategory();
+					refreshAllLabels();
+                }
+            }
+        };
         themeManager.addPropertyChangeListener(themeChangeListener);
 
         updateThemeInfo(themeManager);
 
-		eventBroker = workbench.getService(IEventBroker.class);
+        eventBroker = (IEventBroker) workbench.getService(IEventBroker.class);
 		eventBroker.subscribe(WorkbenchThemeManager.Events.THEME_REGISTRY_RESTYLED,
 				themeRegistryRestyledHandler);
     }
@@ -2032,9 +2053,12 @@ getPreferenceStore(),
 		fontSampler.setLayout(gridLayout);
 		fontSampler.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		fontSampler.addPaintListener(e -> {
-			if (currentFont != null) // do the font preview
-				paintFontSample(e.gc);
+		fontSampler.addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent e) {
+				if (currentFont != null) // do the font preview
+					paintFontSample(e.gc);
+			}
 		});
 		return fontSampler;
 	}
@@ -2073,9 +2097,12 @@ getPreferenceStore(),
 		colorSampler.setLayout(gridLayout);
 		colorSampler.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		colorSampler.addPaintListener(e -> {
-			if (currentColor != null) // do the color preview
-				paintColorSample(e.gc);
+		colorSampler.addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent e) {
+				if (currentColor != null) // do the color preview
+					paintColorSample(e.gc);
+			}
 		});
 		return colorSampler;
 	}
@@ -2094,8 +2121,10 @@ getPreferenceStore(),
 		String messageTop = RESOURCE_BUNDLE.getString("fontColorSample"); //$NON-NLS-1$
 		String fontColorString = RESOURCE_BUNDLE.getString("fontColorString"); //$NON-NLS-1$
 		RGB rgb = currentColor.getRGB();
-		String messageBottom = MessageFormat.format(fontColorString, Integer.valueOf(rgb.red),
-				Integer.valueOf(rgb.green), Integer.valueOf(rgb.blue));
+		String messageBottom = MessageFormat
+				.format(fontColorString,
+						new Object[] { Integer.valueOf(rgb.red), Integer.valueOf(rgb.green),
+								Integer.valueOf(rgb.blue) });
 
 		// calculate position of the vertical line
 		int separator = (clientArea.width - 2) / 3;
@@ -2189,12 +2218,9 @@ getPreferenceStore(),
 
 	private boolean isAvailableInCurrentTheme(ThemeElementDefinition definition) {
 		if (definition instanceof ColorDefinition) {
-			ColorDefinition colorDef = (ColorDefinition) definition;
-			RGB value = colorDef.getValue();
-			if ((value == null || value == EMPTY_COLOR_VALUE) && colorDef.getDefaultsTo() == null) {
-				return false;
-			}
-			return colorRegistry.get(definition.getId()) != null;
+			RGB value = ((ColorDefinition) definition).getValue();
+			return value != null && value != EMPTY_COLOR_VALUE
+					&& colorRegistry.get(definition.getId()) != null;
 		}
 		return true;
 	}
@@ -2205,7 +2231,7 @@ getPreferenceStore(),
 			return description;
 		}
 		return MessageFormat.format(RESOURCE_BUNDLE.getString("definitionNotAvailInTheme"), //$NON-NLS-1$
-				description).trim();
+				new Object[] { description }).trim();
 	}
 
 	private void updateDefinitionState(ThemeElementDefinition definition, boolean reset) {

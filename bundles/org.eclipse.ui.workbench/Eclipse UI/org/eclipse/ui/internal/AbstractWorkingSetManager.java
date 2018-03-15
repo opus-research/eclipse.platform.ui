@@ -14,15 +14,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
@@ -89,7 +90,13 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 		}
 	}
 
-	private SortedSet<AbstractWorkingSet> workingSets = new TreeSet<>((o1, o2) -> o1.getUniqueId().compareTo(o2.getUniqueId()));
+	private SortedSet<AbstractWorkingSet> workingSets = new TreeSet<>(new Comparator<AbstractWorkingSet>() {
+		@Override
+		public int compare(AbstractWorkingSet o1, AbstractWorkingSet o2) {
+			// Cast and compare directly
+			return o1.getUniqueId().compareTo(o2.getUniqueId());
+		}
+	});
 
 	private List<IWorkingSet> recentWorkingSets = new ArrayList<>();
 
@@ -365,22 +372,25 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 
         final PropertyChangeEvent event = new PropertyChangeEvent(this,
                 changeId, oldValue, newValue);
-		Runnable notifier = () -> {
-			for (int i = 0; i < listeners.length; i++) {
-				final IPropertyChangeListener listener = (IPropertyChangeListener) listeners[i];
-				ISafeRunnable safetyWrapper = new ISafeRunnable() {
+		Runnable notifier = new Runnable() {
+			@Override
+			public void run() {
+				for (int i = 0; i < listeners.length; i++) {
+					final IPropertyChangeListener listener = (IPropertyChangeListener) listeners[i];
+					ISafeRunnable safetyWrapper = new ISafeRunnable() {
 
-					@Override
-					public void run() throws Exception {
-						listener.propertyChange(event);
-					}
+						@Override
+						public void run() throws Exception {
+							listener.propertyChange(event);
+						}
 
-					@Override
-					public void handleException(Throwable exception) {
-						// logged by the runner
-					}
-				};
-				SafeRunner.run(safetyWrapper);
+						@Override
+						public void handleException(Throwable exception) {
+							// logged by the runner
+						}
+					};
+					SafeRunner.run(safetyWrapper);
+				}
 			}
 		};
 		// Notifications are sent on the UI thread.
@@ -786,7 +796,7 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 		saveMruList(memento);
 
 		FileOutputStream stream = new FileOutputStream(stateFile);
-		OutputStreamWriter writer = new OutputStreamWriter(stream, StandardCharsets.UTF_8);
+		OutputStreamWriter writer = new OutputStreamWriter(stream, "utf-8"); //$NON-NLS-1$
 		memento.save(writer);
 		writer.close();
 

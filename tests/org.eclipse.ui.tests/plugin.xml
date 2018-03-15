@@ -493,11 +493,6 @@
             name="Text Control view"
             restorable="true">
       </view>
-      <view
-            class="org.eclipse.ui.tests.propertysheet.AdaptingSaveableView"
-            id="org.eclipse.ui.tests.propertysheet.AdaptingSaveableView"
-            name="AdaptingSaveableView">
-      </view>
 
    </extension>
    <extension
@@ -769,10 +764,6 @@
             name="Bug 356116 Editor"
             id="org.eclipse.ui.tests.editor.bug356116">
       </editor>
-      <editorContentTypeBinding
-            contentTypeId="org.eclipse.ui.tests.contentType.bug502837"
-            editorId="org.eclipse.ui.tests.api.MockEditorPart1">
-      </editorContentTypeBinding>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">
@@ -1132,12 +1123,6 @@
            file-extensions="bug356116"
            name="Bug 356116 B content type"
            id="org.eclipse.ui.tests.contentType.bug356116.b">
-     </content-type>
-     <content-type
-           priority="normal"
-           file-extensions="bug502837"
-           name="ContentType for bug502837"
-           id="org.eclipse.ui.tests.contentType.bug502837">
      </content-type>
    </extension>
    		
@@ -3730,13 +3715,6 @@
             id="org.eclipse.ui.tests.LifecycleView"
             name="Lifecycle View">
       </view>
-      <view
-            class="org.eclipse.ui.tests.api.workbenchpart.DependencyInjectionView"
-            id="org.eclipse.ui.tests.dependencyinjectionview"
-            inject="true"
-            name="Dependency Injection View"
-            restorable="true">
-      </view>
    </extension>
    <extension
          point="org.eclipse.ui.statusHandlers">
@@ -4414,31 +4392,6 @@
             class="org.eclipse.ui.tests.ide.api.IDETest$TestOverride"
             id="org.eclipse.ui.tests.editorAssociationOverride1">
       </editorAssociationOverride>
-   </extension>
-   <extension
-         id="DynamicToolbarContributionTest"
-         point="org.eclipse.ui.menus">
-   <menuContribution
-       locationURI="toolbar:org.eclipse.ui.trim.status">
-              <toolbar id="org.eclipse.ui.trim.status">
-              <dynamic
-              class="org.eclipse.ui.tests.menus.DynamicToolbarTest$MyStatusBar"
-                id="org.eclipse.ui.tests.dynamicToolbarContribution">
-              </dynamic>
-              </toolbar>
-   </menuContribution>
-   </extension>
-   <extension
-         point="org.eclipse.ui.ide.projectConfigurators">
-      <projectConfigurator
-            class="org.eclipse.ui.tests.datatransfer.contributions.ImportMeProjectConfigurator"
-            label="Example project detector">
-         <activeWhen>
-            <hasFileRecursively
-                  filename="importme">
-            </hasFileRecursively>
-         </activeWhen>
-      </projectConfigurator>
    </extension>
    
 </plugin>

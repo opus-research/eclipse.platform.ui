@@ -59,8 +59,8 @@ public class PathEditor extends ListEditor {
 	protected String createList(String[] items) {
         StringBuffer path = new StringBuffer("");//$NON-NLS-1$
 
-        for (String item : items) {
-            path.append(item);
+        for (int i = 0; i < items.length; i++) {
+            path.append(items[i]);
             path.append(File.pathSeparator);
         }
         return path.toString();

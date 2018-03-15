@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 487418
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  ******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -231,10 +230,14 @@ public class LegacyHandlerService implements IHandlerService {
 
 	@Override
 	public void addSourceProvider(ISourceProvider provider) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void removeSourceProvider(ISourceProvider provider) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -569,10 +572,8 @@ public class LegacyHandlerService implements IHandlerService {
 			if (awChildren.length > 0) {
 				final IConfigurationElement[] subChildren = awChildren[0].getChildren();
 				if (subChildren.length != 1) {
-					if (Policy.DEBUG_CMDS) {
-						Activator.trace(Policy.DEBUG_CMDS_FLAG,
-								"Incorrect activeWhen element " + commandId, null); //$NON-NLS-1$
-					}
+					Activator.trace(Policy.DEBUG_CMDS,
+							"Incorrect activeWhen element " + commandId, null); //$NON-NLS-1$
 					continue;
 				}
 				final ElementHandler elementHandler = ElementHandler.getDefault();
@@ -580,10 +581,8 @@ public class LegacyHandlerService implements IHandlerService {
 				try {
 					activeWhen = elementHandler.create(converter, subChildren[0]);
 				} catch (CoreException e) {
-					if (Policy.DEBUG_CMDS) {
-						Activator.trace(Policy.DEBUG_CMDS_FLAG,
-								"Incorrect activeWhen element " + commandId, e); //$NON-NLS-1$
-					}
+					Activator.trace(Policy.DEBUG_CMDS,
+							"Incorrect activeWhen element " + commandId, e); //$NON-NLS-1$
 				}
 			}
 			Expression enabledWhen = null;
@@ -592,10 +591,8 @@ public class LegacyHandlerService implements IHandlerService {
 			if (ewChildren.length > 0) {
 				final IConfigurationElement[] subChildren = ewChildren[0].getChildren();
 				if (subChildren.length != 1) {
-					if (Policy.DEBUG_CMDS) {
-						Activator.trace(Policy.DEBUG_CMDS_FLAG,
-								"Incorrect enableWhen element " + commandId, null); //$NON-NLS-1$
-					}
+					Activator.trace(Policy.DEBUG_CMDS,
+							"Incorrect enableWhen element " + commandId, null); //$NON-NLS-1$
 					continue;
 				}
 				final ElementHandler elementHandler = ElementHandler.getDefault();
@@ -603,10 +600,8 @@ public class LegacyHandlerService implements IHandlerService {
 				try {
 					enabledWhen = elementHandler.create(converter, subChildren[0]);
 				} catch (CoreException e) {
-					if (Policy.DEBUG_CMDS) {
-						Activator.trace(Policy.DEBUG_CMDS_FLAG,
-								"Incorrect enableWhen element " + commandId, e); //$NON-NLS-1$
-					}
+					Activator.trace(Policy.DEBUG_CMDS,
+							"Incorrect enableWhen element " + commandId, e); //$NON-NLS-1$
 				}
 			}
 			registerLegacyHandler(

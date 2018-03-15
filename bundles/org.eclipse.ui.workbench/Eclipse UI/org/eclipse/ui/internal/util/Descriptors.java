@@ -23,6 +23,7 @@ import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -155,7 +156,12 @@ public final class Descriptors {
         }
     }
 
-    private static DisposeListener disposeListener = e -> doDispose(e.widget);
+    private static DisposeListener disposeListener = new DisposeListener() {
+        @Override
+		public void widgetDisposed(DisposeEvent e) {
+            doDispose(e.widget);
+        }
+    };
 
     // Item //////////////////////////////////////////////////////////////////////////////////
 

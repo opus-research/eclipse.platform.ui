@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  *******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -94,9 +93,7 @@ final class HandlerActivation implements IHandlerActivation {
 				 * information is not really useful to us, so we can just treat
 				 * it as false.
 				 */
-				if (Policy.DEBUG_CMDS) {
-					Activator.trace(Policy.DEBUG_CMDS_FLAG, "Failed to calculate active", e); //$NON-NLS-1$
-				}
+				Activator.trace(Policy.DEBUG_CMDS, "Failed to calculate active", e); //$NON-NLS-1$
 			}
 		}
 		return active;
@@ -148,6 +145,8 @@ final class HandlerActivation implements IHandlerActivation {
 
 	@Override
 	public void clearActive() {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -181,3 +180,4 @@ final class HandlerActivation implements IHandlerActivation {
 				+ ": " + handler + ": " + context; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
+

@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sopot Cela <sopotcela@gmail.com> - Bug 391961
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440810, 485840, 474320, 497634
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440810, 485840
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 380233
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 485829
  ******************************************************************************/
@@ -47,14 +47,23 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.DragDetectEvent;
+import org.eclipse.swt.events.DragDetectListener;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -68,6 +77,7 @@ import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -295,28 +305,61 @@ public class PerspectiveSwitcher {
 		layout.marginTop = 6;
 		comp.setLayout(layout);
 		perspSwitcherToolbar = new ToolBar(comp, SWT.FLAT | SWT.WRAP | SWT.RIGHT + orientation);
-		comp.addPaintListener(e -> paint(e));
+		comp.addPaintListener(new PaintListener() {
+
+			@Override
+			public void paintControl(PaintEvent e) {
+				paint(e);
+			}
+		});
 		toolParent = ((Control) toolControl.getParent().getWidget());
+		toolParent.addPaintListener(new PaintListener() {
 
-		comp.addDisposeListener(e -> dispose());
-
-		perspSwitcherToolbar.addMenuDetectListener(e -> {
-			ToolBar tb = (ToolBar) e.widget;
-			Point p = new Point(e.x, e.y);
-			p = perspSwitcherToolbar.getDisplay().map(null, perspSwitcherToolbar, p);
-			ToolItem item = tb.getItem(p);
-			if (item == null)
-				E4Util.message("  ToolBar menu"); //$NON-NLS-1$
-			else {
-				MPerspective persp = (MPerspective) item.getData();
-				if (persp == null)
-					E4Util.message("  Add button Menu"); //$NON-NLS-1$
-				else
-					openMenuFor(item, persp);
+			@Override
+			public void paintControl(PaintEvent e) {
+				if (borderColor == null || borderColor.isDisposed()) {
+					borderColor = e.display.getSystemColor(SWT.COLOR_GRAY);
+				}
+				e.gc.setForeground(borderColor);
+				Rectangle bounds = ((Control) e.widget).getBounds();
+				e.gc.drawLine(0, bounds.height - 1, bounds.width, bounds.height - 1);
 			}
 		});
 
-		perspSwitcherToolbar.addDisposeListener(e -> disposeTBImages());
+		comp.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				dispose();
+			}
+
+		});
+
+		perspSwitcherToolbar.addMenuDetectListener(new MenuDetectListener() {
+			@Override
+			public void menuDetected(MenuDetectEvent e) {
+				ToolBar tb = (ToolBar) e.widget;
+				Point p = new Point(e.x, e.y);
+				p = perspSwitcherToolbar.getDisplay().map(null, perspSwitcherToolbar, p);
+				ToolItem item = tb.getItem(p);
+				if (item == null)
+					E4Util.message("  ToolBar menu"); //$NON-NLS-1$
+				else {
+					MPerspective persp = (MPerspective) item.getData();
+					if (persp == null)
+						E4Util.message("  Add button Menu"); //$NON-NLS-1$
+					else
+						openMenuFor(item, persp);
+				}
+			}
+		});
+
+		perspSwitcherToolbar.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				disposeTBImages();
+			}
+
+		});
 
 		perspSwitcherToolbar.getAccessible().addAccessibleListener(new AccessibleAdapter() {
 			@Override
@@ -467,16 +510,22 @@ public class PerspectiveSwitcher {
 			}
 		});
 
-		bar.addDragDetectListener(e -> {
-			if (dragItem != null) {
-				dragging = true;
-				track(e);
+		bar.addDragDetectListener(new DragDetectListener() {
+			@Override
+			public void dragDetected(DragDetectEvent e) {
+				if (dragItem != null) {
+					dragging = true;
+					track(e);
+				}
 			}
 		});
 
-		bar.addMouseMoveListener(e -> {
-			if (dragging) {
-				track(e);
+		bar.addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void mouseMove(MouseEvent e) {
+				if (dragging) {
+					track(e);
+				}
 			}
 		});
 	}
@@ -515,10 +564,13 @@ public class PerspectiveSwitcher {
 				if (image != null) {
 					psItem.setImage(image);
 
-					psItem.addListener(SWT.Dispose, event -> {
-						Image currentImage = psItem.getImage();
-						if (currentImage != null)
-							currentImage.dispose();
+					psItem.addListener(SWT.Dispose, new Listener() {
+						@Override
+						public void handleEvent(org.eclipse.swt.widgets.Event event) {
+							Image currentImage = psItem.getImage();
+							if (currentImage != null)
+								currentImage.dispose();
+						}
 					});
 					foundImage = true;
 					psItem.setToolTipText(persp.getLocalizedLabel());
@@ -548,9 +600,12 @@ public class PerspectiveSwitcher {
 			}
 		});
 
-		psItem.addListener(SWT.MenuDetect, event -> {
-			MPerspective persp1 = (MPerspective) event.widget.getData();
-			openMenuFor(psItem, persp1);
+		psItem.addListener(SWT.MenuDetect, new Listener() {
+			@Override
+			public void handleEvent(org.eclipse.swt.widgets.Event event) {
+				MPerspective persp = (MPerspective) event.widget.getData();
+				openMenuFor(psItem, persp);
+			}
 		});
 
 		// update the size
@@ -602,7 +657,14 @@ public class PerspectiveSwitcher {
 
 			@Override
 			public void menuHidden(MenuEvent e) {
-				perspSwitcherToolbar.getDisplay().asyncExec(() -> menu.dispose());
+				perspSwitcherToolbar.getDisplay().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						menu.dispose();
+					}
+
+				});
 			}
 
 			@Override
@@ -744,16 +806,20 @@ public class PerspectiveSwitcher {
 	}
 
 	private void setPropertyChangeListener() {
-		propertyChangeListener = propertyChangeEvent -> {
-			if (IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR
-					.equals(propertyChangeEvent.getProperty())) {
-				Object newValue = propertyChangeEvent.getNewValue();
-				boolean showText = true; // default
-				if (newValue instanceof Boolean)
-					showText = ((Boolean) newValue).booleanValue();
-				else if ("false".equals(newValue)) //$NON-NLS-1$
-					showText = false;
-				changeShowText(showText);
+		propertyChangeListener = new IPropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+				if (IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR
+						.equals(propertyChangeEvent.getProperty())) {
+					Object newValue = propertyChangeEvent.getNewValue();
+					boolean showText = true; // default
+					if (newValue instanceof Boolean)
+						showText = ((Boolean) newValue).booleanValue();
+					else if ("false".equals(newValue)) //$NON-NLS-1$
+						showText = false;
+					changeShowText(showText);
+				}
 			}
 		};
 		PrefUtil.getAPIPreferenceStore().addPropertyChangeListener(propertyChangeListener);

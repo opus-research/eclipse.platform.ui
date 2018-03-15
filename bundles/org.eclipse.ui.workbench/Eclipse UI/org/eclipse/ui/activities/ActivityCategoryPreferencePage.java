@@ -26,11 +26,13 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -264,8 +266,6 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
 			enabler = new ActivityEnabler(workingCopy, strings);
 			Control enablerControl = enabler.createControl(composite);
 			enablerControl.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-			Dialog.applyDialogFont(composite);
 			return composite;
 		}
 
@@ -419,11 +419,15 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
         categoryViewer.addFilter(new EmptyCategoryFilter());
 
         categoryViewer
-                .addSelectionChangedListener(event -> {
-				    ICategory element = (ICategory) ((IStructuredSelection) event
-				            .getSelection()).getFirstElement();
-				    setDetails(element);
-				});
+                .addSelectionChangedListener(new ISelectionChangedListener() {
+
+                    @Override
+                    public void selectionChanged(SelectionChangedEvent event) {
+                        ICategory element = (ICategory) ((IStructuredSelection) event
+                                .getSelection()).getFirstElement();
+                        setDetails(element);
+                    }
+                });
         categoryViewer.setInput(workingCopy.getDefinedCategoryIds());
 
 		updateCategoryCheckState();

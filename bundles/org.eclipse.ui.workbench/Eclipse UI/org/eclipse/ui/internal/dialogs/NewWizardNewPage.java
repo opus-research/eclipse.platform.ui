@@ -22,6 +22,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -33,6 +35,8 @@ import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardContainer2;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -342,19 +346,22 @@ class NewWizardNewPage implements ISelectionChangedListener {
 
         treeViewer.getTree().setFont(parent.getFont());
 
-        treeViewer.addDoubleClickListener(event -> {
-			    IStructuredSelection s = (IStructuredSelection) event
-					.getSelection();
-			selectionChanged(new SelectionChangedEvent(event.getViewer(), s));
+        treeViewer.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+			public void doubleClick(DoubleClickEvent event) {
+            	    IStructuredSelection s = (IStructuredSelection) event
+						.getSelection();
+				selectionChanged(new SelectionChangedEvent(event.getViewer(), s));
 
-			Object element = s.getFirstElement();
-		    if (treeViewer.isExpandable(element)) {
-		    	treeViewer.setExpandedState(element, !treeViewer
-		                .getExpandedState(element));
-		    } else if (element instanceof WorkbenchWizardElement) {
-		        page.advanceToNextPageOrFinish();
-		    }
-		});
+				Object element = s.getFirstElement();
+                if (treeViewer.isExpandable(element)) {
+                	treeViewer.setExpandedState(element, !treeViewer
+                            .getExpandedState(element));
+                } else if (element instanceof WorkbenchWizardElement) {
+                    page.advanceToNextPageOrFinish();
+                }
+            }
+        });
 
         treeViewer.addFilter(filter);
 
@@ -463,12 +470,16 @@ class NewWizardNewPage implements ISelectionChangedListener {
         descImageCanvas.setLayoutData(data);
 
         // hook a listener to get rid of cached images.
-        descImageCanvas.addDisposeListener(e -> {
-		    for (Iterator i = imageTable.values().iterator(); i.hasNext();) {
-		        ((Image) i.next()).dispose();
-		    }
-		    imageTable.clear();
-		});
+        descImageCanvas.addDisposeListener(new DisposeListener() {
+
+            @Override
+			public void widgetDisposed(DisposeEvent e) {
+                for (Iterator i = imageTable.values().iterator(); i.hasNext();) {
+                    ((Image) i.next()).dispose();
+                }
+                imageTable.clear();
+            }
+        });
     }
 
     /**
@@ -587,7 +598,12 @@ class NewWizardNewPage implements ISelectionChangedListener {
 
         //work around for 62039
         final StructuredSelection selection = new StructuredSelection(selected);
-        filteredTree.getViewer().getControl().getDisplay().asyncExec(() -> filteredTree.getViewer().setSelection(selection, true));
+        filteredTree.getViewer().getControl().getDisplay().asyncExec(new Runnable() {
+            @Override
+			public void run() {
+            	filteredTree.getViewer().setSelection(selection, true);
+            }
+        });
     }
 
     /**

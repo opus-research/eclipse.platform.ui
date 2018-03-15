@@ -60,9 +60,8 @@ public class SelectionChangedEvent extends EventObject {
 	 * Returns the selection.
 	 *
 	 * @return IStructuredSelection
-	 * @throws ClassCastException
-	 *             if the selection is not an instance of IStructuredSelection
-	 * @since 3.13
+	 * @throws ClassCastException if the selection is not an instance of IStructuredSelection
+	 * @since 3.12
 	 */
 	public IStructuredSelection getStructuredSelection() throws ClassCastException {
 		ISelection selection = getSelection();

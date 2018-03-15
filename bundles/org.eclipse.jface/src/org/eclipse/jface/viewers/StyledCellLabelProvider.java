@@ -283,8 +283,8 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 
 		StyleRange[] styleRanges = cell.getStyleRanges();
 		if (styleRanges != null) { // user didn't fill styled ranges
-			for (StyleRange styleRange : styleRanges) {
-				StyleRange curr = prepareStyleRange(styleRange, applyColors);
+			for (int i = 0; i < styleRanges.length; i++) {
+				StyleRange curr = prepareStyleRange(styleRanges[i], applyColors);
 				layout.setStyle(curr, curr.start, curr.start + curr.length - 1);
 				if (curr.font != null) {
 					containsOtherFont= true;

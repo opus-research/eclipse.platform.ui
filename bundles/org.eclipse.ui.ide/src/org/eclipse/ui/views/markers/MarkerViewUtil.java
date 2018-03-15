@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  *******************************************************************************/
 
 package org.eclipse.ui.views.markers;
-
-import java.util.ArrayList;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -88,41 +86,27 @@ public class MarkerViewUtil {
 	public static boolean showMarker(IWorkbenchPage page, IMarker marker,
 			boolean showView) {
 
-		return showMarkers(page, new IMarker[] { marker }, showView);
-	}
-
-	/**
-	 * Shows the given markers in the appropriate view for the first marker in
-	 * the given page. If following markers do not belong to this view, they
-	 * would not be shown. This must be called from the UI thread.
-	 *
-	 * @param page
-	 *            the workbench page in which to show the markers
-	 * @param markers
-	 *            the markers to show
-	 * @param showView
-	 *            <code>true</code> if the view should be shown first
-	 *            <code>false</code> to only show the markers if the view is
-	 *            already showing
-	 * @return <code>true</code> if the markers were successfully shown,
-	 *         <code>false</code> if not
-	 * @since 3.13
-	 */
-	public static boolean showMarkers(IWorkbenchPage page, IMarker[] markers, boolean showView) {
-
-		if (null == markers || 0 == markers.length || null == markers[0])
-			return false;
 		boolean returnValue = false;
 		try {
-			String viewId = getViewId(markers[0]);
-			IMarker[] markersSameView = getMarkersOfView(viewId, markers);
+			String viewId = getViewId(marker);
 			if (viewId == null) // Use the problem view by default
 				viewId = IPageLayout.ID_PROBLEM_VIEW;
 
 			IViewPart view = showView ? page.showView(viewId) : page
 					.findView(viewId);
 			if (view != null)
-				returnValue = MarkerSupportInternalUtilities.showMarkers(view, markersSameView);
+				returnValue = MarkerSupportInternalUtilities.showMarker(view,
+						marker);
+
+			// If we have already shown the new one do not open another one
+			viewId = getLegacyViewId(marker);
+			if (viewId != null) {
+				if (returnValue)
+					view = page.findView(viewId);
+				else
+					view = showView ? page.showView(viewId) : page
+							.findView(viewId);
+			}
 		} catch (CoreException e) {
 			Policy.handle(e);
 		}
@@ -130,26 +114,21 @@ public class MarkerViewUtil {
 	}
 
 	/**
-	 * Retrieves all the markers that belongs to the given view.
+	 * Returns the id of the view used to show markers of the same type as the
+	 * given marker using.legacy support
 	 *
-	 * @param viewId
-	 *            the id of the given view
-	 * @param markers
-	 *            the markers to be inspect
-	 *
-	 * @return markers that belongs to the given view
+	 * @param marker
+	 *            the marker
+	 * @return the view id or <code>null</code> if no appropriate view could
+	 *         be determined
 	 * @throws CoreException
 	 *             if an exception occurs testing the type of the marker
 	 */
-	private static IMarker[] getMarkersOfView(String viewId, IMarker[] markers) throws CoreException {
-		if (null == viewId) // all markers should be shown
-			return markers;
-
-		ArrayList<IMarker> markersOfView = new ArrayList<>();
-		for (IMarker marker : markers) {
-			if (null != marker && viewId.equals(getViewId(marker)))
-				markersOfView.add(marker);
-		}
-		return markersOfView.toArray(new IMarker[markersOfView.size()]);
+	private static String getLegacyViewId(IMarker marker) throws CoreException {
+		String viewId = getViewId(marker);
+		if (viewId == null)
+			return null;
+		return viewId + MarkerSupportInternalUtilities.LEGACY_SUFFIX;
 	}
+
 }

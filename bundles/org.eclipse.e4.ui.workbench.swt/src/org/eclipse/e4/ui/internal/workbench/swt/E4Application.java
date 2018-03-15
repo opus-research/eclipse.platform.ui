@@ -24,7 +24,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -77,7 +76,6 @@ import org.eclipse.e4.ui.workbench.lifecycle.ProcessRemovals;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPlaceholderResolver;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
-import org.eclipse.e4.ui.workbench.swt.internal.copy.WorkbenchSWTMessages;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.common.util.URI;
@@ -712,7 +710,7 @@ public class E4Application implements IApplication {
 			String versionLine = WORKSPACE_VERSION_KEY + '=' + WORKSPACE_VERSION_VALUE;
 
 			output = new FileOutputStream(versionFile);
-			output.write(versionLine.getBytes(StandardCharsets.UTF_8));
+			output.write(versionLine.getBytes("UTF-8")); //$NON-NLS-1$
 		} catch (IOException e) {
 			Logger logger = new WorkbenchLogger(PLUGIN_ID);
 			logger.error(e);

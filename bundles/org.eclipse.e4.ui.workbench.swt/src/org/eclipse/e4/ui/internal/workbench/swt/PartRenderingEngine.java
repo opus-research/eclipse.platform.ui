@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 457939
  *     Alexander Baranov <achilles-86@mail.ru> - Bug 458460
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 483842
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 487621
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -32,11 +31,8 @@ import javax.inject.Named;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -57,7 +53,9 @@ import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.css.swt.theme.IThemeManager;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
+import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.MContribution;
@@ -118,7 +116,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	IRendererFactory curFactory = null;
 
-	private Map<String, AbstractPartRenderer> customRendererMap = new HashMap<>();
+	private Map<String, AbstractPartRenderer> customRendererMap = new HashMap<String, AbstractPartRenderer>();
 
 	org.eclipse.swt.widgets.Listener keyListener;
 
@@ -144,9 +142,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		boolean okToRender = parent instanceof MApplication || parent.getWidget() != null;
 
 		if (changedElement.isToBeRendered() && okToRender) {
-			if (Policy.DEBUG_RENDERER) {
-				WorkbenchSWTActivator.trace(Policy.DEBUG_RENDERER_FLAG, "visible -> true", null); //$NON-NLS-1$
-			}
+			Activator.trace(Policy.DEBUG_RENDERER, "visible -> true", null); //$NON-NLS-1$
 
 			// Note that the 'createGui' protocol calls 'childAdded'
 			Object w = createGui(changedElement);
@@ -154,9 +150,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				fixZOrder(changedElement);
 			}
 		} else {
-			if (Policy.DEBUG_RENDERER) {
-				WorkbenchSWTActivator.trace(Policy.DEBUG_RENDERER_FLAG, "visible -> false", null); //$NON-NLS-1$
-			}
+			Activator.trace(Policy.DEBUG_RENDERER, "visible -> false", null); //$NON-NLS-1$
 
 			// Ensure that the element about to be removed is not the
 			// selected element
@@ -284,9 +278,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		}
 
 		if (UIEvents.isADD(event)) {
-			if (Policy.DEBUG_RENDERER) {
-				WorkbenchSWTActivator.trace(Policy.DEBUG_RENDERER_FLAG, "Child Added", null); //$NON-NLS-1$
-			}
+			Activator.trace(Policy.DEBUG_RENDERER, "Child Added", null); //$NON-NLS-1$
 			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.NEW_VALUE)) {
 				MUIElement added = (MUIElement) o;
 
@@ -325,9 +317,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 			}
 		} else if (UIEvents.isREMOVE(event)) {
-			if (Policy.DEBUG_RENDERER) {
-				WorkbenchSWTActivator.trace(Policy.DEBUG_RENDERER_FLAG, "Child Removed", null); //$NON-NLS-1$
-			}
+			Activator.trace(Policy.DEBUG_RENDERER, "Child Removed", null); //$NON-NLS-1$
 			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.OLD_VALUE)) {
 				MUIElement removed = (MUIElement) o;
 				// Removing invisible elements is a NO-OP as far as the
@@ -339,8 +329,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				if (removed.getWidget() instanceof Control) {
 					Control ctrl = (Control) removed.getWidget();
 					ctrl.setLayoutData(null);
-					// bug 487621
-					ctrl.getParent().layout(new Control[] { ctrl }, SWT.CHANGED | SWT.DEFER);
+					ctrl.requestLayout();
 				}
 
 				// Ensure that the element about to be removed is not the
@@ -491,9 +480,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 		curFactory = factory;
 		context.set(IRendererFactory.class, curFactory);
 
-		IScopeContext[] contexts = new IScopeContext[] { DefaultScope.INSTANCE, InstanceScope.INSTANCE};
-		enableThemePreference = Platform.getPreferencesService().getBoolean("org.eclipse.e4.ui.workbench.renderers.swt",
-				ENABLED_THEME_KEY, true, contexts);
+		IEclipsePreferences node = InstanceScope.INSTANCE.getNode("org.eclipse.e4.ui.workbench.renderers.swt");
+		enableThemePreference = node.getBoolean(ENABLED_THEME_KEY, true);
 
 		cssThemeChangedHandler = new StylingPreferencesHandler(context.get(Display.class));
 	}
@@ -501,11 +489,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 	private static void populateModelInterfaces(MContext contextModel,
 			IEclipseContext context, Class<?>[] interfaces) {
 		for (Class<?> intf : interfaces) {
-			if (Policy.DEBUG_CONTEXTS) {
-				WorkbenchSWTActivator.trace(Policy.DEBUG_CONTEXTS_FLAG,
-						"Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
-								+ contextModel.getClass().getName(), null);
-			}
+			Activator.trace(Policy.DEBUG_CONTEXTS,
+					"Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
+							+ contextModel.getClass().getName(), null);
 			context.set(intf.getName(), contextModel);
 
 			populateModelInterfaces(contextModel, context, intf.getInterfaces());
@@ -879,7 +865,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				MUIElement selectedElement = container.getSelectedElement();
 				List<MUIElement> children = container.getChildren();
 				// Bug 458460: Operate on a copy in case child nulls out parent
-				for (MUIElement child : new ArrayList<>(children)) {
+				for (MUIElement child : new ArrayList<MUIElement>(children)) {
 					// remove stuff in the "back" first
 					if (child != selectedElement) {
 						removeGui(child);
@@ -1126,18 +1112,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 						}
 					};
 				}
-				final IEventLoopAdvisor finalAdvisor = advisor;
-				display.setErrorHandler(e -> {
-					// If e is one of the exception types that are generally
-					// recoverable, hand it to the event loop advisor
-					if (e instanceof LinkageError || e instanceof AssertionError) {
-						handle(e, finalAdvisor);
-					} else {
-						// Otherwise, rethrow it
-						throw e;
-					}
-				});
-				display.setRuntimeExceptionHandler(e -> handle(e, finalAdvisor));
 				// Spin the event loop until someone disposes the display
 				while (((testShell != null && !testShell.isDisposed()) || (theApp != null && someAreVisible(theApp
 						.getChildren()))) && !display.isDisposed()) {
@@ -1434,7 +1408,12 @@ public class PartRenderingEngine implements IPresentationEngine {
 		}
 
 		protected Listener createOnDisplayDisposedListener() {
-			return event -> resetOverriddenPreferences();
+			return new Listener() {
+					@Override
+					public void handleEvent(org.eclipse.swt.widgets.Event event) {
+						resetOverriddenPreferences();
+					}
+			};
 		}
 
 		@Override
@@ -1466,7 +1445,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		protected Set<IEclipsePreferences> getPreferences() {
 			if (prefs == null) {
-				prefs = new HashSet<>();
+				prefs = new HashSet<IEclipsePreferences>();
 				BundleContext context = WorkbenchSWTActivator.getDefault().getContext();
 				for (Bundle bundle : context.getBundles()) {
 					if (bundle.getSymbolicName() != null) {

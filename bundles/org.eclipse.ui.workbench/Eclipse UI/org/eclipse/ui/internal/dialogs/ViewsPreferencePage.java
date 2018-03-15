@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,9 @@ import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -142,24 +144,28 @@ public class ViewsPreferencePage extends PreferencePage implements
 			themeIdCombo.setSelection(new StructuredSelection(currentTheme));
 		}
 		themeComboDecorator = new ControlDecoration(themeIdCombo.getCombo(), SWT.TOP | SWT.LEFT);
-		themeIdCombo.addSelectionChangedListener(event -> {
-			ITheme selection = getSelectedTheme();
-			if (!selection.equals(currentTheme)) {
-				themeComboDecorator.setDescriptionText(WorkbenchMessages.ThemeChangeWarningText);
-				Image decorationImage = FieldDecorationRegistry.getDefault()
-						.getFieldDecoration(FieldDecorationRegistry.DEC_WARNING).getImage();
-				themeComboDecorator.setImage(decorationImage);
-				themeComboDecorator.show();
-			} else {
-				themeComboDecorator.hide();
+		themeIdCombo.addSelectionChangedListener(new ISelectionChangedListener() {
+
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				ITheme selection = getSelectedTheme();
+				if (!selection.equals(currentTheme)) {
+					themeComboDecorator.setDescriptionText(WorkbenchMessages.ThemeChangeWarningText);
+					Image decorationImage = FieldDecorationRegistry.getDefault()
+							.getFieldDecoration(FieldDecorationRegistry.DEC_WARNING).getImage();
+					themeComboDecorator.setImage(decorationImage);
+					themeComboDecorator.show();
+				} else {
+					themeComboDecorator.hide();
+				}
+				try {
+					((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY))
+							.setSelection(selection);
+				} catch (SWTException e) {
+					WorkbenchPlugin.log("Failed to set CSS preferences", e); //$NON-NLS-1$
+				}
+				selectColorsAndFontsTheme(getColorAndFontThemeIdByThemeId(selection.getId()));
 			}
-			try {
-				((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY))
-						.setSelection(selection);
-			} catch (SWTException e) {
-				WorkbenchPlugin.log("Failed to set CSS preferences", e); //$NON-NLS-1$
-			}
-			selectColorsAndFontsTheme(getColorAndFontThemeIdByThemeId(selection.getId()));
 		});
 
 		currentColorsAndFontsTheme = getCurrentColorsAndFontsTheme();
@@ -182,7 +188,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 			selectColorsAndFontsTheme(colorsAndFontsThemeId);
 		}
 
-		Dialog.applyDialogFont(comp);
 		return comp;
 	}
 
@@ -386,19 +391,22 @@ public class ViewsPreferencePage extends PreferencePage implements
 		colorsAndFontsThemeCombo.setContentProvider(new ArrayContentProvider());
 		colorsAndFontsThemeCombo.setInput(getColorsAndFontsThemes());
 		colorsAndFontsThemeCombo.getControl().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		colorsAndFontsThemeCombo.addSelectionChangedListener(event -> {
-			ColorsAndFontsTheme colorsAndFontsTheme = getSelectedColorsAndFontsTheme();
-			if (!colorsAndFontsTheme.equals(currentColorsAndFontsTheme)) {
-				Image decorationImage = FieldDecorationRegistry.getDefault()
-						.getFieldDecoration(FieldDecorationRegistry.DEC_WARNING).getImage();
-				colorFontsDecorator.setImage(decorationImage);
-				colorFontsDecorator
-						.setDescriptionText(WorkbenchMessages.ThemeChangeWarningText);
-				colorFontsDecorator.show();
-			} else
-				colorFontsDecorator.hide();
-			refreshColorsAndFontsThemeDescriptionText(colorsAndFontsTheme);
-			setColorsAndFontsTheme(colorsAndFontsTheme);
+		colorsAndFontsThemeCombo.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				ColorsAndFontsTheme colorsAndFontsTheme = getSelectedColorsAndFontsTheme();
+				if (!colorsAndFontsTheme.equals(currentColorsAndFontsTheme)) {
+					Image decorationImage = FieldDecorationRegistry.getDefault()
+							.getFieldDecoration(FieldDecorationRegistry.DEC_WARNING).getImage();
+					colorFontsDecorator.setImage(decorationImage);
+					colorFontsDecorator
+							.setDescriptionText(WorkbenchMessages.ThemeChangeWarningText);
+					colorFontsDecorator.show();
+				} else
+					colorFontsDecorator.hide();
+				refreshColorsAndFontsThemeDescriptionText(colorsAndFontsTheme);
+				setColorsAndFontsTheme(colorsAndFontsTheme);
+			}
 		});
 	}
 

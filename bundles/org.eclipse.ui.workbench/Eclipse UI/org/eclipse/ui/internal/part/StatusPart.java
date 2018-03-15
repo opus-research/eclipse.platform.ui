@@ -16,6 +16,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -204,6 +206,11 @@ public class StatusPart {
 		final Image image = descriptor.getImageDescriptor().createImage();
 		button.setImage(image);
 		button.setToolTipText(WorkbenchMessages.ErrorLogUtil_ShowErrorLogTooltip);
-		button.addDisposeListener(e -> image.dispose());
+		button.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				image.dispose();
+			}
+		});
     }
 }

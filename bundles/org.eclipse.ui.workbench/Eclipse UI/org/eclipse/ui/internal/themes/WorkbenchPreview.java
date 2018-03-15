@@ -11,6 +11,7 @@
 package org.eclipse.ui.internal.themes;
 
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
@@ -53,13 +54,16 @@ public class WorkbenchPreview implements IThemePreview {
 
     private ViewForm viewForm;
 
-    private IPropertyChangeListener fontAndColorListener = event -> {
-	    if (!disposed) {
-	        setColorsAndFonts();
-	        //viewMessage.setSize(viewMessage.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
-	        viewForm.layout(true);
-	    }
-	};
+    private IPropertyChangeListener fontAndColorListener = new IPropertyChangeListener() {
+        @Override
+		public void propertyChange(PropertyChangeEvent event) {
+            if (!disposed) {
+                setColorsAndFonts();
+                //viewMessage.setSize(viewMessage.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
+                viewForm.layout(true);
+            }
+        }
+    };
 
     @Override
 	public void createControl(Composite parent, ITheme currentTheme) {

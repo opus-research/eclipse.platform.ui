@@ -143,7 +143,6 @@ public class ErrorMessagesPage extends FormPage {
 		super(editor, "messageManager", "Message Manager");
 	}
 
-	@Override
 	protected void createFormContent(final IManagedForm managedForm) {
 		final ScrolledForm form = managedForm.getForm();
 		final FormToolkit toolkit = managedForm.getToolkit();
@@ -152,7 +151,6 @@ public class ErrorMessagesPage extends FormPage {
 		form.setText("Example with message handling");
 		toolkit.decorateFormHeading(form.getForm());
 		form.getForm().addMessageHyperlinkListener(new HyperlinkAdapter() {
-			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				String title = e.getLabel();
 				// String details = title;
@@ -225,7 +223,6 @@ public class ErrorMessagesPage extends FormPage {
 		final Button button1 = toolkit.createButton(form.getBody(),
 				"Add general error", SWT.CHECK);
 		button1.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (button1.getSelection()) {
 					mmng.addMessage("saveError", "Save Error", null,
@@ -238,7 +235,6 @@ public class ErrorMessagesPage extends FormPage {
 		final Button button2 = toolkit.createButton(form.getBody(),
 				"Add static message", SWT.CHECK);
 		button2.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (button2.getSelection()) {
 					mmng.addMessage("info", "Secondary info", null,
@@ -251,7 +247,6 @@ public class ErrorMessagesPage extends FormPage {
 		final Button button3 = toolkit.createButton(form.getBody(),
 				"Auto update", SWT.CHECK);
 		button3.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				mmng.setAutoUpdate(button3.getSelection());
 			}
@@ -276,7 +271,6 @@ public class ErrorMessagesPage extends FormPage {
 
 	private void configureFormText(final Form form, FormText text) {
 		text.addHyperlinkListener(new HyperlinkAdapter() {
-			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				String is = (String)e.getHref();
 				try {
@@ -337,7 +331,6 @@ public class ErrorMessagesPage extends FormPage {
 		gd.widthHint = 150;
 		text.setLayoutData(gd);
 		text.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				String s = text.getText();
 				// flag length
