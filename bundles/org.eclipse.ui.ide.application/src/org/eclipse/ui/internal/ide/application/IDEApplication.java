@@ -24,10 +24,8 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -38,7 +36,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.util.NLS;
@@ -134,11 +131,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
                 return instanceLocationCheck;
             }
 
-			// Set the default value of the preference controlling the workspace
-			// name displayed in the window title.
-			setWorkspaceNameDefault();
-
-			// create the workbench with this advisor and run it until it exits
+            // create the workbench with this advisor and run it until it exits
             // N.B. createWorkbench remembers the advisor, and also registers
             // the workbench globally so that all UI plug-ins can find it using
             // PlatformUI.getWorkbench() or AbstractUIPlugin.getWorkbench()
@@ -167,24 +160,10 @@ public class IDEApplication implements IApplication, IExecutableExtension {
     }
 
     /**
-	 * Sets the default value of the preference controlling the workspace name
-	 * displayed in the window title to the name of the workspace directory.
-	 * This preference cannot be set in the preference initializer because the
-	 * workspace directory may not be known when the preference initializer is
-	 * called.
-	 */
-	private static void setWorkspaceNameDefault() {
-		IPath workspaceDir = ResourcesPlugin.getWorkspace().getRoot().getLocation();
-		String workspaceName = workspaceDir.lastSegment();
-		IPreferenceStore preferences = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
-		preferences.setDefault(IDEInternalPreferences.WORKSPACE_NAME, workspaceName);
-	}
-
-	/**
-	 * Creates the display used by the application.
-	 *
-	 * @return the display used by the application
-	 */
+     * Creates the display used by the application.
+     *
+     * @return the display used by the application
+     */
     protected Display createDisplay() {
         return PlatformUI.createDisplay();
     }
