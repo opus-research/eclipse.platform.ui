@@ -921,6 +921,9 @@ public class WorkbenchMessages extends NLS {
 	public static String ContentTypes_newContentTypeDialog_invalidContentTypeName;
 	public static String ContentTypes_failedAtEditingContentTypes;
     public static String Edit;
+	public static String ContentTypes_editorAssociations;
+	public static String ContentTypes_editorAssociationAddLabel;
+	public static String ContentTypes_editorAssociationRemoveLabel;
 
     // =========================================================================
     // Deprecated actions support
@@ -1020,7 +1023,6 @@ public class WorkbenchMessages extends NLS {
 	// Util
 	public static String Util_List;
 	public static String Util_listNull;
-
 
 
 }
