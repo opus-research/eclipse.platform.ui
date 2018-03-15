@@ -7,7 +7,6 @@
  *
  *  Contributors:
  *     IBM Corporation - initial API and implementation
- *     Ralf M Petter <ralf.petter@gmail.com> - Bug 509719
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 
@@ -854,8 +853,10 @@ public class FormHeading extends Canvas {
 
 	private void updateGradientImage() {
 		Rectangle rect = getBounds();
-		Image oldGradientImage = gradientImage;
-		gradientImage = null;
+		if (gradientImage != null) {
+			FormImages.getInstance().markFinished(gradientImage, getDisplay());
+			gradientImage = null;
+		}
 		if (gradientInfo != null) {
 			gradientImage = FormImages.getInstance().getGradient(gradientInfo.gradientColors, gradientInfo.percents,
 					gradientInfo.vertical ? rect.height : rect.width, gradientInfo.vertical, getColor(COLOR_BASE_BG), getDisplay());
@@ -866,9 +867,6 @@ public class FormHeading extends Canvas {
 			GC gc = new GC(gradientImage);
 			gc.drawImage(backgroundImage, 0, 0);
 			gc.dispose();
-		}
-		if (oldGradientImage != null) {
-			FormImages.getInstance().markFinished(oldGradientImage, getDisplay());
 		}
 		setBackgroundImage(gradientImage);
 	}
