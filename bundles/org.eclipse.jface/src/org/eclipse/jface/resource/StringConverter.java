@@ -328,9 +328,9 @@ public class StringConverter {
     public static FontData[] asFontDataArray(String value) {
         String[] strings = getArrayFromList(value, FONT_SEPARATOR);
         ArrayList<FontData> data = new ArrayList<>(strings.length);
-        for (String string : strings) {
+        for (int i = 0; i < strings.length; i++) {
             try {
-                data.add(StringConverter.asFontData(string));
+                data.add(StringConverter.asFontData(strings[i]));
             } catch (DataFormatException e) {
                 //do-nothing
             }
