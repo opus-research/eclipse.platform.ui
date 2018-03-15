@@ -129,7 +129,8 @@ public class Form extends Composite {
 			int width = 0;
 			int height = 0;
 
-			Point hsize = headCache.computeSize(wHint, SWT.DEFAULT);
+			Point hsize = headCache.computeSize(FormUtil.getWidthHint(wHint,
+					head), SWT.DEFAULT);
 			width = Math.max(hsize.x, width);
 			height = hsize.y;
 
@@ -139,7 +140,8 @@ public class Form extends Composite {
 			if (ignoreBody)
 				bsize = new Point(0,0);
 			else
-				bsize = bodyCache.computeSize(wHint, SWT.DEFAULT);
+				bsize = bodyCache.computeSize(FormUtil.getWidthHint(wHint,
+					body), SWT.DEFAULT);
 			width = Math.max(bsize.x, width);
 			height += bsize.y;
 			return new Point(width, height);
@@ -173,7 +175,7 @@ public class Form extends Composite {
 		super.setLayout(new FormLayout());
 		head = new FormHeading(this, SWT.NULL);
 		head.setMenu(parent.getMenu());
-		body = new Composite(this, SWT.NULL);
+		body = new LayoutComposite(this, SWT.NULL);
 		body.setMenu(parent.getMenu());
 	}
 
@@ -188,6 +190,15 @@ public class Form extends Composite {
 		super.setMenu(menu);
 		head.setMenu(menu);
 		body.setMenu(menu);
+	}
+
+	/**
+	 * Fully delegates the size computation to the internal layout manager.
+	 */
+	@Override
+	public final Point computeSize(int wHint, int hHint, boolean changed) {
+		return ((FormLayout) getLayout()).computeSize(this, wHint, hHint,
+				changed);
 	}
 
 	/**
