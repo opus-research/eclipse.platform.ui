@@ -156,7 +156,6 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.dialogs.EditorSelectionDialog;
-import org.eclipse.ui.internal.EditorReference;
 import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
@@ -4744,21 +4743,16 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	@Override
 	public void showEditor(IEditorReference ref) {
-		IWorkbenchPart wPart = ref.getPart(false);
-		MPart part = ((EditorReference)ref).getModel();
-		part.setVisible(true);
-		
-		//Workaround to get content visible. Otherwise the content sometimes is not rendered.
-		MElementContainer<MUIElement> partStack = part.getParent();
-		partStack.setSelectedElement(null);
-		partStack.setSelectedElement(part);
-		wPart.setFocus();
+		// FIXME compat showEditor
+		E4Util.unsupported("showEditor"); //$NON-NLS-1$
+
 	}
 
 	@Override
 	public void hideEditor(IEditorReference ref) {
-		MPart part = ((EditorReference)ref).getModel();
-		part.setVisible(false);
+		// FIXME compat hideEditor
+		E4Util.unsupported("hideEditor"); //$NON-NLS-1$
+
 	}
 
 	private String getEditorImageURI(EditorReference reference) {
