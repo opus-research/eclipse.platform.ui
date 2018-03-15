@@ -44,7 +44,7 @@ public abstract class ListDiffEntry<E> {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder buffer = new StringBuilder();
+		StringBuffer buffer = new StringBuffer();
 		buffer
 			.append(this.getClass().getName())
 			.append("{position [") //$NON-NLS-1$
