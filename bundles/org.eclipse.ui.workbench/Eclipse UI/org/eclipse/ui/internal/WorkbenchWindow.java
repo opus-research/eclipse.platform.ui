@@ -303,7 +303,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 *
 	 * @since 3.3
 	 */
-	private ListenerList<IPropertyChangeListener> genericPropertyListeners = new ListenerList<>();
+	private ListenerList genericPropertyListeners = new ListenerList();
 
 	private IAdaptable input;
 
@@ -2421,9 +2421,9 @@ STATUS_LINE_ID, model);
 		// there is a separator for the additions group thus >= 2
 	}
 
-	private ListenerList<IActionSetsListener> actionSetListeners = null;
+	private ListenerList actionSetListeners = null;
 
-	private ListenerList<IBackgroundSaveListener> backgroundSaveListeners = new ListenerList<>(ListenerList.IDENTITY);
+	private ListenerList backgroundSaveListeners = new ListenerList(ListenerList.IDENTITY);
 
 	private SelectionService selectionService;
 
@@ -2451,7 +2451,7 @@ STATUS_LINE_ID, model);
 
 	final void addActionSetsListener(final IActionSetsListener listener) {
 		if (actionSetListeners == null) {
-			actionSetListeners = new ListenerList<>();
+			actionSetListeners = new ListenerList();
 		}
 
 		actionSetListeners.add(listener);
