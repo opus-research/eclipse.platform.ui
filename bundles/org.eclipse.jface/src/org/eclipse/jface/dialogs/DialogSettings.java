@@ -564,5 +564,4 @@ public class DialogSettings implements IDialogSettings {
     		return null;
     	}
     }
-
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.eclipse.jface" version="2">
+    <resource path="src/org/eclipse/jface/dialogs/IDialogSettings.java" type="org.eclipse.jface.dialogs.IDialogSettings">
+        <filter comment="See https://bugs.eclipse.org/bugs/show_bug.cgi?id=519888" id="404000815">
+            <message_arguments>
+                <message_argument value="org.eclipse.jface.dialogs.IDialogSettings"/>
+                <message_argument value="getDouble(String, double)"/>
+            </message_arguments>
+        </filter>
+        <filter comment="See https://bugs.eclipse.org/bugs/show_bug.cgi?id=519888" id="404000815">
+            <message_arguments>
+                <message_argument value="org.eclipse.jface.dialogs.IDialogSettings"/>
+                <message_argument value="getFloat(String, float)"/>
+            </message_arguments>
+        </filter>
+        <filter comment="See https://bugs.eclipse.org/bugs/show_bug.cgi?id=519888" id="404000815">
+            <message_arguments>
+                <message_argument value="org.eclipse.jface.dialogs.IDialogSettings"/>
+                <message_argument value="getInt(String, int)"/>
+            </message_arguments>
+        </filter>
+        <filter comment="See https://bugs.eclipse.org/bugs/show_bug.cgi?id=519888" id="404000815">
+            <message_arguments>
+                <message_argument value="org.eclipse.jface.dialogs.IDialogSettings"/>
+                <message_argument value="getLong(String, long)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>
