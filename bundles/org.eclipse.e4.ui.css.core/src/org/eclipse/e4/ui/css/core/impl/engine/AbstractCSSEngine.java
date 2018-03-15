@@ -137,7 +137,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	/**
 	 * An ordered list of ICSSPropertyHandlerProvider
 	 */
-	protected List<ICSSPropertyHandlerProvider> propertyHandlerProviders = new ArrayList<>();
+	protected List<ICSSPropertyHandlerProvider> propertyHandlerProviders = new ArrayList<ICSSPropertyHandlerProvider>();
 
 	private Map<String, String> currentCSSPropertiesApplyed;
 
@@ -200,12 +200,13 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 				Path p = new Path(source.getURI());
 				IPath trim = p.removeLastSegments(1);
 				boolean isArchive = source.getURI().contains(ARCHIVE_IDENTIFIER);
-				url = FileLocator
-						.resolve(new URL(trim.addTrailingSeparator().toString() + ((CSSImportRule) rule).getHref()));
+				url = FileLocator.resolve(new URL(trim.addTrailingSeparator()
+						.toString() + ((CSSImportRule) rule).getHref()));
 				File testFile = new File(url.getFile());
 				if (!isArchive&&!testFile.exists()) {
 					// look in platform default
-					String path = getResourcesLocatorManager().resolve((importRule).getHref());
+					String path = getResourcesLocatorManager().resolve(
+							(importRule).getHref());
 					testFile = new File(new URL(path).getFile());
 					if (testFile.exists()) {
 						url = new URL(path);
@@ -264,30 +265,35 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	/*--------------- Parse style declaration -----------------*/
 
 	@Override
-	public CSSStyleDeclaration parseStyleDeclaration(String style) throws IOException {
+	public CSSStyleDeclaration parseStyleDeclaration(String style)
+			throws IOException {
 		Reader reader = new StringReader(style);
 		return parseStyleDeclaration(reader);
 	}
 
 	@Override
-	public CSSStyleDeclaration parseStyleDeclaration(Reader reader) throws IOException {
+	public CSSStyleDeclaration parseStyleDeclaration(Reader reader)
+			throws IOException {
 		InputSource source = new InputSource();
 		source.setCharacterStream(reader);
 		return parseStyleDeclaration(source);
 	}
 
 	@Override
-	public CSSStyleDeclaration parseStyleDeclaration(InputStream stream) throws IOException {
+	public CSSStyleDeclaration parseStyleDeclaration(InputStream stream)
+			throws IOException {
 		InputSource source = new InputSource();
 		source.setByteStream(stream);
 		return parseStyleDeclaration(source);
 	}
 
 	@Override
-	public CSSStyleDeclaration parseStyleDeclaration(InputSource source) throws IOException {
+	public CSSStyleDeclaration parseStyleDeclaration(InputSource source)
+			throws IOException {
 		checkInputSource(source);
 		CSSParser parser = makeCSSParser();
-		CSSStyleDeclaration styleDeclaration = parser.parseStyleDeclaration(source);
+		CSSStyleDeclaration styleDeclaration = parser
+				.parseStyleDeclaration(source);
 		return styleDeclaration;
 	}
 
@@ -358,7 +364,8 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	}
 
 	@Override
-	public void applyStyles(Object element, boolean applyStylesToChildNodes, boolean computeDefaultStyle) {
+	public void applyStyles(Object element, boolean applyStylesToChildNodes,
+			boolean computeDefaultStyle) {
 		Element elt = getElement(element);
 		if (elt != null) {
 			if (!isVisible(elt)) {
@@ -427,12 +434,12 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 				 */
 				NodeList nodes = elt instanceof ChildVisibilityAwareElement
 						? ((ChildVisibilityAwareElement) elt).getVisibleChildNodes() : elt.getChildNodes();
-						if (nodes != null) {
-							for (int k = 0; k < nodes.getLength(); k++) {
-								applyStyles(nodes.item(k), applyStylesToChildNodes);
-							}
-							onStylesAppliedToChildNodes(elt, nodes);
-						}
+				if (nodes != null) {
+					for (int k = 0; k < nodes.getLength(); k++) {
+						applyStyles(nodes.item(k), applyStylesToChildNodes);
+					}
+					onStylesAppliedToChildNodes(elt, nodes);
+				}
 			}
 		}
 
@@ -448,7 +455,8 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	protected boolean isVisible(Element elt) {
 		Node parentNode = elt.getParentNode();
 		if (parentNode instanceof ChildVisibilityAwareElement) {
-			NodeList l = ((ChildVisibilityAwareElement) parentNode).getVisibleChildNodes();
+			NodeList l = ((ChildVisibilityAwareElement) parentNode)
+					.getVisibleChildNodes();
 			if (l != null) {
 				for (int i = 0; i < l.getLength(); i++) {
 					if (l.item(i) == elt) {
@@ -525,11 +533,12 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	/*--------------- Apply style declaration -----------------*/
 
 	@Override
-	public void applyStyleDeclaration(Object element, CSSStyleDeclaration style, String pseudo) {
+	public void applyStyleDeclaration(Object element,
+			CSSStyleDeclaration style, String pseudo) {
 		// Apply style
 		boolean avoidanceCacheInstalled = currentCSSPropertiesApplyed == null;
 		if (avoidanceCacheInstalled) {
-			currentCSSPropertiesApplyed = new HashMap<>();
+			currentCSSPropertiesApplyed = new HashMap<String, String>();
 		}
 		List<ICSSPropertyHandler2> handlers2 = null;
 		for (int i = 0; i < style.getLength(); i++) {
@@ -543,19 +552,21 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 					propertyHandler2 = (ICSSPropertyHandler2) handler;
 				} else {
 					if (handler instanceof ICSSPropertyHandler2Delegate) {
-						propertyHandler2 = ((ICSSPropertyHandler2Delegate) handler).getCSSPropertyHandler2();
+						propertyHandler2 = ((ICSSPropertyHandler2Delegate) handler)
+								.getCSSPropertyHandler2();
 					}
 				}
 				if (propertyHandler2 != null) {
 					if (handlers2 == null) {
-						handlers2 = new ArrayList<>();
+						handlers2 = new ArrayList<ICSSPropertyHandler2>();
 					}
 					if (!handlers2.contains(propertyHandler2)) {
 						handlers2.add(propertyHandler2);
 					}
 				}
 			} catch (Exception e) {
-				if (throwError || (!throwError && !(e instanceof UnsupportedPropertyException))) {
+				if (throwError
+						|| (!throwError && !(e instanceof UnsupportedPropertyException))) {
 					handleExceptions(e);
 				}
 			}
@@ -760,7 +771,8 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 						return handler;
 					}
 				} catch (Exception e) {
-					if (throwError || (!throwError && !(e instanceof UnsupportedPropertyException))) {
+					if (throwError
+							|| (!throwError && !(e instanceof UnsupportedPropertyException))) {
 						handleExceptions(e);
 					}
 				}
@@ -818,14 +830,14 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	protected Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			String property) throws Exception {
-		Collection<ICSSPropertyHandler> handlers = new ArrayList<>();
+		Collection<ICSSPropertyHandler> handlers = new ArrayList<ICSSPropertyHandler>();
 		for (ICSSPropertyHandlerProvider provider : propertyHandlerProviders) {
 			Collection<ICSSPropertyHandler> h = provider
 					.getCSSPropertyHandlers(property);
 			if (handlers == null) {
 				handlers = h;
 			} else {
-				handlers = new ArrayList<>(handlers);
+				handlers = new ArrayList<ICSSPropertyHandler>(handlers);
 				handlers.addAll(h);
 			}
 		}
@@ -840,7 +852,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	 */
 	@Override
 	public Collection<String> getCSSProperties(Object element) {
-		Set<String> properties = new HashSet<>();
+		Set<String> properties = new HashSet<String>();
 		for (ICSSPropertyHandlerProvider provider : propertyHandlerProviders) {
 			properties.addAll(provider.getCSSProperties(element));
 		}
@@ -944,7 +956,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	protected Map<Object, CSSElementContext> getElementsContext() {
 		if (elementsContext == null) {
-			elementsContext = new HashMap<>();
+			elementsContext = new HashMap<Object, CSSElementContext>();
 		}
 		return elementsContext;
 	}
@@ -1072,7 +1084,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	@Override
 	public void registerCSSValueConverter(ICSSValueConverter converter) {
 		if (valueConverters == null) {
-			valueConverters = new HashMap<>();
+			valueConverters = new HashMap<Object, ICSSValueConverter>();
 		}
 		valueConverters.put(converter.getToType(), converter);
 	}
