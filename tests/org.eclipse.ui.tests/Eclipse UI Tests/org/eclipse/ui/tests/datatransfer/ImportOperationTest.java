@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,6 +62,9 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
         newFile.createNewFile();
     }
 
+    /*
+     * @see IOverwriteQuery#queryOverwrite(String)
+     */
     @Override
 	public String queryOverwrite(String pathString) {
         //Always return an empty String - we aren't
@@ -72,7 +75,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     @Override
 	protected void doSetUp() throws Exception {
         super.doSetUp();
-		Class<?> testClass = Class
+        Class testClass = Class
                 .forName("org.eclipse.ui.tests.datatransfer.ImportOperationTest");
         InputStream stream = testClass.getResourceAsStream("tests.ini");
         Properties properties = new Properties();
@@ -117,7 +120,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     public void testGetStatus() throws Exception {
         project = FileUtil.createProject("ImportGetStatus");
         File element = new File(localDirectory);
-		List<File> importElements = new ArrayList<>();
+        List importElements = new ArrayList();
         importElements.add(element);
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 FileSystemStructureProvider.INSTANCE, this, importElements);
@@ -128,7 +131,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     public void testImportList() throws Exception {
         project = FileUtil.createProject("ImportList");
         File element = new File(localDirectory);
-		List<File> importElements = new ArrayList<>();
+        List importElements = new ArrayList();
         importElements.add(element);
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 FileSystemStructureProvider.INSTANCE, this, importElements);
@@ -150,7 +153,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
         project = FileUtil.createProject("ImportSourceList");
         File element = new File(localDirectory + File.separator
                 + directoryNames[0]);
-		List<File> importElements = new ArrayList<>();
+        List importElements = new ArrayList();
         importElements.add(element);
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 new File(localDirectory), FileSystemStructureProvider.INSTANCE,
@@ -162,7 +165,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     public void testSetContext() throws Exception {
         project = FileUtil.createProject("ImportSetContext");
         File element = new File(localDirectory);
-		List<File> importElements = new ArrayList<>();
+        List importElements = new ArrayList();
         importElements.add(element);
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 FileSystemStructureProvider.INSTANCE, this, importElements);
@@ -174,7 +177,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     public void testSetCreateContainerStructure() throws Exception {
         project = FileUtil.createProject("ImportSetCreateContainerStructure");
         File element = new File(localDirectory);
-		List<File> importElements = new ArrayList<>();
+        List importElements = new ArrayList();
         importElements.add(element);
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 FileSystemStructureProvider.INSTANCE, this, importElements);
@@ -207,7 +210,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 new File(localDirectory), FileSystemStructureProvider.INSTANCE,
                 this);
-		List<File> importElements = new ArrayList<>();
+        List importElements = new ArrayList();
         importElements.add(element);
         operation.setFilesToImport(importElements);
         openTestWindow().run(true, true, operation);
@@ -217,7 +220,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     public void testSetOverwriteResources() throws Exception {
         project = FileUtil.createProject("ImportSetOverwriteResources");
         File element = new File(localDirectory);
-		List<File> importElements = new ArrayList<>();
+        List importElements = new ArrayList();
         importElements.add(element);
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 FileSystemStructureProvider.INSTANCE, this, importElements);

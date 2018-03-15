@@ -37,7 +37,7 @@ public class DeltaInfoHandler extends AbstractHandler {
 		Person model = service.getPerson(local.getId());
 
 		boolean delta = false;
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		buf.append(ContributionMessages.InfoEditor_surname);
 		if (!model.getSurname().equals(local.getSurname())) {
 			delta = true;

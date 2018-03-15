@@ -81,7 +81,7 @@ public class TestExtensionTreeData {
 
 	@Override
 	public String toString() {
-		StringBuilder toString = new StringBuilder(getName()).append(":");
+		StringBuffer toString = new StringBuffer(getName()).append(":");
 
 		toString.append("[");
 		// update local children to remove any stale kids

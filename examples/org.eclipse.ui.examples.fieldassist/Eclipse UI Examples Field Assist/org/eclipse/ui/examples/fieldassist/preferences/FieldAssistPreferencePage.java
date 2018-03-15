@@ -12,14 +12,11 @@
 package org.eclipse.ui.examples.fieldassist.preferences;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.IntegerFieldEditor;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.jface.preference.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.examples.fieldassist.FieldAssistPlugin;
 import org.eclipse.ui.examples.fieldassist.TaskAssistExampleMessages;
 
@@ -51,7 +48,6 @@ public class FieldAssistPreferencePage extends FieldEditorPreferencePage
 	 * GUI blocks needed to manipulate various types of preferences. Each field
 	 * editor knows how to save and
 	 */
-	@Override
 	public void createFieldEditors() {
 		addField(new RadioGroupFieldEditor(
 				PreferenceConstants.PREF_DECORATOR_VERTICALLOCATION,
@@ -128,7 +124,11 @@ public class FieldAssistPreferencePage extends FieldEditorPreferencePage
 		Dialog.applyDialogFont(getFieldEditorParent());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	 */
 	public void init(IWorkbench workbench) {
 	}
 

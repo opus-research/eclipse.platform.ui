@@ -24,6 +24,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TaskItem;
 import org.eclipse.ui.progress.IProgressConstants;
@@ -66,7 +68,12 @@ public class TaskBarProgressManager {
 		// on the application TaskBar
 		ProgressManager.getInstance().addListener(listener);
 
-		taskItem.addDisposeListener(e -> dispose());
+		taskItem.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				dispose();
+			}
+		});
 	}
 
 	/**
@@ -222,8 +229,9 @@ public class TaskBarProgressManager {
 				jobs.clear();
 				jobInfoMap.clear();
 				setAnimated(false);
-				for (JobInfo currentInfo : manager.getJobInfos(showsDebug())) {
-					addJob(currentInfo);
+				JobInfo[] currentInfos = manager.getJobInfos(showsDebug());
+				for (int i = 0; i < currentInfos.length; i++) {
+					addJob(currentInfos[i]);
 				}
 			}
 

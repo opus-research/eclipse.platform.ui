@@ -71,24 +71,20 @@ public class TabbedPropertyViewer extends StructuredViewer {
 		return list.getSelectionIndex();
 	}
 
-	@Override
 	protected Widget doFindInputItem(Object element) {
 		/* not implemented */
 		return null;
 	}
 
-	@Override
 	protected Widget doFindItem(Object element) {
 		/* not implemented */
 		return null;
 	}
 
-	@Override
 	protected void doUpdateItem(Widget item, Object element, boolean fullMap) {
 		/* not implemented */
 	}
 
-	@Override
 	protected List getSelectionFromWidget() {
 		int index = list.getSelectionIndex();
 		if (index == TabbedPropertyList.NONE) {
@@ -99,12 +95,10 @@ public class TabbedPropertyViewer extends StructuredViewer {
 		return result;
 	}
 
-	@Override
 	protected void internalRefresh(Object element) {
 		/* not implemented */
 	}
 
-	@Override
 	public void reveal(Object element) {
 		/* not implemented */
 	}
@@ -113,7 +107,6 @@ public class TabbedPropertyViewer extends StructuredViewer {
 	 * We do not consider multiple selections. Only the first
 	 * element will represent the selection.
 	 */
-	@Override
 	protected void setSelectionToWidget(List l, boolean reveal) {
 		if (l == null || l.size() == 0) { // clear selection
 			list.deselectAll();
@@ -130,19 +123,17 @@ public class TabbedPropertyViewer extends StructuredViewer {
 		}
 	}
 
-	@Override
 	public Control getControl() {
 		return list;
 	}
 
-	@Override
 	protected void inputChanged(Object input, Object oldInput) {
 		elements.clear();
 		Object[] children = getSortedChildren(getRoot());
 		list.removeAll();
-		for (Object child : children) {
-			elements.add(child);
-			mapElement(child, list);
+		for (int i = 0; i < children.length; i++) {
+			elements.add(children[i]);
+			mapElement(children[i], list);
 		}
 		list.setElements(children);
 	}

@@ -131,4 +131,18 @@ public interface IObservableSet<E> extends Set<E>, IObservableCollection<E> {
 	@Override
 	boolean removeAll(Collection<?> c);
 
+	// Comparison and hashing
+
+	/**
+	 * @TrackedGetter
+	 */
+	@Override
+	boolean equals(Object o);
+
+	/**
+	 * @TrackedGetter
+	 */
+	@Override
+	int hashCode();
+
 }

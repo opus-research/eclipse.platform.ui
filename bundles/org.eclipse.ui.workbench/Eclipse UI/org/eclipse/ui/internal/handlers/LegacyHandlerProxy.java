@@ -138,7 +138,7 @@ public final class LegacyHandlerProxy extends AbstractHandler {
 
 	@Override
 	public final String toString() {
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer();
 
 		buffer.append("LegacyProxy("); //$NON-NLS-1$
 		if (handler == null) {
