@@ -76,8 +76,8 @@ public class NavigationHistoryAction extends PageEventAction {
     			if (recreateMenu) {
 					Menu m = (Menu) e.widget;
 					MenuItem[] items = m.getItems();
-					for (MenuItem item : items) {
-						item.dispose();
+					for (int i = 0; i < items.length; i++) {
+						items[i].dispose();
 					}
 					fillMenu(m);
 				}

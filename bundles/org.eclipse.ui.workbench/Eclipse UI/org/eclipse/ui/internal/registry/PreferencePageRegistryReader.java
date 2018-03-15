@@ -90,8 +90,8 @@ public class PreferencePageRegistryReader extends CategorizedPageRegistryReader 
 	@Override
 	Object findNode(Object parent, String currentToken) {
 		IPreferenceNode[] subNodes = ((WorkbenchPreferenceNode) parent).getSubNodes();
-		for (IPreferenceNode subNode : subNodes) {
-			WorkbenchPreferenceNode node = (WorkbenchPreferenceNode) subNode;
+		for (int i = 0; i < subNodes.length; i++) {
+			WorkbenchPreferenceNode node = (WorkbenchPreferenceNode) subNodes[i];
 			if (node.getId().equals(currentToken)) {
 				return node;
 			}

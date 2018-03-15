@@ -726,7 +726,8 @@ public final class KeysPreferencePage extends PreferencePage implements
 		// Arrow buttons aren't normally added to the tab list. Let's fix that.
 		final Control[] tabStops = groupKeySequence.getTabList();
 		final ArrayList newTabStops = new ArrayList();
-		for (Control tabStop : tabStops) {
+		for (int i = 0; i < tabStops.length; i++) {
+			Control tabStop = tabStops[i];
 			newTabStops.add(tabStop);
 			if (textTriggerSequence.equals(tabStop)) {
 				newTabStops.add(buttonAddKey);
@@ -1309,7 +1310,8 @@ public final class KeysPreferencePage extends PreferencePage implements
 					fileWriter = new BufferedWriter(new FileWriter(filePath));
 					final TableItem[] items = tableBindings.getItems();
 					final int numColumns = tableBindings.getColumnCount();
-					for (final TableItem item : items) {
+					for (int i = 0; i < items.length; i++) {
+						final TableItem item = items[i];
 						for (int j = 0; j < numColumns; j++) {
 							String buf = Util.replaceAll(item.getText(j), "\"", //$NON-NLS-1$
 									"\"\""); //$NON-NLS-1$
@@ -1650,7 +1652,8 @@ public final class KeysPreferencePage extends PreferencePage implements
 			Map schemesByName = new HashMap();
 
 			final Scheme[] definedSchemes = bindingService.getDefinedSchemes();
-			for (final Scheme scheme : definedSchemes) {
+			for (int i = 0; i < definedSchemes.length; i++) {
+				final Scheme scheme = definedSchemes[i];
 				try {
 					String name = scheme.getName();
 					Collection schemes = (Collection) schemesByName.get(name);
@@ -1752,7 +1755,8 @@ public final class KeysPreferencePage extends PreferencePage implements
 
 			// Make an internal copy of the binding manager, for local changes.
 			try {
-				for (final Scheme scheme : definedSchemes) {
+				for (int i = 0; i < definedSchemes.length; i++) {
+					final Scheme scheme = definedSchemes[i];
 					final Scheme copy = localChangeManager.getScheme(scheme
 							.getId());
 					copy.define(scheme.getName(), scheme.getDescription(),
@@ -2306,8 +2310,8 @@ public final class KeysPreferencePage extends PreferencePage implements
 
 				// Compare the items in the current sort order.
 				int compare = 0;
-				for (int element : sortOrder) {
-					switch (element) {
+				for (int i = 0; i < sortOrder.length; i++) {
+					switch (sortOrder[i]) {
 					case VIEW_CATEGORY_COLUMN_INDEX:
 						compare = Util.compare(categoryName1, categoryName2);
 						if (compare != 0) {
