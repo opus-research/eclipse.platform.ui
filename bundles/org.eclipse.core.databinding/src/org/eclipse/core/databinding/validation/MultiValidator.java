@@ -275,11 +275,11 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 			// (prevent dependency loop)
 			for (Iterator itNew = newTargets.iterator(); itNew.hasNext();) {
 				Object newDependency = itNew.next();
-				if (newDependency.equals(validationStatus)
-						|| newDependency.equals(unmodifiableValidationStatus)
-						|| newDependency.equals(targets)
-						|| newDependency.equals(unmodifiableTargets)
-						|| newDependency.equals(models)) {
+				if (newDependency == validationStatus
+						|| newDependency == unmodifiableValidationStatus
+						|| newDependency == targets
+						|| newDependency == unmodifiableTargets
+						|| newDependency == models) {
 					itNew.remove();
 				}
 			}
@@ -293,7 +293,7 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 				Object oldDependency = targets.get(i);
 				for (Iterator itNew = newTargets.iterator(); itNew.hasNext();) {
 					Object newDependency = itNew.next();
-					if (oldDependency.equals(newDependency)) {
+					if (oldDependency == newDependency) {
 						// Dependency is already known--remove from list of
 						// new dependencies
 						itNew.remove();
