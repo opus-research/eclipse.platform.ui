@@ -12,7 +12,7 @@
  *     Brian de Alwis - Fix size computation to account for trim
  *     Markus Kuppe <bugs.eclipse.org@lemmster.de> - Bug 449485: [QuickAccess] "Widget is disposed" exception in errorlog during shutdown due to quickaccess.SearchField.storeDialog
  *     Elena Laskavaia <elaskavaia.cdt@gmail.com> - Bug 433746: [QuickAccess] SWTException on closing quick access shell
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278, 491291, 491312, 491293
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278, 491291, 491312
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
@@ -66,6 +66,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -126,9 +128,11 @@ public class SearchField {
 
 	private String selectedString = ""; //$NON-NLS-1$
 	private AccessibleAdapter accessibleListener;
+	private Font font;
 
 	@Inject
 	private IBindingService bindingService;
+
 
 	private TriggerSequence triggerSequence = null;
 
@@ -223,7 +227,6 @@ public class SearchField {
 		shell.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		shell.setText(QuickAccessMessages.QuickAccess_EnterSearch); // just for debugging, not shown anywhere
 		GridLayoutFactory.fillDefaults().applyTo(shell);
-		quickAccessContents.createHintText(shell, Window.getDefaultOrientation());
 		table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
 		txtQuickAccess.addMouseListener(new MouseAdapter() {
 			@Override
@@ -353,7 +356,14 @@ public class SearchField {
 
 	private Text createText(Composite parent) {
 		Text text = new Text(parent, SWT.SEARCH);
-		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
+		text.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription);
+
+		FontData[] fD = text.getFont().getFontData();
+		int round = (int) Math.round(fD[0].getHeight() * 0.8);
+		fD[0].setHeight(round);
+		font = new Font(text.getDisplay(), fD[0]);
+		text.setFont(font);
+
 		return text;
 	}
 
@@ -364,10 +374,9 @@ public class SearchField {
 		updateQuickAccessTriggerSequence();
 
 		if (triggerSequence != null) {
-			txtQuickAccess.setToolTipText(
-					NLS.bind(QuickAccessMessages.QuickAccess_TooltipDescription, triggerSequence.format()));
+			txtQuickAccess.setMessage(NLS.bind(QuickAccessMessages.QuickAccess_EnterSearch, triggerSequence.format()));
 		} else {
-			txtQuickAccess.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription_Empty);
+			txtQuickAccess.setMessage(QuickAccessMessages.QuickAccess_EnterSearch_Empty);
 		}
 
 		GC gc = new GC(txtQuickAccess);
