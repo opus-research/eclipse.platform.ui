@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
@@ -63,6 +64,7 @@ import org.eclipse.e4.ui.workbench.modeling.EPlaceholderResolver;
 import org.eclipse.e4.ui.workbench.modeling.ElementMatcher;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.osgi.framework.Bundle;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -119,6 +121,17 @@ public class ModelServiceImpl implements EModelService {
 
 		this.appContext = appContext;
 		IEventBroker eventBroker = appContext.get(IEventBroker.class);
+		if (eventBroker == null) {
+			StringBuilder msg = new StringBuilder();
+			msg.append("Could not retrieve event broker!"); //$NON-NLS-1$
+			Bundle bundle = Platform.getBundle("org.eclipse.equinox.event"); //$NON-NLS-1$
+			if (bundle == null) {
+				msg.append(" Bundle 'org.eclipse.equinox.event' is missing. Please check your configuration."); //$NON-NLS-1$
+			} else if (bundle.getState() != Bundle.ACTIVE) {
+				msg.append(" Bundle 'org.eclipse.equinox.event' is not active. Please check your configuration."); //$NON-NLS-1$
+			}
+			throw new IllegalStateException(msg.toString());
+		}
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, hostedElementHandler);
 
 		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(
