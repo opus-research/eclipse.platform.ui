@@ -104,7 +104,8 @@ public class UndoHistoryView extends ViewPart implements
 	 * undo context.
 	 */
 
-	class ViewContentProvider implements IStructuredContentProvider, IOperationHistoryListener {
+	class ViewContentProvider implements IStructuredContentProvider,
+			IOperationHistoryListener {
 
 		@Override
 		public void inputChanged(Viewer v, Object oldInput, Object newInput) {

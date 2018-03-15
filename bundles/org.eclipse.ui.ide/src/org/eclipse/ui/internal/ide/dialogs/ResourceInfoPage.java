@@ -17,7 +17,6 @@ package org.eclipse.ui.internal.ide.dialogs;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -343,11 +342,8 @@ public class ResourceInfoPage extends PropertyPage {
 						Command command = commandService.getCommand(ShowInSystemExplorerHandler.ID);
 						if (command.isDefined()) {
 							ParameterizedCommand parameterizedCommand = commandService
-									.createCommand(ShowInSystemExplorerHandler.ID, Collections.singletonMap(
-											ShowInSystemExplorerHandler.RESOURCE_PATH_PARAMETER, locationStr));
-							if (handlerService.canExecute(parameterizedCommand)) {
-								handlerService.executeHandler(parameterizedCommand);
-							}
+									.createCommand(ShowInSystemExplorerHandler.ID, null);
+							handlerService.executeHandler(parameterizedCommand);
 						}
 					}
 				});
@@ -1084,9 +1080,9 @@ public class ResourceInfoPage extends PropertyPage {
 
 			MessageDialog dialog = new MessageDialog(getShell(),
 					IDEWorkbenchMessages.ResourceInfo_recursiveChangesTitle,
-					null, message, MessageDialog.QUESTION, 1,
-					IDialogConstants.YES_LABEL,
-					IDialogConstants.NO_LABEL);
+					null, message, MessageDialog.QUESTION, new String[] {
+							IDialogConstants.YES_LABEL,
+							IDialogConstants.NO_LABEL }, 1);
 
 			return dialog.open() == 0;
 		}

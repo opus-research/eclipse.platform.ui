@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.commands.common.EventManager;
@@ -774,11 +773,13 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         //Potentially long operation - show a busy cursor
         BusyIndicator.showWhile(treeViewer.getControl().getDisplay(),
                 () -> {
+				    Iterator keyIterator = items.keySet().iterator();
+
 				    //Update the store before the hierarchy to prevent updating parents before all of the children are done
-					for (Entry<?, List> entry : ((Map<Object, List>) items).entrySet()) {
-						Object key1 = entry.getKey();
+				    while (keyIterator.hasNext()) {
+				        Object key1 = keyIterator.next();
 				        //Replace the items in the checked state store with those from the supplied items
-						List selections = entry.getValue();
+				        List selections = (List) items.get(key1);
 				        if (selections.size() == 0) {
 							//If it is empty remove it from the list
 				            checkedStateStore.remove(key1);
@@ -794,13 +795,16 @@ public class CheckboxTreeAndListGroup extends EventManager implements
 				    }
 
 				    //Now update hierarchies
-					for (Entry<Object, List> entry : ((Map<Object, List>) items).entrySet()) {
-						Object key2 = entry.getKey();
+				    keyIterator = items.keySet().iterator();
+
+				    while (keyIterator.hasNext()) {
+				        Object key2 = keyIterator.next();
 				        updateHierarchy(key2);
 				        if (currentTreeSelection != null
 				                && currentTreeSelection.equals(key2)) {
 				            listViewer.setAllChecked(false);
-							listViewer.setCheckedElements(entry.getValue().toArray());
+				            listViewer.setCheckedElements(((List) items
+				                    .get(key2)).toArray());
 				        }
 				    }
 				});
