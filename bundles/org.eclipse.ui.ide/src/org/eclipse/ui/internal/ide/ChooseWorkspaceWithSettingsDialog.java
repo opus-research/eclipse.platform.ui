@@ -120,14 +120,14 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 		form.getBody().setLayout(new GridLayout());
 		form.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		final ExpandableComposite copySettingsExpandable =
+		final ExpandableComposite expandable =
 				toolkit.createExpandableComposite(form.getBody(), ExpandableComposite.TWISTIE);
 
-		copySettingsExpandable.setText(IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_SettingsGroupName);
-		copySettingsExpandable.setBackground(workArea.getBackground());
-		copySettingsExpandable.setLayout(new GridLayout());
-		copySettingsExpandable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		copySettingsExpandable.addExpansionListener(new IExpansionListener() {
+		expandable.setText(IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_SettingsGroupName);
+		expandable.setBackground(workArea.getBackground());
+		expandable.setLayout(new GridLayout());
+		expandable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		expandable.addExpansionListener(new IExpansionListener() {
 
 			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
@@ -145,13 +145,13 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 			}
 		});
 
-		Composite sectionClient = toolkit.createComposite(copySettingsExpandable);
+		Composite sectionClient = toolkit.createComposite(expandable);
 		sectionClient.setBackground(workArea.getBackground());
 
 		if (createButtons(toolkit, sectionClient))
-			copySettingsExpandable.setExpanded(true);
+			expandable.setExpanded(true);
 
-		copySettingsExpandable.setClient(sectionClient);
+		expandable.setClient(sectionClient);
 
 	}
 

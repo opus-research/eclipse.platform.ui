@@ -12,16 +12,12 @@
 
 package org.eclipse.jface.internal.databinding.viewers;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.jface.databinding.viewers.IViewerUpdater;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 
 /**
@@ -49,18 +45,9 @@ public abstract class ViewerUpdater implements IViewerUpdater {
 	public abstract void remove(Object element, int position);
 
 	@Override
-	public void replace(final Object oldElement, final Object newElement, final int position) {
-		final List<Object> selectedElements = new ArrayList<>(viewer.getStructuredSelection().toList());
-
+	public void replace(Object oldElement, Object newElement, int position) {
 		remove(oldElement, position);
 		insert(newElement, position);
-
-		// Preserve selection
-		selectionContains(selectedElements, oldElement).ifPresent(iter -> {
-			iter.remove();
-			selectedElements.add(newElement);
-			viewer.setSelection(new StructuredSelection(selectedElements));
-		});
 	}
 
 	@Override
@@ -72,7 +59,9 @@ public abstract class ViewerUpdater implements IViewerUpdater {
 			insert(element, newPosition);
 
 			// Preserve selection
-			selectionContains(selection.toList(), element).ifPresent(i -> viewer.setSelection(selection));
+			if (selectionContains(selection, element)) {
+				viewer.setSelection(selection);
+			}
 		}
 	}
 
@@ -81,18 +70,19 @@ public abstract class ViewerUpdater implements IViewerUpdater {
 				&& viewer.getFilters().length == 0;
 	}
 
-	private Optional<Iterator<?>> selectionContains(List<?> selection, Object element) {
+	private boolean selectionContains(IStructuredSelection selection,
+			Object element) {
 		if (!selection.isEmpty()) {
 			IElementComparer comparer = viewer.getComparer();
-			for (Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+			for (Iterator iter = selection.iterator(); iter.hasNext();) {
 				Object selectionElement = iter.next();
 				if (comparer == null ? Util.equals(element, selectionElement)
 						: comparer.equals(element, selectionElement)) {
-					return Optional.of(iter);
+					return true;
 				}
 			}
 		}
-		return Optional.empty();
+		return false;
 	}
 
 	@Override
