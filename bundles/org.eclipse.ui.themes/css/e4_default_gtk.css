@@ -109,3 +109,7 @@ CTabFolder Canvas {
 	background-color: #F8F8F8;
 }
 
+
+StyledText {
+	swt-scrollbar-themed: false;
+}

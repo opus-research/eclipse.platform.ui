@@ -82,3 +82,7 @@ CTabItem:selected {
 #org-eclipse-ui-editorss {
 	swt-tab-height: 8px;
 }
+
+StyledText {
+	swt-scrollbar-themed: false;
+}
