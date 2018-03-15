@@ -16,6 +16,7 @@ import java.net.URL;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
@@ -62,7 +63,10 @@ public class OpenBrowserHandler extends AbstractHandler {
 							name, tooltip);
 					browser.openURL(url); // Must open browser on UI thread
 				} catch (PartInitException ex) {
-					WebBrowserUIPlugin.logError("error opening browser", ex); //$NON-NLS-1$
+					// Ideally, we would leave reporting this error to whoever executed the command.
+					// Alas, we cannot simply throw an ExecutionException, as opening the browser has to happen on the UI thread.
+					// Hence, this handler reports its own errors.
+					WebBrowserUtil.openError(NLS.bind(Messages.errorCouldNotLaunchWebBrowser, url));
 				}
 			}
 		});
