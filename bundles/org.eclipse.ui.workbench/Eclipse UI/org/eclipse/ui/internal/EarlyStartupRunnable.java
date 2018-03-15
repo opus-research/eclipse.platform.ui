@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ui.IStartup;
-import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 
 /**
@@ -112,9 +111,9 @@ public class EarlyStartupRunnable extends SafeRunnable {
 
         // if class attribute is absent then try to use the compatibility
         // bundle to return the plugin object
-        if (classname == null) {
-        	return getPluginForCompatibility();
-        }
+        if (classname == null || classname.length() <= 0) {
+			return getPluginForCompatibility();
+		}
 
         // otherwise the 3.0 runtime should be able to do it
         return WorkbenchPlugin.createExtension(element,
@@ -127,13 +126,6 @@ public class EarlyStartupRunnable extends SafeRunnable {
      * is not loaded or the plugin object cannot be created.
      */
     private Object getPluginForCompatibility() {
-        String message = "The 'org.eclipse.ui.startup' extension from '" + extension.getNamespaceIdentifier() //$NON-NLS-1$
-            + "' does not provide a 'class' attribute.\nThis usage is deprecated and a 'class' attribute should be provided.\n" //$NON-NLS-1$
-            + "The release after Mars (4.5) will no longer support the deprecated usage!"; //$NON-NLS-1$
-        IStatus status = new Status(IStatus.WARNING, PlatformUI.PLUGIN_ID, 0, message, null);
-        WorkbenchPlugin.log(status);
-
-
         // make sure the compatibility bundle is available
         Bundle compatBundle = Platform.getBundle(PI_RUNTIME_COMPATIBILITY);
         if (compatBundle == null) {

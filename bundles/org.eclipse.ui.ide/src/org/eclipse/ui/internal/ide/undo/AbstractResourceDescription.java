@@ -24,11 +24,11 @@ import org.eclipse.ui.ide.undo.ResourceDescription;
 /**
  * Base implementation of ResourceDescription that describes the common
  * attributes of a resource to be created.
- *
+ * 
  * This class is not intended to be instantiated or used by clients.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 abstract class AbstractResourceDescription extends ResourceDescription {
 	IContainer parent;
@@ -50,7 +50,7 @@ abstract class AbstractResourceDescription extends ResourceDescription {
 
 	/**
 	 * Create a resource description from the specified resource.
-	 *
+	 * 
 	 * @param resource
 	 *            the resource to be described
 	 */
@@ -79,12 +79,11 @@ abstract class AbstractResourceDescription extends ResourceDescription {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.ide.undo.ResourceDescription#createResource(org.eclipse
 	 * .core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public IResource createResource(IProgressMonitor monitor)
 			throws CoreException {
 		IResource resource = createResourceHandle();
@@ -95,10 +94,9 @@ abstract class AbstractResourceDescription extends ResourceDescription {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.ide.undo.ResourceDescription#isValid()
 	 */
-	@Override
 	public boolean isValid() {
 		return parent == null || parent.exists();
 	}
@@ -107,7 +105,7 @@ abstract class AbstractResourceDescription extends ResourceDescription {
 	 * Restore any saved attributed of the specified resource. This method is
 	 * called after the existent resource represented by the receiver has been
 	 * created.
-	 *
+	 * 
 	 * @param resource
 	 *            the newly created resource
 	 * @throws CoreException
@@ -140,10 +138,9 @@ abstract class AbstractResourceDescription extends ResourceDescription {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.ide.undo.ResourceDescription#verifyExistence(boolean)
 	 */
-	@Override
 	public boolean verifyExistence(boolean checkMembers) {
 		IContainer p = parent;
 		if (p == null) {

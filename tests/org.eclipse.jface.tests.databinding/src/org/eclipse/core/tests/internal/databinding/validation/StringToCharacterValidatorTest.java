@@ -26,10 +26,9 @@ public class StringToCharacterValidatorTest extends TestCase {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		StringToCharacterConverter converter = StringToCharacterConverter

@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Scale;
 /**
  * A field editor for an integer type preference. This class may be used as is,
  * or subclassed as required.
- *
+ * 
  * @since 3.0
  */
 public class ScaleFieldEditor extends FieldEditor {
@@ -60,7 +60,7 @@ public class ScaleFieldEditor extends FieldEditor {
 
     /**
      * Creates a scale field editor.
-     *
+     * 
      * @param name
      *            the name of the preference this field editor works on
      * @param labelText
@@ -75,7 +75,7 @@ public class ScaleFieldEditor extends FieldEditor {
 
     /**
      * Creates a scale field editor with particular scale values.
-     *
+     * 
      * @param name
      *            the name of the preference this field editor works on
      * @param labelText
@@ -97,11 +97,22 @@ public class ScaleFieldEditor extends FieldEditor {
         setValues(min, max, increment, pageIncrement);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#adjustForNumColumns(int)
+     */
     @Override
 	protected void adjustForNumColumns(int numColumns) {
         ((GridData) scale.getLayoutData()).horizontalSpan = numColumns - 1;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#doFillIntoGrid(org.eclipse.swt.widgets.Composite,
+     *      int)
+     */
     @Override
 	protected void doFillIntoGrid(Composite parent, int numColumns) {
         Control control = getLabelControl(parent);
@@ -117,6 +128,11 @@ public class ScaleFieldEditor extends FieldEditor {
         updateScale();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#doLoad()
+     */
     @Override
 	protected void doLoad() {
         if (scale != null) {
@@ -126,6 +142,11 @@ public class ScaleFieldEditor extends FieldEditor {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#doLoadDefault()
+     */
     @Override
 	protected void doLoadDefault() {
         if (scale != null) {
@@ -135,6 +156,11 @@ public class ScaleFieldEditor extends FieldEditor {
         valueChanged();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#doStore()
+     */
     @Override
 	protected void doStore() {
         getPreferenceStore()
@@ -143,7 +169,7 @@ public class ScaleFieldEditor extends FieldEditor {
 
     /**
      * Returns the value that will be used for Scale.setIncrement(int).
-     *
+     * 
      * @return the value.
      * @see org.eclipse.swt.widgets.Scale#setIncrement(int)
      */
@@ -153,7 +179,7 @@ public class ScaleFieldEditor extends FieldEditor {
 
     /**
      * Returns the value that will be used for Scale.setMaximum(int).
-     *
+     * 
      * @return the value.
      * @see org.eclipse.swt.widgets.Scale#setMaximum(int)
      */
@@ -163,7 +189,7 @@ public class ScaleFieldEditor extends FieldEditor {
 
     /**
      * Returns the value that will be used for Scale.setMinimum(int).
-     *
+     * 
      * @return the value.
      * @see org.eclipse.swt.widgets.Scale#setMinimum(int)
      */
@@ -171,6 +197,11 @@ public class ScaleFieldEditor extends FieldEditor {
         return minValue;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#getNumberOfControls()
+     */
     @Override
 	public int getNumberOfControls() {
         return 2;
@@ -178,7 +209,7 @@ public class ScaleFieldEditor extends FieldEditor {
 
     /**
      * Returns the value that will be used for Scale.setPageIncrement(int).
-     *
+     * 
      * @return the value.
      * @see org.eclipse.swt.widgets.Scale#setPageIncrement(int)
      */
@@ -188,7 +219,7 @@ public class ScaleFieldEditor extends FieldEditor {
 
     /**
      * Returns this field editor's scale control.
-     *
+     * 
      * @return the scale control, or <code>null</code> if no scale field is
      *         created yet
      */
@@ -199,7 +230,7 @@ public class ScaleFieldEditor extends FieldEditor {
     /**
      * Returns this field editor's scale control. The control is created if it
      * does not yet exist.
-     *
+     * 
      * @param parent
      *            the parent
      * @return the scale control
@@ -233,12 +264,17 @@ public class ScaleFieldEditor extends FieldEditor {
      * <li>Maximim = 10
      * <li>Increment = 1
      * <li>Page Increment = 1
-     * </ul>
+     * </ul> 
      */
     private void setDefaultValues() {
         setValues(0, 10, 1, 1);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#setFocus()
+     */
     @Override
 	public void setFocus() {
         if (scale != null && !scale.isDisposed()) {
@@ -249,7 +285,7 @@ public class ScaleFieldEditor extends FieldEditor {
     /**
      * Set the value to be used for Scale.setIncrement(int) and update the
      * scale.
-     *
+     * 
      * @param increment
      *            a value greater than 0.
      * @see org.eclipse.swt.widgets.Scale#setIncrement(int)
@@ -262,7 +298,7 @@ public class ScaleFieldEditor extends FieldEditor {
     /**
      * Set the value to be used for Scale.setMaximum(int) and update the
      * scale.
-     *
+     * 
      * @param max
      *            a value greater than 0.
      * @see org.eclipse.swt.widgets.Scale#setMaximum(int)
@@ -275,7 +311,7 @@ public class ScaleFieldEditor extends FieldEditor {
     /**
      * Set the value to be used for Scale.setMinumum(int) and update the
      * scale.
-     *
+     * 
      * @param min
      *            a value greater than 0.
      * @see org.eclipse.swt.widgets.Scale#setMinimum(int)
@@ -288,7 +324,7 @@ public class ScaleFieldEditor extends FieldEditor {
     /**
      * Set the value to be used for Scale.setPageIncrement(int) and update the
      * scale.
-     *
+     * 
      * @param pageIncrement
      *            a value greater than 0.
      * @see org.eclipse.swt.widgets.Scale#setPageIncrement(int)
@@ -300,7 +336,7 @@ public class ScaleFieldEditor extends FieldEditor {
 
     /**
      * Set all Scale values.
-     *
+     * 
      * @param min
      *            the value used for Scale.setMinimum(int).
      * @param max

@@ -29,7 +29,7 @@ import org.eclipse.core.runtime.Assert;
  * supports all removal methods (including {@link #clear()}), as well as the
  * {@link #set(int, Object)} method. All other mutator methods (addition methods
  * and {@link #move(int, int)}) throw an {@link UnsupportedOperationException}.
- *
+ * 
  * @since 1.2
  */
 public class MultiList extends AbstractObservableList {
@@ -43,7 +43,7 @@ public class MultiList extends AbstractObservableList {
 	/**
 	 * Constructs a MultiList in the default realm, and backed by the given
 	 * observable lists.
-	 *
+	 * 
 	 * @param lists
 	 *            the array of observable lists backing this MultiList.
 	 */
@@ -54,7 +54,7 @@ public class MultiList extends AbstractObservableList {
 	/**
 	 * Constructs a MultiList in the default realm backed by the given
 	 * observable lists.
-	 *
+	 * 
 	 * @param lists
 	 *            the array of observable lists backing this MultiList.
 	 * @param elementType
@@ -67,7 +67,7 @@ public class MultiList extends AbstractObservableList {
 	/**
 	 * Constructs a MultiList belonging to the given realm, and backed by the
 	 * given observable lists.
-	 *
+	 * 
 	 * @param realm
 	 *            the observable's realm
 	 * @param lists
@@ -80,7 +80,7 @@ public class MultiList extends AbstractObservableList {
 	/**
 	 * Constructs a MultiList belonging to the given realm, and backed by the
 	 * given observable lists.
-	 *
+	 * 
 	 * @param realm
 	 *            the observable's realm
 	 * @param lists
@@ -100,14 +100,11 @@ public class MultiList extends AbstractObservableList {
 		}
 	}
 
-	@Override
 	protected void firstListenerAdded() {
 		if (listChangeListener == null) {
 			listChangeListener = new IListChangeListener() {
-				@Override
 				public void handleListChange(final ListChangeEvent event) {
 					getRealm().exec(new Runnable() {
-						@Override
 						public void run() {
 							stale = null;
 							listChanged(event);
@@ -120,10 +117,8 @@ public class MultiList extends AbstractObservableList {
 		}
 		if (staleListener == null) {
 			staleListener = new IStaleListener() {
-				@Override
 				public void handleStale(StaleEvent staleEvent) {
 					getRealm().exec(new Runnable() {
-						@Override
 						public void run() {
 							makeStale();
 						}
@@ -143,7 +138,6 @@ public class MultiList extends AbstractObservableList {
 		}
 	}
 
-	@Override
 	protected void lastListenerRemoved() {
 		if (listChangeListener != null) {
 			for (int i = 0; i < lists.length; i++) {
@@ -202,7 +196,6 @@ public class MultiList extends AbstractObservableList {
 				.isAddition(), entry.getElement());
 	}
 
-	@Override
 	protected int doGetSize() {
 		int size = 0;
 		for (int i = 0; i < lists.length; i++)
@@ -210,39 +203,32 @@ public class MultiList extends AbstractObservableList {
 		return size;
 	}
 
-	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
-	@Override
 	public boolean add(Object o) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public void add(int index, Object o) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public boolean addAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public boolean addAll(int index, Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public void clear() {
 		checkRealm();
 		for (int i = 0; i < lists.length; i++)
 			lists[i].clear();
 	}
 
-	@Override
 	public Object get(int index) {
 		getterCalled();
 		int offset = 0;
@@ -255,7 +241,6 @@ public class MultiList extends AbstractObservableList {
 				+ offset);
 	}
 
-	@Override
 	public boolean contains(Object o) {
 		getterCalled();
 		for (int i = 0; i < lists.length; i++) {
@@ -265,7 +250,6 @@ public class MultiList extends AbstractObservableList {
 		return false;
 	}
 
-	@Override
 	public boolean equals(Object o) {
 		getterCalled();
 		if (o == this)
@@ -290,7 +274,6 @@ public class MultiList extends AbstractObservableList {
 		return true;
 	}
 
-	@Override
 	public int hashCode() {
 		getterCalled();
 		int result = 1;
@@ -300,7 +283,6 @@ public class MultiList extends AbstractObservableList {
 		return result;
 	}
 
-	@Override
 	public int indexOf(Object o) {
 		getterCalled();
 		int offset = 0;
@@ -313,7 +295,6 @@ public class MultiList extends AbstractObservableList {
 		return -1;
 	}
 
-	@Override
 	public boolean isEmpty() {
 		getterCalled();
 		for (int i = 0; i < lists.length; i++) {
@@ -323,13 +304,11 @@ public class MultiList extends AbstractObservableList {
 		return true;
 	}
 
-	@Override
 	public Iterator iterator() {
 		getterCalled();
 		return new MultiListItr();
 	}
 
-	@Override
 	public int lastIndexOf(Object o) {
 		getterCalled();
 		int offset = size();
@@ -342,18 +321,15 @@ public class MultiList extends AbstractObservableList {
 		return -1;
 	}
 
-	@Override
 	public ListIterator listIterator(int index) {
 		getterCalled();
 		return new MultiListListItr(index);
 	}
 
-	@Override
 	public Object move(int oldIndex, int newIndex) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public boolean remove(Object o) {
 		checkRealm();
 		int i = indexOf(o);
@@ -364,7 +340,6 @@ public class MultiList extends AbstractObservableList {
 		return false;
 	}
 
-	@Override
 	public Object remove(int index) {
 		int offset = 0;
 		for (int i = 0; i < lists.length; i++) {
@@ -377,7 +352,6 @@ public class MultiList extends AbstractObservableList {
 				+ offset);
 	}
 
-	@Override
 	public boolean removeAll(Collection c) {
 		boolean changed = false;
 		for (int i = 0; i < lists.length; i++) {
@@ -386,7 +360,6 @@ public class MultiList extends AbstractObservableList {
 		return changed;
 	}
 
-	@Override
 	public boolean retainAll(Collection c) {
 		boolean changed = false;
 		for (int i = 0; i < lists.length; i++) {
@@ -395,7 +368,6 @@ public class MultiList extends AbstractObservableList {
 		return changed;
 	}
 
-	@Override
 	public Object set(int index, Object o) {
 		int offset = 0;
 		for (int i = 0; i < lists.length; i++) {
@@ -408,13 +380,11 @@ public class MultiList extends AbstractObservableList {
 				+ offset);
 	}
 
-	@Override
 	public Object[] toArray() {
 		getterCalled();
 		return toArray(new Object[doGetSize()]);
 	}
 
-	@Override
 	public Object[] toArray(Object[] a) {
 		getterCalled();
 		Object[] result = a;
@@ -432,7 +402,6 @@ public class MultiList extends AbstractObservableList {
 		return result;
 	}
 
-	@Override
 	public boolean isStale() {
 		getterCalled();
 
@@ -465,7 +434,6 @@ public class MultiList extends AbstractObservableList {
 		ObservableTracker.getterCalled(this);
 	}
 
-	@Override
 	public synchronized void dispose() {
 		if (lists != null) {
 			if (listChangeListener != null) {
@@ -498,7 +466,6 @@ public class MultiList extends AbstractObservableList {
 			}
 		}
 
-		@Override
 		public boolean hasNext() {
 			for (int i = iterIndex; i < iters.length; i++) {
 				if (iters[i].hasNext())
@@ -507,14 +474,12 @@ public class MultiList extends AbstractObservableList {
 			return false;
 		}
 
-		@Override
 		public Object next() {
 			while (iterIndex < iters.length && !iters[iterIndex].hasNext())
 				iterIndex++;
 			return iters[iterIndex].next();
 		}
 
-		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();
 		}
@@ -545,12 +510,10 @@ public class MultiList extends AbstractObservableList {
 			}
 		}
 
-		@Override
 		public void add(Object o) {
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
 		public boolean hasNext() {
 			for (int i = iterIndex; i < iters.length; i++) {
 				if (iters[i].hasNext())
@@ -559,7 +522,6 @@ public class MultiList extends AbstractObservableList {
 			return false;
 		}
 
-		@Override
 		public boolean hasPrevious() {
 			for (int i = iterIndex; i >= 0; i--) {
 				if (iters[i].hasPrevious())
@@ -568,14 +530,12 @@ public class MultiList extends AbstractObservableList {
 			return false;
 		}
 
-		@Override
 		public Object next() {
 			while (iterIndex < iters.length && !iters[iterIndex].hasNext())
 				iterIndex++;
 			return iters[iterIndex].next();
 		}
 
-		@Override
 		public int nextIndex() {
 			int offset = 0;
 			for (int i = 0; i < iterIndex; i++)
@@ -583,14 +543,12 @@ public class MultiList extends AbstractObservableList {
 			return offset + iters[iterIndex].nextIndex();
 		}
 
-		@Override
 		public Object previous() {
 			while (iterIndex >= 0 && !iters[iterIndex].hasPrevious())
 				iterIndex--;
 			return iters[iterIndex].previous();
 		}
 
-		@Override
 		public int previousIndex() {
 			int offset = 0;
 			for (int i = 0; i < iterIndex; i++)
@@ -598,12 +556,10 @@ public class MultiList extends AbstractObservableList {
 			return offset + iters[iterIndex].previousIndex();
 		}
 
-		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
 		public void set(Object o) {
 			iters[iterIndex].set(o);
 		}

@@ -43,7 +43,7 @@ public class PluginDropAdapter extends ViewerDropAdapter {
      */
     private TransferData currentTransfer;
 
-    /**
+    /** 
      * Creates a plug-in drop adapter for the given viewer.
      *
      * @param viewer the viewer
@@ -52,6 +52,10 @@ public class PluginDropAdapter extends ViewerDropAdapter {
         super(viewer);
     }
 
+    /* (non-Javadoc)
+     * Method declared on DropTargetAdapter.
+     * The user has dropped something on the desktop viewer.
+     */
     @Override
 	public void drop(DropTargetEvent event) {
         try {
@@ -106,7 +110,7 @@ public class PluginDropAdapter extends ViewerDropAdapter {
         }
         return null;
     }
-
+    
     /**
      * @see ViewerDropAdapter#performDrop
      */

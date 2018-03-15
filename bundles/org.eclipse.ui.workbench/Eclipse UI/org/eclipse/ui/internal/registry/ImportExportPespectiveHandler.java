@@ -86,8 +86,8 @@ public class ImportExportPespectiveHandler {
 	private IPreferenceChangeListener preferenceListener;
 	private boolean ignoreEvents;
 
-	private List<MPerspective> exportedPersps = new ArrayList<>();
-	private List<String> importedPersps = new ArrayList<>();
+	private List<MPerspective> exportedPersps = new ArrayList<MPerspective>();
+	private List<String> importedPersps = new ArrayList<String>();
 	private Map<String, String> minMaxPersistedState;
 
 	private static Boolean impExpEnabled;
@@ -134,7 +134,7 @@ public class ImportExportPespectiveHandler {
 			String targetId = getOriginalId(perspective.getElementId());
 			ArrayList<String> showInTags = PerspectiveBuilder.getShowInPartFromRegistry(targetId);
 			if (showInTags != null) {
-				List<String> newTags = new ArrayList<>();
+				List<String> newTags = new ArrayList<String>();
 				for (String showIn : showInTags) {
 					newTags.add(ModeledPageLayout.SHOW_IN_PART_TAG + showIn);
 				}
@@ -351,14 +351,11 @@ public class ImportExportPespectiveHandler {
 	}
 
 	public static boolean isImpExpEnabled() {
-		if (impExpEnabled == null) {
-			String propertyStr = System.getProperty("e4.impExpPerspectiveEnabled"); //$NON-NLS-1$
-			if (propertyStr == null) {
-				impExpEnabled = true;
-			} else {
-				impExpEnabled = Boolean.parseBoolean(propertyStr);
-			}
-		}
+		impExpEnabled = true;
+		// if (impExpEnabled == null) {
+		//impExpEnabled = Boolean.parseBoolean(System.getProperty("e4.impExpPerspectiveEnabled")); //$NON-NLS-1$
+		// }
+		// return impExpEnabled;
 		return impExpEnabled;
 	}
 

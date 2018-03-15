@@ -21,7 +21,7 @@ import org.eclipse.core.internal.databinding.observable.Util;
 
 /**
  * Object describing a diff between two lists.
- *
+ * 
  * @since 1.0
  */
 public abstract class ListDiff implements IDiff {
@@ -29,7 +29,7 @@ public abstract class ListDiff implements IDiff {
 	/**
 	 * Returns a ListDiffEntry array representing the differences in the list,
 	 * in the order they are to be processed.
-	 *
+	 * 
 	 * @return a ListDiffEntry array representing the differences in the list,
 	 *         in the order they are to be processed.
 	 */
@@ -50,7 +50,7 @@ public abstract class ListDiff implements IDiff {
 	 * <li>{@link ListDiffVisitor#handleAdd(int, Object)} is called whenever an
 	 * add entry does not match conditions in 1 or 2.
 	 * </ol>
-	 *
+	 * 
 	 * @param visitor
 	 *            the visitor to receive callbacks.
 	 * @see ListDiffVisitor
@@ -143,7 +143,7 @@ public abstract class ListDiff implements IDiff {
 	/**
 	 * Returns true if the diff contains no added, removed, moved or replaced
 	 * elements.
-	 *
+	 * 
 	 * @return true if the diff contains no added, removed, moved or replaced
 	 *         elements.
 	 * @since 1.2
@@ -154,24 +154,21 @@ public abstract class ListDiff implements IDiff {
 
 	/**
 	 * Applies the changes in this diff to the given list
-	 *
+	 * 
 	 * @param list
 	 *            the list to which the diff will be applied
 	 * @since 1.2
 	 */
 	public void applyTo(final List list) {
 		accept(new ListDiffVisitor() {
-			@Override
 			public void handleAdd(int index, Object element) {
 				list.add(index, element);
 			}
 
-			@Override
 			public void handleRemove(int index, Object element) {
 				list.remove(index);
 			}
 
-			@Override
 			public void handleReplace(int index, Object oldElement,
 					Object newElement) {
 				list.set(index, newElement);
@@ -185,7 +182,7 @@ public abstract class ListDiff implements IDiff {
 	 * <p>
 	 * <b>Note</b>: the returned list is only valid until structural changes are
 	 * made to the passed-in list.
-	 *
+	 * 
 	 * @param list
 	 *            the list over which the diff will be simulated
 	 * @return an unmodifiable list showing what <code>list</code> would look
@@ -196,7 +193,6 @@ public abstract class ListDiff implements IDiff {
 	public List simulateOn(List list) {
 		final List[] result = { list };
 		accept(new ListDiffVisitor() {
-			@Override
 			public void handleAdd(int index, Object element) {
 				List first = result[0].subList(0, index);
 				List middle = Collections.singletonList(element);
@@ -204,14 +200,12 @@ public abstract class ListDiff implements IDiff {
 				result[0] = ConcatList.cat(first, middle, last);
 			}
 
-			@Override
 			public void handleRemove(int index, Object element) {
 				List first = result[0].subList(0, index);
 				List last = result[0].subList(index + 1, result[0].size());
 				result[0] = ConcatList.cat(first, last);
 			}
 
-			@Override
 			public void handleReplace(int index, Object oldElement,
 					Object newElement) {
 				List first = result[0].subList(0, index);
@@ -253,7 +247,6 @@ public abstract class ListDiff implements IDiff {
 			this.subLists = sublists;
 		}
 
-		@Override
 		public Object get(int index) {
 			int offset = 0;
 			for (int i = 0; i < subLists.length; i++) {
@@ -266,7 +259,6 @@ public abstract class ListDiff implements IDiff {
 			throw new IndexOutOfBoundsException();
 		}
 
-		@Override
 		public int size() {
 			int size = 0;
 			for (int i = 0; i < subLists.length; i++) {
@@ -279,7 +271,6 @@ public abstract class ListDiff implements IDiff {
 	/**
 	 * @see java.lang.Object#toString()
 	 */
-	@Override
 	public String toString() {
 		ListDiffEntry[] differences = getDifferences();
 		StringBuffer buffer = new StringBuffer();

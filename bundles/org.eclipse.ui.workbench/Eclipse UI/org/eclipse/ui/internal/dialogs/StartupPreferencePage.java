@@ -90,7 +90,7 @@ public class StartupPreferencePage extends PreferencePage implements
 		viewer.setLabelProvider(new LabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return Platform.getBundle(((ContributionInfo) element).getBundleId())
+				return (String) Platform.getBundle(((ContributionInfo) element).getBundleId())
 						.getHeaders().get(
 						Constants.BUNDLE_NAME);
 			}

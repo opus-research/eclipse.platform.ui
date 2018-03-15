@@ -15,7 +15,7 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class CheckboxTableViewerUpdater extends TableViewerUpdater {
 	private final CheckboxTableViewer checkboxViewer;
@@ -25,7 +25,6 @@ public class CheckboxTableViewerUpdater extends TableViewerUpdater {
 		checkboxViewer = viewer;
 	}
 
-	@Override
 	public void move(Object element, int oldPosition, int newPosition) {
 		if (isElementOrderPreserved()) {
 			boolean wasChecked = checkboxViewer.getChecked(element);

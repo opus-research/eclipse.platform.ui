@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.IStatus;
 		this.validationStatusProviders = dbc.getValidationStatusProviders();
 	}
 
-	@Override
 	protected Object calculate() {
 		int maxSeverity = IStatus.OK;
 		ValidationStatusProvider maxSeverityProvider = null;
@@ -45,7 +44,6 @@ import org.eclipse.core.runtime.IStatus;
 		return maxSeverityProvider;
 	}
 
-	@Override
 	public synchronized void dispose() {
 		validationStatusProviders = null;
 		super.dispose();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433603
  *******************************************************************************/
 package org.eclipse.ui.tests.multipageeditor;
 
@@ -22,13 +21,17 @@ import org.eclipse.ui.part.MultiPageEditorPart;
  * creates two pages -- each with a different context. The first context binds
  * "Ctrl+Shift+4" -- the second binds "Ctrl+Shift+5" -- to the command
  * "org.eclipse.ui.tests.TestCommand".
- *
+ * 
  * @since 3.0
  */
 public final class TestMultiPageEditor extends MultiPageEditorPart {
 
-    @Override
-	protected void createPages() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.MultiPageEditorPart#createPages()
+     */
+    protected void createPages() {
         try {
             IEditorPart part1 = new TestKeyBindingMultiPageEditorPart(0);
             addPage(part1, getEditorInput());
@@ -40,29 +43,46 @@ public final class TestMultiPageEditor extends MultiPageEditorPart {
         }
     }
 
-	@Override
-	public void doSave(IProgressMonitor monitor) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+     */
+    public void doSave(IProgressMonitor monitor) {
         // Do nothing.
     }
 
-	@Override
-	public void doSaveAs() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#doSaveAs()
+     */
+    public void doSaveAs() {
         throw new UnsupportedOperationException("Not implemented in this test."); //$NON-NLS-1$
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#gotoMarker(org.eclipse.core.resources.IMarker)
+     */
     public void gotoMarker(IMarker marker) {
         // Do nothing.
 
     }
 
-	@Override
-	public boolean isSaveAsAllowed() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
+     */
+    public boolean isSaveAsAllowed() {
         return false;
     }
 
     /**
      * Sets the active page.
-     *
+     * 
      * @param page
      *            The page to activate; should be either <code>0</code> or
      *            <code>1</code>.

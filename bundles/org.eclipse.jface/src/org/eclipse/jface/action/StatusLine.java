@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440270
  *******************************************************************************/
 
 package org.eclipse.jface.action;
@@ -116,7 +115,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/** stop image descriptor */
 	protected static ImageDescriptor fgStopImage = ImageDescriptor
-			.createFromFile(StatusLine.class, "images/stop.png");//$NON-NLS-1$
+			.createFromFile(StatusLine.class, "images/stop.gif");//$NON-NLS-1$
 
 	private MenuItem copyMenuItem;
 	static {
@@ -242,7 +241,7 @@ import org.eclipse.swt.widgets.ToolItem;
 				 * Workaround for Linux Motif: Even if the progress bar and
 				 * cancel button are not set to be visible ad of width 0, they
 				 * still draw over the first pixel of the editor contributions.
-				 *
+				 * 
 				 * The fix here is to draw the progress bar and cancel button
 				 * off screen if they are not visible.
 				 */
@@ -261,7 +260,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Create a new StatusLine as a child of the given parent.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent for this Composite
 	 * @param style
@@ -269,7 +268,7 @@ import org.eclipse.swt.widgets.ToolItem;
 	 */
 	public StatusLine(Composite parent, int style) {
 		super(parent, style);
-
+		
 		getAccessible().addAccessibleControlListener(new AccessibleControlAdapter() {
 			@Override
 			public void getRole(AccessibleControlEvent e) {
@@ -292,7 +291,7 @@ import org.eclipse.swt.widgets.ToolItem;
 		setLayout(new StatusLineLayout());
 
 		fMessageLabel = new CLabel(this, SWT.NONE);// SWT.SHADOW_IN);
-
+		
 		// this would need extra work to make this accessible
 		// from the workbench command framework.
 		Menu menu = new Menu(fMessageLabel);
@@ -312,7 +311,7 @@ import org.eclipse.swt.widgets.ToolItem;
 				}
 			}
 		});
-
+		
 		fProgressIsVisible = false;
 		fCancelEnabled = false;
 
@@ -355,7 +354,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Notifies that the main task is beginning.
-	 *
+	 * 
 	 * @param name
 	 *            the name (or description) of the main task
 	 * @param totalWork
@@ -416,7 +415,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Returns the status line's progress monitor
-	 *
+	 * 
 	 * @return {@link IProgressMonitor} the progress monitor
 	 */
 	public IProgressMonitor getProgressMonitor() {
@@ -439,7 +438,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Hides the Cancel button and ProgressIndicator.
-	 *
+	 * 
 	 */
 	protected void hideProgress() {
 
@@ -511,7 +510,7 @@ import org.eclipse.swt.widgets.ToolItem;
 	 * running operation. If the ProgressIndication is currently visible calling
 	 * this method may have a direct effect on the layout because it will make a
 	 * cancel button visible.
-	 *
+	 * 
 	 * @param enabled
 	 *            <code>true</true> if cancel should be enabled
 	 */
@@ -529,7 +528,7 @@ import org.eclipse.swt.widgets.ToolItem;
 	/**
 	 * Sets the error message text to be displayed on the status line. The image
 	 * on the status line is cleared.
-	 *
+	 * 
 	 * @param message
 	 *            the error message, or <code>null</code> for no error message
 	 */
@@ -539,7 +538,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Sets an image and error message text to be displayed on the status line.
-	 *
+	 * 
 	 * @param image
 	 *            the image to use, or <code>null</code> for no image
 	 * @param message
@@ -566,7 +565,7 @@ import org.eclipse.swt.widgets.ToolItem;
 	/**
 	 * Sets the message text to be displayed on the status line. The image on
 	 * the status line is cleared.
-	 *
+	 * 
 	 * @param message
 	 *            the error message, or <code>null</code> for no error message
 	 */
@@ -576,7 +575,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Sets an image and a message text to be displayed on the status line.
-	 *
+	 * 
 	 * @param image
 	 *            the image to use, or <code>null</code> for no image
 	 * @param message
@@ -601,7 +600,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Makes the Cancel button visible.
-	 *
+	 * 
 	 */
 	protected void showButton() {
 		if (fToolBar != null && !fToolBar.isDisposed()) {
@@ -614,7 +613,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Shows the Cancel button and ProgressIndicator.
-	 *
+	 * 
 	 */
 	protected void showProgress() {
 		if (!fProgressIsVisible && !isDisposed()) {
@@ -647,7 +646,7 @@ import org.eclipse.swt.widgets.ToolItem;
 	/**
 	 * Notifies that a subtask of the main task is beginning. Subtasks are
 	 * optional; the main task might not have subtasks.
-	 *
+	 * 
 	 * @param name
 	 *            the name (or description) of the subtask
 	 * @see IProgressMonitor#subTask(String)

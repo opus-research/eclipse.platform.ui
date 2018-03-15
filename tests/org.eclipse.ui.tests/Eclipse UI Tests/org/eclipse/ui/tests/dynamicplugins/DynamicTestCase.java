@@ -25,7 +25,7 @@ import org.osgi.framework.BundleException;
 
 /**
  * Baseclass for all dynamic tests.
- *
+ * 
  * @since 3.1
  */
 public abstract class DynamicTestCase extends UITestCase implements
@@ -36,11 +36,11 @@ public abstract class DynamicTestCase extends UITestCase implements
 	private Bundle newBundle;
 
 	private volatile boolean removedRecieved;
-
+	
 	private WeakReference addedDelta;
-
+	
 	private WeakReference removedDelta;
-
+	
 	private ReferenceQueue queue;
 
 	/**
@@ -50,7 +50,11 @@ public abstract class DynamicTestCase extends UITestCase implements
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
+	 */
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		try {
@@ -64,7 +68,7 @@ public abstract class DynamicTestCase extends UITestCase implements
 
 	/**
 	 * Get the bundle for this test.
-	 *
+	 * 
 	 * @return the bundle for this test
 	 */
 	protected final Bundle getBundle() {
@@ -105,7 +109,7 @@ public abstract class DynamicTestCase extends UITestCase implements
 	/**
 	 * Return the namespace of the plugin that defines the extension point being
 	 * tested. Default is "org.eclipse.ui".
-	 *
+	 * 
 	 * @return the namespace of the declaring plugin
 	 */
 	protected String getDeclaringNamespace() {
@@ -114,53 +118,52 @@ public abstract class DynamicTestCase extends UITestCase implements
 
 	/**
 	 * Return the id of the extension to be tested.
-	 *
+	 * 
 	 * @return the id of the extension to be tested
 	 */
 	protected abstract String getExtensionId();
 
 	/**
 	 * Return the name of the extension point that is being tested.
-	 *
+	 * 
 	 * @return the extension point being tested
 	 */
 	protected abstract String getExtensionPoint();
 
 	/**
 	 * Return the install location of the bundle to test.
-	 *
+	 * 
 	 * @return the install location of the bundle to test
 	 */
 	protected abstract String getInstallLocation();
-
+	
 	/**
 	 * Return a <code>Class</code> that we know to be in teh bundle to test.
-	 *
+	 * 
 	 * @return a <code>Class</code> that we know to be in teh bundle to test.  May be <code>null</code>.
 	 * @since 3.1
 	 */
 	protected String getMarkerClass() {
 		return null;
 	}
-
+	
 	/**
 	 * Tests to ensure that the marker class is released when the bundle is unloaded.
-	 * If <code>getMarkerClass()</code> returns <code>null</code> then this method
+	 * If <code>getMarkerClass()</code> returns <code>null</code> then this method 
 	 * will always succeed.
-	 *
+	 * 
 	 * @throws Exception
 	 * @since 3.1
 	 */
-	public void testClass() throws Exception {
+	public void testClass() throws Exception {	
 		String className = getMarkerClass();
-		if (className == null) {
-			return;
-		}
-
+		if (className == null)
+			return;		
+		
 		setName("testClass() for " + getClass().getName());
-
+		
 		Bundle bundle = getBundle();
-
+		
 		Class clazz = bundle.loadClass(className);
 		assertNotNull(clazz);
 		ReferenceQueue myQueue = new ReferenceQueue();
@@ -173,7 +176,7 @@ public abstract class DynamicTestCase extends UITestCase implements
 
 	/**
 	 * Return whether the bundle ADDED event has been recieved.
-	 *
+	 * 
 	 * @return whether the bundle ADDED event has been recieved
 	 */
 	protected final boolean hasAddedEventPropagated() {
@@ -182,7 +185,7 @@ public abstract class DynamicTestCase extends UITestCase implements
 
 	/**
 	 * Return whether the bundle REMOVED event has been recieved.
-	 *
+	 * 
 	 * @return whether the bundle REMOVED event has been recieved
 	 */
 	protected final boolean hasRemovedEventPropagated() {
@@ -195,14 +198,13 @@ public abstract class DynamicTestCase extends UITestCase implements
 	 * {@link DynamicTestCase#getDeclaringNamespace()},
 	 * {@link DynamicTestCase#getExtensionPoint()}, and
 	 * {@link DynamicTestCase#getExtensionId()}.
-	 *
+	 * 
 	 * Custom implementationss should ensure that addition and removal of the
 	 * target extension are recorded.
-	 *
+	 * 
 	 * @see DynamicTestCase#setAddedEventPropagated(boolean)
 	 * @see DynamicTestCase#setRemovedEventPropagated(boolean)
 	 */
-	@Override
 	public void registryChanged(IRegistryChangeEvent event) {
 		IExtensionDelta delta = event.getExtensionDelta(
 				getDeclaringNamespace(), getExtensionPoint(), getExtensionId());
@@ -265,7 +267,7 @@ public abstract class DynamicTestCase extends UITestCase implements
 
 	/**
 	 * Set whether the bundle ADDED event has been recieved.
-	 *
+	 * 
 	 * @param added
 	 *            whether the bundle ADDED event has been recieved
 	 */
@@ -275,7 +277,7 @@ public abstract class DynamicTestCase extends UITestCase implements
 
 	/**
 	 * Set whether the bundle REMOVED event has been recieved.
-	 *
+	 * 
 	 * @param added
 	 *            whether the bundle REMOVED event has been recieved
 	 */

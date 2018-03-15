@@ -18,7 +18,6 @@ import org.eclipse.ui.fieldassist.ContentAssistCommandAdapter;
 
 public class ComboCommandFieldAssistWindow extends ComboFieldAssistWindow {
 
-	@Override
 	protected ContentProposalAdapter createContentProposalAdapter(
 			Control control) {
 		return new ContentAssistCommandAdapter(control,

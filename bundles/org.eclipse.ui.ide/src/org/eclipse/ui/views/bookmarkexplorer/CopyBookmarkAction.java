@@ -33,7 +33,7 @@ class CopyBookmarkAction extends BookmarkAction {
 
     /**
      * Creates the action.
-     *
+     * 
      * @param bookmarkNavigator the view
      */
     public CopyBookmarkAction(BookmarkNavigator bookmarkNavigator) {
@@ -46,8 +46,7 @@ class CopyBookmarkAction extends BookmarkAction {
     /**
      * Performs this action.
      */
-    @Override
-	public void run() {
+    public void run() {
         // Get the selected markers
         BookmarkNavigator bookmarkNavigator = getView();
         StructuredViewer viewer = bookmarkNavigator.getViewer();
@@ -63,11 +62,10 @@ class CopyBookmarkAction extends BookmarkAction {
         setClipboard(markers, createBookmarkReport(markers));
     }
 
-    /**
+    /** 
      * Updates enablement based on the current selection
      */
-    @Override
-	public void selectionChanged(IStructuredSelection sel) {
+    public void selectionChanged(IStructuredSelection sel) {
         setEnabled(!sel.isEmpty());
     }
 

@@ -20,7 +20,6 @@ import org.eclipse.core.commands.ExecutionException;
  */
 public class SubtractIntegerHandler extends AbstractHandler {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		Integer minuend = (Integer) event
 				.getObjectParameterForExecution(CommandParameterTypeTest.MINUEND);

@@ -38,7 +38,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class KeysPreferenceModelTest extends UITestCase {
 
@@ -119,7 +119,6 @@ public class KeysPreferenceModelTest extends UITestCase {
 		final ArrayList events = new ArrayList();
 		// test setup vars
 		controller.addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				events.add(event);
 			}
@@ -165,7 +164,6 @@ public class KeysPreferenceModelTest extends UITestCase {
 		// test setup vars
 		final ArrayList events = new ArrayList();
 		controller.addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				events.add(event);
 			}
@@ -219,7 +217,6 @@ public class KeysPreferenceModelTest extends UITestCase {
 		// test setup vars
 		final ArrayList events = new ArrayList();
 		controller.addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				events.add(event);
 			}
@@ -277,7 +274,6 @@ public class KeysPreferenceModelTest extends UITestCase {
 		// test setup vars
 		final ArrayList events = new ArrayList();
 		controller.addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				events.add(event);
 			}
@@ -421,7 +417,6 @@ public class KeysPreferenceModelTest extends UITestCase {
 		// test setup vars
 		final ArrayList events = new ArrayList();
 		controller.addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				events.add(event);
 			}
@@ -473,7 +468,6 @@ public class KeysPreferenceModelTest extends UITestCase {
 		// test setup vars
 		final ArrayList events = new ArrayList();
 		controller.addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				events.add(event);
 			}
@@ -556,7 +550,6 @@ public class KeysPreferenceModelTest extends UITestCase {
 		// test setup vars
 		final ArrayList events = new ArrayList();
 		controller.addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				events.add(event);
 			}

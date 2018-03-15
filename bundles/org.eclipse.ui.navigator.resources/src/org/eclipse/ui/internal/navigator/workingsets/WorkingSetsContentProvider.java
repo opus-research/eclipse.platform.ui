@@ -35,9 +35,9 @@ import org.eclipse.ui.navigator.resources.ProjectExplorer;
 
 /**
  * Provides children and parents for IWorkingSets.
- *
+ * 
  * @since 3.2.1
- *
+ * 
  */
 public class WorkingSetsContentProvider implements ICommonContentProvider {
 
@@ -60,9 +60,12 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	private IExtensionStateModel extensionStateModel;
 	private CommonNavigator projectExplorer;
 	private CommonViewer viewer;
-
+	
 	private IPropertyChangeListener rootModeListener = new IPropertyChangeListener() {
-
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+		 */
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if(SHOW_TOP_LEVEL_WORKING_SETS.equals(event.getProperty())) {
@@ -71,28 +74,37 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		}
 
 	};
+	
 
-
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ICommonContentProvider#init(org.eclipse.ui.navigator.ICommonContentExtensionSite)
+	 */
 	@Override
 	public void init(ICommonContentExtensionSite aConfig) {
 		NavigatorContentService cs = (NavigatorContentService) aConfig.getService();
 		viewer = (CommonViewer) cs.getViewer();
 		projectExplorer = viewer.getCommonNavigator();
-
+		
 		extensionStateModel = aConfig.getExtensionStateModel();
 		extensionStateModel.addPropertyChangeListener(rootModeListener);
 		updateRootMode();
-
+		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void restoreState(IMemento aMemento) {
-
+		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void saveState(IMemento aMemento) {
-
+		
 	}
 
 	@Override
@@ -152,7 +164,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 			helper = new WorkingSetHelper(rootSet);
 		}
 	}
-
+ 
 	private void updateRootMode() {
 		if (projectExplorer == null) {
 			return;
@@ -170,7 +182,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 
 		/**
 		 * Create a Helper class for the given working set
-		 *
+		 * 
 		 * @param set
 		 *            The set to use to build the item to parent map.
 		 */
@@ -201,7 +213,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		}
 
 		/**
-		 *
+		 * 
 		 * @param element
 		 *            An element from the viewer
 		 * @return The parent associated with the element, if any.
@@ -212,7 +224,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 			return parents.get(element);
 		}
 	}
-
+	
 
 
 }

@@ -24,7 +24,6 @@ public class NumberToShortValidatorTest extends NumberToNumberValidatorTestHarne
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.validation.NumberToNumberValidatorTestHarness#doGetOutOfRangeNumber()
 	 */
-	@Override
 	protected Number doGetOutOfRangeNumber() {
 		return new Integer(Short.MAX_VALUE + 1);
 	}
@@ -32,7 +31,6 @@ public class NumberToShortValidatorTest extends NumberToNumberValidatorTestHarne
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.validation.NumberToNumberValidatorTestHarness#doGetToBoxedTypeValidator(java.lang.Class)
 	 */
-	@Override
 	protected NumberToNumberValidator doGetToBoxedTypeValidator(Class fromType) {
 		NumberToShortConverter converter = new NumberToShortConverter(NumberFormat.getInstance(),
 				Integer.class, false);
@@ -42,7 +40,6 @@ public class NumberToShortValidatorTest extends NumberToNumberValidatorTestHarne
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.validation.NumberToNumberValidatorTestHarness#doGetToPrimitiveValidator(java.lang.Class)
 	 */
-	@Override
 	protected NumberToNumberValidator doGetToPrimitiveValidator(Class fromType) {
 		NumberToShortConverter converter = new NumberToShortConverter(NumberFormat.getInstance(),
 				Integer.class, true);

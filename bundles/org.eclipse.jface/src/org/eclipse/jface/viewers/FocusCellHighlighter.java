@@ -31,7 +31,7 @@ public abstract class FocusCellHighlighter {
 	void setMgr(SWTFocusCellManager mgr) {
 		this.mgr = mgr;
 	}
-
+	
 	/**
 	 * @return the focus cell
 	 */
@@ -40,10 +40,10 @@ public abstract class FocusCellHighlighter {
 		// to the SWTFocusCellManager instance
 		if( mgr != null ) {
 		    // Use this method because it ensure that no
-		    // cell update (which might cause scrolling) happens
-			return mgr._getFocusCell();
+		    // cell update (which might cause scrolling) happens 
+			return mgr._getFocusCell();	
 		}
-
+		
 		return viewer.getColumnViewerEditor().getFocusCell();
 	}
 
@@ -52,8 +52,7 @@ public abstract class FocusCellHighlighter {
 	 * extend.
 	 *
 	 * @param cell
-	 *            the new focus cell or <code>null</code> if no new cell
-	 *            receives the focus
+	 *            the new focus cell
 	 * @deprecated use {@link #focusCellChanged(ViewerCell, ViewerCell)} instead
 	 */
 	@Deprecated

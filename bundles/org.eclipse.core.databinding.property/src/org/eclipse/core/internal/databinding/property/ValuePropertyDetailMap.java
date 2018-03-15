@@ -25,7 +25,7 @@ import org.eclipse.core.databinding.property.value.IValueProperty;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ValuePropertyDetailMap extends MapProperty {
 	private final IValueProperty masterProperty;
@@ -41,35 +41,29 @@ public class ValuePropertyDetailMap extends MapProperty {
 		this.detailProperty = detailProperty;
 	}
 
-	@Override
 	public Object getKeyType() {
 		return detailProperty.getKeyType();
 	}
 
-	@Override
 	public Object getValueType() {
 		return detailProperty.getValueType();
 	}
 
-	@Override
 	protected Map doGetMap(Object source) {
 		Object masterValue = masterProperty.getValue(source);
 		return detailProperty.getMap(masterValue);
 	}
 
-	@Override
 	protected void doSetMap(Object source, Map map) {
 		Object masterValue = masterProperty.getValue(source);
 		detailProperty.setMap(masterValue, map);
 	}
 
-	@Override
 	protected void doUpdateMap(Object source, MapDiff diff) {
 		Object masterValue = masterProperty.getValue(source);
 		detailProperty.updateMap(masterValue, diff);
 	}
 
-	@Override
 	public IObservableMap observe(Realm realm, Object source) {
 		IObservableValue masterValue;
 
@@ -85,7 +79,6 @@ public class ValuePropertyDetailMap extends MapProperty {
 		return detailMap;
 	}
 
-	@Override
 	public IObservableMap observeDetail(IObservableValue master) {
 		IObservableValue masterValue;
 
@@ -101,7 +94,6 @@ public class ValuePropertyDetailMap extends MapProperty {
 		return detailMap;
 	}
 
-	@Override
 	public String toString() {
 		return masterProperty + " => " + detailProperty; //$NON-NLS-1$
 	}

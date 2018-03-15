@@ -21,7 +21,7 @@ import org.eclipse.core.databinding.property.list.SimpleListProperty;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class SelfListProperty extends SimpleListProperty {
 	private final Object elementType;
@@ -33,27 +33,22 @@ public class SelfListProperty extends SimpleListProperty {
 		this.elementType = elementType;
 	}
 
-	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
-	@Override
 	protected List doGetList(Object source) {
 		return (List) source;
 	}
 
-	@Override
 	protected void doSetList(Object source, List list, ListDiff diff) {
 		doUpdateList(source, diff);
 	}
 
-	@Override
 	protected void doUpdateList(Object source, ListDiff diff) {
 		diff.applyTo((List) source);
 	}
 
-	@Override
 	public INativePropertyListener adaptListener(
 			ISimplePropertyListener listener) {
 		return null; // no listener API

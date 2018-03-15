@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 249992)
  *     Matthew Hall - bug 260329
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -16,8 +15,7 @@ package org.eclipse.jface.examples.databinding.snippets;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.SelectObservableValue;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.IViewerObservableValue;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -32,7 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Demonstrate usage of SelectObservableValue
- *
+ * 
  * @since 3.2
  */
 public class Snippet024SelectObservableValue {
@@ -40,7 +38,7 @@ public class Snippet024SelectObservableValue {
 
 	public static void main(String[] args) {
 		final Display display = Display.getDefault();
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -91,7 +89,8 @@ public class Snippet024SelectObservableValue {
 		for (int i = 0; i < colors.length; i++) {
 			Button button = new Button(group, SWT.RADIO);
 			button.setText(colors[i].toString());
-			radioGroup.addOption(colors[i], WidgetProperties.selection().observe(button));
+			radioGroup.addOption(colors[i], SWTObservables
+					.observeSelection(button));
 		}
 
 		DataBindingContext dbc = new DataBindingContext();

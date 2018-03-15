@@ -27,9 +27,9 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 /**
  * SeverityAndDescriptionConfigurationArea is the configuration area for the
  * severity and description field.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class SeverityAndDescriptionConfigurationArea extends
 		DescriptionConfigurationArea {
@@ -49,10 +49,9 @@ public class SeverityAndDescriptionConfigurationArea extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#apply(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
 	 */
-	@Override
 	public void apply(MarkerFieldFilter filter) {
 		super.apply(filter);
 		((SeverityAndDescriptionFieldFilter) filter).selectedSeverities = severities;
@@ -61,7 +60,7 @@ public class SeverityAndDescriptionConfigurationArea extends
 
 	/**
 	 * Create a group for the severity selection.
-	 *
+	 * 
 	 * @param parent
 	 * @return {@link Composite}
 	 */
@@ -82,10 +81,9 @@ public class SeverityAndDescriptionConfigurationArea extends
 		errorButton.addSelectionListener(new SelectionAdapter() {
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateSeverities(
 						SeverityAndDescriptionFieldFilter.SEVERITY_ERROR,
@@ -101,10 +99,9 @@ public class SeverityAndDescriptionConfigurationArea extends
 		warningButton.addSelectionListener(new SelectionAdapter() {
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateSeverities(
 						SeverityAndDescriptionFieldFilter.SEVERITY_WARNING,
@@ -117,10 +114,9 @@ public class SeverityAndDescriptionConfigurationArea extends
 		infoButton.addSelectionListener(new SelectionAdapter() {
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateSeverities(
 						SeverityAndDescriptionFieldFilter.SEVERITY_INFO,
@@ -132,10 +128,9 @@ public class SeverityAndDescriptionConfigurationArea extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#initialize(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
 	 */
-	@Override
 	public void initialize(MarkerFieldFilter filter) {
 		super.initialize(filter);
 		SeverityAndDescriptionFieldFilter sevFilter = (SeverityAndDescriptionFieldFilter) filter;
@@ -151,7 +146,7 @@ public class SeverityAndDescriptionConfigurationArea extends
 
 	/**
 	 * Set or clear the flag for the constant based on the enablement.
-	 *
+	 * 
 	 * @param constant
 	 *            one of {@link IMarker#SEVERITY_ERROR},{@link IMarker#SEVERITY_WARNING},{@link IMarker#SEVERITY_INFO}
 	 * @param enabled
@@ -166,7 +161,7 @@ public class SeverityAndDescriptionConfigurationArea extends
 
 	/**
 	 * Set the enabled state of the severity buttons.
-	 *
+	 * 
 	 * @param enabled
 	 */
 	void setSeverityButtonsEnabled(boolean enabled) {

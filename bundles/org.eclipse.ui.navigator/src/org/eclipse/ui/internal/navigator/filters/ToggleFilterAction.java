@@ -21,7 +21,7 @@ import org.eclipse.ui.navigator.ICommonFilterDescriptor;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class ToggleFilterAction extends Action {
 
@@ -46,7 +46,11 @@ public class ToggleFilterAction extends Action {
 		setText(descriptor.getName());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.Action#run()
+	 */
 	public void run() {
 
 		boolean toMakeActive = !isChecked();

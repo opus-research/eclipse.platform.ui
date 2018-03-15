@@ -28,19 +28,19 @@ public class ResourceFilterPage extends PropertyPage {
 	ResourceFilterGroup groupWidget;
 
 	/**
-	 *
+	 * 
 	 */
 	public ResourceFilterPage() {
 		groupWidget = new ResourceFilterGroup();
 	}
 
-	@Override
 	protected Control createContents(Composite parent) {
 
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
 				IIDEHelpContextIds.RESOURCE_FILTER_PROPERTY_PAGE);
 
-		IResource resource = getElement().getAdapter(IResource.class);
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
 		IContainer container = resource instanceof IContainer ? (IContainer) resource
 				: null;
 		groupWidget.setContainer(container);
@@ -48,12 +48,15 @@ public class ResourceFilterPage extends PropertyPage {
 		return groupWidget.createContents(parent);
 	}
 
-	@Override
 	protected void performDefaults() {
 		groupWidget.performDefaults();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.DialogPage#dispose()
+	 */
 	public void dispose() {
 		groupWidget.dispose();
 		super.dispose();
@@ -62,7 +65,6 @@ public class ResourceFilterPage extends PropertyPage {
 	/**
 	 * Apply the read only state and the encoding to the resource.
 	 */
-	@Override
 	public boolean performOk() {
 		return groupWidget.performOk();
 	}

@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.List;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class WidgetItemsProperty extends WidgetDelegatingListProperty {
 	private IListProperty cCombo;
@@ -26,13 +26,12 @@ public class WidgetItemsProperty extends WidgetDelegatingListProperty {
 	private IListProperty list;
 
 	/**
-	 *
+	 * 
 	 */
 	public WidgetItemsProperty() {
 		super(String.class);
 	}
 
-	@Override
 	protected IListProperty doGetDelegate(Object source) {
 		if (source instanceof CCombo) {
 			if (cCombo == null)

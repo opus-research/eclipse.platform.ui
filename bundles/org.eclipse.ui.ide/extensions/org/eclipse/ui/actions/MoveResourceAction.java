@@ -48,18 +48,17 @@ public class MoveResourceAction extends CopyResourceAction {
      * Creates a new action.
      *
      * @param shell the shell for any dialogs
-     *
+     * 
      * @deprecated {@link #MoveResourceAction(IShellProvider)}
      */
-    @Deprecated
-	public MoveResourceAction(Shell shell) {
+    public MoveResourceAction(Shell shell) {
         super(shell, IDEWorkbenchMessages.MoveResourceAction_text);
         initAction();
     }
 
     /**
      * Creates a new action.
-     *
+     * 
      * @param provider the shell for any dialogs.
      * @since 3.4
      */
@@ -67,7 +66,7 @@ public class MoveResourceAction extends CopyResourceAction {
     	super(provider, IDEWorkbenchMessages.MoveResourceAction_text);
     	initAction();
     }
-
+    
     /**
      * Initializes the workbench
      */
@@ -77,9 +76,11 @@ public class MoveResourceAction extends CopyResourceAction {
         PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
 				IIDEHelpContextIds.MOVE_RESOURCE_ACTION);
     }
-
-    @Override
-	protected CopyFilesAndFoldersOperation createOperation() {
+    
+    /* (non-Javadoc)
+     * Overrides method in CopyResourceAction
+     */
+    protected CopyFilesAndFoldersOperation createOperation() {
         return new MoveFilesAndFoldersOperation(getShell());
     }
 
@@ -92,16 +93,20 @@ public class MoveResourceAction extends CopyResourceAction {
         return destinations;
     }
 
-    @Override
-	protected IResource[] getResources(List resourceList) {
+    /* (non-Javadoc)
+     * Overrides method in CopyResourceAction
+     */
+    protected IResource[] getResources(List resourceList) {
         ReadOnlyStateChecker checker = new ReadOnlyStateChecker(getShell(),
                 IDEWorkbenchMessages.MoveResourceAction_title,
                 IDEWorkbenchMessages.MoveResourceAction_checkMoveMessage);
         return checker.checkReadOnlyResources(super.getResources(resourceList));
     }
 
-    @Override
-	protected void runOperation(IResource[] resources, IContainer destination) {
+    /* (non-Javadoc)
+     * Overrides method in CopyResourceAction
+     */
+    protected void runOperation(IResource[] resources, IContainer destination) {
         //Initialize the destinations
         destinations = new ArrayList();
         IResource[] copiedResources = operation.copyResources(resources,
@@ -112,9 +117,11 @@ public class MoveResourceAction extends CopyResourceAction {
                     copiedResources[i].getName()));
         }
     }
-
-    @Override
-	public void run() {
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.actions.CopyResourceAction#run()
+     */
+    public void run() {
 		if (LTKLauncher.openMoveWizard(getStructuredSelection())) {
 			return;
 		}

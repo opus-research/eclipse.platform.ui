@@ -30,7 +30,7 @@ import org.eclipse.ui.tests.harness.util.DialogCheck;
 
 /**
  * Tests the WorkingSetEditWizard
- * Tests input validation, presence of correct edit page and
+ * Tests input validation, presence of correct edit page and 
  * wizard page texts.
  */
 public class UIEditWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
@@ -40,8 +40,7 @@ public class UIEditWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
         super(name);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         WorkingSetRegistry registry = WorkbenchPlugin.getDefault()
                 .getWorkingSetRegistry();
         fDefaultEditPage = registry.getDefaultWorkingSetPage();

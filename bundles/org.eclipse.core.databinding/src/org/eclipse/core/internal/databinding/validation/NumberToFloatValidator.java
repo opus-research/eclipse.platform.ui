@@ -24,7 +24,7 @@ import org.eclipse.core.internal.databinding.conversion.StringToNumberParser;
 public class NumberToFloatValidator extends NumberToNumberValidator {
 	private static final Float MIN = new Float(Float.MIN_VALUE);
 	private static final Float MAX = new Float(Float.MAX_VALUE);
-
+	
 	/**
 	 * @param converter
 	 */
@@ -32,7 +32,9 @@ public class NumberToFloatValidator extends NumberToNumberValidator {
 		super(converter, MIN, MAX);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.internal.databinding.validation.NumberToNumberValidator#inRange(java.lang.Number)
+	 */
 	protected boolean inRange(Number number) {
 		return StringToNumberParser.inFloatRange(number);
 	}

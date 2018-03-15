@@ -28,6 +28,13 @@ public class PartDragAgent extends DragAgent {
 		super(manager);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.addons.dndaddon.DragAgent#getElementToDrag(org.eclipse.e4.ui.
+	 * workbench.addons.dndaddon.CursorInfo)
+	 */
 	@Override
 	public MUIElement getElementToDrag(DnDInfo info) {
 		if (!(info.curElement instanceof MPartStack))
@@ -77,6 +84,12 @@ public class PartDragAgent extends DragAgent {
 		return info.curElement;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DragAgent#dragStart(org.eclipse.e4.ui.model.
+	 * application.ui.MUIElement)
+	 */
 	@Override
 	public void dragStart(DnDInfo info) {
 		super.dragStart(info);
@@ -84,6 +97,11 @@ public class PartDragAgent extends DragAgent {
 			dndManager.hostElement(dragElement, 16, 10);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DragAgent#dragFinished()
+	 */
 	@Override
 	public void dragFinished(boolean performDrop, DnDInfo info) {
 		if (dragElement instanceof MPart) {

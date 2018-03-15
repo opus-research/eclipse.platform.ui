@@ -39,9 +39,8 @@ public class TestVirtualTree extends TestTree {
 			@Override
 			public void handleEvent(Event event) {
 				String position = getPosition((TreeItem) event.item);
-				if (position.endsWith(".32")) {
+				if (position.endsWith(".32"))
 					Thread.dumpStack();
-				}
 				System.out.println("updating " + position);
 			}
 		});
@@ -49,9 +48,8 @@ public class TestVirtualTree extends TestTree {
 		viewer.setContentProvider(new TestModelContentProvider());
 		viewer.setUseHashlookup(true);
 
-		if (fViewer2 == null) {
+		if (fViewer2 == null)
 			fViewer2 = viewer;
-		}
 		return viewer;
 	}
 
@@ -60,9 +58,8 @@ public class TestVirtualTree extends TestTree {
 	 */
 	public static void main(String[] args) {
 		TestBrowser browser = new TestVirtualTree();
-		if (args.length > 0 && args[0].equals("-twopanes")) {
+		if (args.length > 0 && args[0].equals("-twopanes"))
 			browser.show2Panes();
-		}
 
 		browser.setBlockOnOpen(true);
 		browser.open(TestElement.createModel(3, 10));

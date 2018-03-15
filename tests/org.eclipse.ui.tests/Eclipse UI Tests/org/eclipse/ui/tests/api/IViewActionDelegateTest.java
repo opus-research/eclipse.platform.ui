@@ -45,8 +45,7 @@ public class IViewActionDelegateTest extends IActionDelegateTest {
     /**
      * @see IActionDelegateTest#createActionWidget()
      */
-    @Override
-	protected Object createActionWidget() throws Throwable {
+    protected Object createActionWidget() throws Throwable {
         MockViewPart view = (MockViewPart) fPage.showView(TEST_VIEW_ID);
         return view;
     }
@@ -54,8 +53,7 @@ public class IViewActionDelegateTest extends IActionDelegateTest {
     /**
      * @see IActionDelegateTest#runAction()
      */
-    @Override
-	protected void runAction(Object widget) throws Throwable {
+    protected void runAction(Object widget) throws Throwable {
         MockViewPart view = (MockViewPart) widget;
         IMenuManager mgr = view.getViewSite().getActionBars().getMenuManager();
         ActionUtil.runActionWithLabel(this, mgr, "Mock Action");
@@ -64,8 +62,7 @@ public class IViewActionDelegateTest extends IActionDelegateTest {
     /**
      * @see IActionDelegateTest#fireSelection()
      */
-    @Override
-	protected void fireSelection(Object widget) throws Throwable {
+    protected void fireSelection(Object widget) throws Throwable {
         MockViewPart view = (MockViewPart) widget;
         view.fireSelection();
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,7 +56,7 @@ import org.eclipse.ui.navigator.ICommonMenuConstants;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class ResourceMgmtActionProvider extends CommonActionProvider {
 
@@ -72,6 +72,13 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 
 	private Shell shell;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator
+	 * .ICommonActionExtensionSite)
+	 */
 	@Override
 	public void init(ICommonActionExtensionSite aSite) {
 		super.init(aSite);
@@ -105,7 +112,7 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 	 * <p>
 	 * No disabled action should be on the context menu.
 	 * </p>
-	 *
+	 * 
 	 * @param menu
 	 *            context menu to add actions to
 	 */
@@ -126,7 +133,7 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 			if (next instanceof IProject) {
 				project = (IProject) next;
 			} else if (next instanceof IAdaptable) {
-				project = ((IAdaptable) next).getAdapter(IProject.class);
+				project = (IProject) ((IAdaptable) next).getAdapter(IProject.class);
 			}
 
 			if (project == null) {
@@ -168,7 +175,7 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 
 	/**
 	 * Returns whether there are builders configured on the given project.
-	 *
+	 * 
 	 * @return <code>true</code> if it has builders, <code>false</code> if not,
 	 *         or if this could not be determined
 	 */

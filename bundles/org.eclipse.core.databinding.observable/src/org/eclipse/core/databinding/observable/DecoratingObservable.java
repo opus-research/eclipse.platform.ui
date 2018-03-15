@@ -17,9 +17,9 @@ import org.eclipse.core.internal.databinding.observable.Util;
 
 /**
  * An observable which decorates another observable
- *
+ * 
  * @since 1.2
- *
+ * 
  */
 public class DecoratingObservable extends AbstractObservable implements
 		IDecoratingObservable {
@@ -32,7 +32,7 @@ public class DecoratingObservable extends AbstractObservable implements
 
 	/**
 	 * Constructs a DecoratingObservable which decorates the given observable.
-	 *
+	 * 
 	 * @param decorated
 	 *            the observable being decorated.
 	 * @param disposeDecoratedOnDispose
@@ -45,19 +45,16 @@ public class DecoratingObservable extends AbstractObservable implements
 		this.decorated = decorated;
 		this.disposedDecoratedOnDispose = disposeDecoratedOnDispose;
 		decorated.addDisposeListener(new IDisposeListener() {
-			@Override
 			public void handleDispose(DisposeEvent staleEvent) {
 				dispose();
 			}
 		});
 	}
 
-	@Override
 	public IObservable getDecorated() {
 		return decorated;
 	}
 
-	@Override
 	public boolean isStale() {
 		getterCalled();
 		return decorated.isStale();
@@ -67,11 +64,9 @@ public class DecoratingObservable extends AbstractObservable implements
 		ObservableTracker.getterCalled(this);
 	}
 
-	@Override
 	protected void firstListenerAdded() {
 		if (staleListener == null) {
 			staleListener = new IStaleListener() {
-				@Override
 				public void handleStale(StaleEvent staleEvent) {
 					DecoratingObservable.this.handleStaleEvent(staleEvent);
 				}
@@ -80,7 +75,6 @@ public class DecoratingObservable extends AbstractObservable implements
 		decorated.addStaleListener(staleListener);
 	}
 
-	@Override
 	protected void lastListenerRemoved() {
 		if (staleListener != null) {
 			decorated.removeStaleListener(staleListener);
@@ -93,7 +87,7 @@ public class DecoratingObservable extends AbstractObservable implements
 	 * By default, this method fires the stale event again, with the decorating
 	 * observable as the event source. Subclasses may override to provide
 	 * different behavior.
-	 *
+	 * 
 	 * @param event
 	 *            the stale event received from the decorated observable
 	 */
@@ -101,7 +95,6 @@ public class DecoratingObservable extends AbstractObservable implements
 		fireStale();
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (obj == this)
 			return true;
@@ -114,12 +107,10 @@ public class DecoratingObservable extends AbstractObservable implements
 		return Util.equals(decorated, obj);
 	}
 
-	@Override
 	public int hashCode() {
 		return decorated.hashCode();
 	}
 
-	@Override
 	public synchronized void dispose() {
 		if (decorated != null && staleListener != null) {
 			decorated.removeStaleListener(staleListener);

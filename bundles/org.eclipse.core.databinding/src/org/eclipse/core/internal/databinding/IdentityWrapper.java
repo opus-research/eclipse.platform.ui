@@ -17,9 +17,9 @@ package org.eclipse.core.internal.databinding;
  * Used for wrapping objects that define their own implementations of equals()
  * and hashCode() when putting them in sets or hashmaps to ensure identity
  * comparison.
- *
+ * 
  * @since 1.0
- *
+ * 
  */
 public class IdentityWrapper {
 
@@ -51,7 +51,6 @@ public class IdentityWrapper {
 		return o;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || obj.getClass() != IdentityWrapper.class) {
 			return false;
@@ -59,7 +58,6 @@ public class IdentityWrapper {
 		return o == ((IdentityWrapper) obj).o;
 	}
 
-	@Override
 	public int hashCode() {
 		return System.identityHashCode(o);
 	}

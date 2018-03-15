@@ -21,7 +21,7 @@ import org.eclipse.core.databinding.property.map.IMapProperty;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class AnonymousBeanMapProperty extends DelegatingMapProperty {
 	private final String propertyName;
@@ -40,7 +40,6 @@ public class AnonymousBeanMapProperty extends DelegatingMapProperty {
 		this.delegates = new HashMap();
 	}
 
-	@Override
 	protected IMapProperty doGetDelegate(Object source) {
 		Class beanClass = source.getClass();
 		if (delegates.containsKey(beanClass))
@@ -57,7 +56,6 @@ public class AnonymousBeanMapProperty extends DelegatingMapProperty {
 		return delegate;
 	}
 
-	@Override
 	public String toString() {
 		String s = "?." + propertyName + "{:}"; //$NON-NLS-1$ //$NON-NLS-2$
 		Class keyType = (Class) getKeyType();

@@ -28,13 +28,13 @@ import org.eclipse.core.internal.databinding.observable.StalenessTracker;
  * Represents a set consisting of the union of elements from one or more other
  * sets. This object does not need to be explicitly disposed. If nobody is
  * listening to the UnionSet, the set will remove its listeners.
- *
+ * 
  * <p>
  * This class is thread safe. All state accessing methods must be invoked from
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @since 1.0
  */
 public final class UnionSet extends ObservableSet {
@@ -77,7 +77,6 @@ public final class UnionSet extends ObservableSet {
 	}
 
 	private ISetChangeListener childSetChangeListener = new ISetChangeListener() {
-		@Override
 		public void handleSetChange(SetChangeEvent event) {
 			processAddsAndRemoves(event.diff.getAdditions(), event.diff
 					.getRemovals());
@@ -85,7 +84,6 @@ public final class UnionSet extends ObservableSet {
 	};
 
 	private IStalenessConsumer stalenessConsumer = new IStalenessConsumer() {
-		@Override
 		public void setStale(boolean stale) {
 			boolean oldStale = UnionSet.this.stale;
 			UnionSet.this.stale = stale;
@@ -95,7 +93,6 @@ public final class UnionSet extends ObservableSet {
 		}
 	};
 
-	@Override
 	public boolean isStale() {
 		getterCalled();
 		if (refCounts != null) {
@@ -154,7 +151,6 @@ public final class UnionSet extends ObservableSet {
 		}
 	}
 
-	@Override
 	protected void firstListenerAdded() {
 		super.firstListenerAdded();
 
@@ -168,7 +164,6 @@ public final class UnionSet extends ObservableSet {
 		setWrappedSet(refCounts.keySet());
 	}
 
-	@Override
 	protected void lastListenerRemoved() {
 		super.lastListenerRemoved();
 
@@ -202,7 +197,6 @@ public final class UnionSet extends ObservableSet {
 		return adds;
 	}
 
-	@Override
 	protected void getterCalled() {
 		super.getterCalled();
 		if (refCounts == null) {

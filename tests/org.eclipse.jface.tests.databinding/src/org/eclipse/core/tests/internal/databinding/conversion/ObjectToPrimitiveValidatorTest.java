@@ -18,13 +18,12 @@ import org.eclipse.core.runtime.IStatus;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class ObjectToPrimitiveValidatorTest extends TestCase {
 
 	private ObjectToPrimitiveValidator objectToPrimitiveValidator;
 
-	@Override
 	protected void setUp() throws Exception {
 		this.objectToPrimitiveValidator = new ObjectToPrimitiveValidator(
 				Integer.TYPE);

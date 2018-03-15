@@ -32,16 +32,14 @@ public class ButtonControlScenario extends ScenariosTestCase {
 
     private Button button;
 
-    @Override
-	protected void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
         // do any setup work here
         button = new Button(getComposite(), SWT.CHECK);
         adventure = SampleData.WINTER_HOLIDAY;
     }
 
-    @Override
-	protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception {
         button.dispose();
         super.tearDown();
     }

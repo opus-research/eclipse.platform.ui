@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,54 +7,70 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.internal.util;
 
 import java.util.ArrayList;
 
-/**
- * This test pass verifies the initial focus of a dialog when it is given focus.
+/*
+ * This test pass verifies the initial focus of a dialog
+ * when it is given focus.
  */
 public class FocusTestPass implements IDialogTestPass {
     private static final int CHECKLIST_SIZE = 1;
 
-    @Override
-	public String title() {
+    /**
+     * @see IDialogTestPass#title()
+     */
+    public String title() {
         return "Test Pass: Initial Focus";
     }
 
-    @Override
-	public String description() {
+    /**
+     * @see IDialogTestPass#description()
+     */
+    public String description() {
         return "Verify the initial focus of the dialogs.";
     }
 
-    @Override
-	public String label() {
+    /**
+     * @see IDialogTestPass#label()
+     */
+    public String label() {
         return "&Initial Focus";
     }
 
-	@Override
-	public ArrayList<String> checkListTexts() {
-		ArrayList<String> list = new ArrayList<String>(CHECKLIST_SIZE);
+    /**
+     * @see IDialogTestPass#checkListTexts()
+     */
+    public ArrayList checkListTexts() {
+        ArrayList list = new ArrayList(CHECKLIST_SIZE);
         list.add("&1) the initial focus is appropriate.");
         return list;
     }
 
-    @Override
-	public String[] failureTexts() {
+    /**
+     * @see IDialogTestPass#failureTexts()
+     * Size of the return array must be the same size as the checkListTexts'
+     * ArrayList.
+     */
+    public String[] failureTexts() {
         String[] failureText = new String[CHECKLIST_SIZE];
         failureText[0] = "The initial focus is inappropriate.";
         return failureText;
     }
 
-    @Override
-	public String queryText() {
+    /**
+     * @see IDialogTestPass#queryText()
+     */
+    public String queryText() {
         return "Is the initial focus of the dialog correct?";
     }
 
-    @Override
-	public int getID() {
+    /**
+     * @see IDialogTestPass#getID()
+     */
+    public int getID() {
         return VerifyDialog.TEST_FOCUS;
     }
 }

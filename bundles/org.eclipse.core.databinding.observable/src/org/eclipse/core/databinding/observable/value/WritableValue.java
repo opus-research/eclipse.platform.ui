@@ -42,7 +42,7 @@ public class WritableValue extends AbstractObservableValue {
 
 	/**
 	 * Constructs a new instance with the default realm.
-	 *
+	 * 
 	 * @param initialValue
 	 *            can be <code>null</code>
 	 * @param valueType
@@ -55,7 +55,7 @@ public class WritableValue extends AbstractObservableValue {
 	/**
 	 * Constructs a new instance with the provided <code>realm</code>, a
 	 * <code>null</code> value type, and a <code>null</code> initial value.
-	 *
+	 * 
 	 * @param realm
 	 */
 	public WritableValue(Realm realm) {
@@ -64,7 +64,7 @@ public class WritableValue extends AbstractObservableValue {
 
 	/**
 	 * Constructs a new instance.
-	 *
+	 * 
 	 * @param realm
 	 * @param initialValue
 	 *            can be <code>null</code>
@@ -79,7 +79,6 @@ public class WritableValue extends AbstractObservableValue {
 
 	private Object value = null;
 
-	@Override
 	public Object doGetValue() {
 		return value;
 	}
@@ -88,14 +87,12 @@ public class WritableValue extends AbstractObservableValue {
 	 * @param value
 	 *            The value to set.
 	 */
-	@Override
 	public void doSetValue(Object value) {
         if (this.value != value) {
             fireValueChange(Diffs.createValueDiff(this.value, this.value = value));
         }
 	}
 
-	@Override
 	public Object getValueType() {
 		return valueType;
 	}

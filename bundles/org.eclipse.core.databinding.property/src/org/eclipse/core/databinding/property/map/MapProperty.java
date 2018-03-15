@@ -30,7 +30,7 @@ import org.eclipse.core.internal.databinding.property.MapPropertyDetailValuesMap
 
 /**
  * Abstract implementation of IMapProperty
- *
+ * 
  * @since 1.2
  */
 public abstract class MapProperty implements IMapProperty {
@@ -39,17 +39,16 @@ public abstract class MapProperty implements IMapProperty {
 	 * By default, this method returns <code>Collections.EMPTY_MAP</code> in
 	 * case the source object is <code>null</code>. Otherwise, this method
 	 * delegates to {@link #doGetMap(Object)}.
-	 *
+	 * 
 	 * <p>
 	 * Clients may override this method if they e.g. want to return a specific
 	 * default map in case the source object is <code>null</code>.
 	 * </p>
-	 *
+	 * 
 	 * @see #doGetMap(Object)
-	 *
+	 * 
 	 * @since 1.3
 	 */
-	@Override
 	public Map getMap(Object source) {
 		if (source == null) {
 			return Collections.EMPTY_MAP;
@@ -59,7 +58,7 @@ public abstract class MapProperty implements IMapProperty {
 
 	/**
 	 * Returns a Map with the current contents of the source's map property
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @return a Map with the current contents of the source's map property
@@ -78,7 +77,6 @@ public abstract class MapProperty implements IMapProperty {
 	/**
 	 * @since 1.3
 	 */
-	@Override
 	public final void setMap(Object source, Map map) {
 		if (source != null) {
 			doSetMap(source, map);
@@ -87,7 +85,7 @@ public abstract class MapProperty implements IMapProperty {
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param map
@@ -103,7 +101,6 @@ public abstract class MapProperty implements IMapProperty {
 	/**
 	 * @since 1.3
 	 */
-	@Override
 	public final void updateMap(Object source, MapDiff diff) {
 		if (source != null) {
 			doUpdateMap(source, diff);
@@ -112,7 +109,7 @@ public abstract class MapProperty implements IMapProperty {
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param diff
@@ -129,38 +126,31 @@ public abstract class MapProperty implements IMapProperty {
 		}
 	}
 
-	@Override
 	public IObservableMap observe(Object source) {
 		return observe(Realm.getDefault(), source);
 	}
 
-	@Override
 	public IObservableFactory mapFactory() {
 		return new IObservableFactory() {
-			@Override
 			public IObservable createObservable(Object target) {
 				return observe(target);
 			}
 		};
 	}
 
-	@Override
 	public IObservableFactory mapFactory(final Realm realm) {
 		return new IObservableFactory() {
-			@Override
 			public IObservable createObservable(Object target) {
 				return observe(realm, target);
 			}
 		};
 	}
 
-	@Override
 	public IObservableMap observeDetail(IObservableValue master) {
 		return MasterDetailObservables.detailMap(master,
 				mapFactory(master.getRealm()), getKeyType(), getValueType());
 	}
 
-	@Override
 	public final IMapProperty values(IValueProperty detailValues) {
 		return new MapPropertyDetailValuesMap(this, detailValues);
 	}

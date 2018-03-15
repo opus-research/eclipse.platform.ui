@@ -22,12 +22,12 @@ import org.eclipse.swt.widgets.Control;
  * A status area provider creates an area that displays detailed information
  * about {@link StatusAdapter} or {@link IStatus}.
  * </p>
- *
+ * 
  * <p>
  * The area provider can be set in {@link WorkbenchStatusDialogManager} as well as in
  * JFace {@link Policy} since its extends {@link ErrorSupportProvider}.
  * </p>
- *
+ * 
  * @see Policy#setErrorSupportProvider(ErrorSupportProvider)
  * @see WorkbenchStatusDialogManager#setSupportAreaProvider(AbstractStatusAreaProvider)
  * @see WorkbenchStatusDialogManager#setDetailsAreaProvider(AbstractStatusAreaProvider)
@@ -37,7 +37,7 @@ public abstract class AbstractStatusAreaProvider extends ErrorSupportProvider {
 
 	/**
 	 * Create an area for detailed support area as a child of the given parent.
-	 *
+	 * 
 	 * @param parent
 	 *            A {@link Composite} that will host support area.
 	 * @param statusAdapter
@@ -47,6 +47,12 @@ public abstract class AbstractStatusAreaProvider extends ErrorSupportProvider {
 	public abstract Control createSupportArea(Composite parent,
 			StatusAdapter statusAdapter);
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.ErrorSupportProvider#createSupportArea(org.eclipse.swt.widgets.Composite,
+	 *      org.eclipse.core.runtime.IStatus)
+	 */
 	@Override
 	public final Control createSupportArea(Composite parent, IStatus status) {
 		return createSupportArea(parent, new StatusAdapter(status));
@@ -61,7 +67,7 @@ public abstract class AbstractStatusAreaProvider extends ErrorSupportProvider {
 	 * suitable only for support area providers (which are presented in the
 	 * status dialog tray).
 	 * </p>
-	 *
+	 * 
 	 * @param statusAdapter
 	 *            - {@link StatusAdapter} for which status are will be
 	 *            requested.

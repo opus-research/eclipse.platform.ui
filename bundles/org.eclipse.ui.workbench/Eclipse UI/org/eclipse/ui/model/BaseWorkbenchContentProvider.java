@@ -20,7 +20,7 @@ import org.eclipse.ui.internal.util.Util;
  * <p>
  * This class may be instantiated, or subclassed.
  * </p>
- *
+ * 
  * @see IWorkbenchAdapter
  * @since 3.0
  */
@@ -48,12 +48,12 @@ public class BaseWorkbenchContentProvider implements ITreeContentProvider {
      * object is not adaptable.
      * <p>
      * </p>
-     *
+     * 
      * @param element the element
      * @return the corresponding workbench adapter object
      */
     protected IWorkbenchAdapter getAdapter(Object element) {
-        return Util.getAdapter(element, IWorkbenchAdapter.class);
+        return (IWorkbenchAdapter)Util.getAdapter(element, IWorkbenchAdapter.class);
     }
 
     /* (non-Javadoc)

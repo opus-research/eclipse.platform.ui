@@ -28,12 +28,11 @@ import org.eclipse.swt.widgets.Widget;
  * <li>All <code>observe()</code> methods should return an
  * {@link ISWTObservable}
  * </ul>
- *
+ * 
  * @since 1.3
  */
 public abstract class WidgetListProperty extends SimpleListProperty implements
 		IWidgetListProperty {
-	@Override
 	public IObservableList observe(Object source) {
 		if (source instanceof Widget) {
 			return observe((Widget) source);
@@ -41,15 +40,13 @@ public abstract class WidgetListProperty extends SimpleListProperty implements
 		return super.observe(source);
 	}
 
-	@Override
 	public IObservableList observe(Realm realm, Object source) {
 		return new SWTObservableListDecorator(super.observe(realm, source),
 				(Widget) source);
 	}
 
-	@Override
 	public ISWTObservableList observe(Widget widget) {
-		return (ISWTObservableList) observe(DisplayRealm.getRealm(widget
+		return (ISWTObservableList) observe(SWTObservables.getRealm(widget
 				.getDisplay()), widget);
 	}
 }

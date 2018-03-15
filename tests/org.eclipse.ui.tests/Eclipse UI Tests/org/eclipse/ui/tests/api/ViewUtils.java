@@ -16,16 +16,15 @@ import org.eclipse.ui.views.IStickyViewDescriptor;
 
 /**
  * Utility class that will test various view properties.
- *
+ * 
  * @since 3.0
  */
 public final class ViewUtils {
 
     public static boolean findInStack(IViewPart[] stack, IViewPart target) {
-        for (IViewPart element : stack) {
-            if (element == target) {
-				return true;
-			}
+        for (int i = 0; i < stack.length; i++) {
+            if (stack[i] == target)
+                return true;
         }
         return false;
     }
@@ -54,16 +53,15 @@ public final class ViewUtils {
         String id = part.getSite().getId();
         IStickyViewDescriptor[] descs = PlatformUI.getWorkbench()
                 .getViewRegistry().getStickyViews();
-        for (IStickyViewDescriptor desc : descs) {
-            if (desc.getId().equals(id)) {
-				return true;
-			}
+        for (int i = 0; i < descs.length; i++) {
+            if (descs[i].getId().equals(id))
+                return true;
         }
         return false;
     }
 
     /**
-     *
+     * 
      */
     protected ViewUtils() {
         //no-op

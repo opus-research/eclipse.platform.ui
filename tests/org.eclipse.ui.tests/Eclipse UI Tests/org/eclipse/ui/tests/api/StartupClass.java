@@ -29,8 +29,10 @@ public class StartupClass implements IStartup {
      */
     private static boolean earlyStartupCompleted = false;
 
-    @Override
-	public void earlyStartup() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IStartup#earlyStartup()
+     */
+    public void earlyStartup() {
         earlyStartupCalled = true;
         Assert.assertNull("IStartup should run in non-UI thread", Display.getCurrent());
         try {

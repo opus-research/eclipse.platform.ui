@@ -17,9 +17,8 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class ToggleStateHandler extends AbstractHandler {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-
+		
 		boolean oldValue = HandlerUtil.toggleCommandState(event.getCommand());
 		return new Boolean(oldValue);
 	}

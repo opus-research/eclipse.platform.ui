@@ -28,20 +28,26 @@ public class ViewActionDelegate implements IViewActionDelegate {
         super();
     }
 
-    @Override
-	public void init(IViewPart view) {
+    /* (non-Javadoc)
+     * Method declared on IViewActionDelegate
+     */
+    public void init(IViewPart view) {
         this.view = view;
     }
 
-    @Override
-	public void run(org.eclipse.jface.action.IAction action) {
+    /* (non-Javadoc)
+     * Method declared on IActionDelegate
+     */
+    public void run(org.eclipse.jface.action.IAction action) {
         MessageDialog.openInformation(view.getSite().getShell(), MessageUtil
                 .getString("Readme_Editor"), //$NON-NLS-1$
                 MessageUtil.getString("View_Action_executed")); //$NON-NLS-1$
     }
 
-    @Override
-	public void selectionChanged(org.eclipse.jface.action.IAction action,
+    /* (non-Javadoc)
+     * Method declared on IActionDelegate
+     */
+    public void selectionChanged(org.eclipse.jface.action.IAction action,
             org.eclipse.jface.viewers.ISelection selection) {
         // do nothing
     }

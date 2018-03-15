@@ -71,38 +71,31 @@ public class NullPointer extends EStructuralFeatureOwnerPointer {
         this.id = id;
     }
 
-    @Override
-	public QName getName() {
+    public QName getName() {
         return name;
     }
 
-    @Override
-	public Object getBaseValue() {
+    public Object getBaseValue() {
         return null;
     }
 
-    @Override
-	public boolean isCollection() {
+    public boolean isCollection() {
         return false;
     }
 
-    @Override
-	public boolean isLeaf() {
+    public boolean isLeaf() {
         return true;
     }
 
-    @Override
-	public boolean isActual() {
+    public boolean isActual() {
         return false;
     }
 
-    @Override
-	public EStructuralFeaturePointer getPropertyPointer() {
+    public EStructuralFeaturePointer getPropertyPointer() {
         return new NullEStructuralFeaturePointer(this);
     }
 
-    @Override
-	public NodePointer createPath(JXPathContext context, Object value) {
+    public NodePointer createPath(JXPathContext context, Object value) {
         if (parent != null) {
             return parent.createPath(context, value).getValuePointer();
         }
@@ -110,8 +103,7 @@ public class NullPointer extends EStructuralFeatureOwnerPointer {
             "Cannot create the root object: " + asPath());
     }
 
-    @Override
-	public NodePointer createPath(JXPathContext context) {
+    public NodePointer createPath(JXPathContext context) {
         if (parent != null) {
             return parent.createPath(context).getValuePointer();
         }
@@ -119,16 +111,14 @@ public class NullPointer extends EStructuralFeatureOwnerPointer {
             "Cannot create the root object: " + asPath());
     }
 
-    @Override
-	public NodePointer createChild(
+    public NodePointer createChild(
         JXPathContext context,
         QName name,
         int index) {
         return createPath(context).createChild(context, name, index);
     }
 
-    @Override
-	public NodePointer createChild(
+    public NodePointer createChild(
         JXPathContext context,
         QName name,
         int index,
@@ -136,13 +126,11 @@ public class NullPointer extends EStructuralFeatureOwnerPointer {
         return createPath(context).createChild(context, name, index, value);
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         return name == null ? 0 : name.hashCode();
     }
 
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (object == this) {
             return true;
         }
@@ -155,16 +143,14 @@ public class NullPointer extends EStructuralFeatureOwnerPointer {
         return name == other.name || name != null && name.equals(other.name);
     }
 
-    @Override
-	public String asPath() {
+    public String asPath() {
         if (id != null) {
             return "id(" + id + ")";
         }
         return parent == null ? "null()" : super.asPath();
     }
 
-    @Override
-	public int getLength() {
+    public int getLength() {
         return 0;
     }
 }

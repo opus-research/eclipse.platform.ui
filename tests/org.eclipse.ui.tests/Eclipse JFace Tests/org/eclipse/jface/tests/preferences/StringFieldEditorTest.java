@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Bisson - <mrbisson@ca.ibm.com> Initial test implementation
- *     Pawel Pogorzelski - <Pawel.Pogorzelski@pl.ibm.com> - test for bug 289599
+ *     Pawel Pogorzelski - <Pawel.Pogorzelski@pl.ibm.com> - test for bug 289599  
  ******************************************************************************/
 
 package org.eclipse.jface.tests.preferences;
@@ -27,79 +27,81 @@ public class StringFieldEditorTest extends TestCase {
 
 	private Shell shell;
 	private StringFieldEditor stringFieldEditor;
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-
+		
 		shell = new Shell();
-
+		
 		stringFieldEditor = new StringFieldEditor("name", "label", shell);
 	}
-
+	
 	public void testSetLabelText() {
 		stringFieldEditor.setLabelText("label text");
 		assertEquals("label text", stringFieldEditor.getLabelText());
-
+		
 		stringFieldEditor.setLabelText("label text");
 		assertEquals("label text", stringFieldEditor.getLabelText());
 	}
-
-	public void testLoad() {
+	
+	public void testLoad() {	
 		PreferenceStore myPreferenceStore = new PreferenceStore();
 		stringFieldEditor.setPreferenceName("name");
-		stringFieldEditor.setPreferenceStore(myPreferenceStore);
+		stringFieldEditor.setPreferenceStore(myPreferenceStore);	
 
 		myPreferenceStore.setDefault("name", "foo");
 		stringFieldEditor.load();
 		assertEquals(stringFieldEditor.getStringValue(), "foo");
-
-		myPreferenceStore.setDefault("name", "foo");
+		
+		myPreferenceStore.setDefault("name", "foo"); 
 		myPreferenceStore.setValue("name", "bar");
 		stringFieldEditor.load();
 		assertEquals(stringFieldEditor.getStringValue(), "bar");
 	}
-
-	public void testLoadDefault() {
+	
+	public void testLoadDefault() {	
 		PreferenceStore myPreferenceStore = new PreferenceStore();
 		stringFieldEditor.setPreferenceName("name");
-		stringFieldEditor.setPreferenceStore(myPreferenceStore);
+		stringFieldEditor.setPreferenceStore(myPreferenceStore);	
 
 		myPreferenceStore.setDefault("name", "foo");
-		myPreferenceStore.setValue("name", "bar");
+		myPreferenceStore.setValue("name", "bar");	
 		stringFieldEditor.loadDefault();
 		assertEquals(stringFieldEditor.getStringValue(), "foo");
 	}
-
+	
 	public void testSetValueInWidget() {
 		PreferenceStore myPreferenceStore = new PreferenceStore();
 		stringFieldEditor.setPreferenceName("name");
-		stringFieldEditor.setPreferenceStore(myPreferenceStore);
+		stringFieldEditor.setPreferenceStore(myPreferenceStore);	
 
 		myPreferenceStore.setValue("name", "foo");
 		stringFieldEditor.load();
 		assertEquals(stringFieldEditor.getStringValue(), "foo");
-
+		
 		Text text = stringFieldEditor.getTextControl(shell);
 		text.setText("bar");
 		assertEquals(stringFieldEditor.getStringValue(), "bar");
 	}
-
+	
 	public void testSetValueInEditor() {
 		PreferenceStore myPreferenceStore = new PreferenceStore();
 		stringFieldEditor.setPreferenceName("name");
-		stringFieldEditor.setPreferenceStore(myPreferenceStore);
+		stringFieldEditor.setPreferenceStore(myPreferenceStore);	
 
 		myPreferenceStore.setValue("name", "foo");
 		stringFieldEditor.load();
 		assertEquals(stringFieldEditor.getStringValue(), "foo");
-
+		
 		stringFieldEditor.setStringValue("bar");
 		Text text = stringFieldEditor.getTextControl(shell);
 		assertEquals(text.getText(), "bar");
 		assertEquals(stringFieldEditor.getStringValue(), "bar");
 	}
-
+	
 	public void testBug289599() {
 		PreferenceStore store = new PreferenceStore();
 		store.setDefault("foo", "bar");
@@ -107,7 +109,6 @@ public class StringFieldEditorTest extends TestCase {
 		store.setValue("foo", "???");
 		assertEquals("???", store.getString("foo"));
 		IPropertyChangeListener listener = new  IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				assertEquals("foo", event.getProperty());
 				assertEquals("???", event.getOldValue());
@@ -119,20 +120,21 @@ public class StringFieldEditorTest extends TestCase {
 		store.removePropertyChangeListener(listener);
 		assertEquals("bar", store.getString("foo"));
 		IPropertyChangeListener failingListener = new  IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				// Make sure no event is fired to this listener
 				fail("1.0");
 			}
 		};
 		store.addPropertyChangeListener(failingListener);
-		// We already called setToDefault, nothing should happen this time
+		// We already called setToDefault, nothing should happen this time 
 		store.setToDefault("foo");
 		store.removePropertyChangeListener(failingListener);
 		assertEquals("bar", store.getString("foo"));
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#tearDown()
+	 */
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}

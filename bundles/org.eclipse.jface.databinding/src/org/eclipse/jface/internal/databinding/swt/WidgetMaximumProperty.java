@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Spinner;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class WidgetMaximumProperty extends WidgetDelegatingValueProperty {
 	private IValueProperty scale;
@@ -26,13 +26,12 @@ public class WidgetMaximumProperty extends WidgetDelegatingValueProperty {
 	private IValueProperty spinner;
 
 	/**
-	 *
+	 * 
 	 */
 	public WidgetMaximumProperty() {
 		super(Integer.TYPE);
 	}
 
-	@Override
 	protected IValueProperty doGetDelegate(Object source) {
 		if (source instanceof Scale) {
 			if (scale == null)

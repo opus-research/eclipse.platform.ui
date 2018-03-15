@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bug 223123
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 413611
  *******************************************************************************/
 package org.eclipse.jface.internal.databinding.provisional.viewers;
 
@@ -34,21 +33,20 @@ import org.eclipse.swt.graphics.Image;
 public class ViewerLabelProvider implements IViewerLabelProvider,
 		ILabelProvider {
 
-	private List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
+	private List listeners = new ArrayList();
 
 	/**
 	 * Subclasses should override this method. They should not call the base
 	 * class implementation.
 	 */
-	@Override
 	public void updateLabel(ViewerLabel label, Object element) {
 		label.setText(element.toString());
 	}
 
-	protected final void fireChangeEvent(Collection<?> changes) {
+	protected final void fireChangeEvent(Collection changes) {
 		final LabelProviderChangedEvent event = new LabelProviderChangedEvent(
 				this, changes.toArray());
-		ILabelProviderListener[] listenerArray = listeners
+		ILabelProviderListener[] listenerArray = (ILabelProviderListener[]) listeners
 				.toArray(new ILabelProviderListener[listeners.size()]);
 		for (int i = 0; i < listenerArray.length; i++) {
 			ILabelProviderListener listener = listenerArray[i];
@@ -62,36 +60,30 @@ public class ViewerLabelProvider implements IViewerLabelProvider,
 		}
 	}
 
-	@Override
 	public final Image getImage(Object element) {
 		ViewerLabel label = new ViewerLabel("", null); //$NON-NLS-1$
 		updateLabel(label, element);
 		return label.getImage();
 	}
 
-	@Override
 	public final String getText(Object element) {
 		ViewerLabel label = new ViewerLabel("", null); //$NON-NLS-1$
 		updateLabel(label, element);
 		return label.getText();
 	}
 
-	@Override
 	public void addListener(ILabelProviderListener listener) {
 		listeners.add(listener);
 	}
 
-	@Override
 	public void dispose() {
 		listeners.clear();
 	}
 
-	@Override
 	public final boolean isLabelProperty(Object element, String property) {
 		return true;
 	}
 
-	@Override
 	public void removeListener(ILabelProviderListener listener) {
 		listeners.remove(listener);
 	}

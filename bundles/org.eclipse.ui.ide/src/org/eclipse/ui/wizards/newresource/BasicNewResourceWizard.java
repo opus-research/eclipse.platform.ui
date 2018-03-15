@@ -76,14 +76,13 @@ public abstract class BasicNewResourceWizard extends Wizard implements
     }
 
     /**
-     * The <code>BasicNewResourceWizard</code> implementation of this
+     * The <code>BasicNewResourceWizard</code> implementation of this 
      * <code>IWorkbenchWizard</code> method records the given workbench and
      * selection, and initializes the default banner image for the pages
      * by calling <code>initializeDefaultPageImageDescriptor</code>.
      * Subclasses may extend.
      */
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         this.workbench = workbench;
         this.selection = currentSelection;
 
@@ -124,7 +123,7 @@ public abstract class BasicNewResourceWizard extends Wizard implements
      *
      * @param resource the resource to be selected and revealed
      * @param window the workbench window to select and reveal the resource
-     *
+     * 
      * @see ISetSelectionTarget
      */
     public static void selectAndReveal(IResource resource,
@@ -164,15 +163,15 @@ public abstract class BasicNewResourceWizard extends Wizard implements
             if (part instanceof ISetSelectionTarget) {
 				target = (ISetSelectionTarget) part;
 			} else {
-				target = part.getAdapter(ISetSelectionTarget.class);
+				target = (ISetSelectionTarget) part
+                        .getAdapter(ISetSelectionTarget.class);
 			}
 
             if (target != null) {
                 // select and reveal resource
                 final ISetSelectionTarget finalTarget = target;
                 window.getShell().getDisplay().asyncExec(new Runnable() {
-                    @Override
-					public void run() {
+                    public void run() {
                         finalTarget.selectReveal(selection);
                     }
                 });

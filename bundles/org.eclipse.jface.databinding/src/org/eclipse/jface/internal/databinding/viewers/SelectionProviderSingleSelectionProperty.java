@@ -24,7 +24,7 @@ import org.eclipse.jface.viewers.Viewer;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class SelectionProviderSingleSelectionProperty extends
 		ViewerValueProperty {
@@ -33,7 +33,7 @@ public class SelectionProviderSingleSelectionProperty extends
 
 	/**
 	 * Constructor.
-	 *
+	 * 
 	 * @param isPostSelection
 	 *            Whether the post selection or the normal selection is to be
 	 *            observed.
@@ -42,12 +42,10 @@ public class SelectionProviderSingleSelectionProperty extends
 		this.isPostSelection = isPostSelection;
 	}
 
-	@Override
 	public Object getValueType() {
 		return null;
 	}
 
-	@Override
 	protected Object doGetValue(Object source) {
 		ISelection selection = ((ISelectionProvider) source).getSelection();
 		if (selection instanceof IStructuredSelection) {
@@ -56,7 +54,6 @@ public class SelectionProviderSingleSelectionProperty extends
 		return null;
 	}
 
-	@Override
 	protected void doSetValue(Object source, Object value) {
 		IStructuredSelection selection = value == null ? StructuredSelection.EMPTY
 				: new StructuredSelection(value);
@@ -67,13 +64,11 @@ public class SelectionProviderSingleSelectionProperty extends
 		}
 	}
 
-	@Override
 	public INativePropertyListener adaptListener(
 			ISimplePropertyListener listener) {
 		return new SelectionChangedListener(this, listener, isPostSelection);
 	}
 
-	@Override
 	public String toString() {
 		return isPostSelection ? "IPostSelectionProvider.postSelection" //$NON-NLS-1$
 				: "ISelectionProvider.selection"; //$NON-NLS-1$

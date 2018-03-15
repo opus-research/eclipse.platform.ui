@@ -30,13 +30,13 @@ import org.eclipse.swt.widgets.TableItem;
 /**
  * NON-API - This class can be used to update a table with automatic dependency
  * tracking.
- *
+ * 
  * @since 1.1
- *
+ * 
  * @noextend This class is not intended to be subclassed by clients. (We do
  *           encourage experimentation for non-production code and are
  *           interested in feedback though.)
- *
+ * 
  */
 public abstract class TableUpdater {
 
@@ -59,7 +59,6 @@ public abstract class TableUpdater {
 		// Runnable implementation. This method runs at most once per repaint
 		// whenever the
 		// value gets marked as dirty.
-		@Override
 		public void run() {
 			if (table != null && !table.isDisposed() && item != null
 					&& !item.isDisposed()) {
@@ -81,7 +80,6 @@ public abstract class TableUpdater {
 		private void updateIfNecessary(final int indexOfItem) {
 			if (dirty) {
 				dependencies = ObservableTracker.runAndMonitor(new Runnable() {
-					@Override
 					public void run() {
 						updateItem(indexOfItem, item, element);
 					}
@@ -91,7 +89,6 @@ public abstract class TableUpdater {
 		}
 
 		// IChangeListener implementation (listening to the ComputedValue)
-		@Override
 		public void handleChange(ChangeEvent event) {
 			// Whenever this updator becomes dirty, schedule the run() method
 			makeDirty();
@@ -115,7 +112,6 @@ public abstract class TableUpdater {
 		}
 
 		// DisposeListener implementation
-		@Override
 		public void widgetDisposed(DisposeEvent e) {
 			stopListening();
 			dependencies = null;
@@ -126,7 +122,6 @@ public abstract class TableUpdater {
 	private class PrivateInterface implements Listener, DisposeListener {
 
 		// Listener implementation
-		@Override
 		public void handleEvent(Event e) {
 			if (e.type == SWT.SetData) {
 				UpdateRunnable runnable = (UpdateRunnable) e.item.getData();
@@ -141,7 +136,6 @@ public abstract class TableUpdater {
 		}
 
 		// DisposeListener implementation
-		@Override
 		public void widgetDisposed(DisposeEvent e) {
 			TableUpdater.this.dispose();
 		}
@@ -153,7 +147,6 @@ public abstract class TableUpdater {
 	private Table table;
 
 	private IListChangeListener listChangeListener = new IListChangeListener() {
-		@Override
 		public void handleListChange(ListChangeEvent event) {
 			ListDiffEntry[] differences = event.diff.getDifferences();
 			for (int i = 0; i < differences.length; i++) {
@@ -175,7 +168,7 @@ public abstract class TableUpdater {
 
 	/**
 	 * Creates an updator for the given control.
-	 *
+	 * 
 	 * @param table
 	 *            table to update
 	 * @param list
@@ -212,12 +205,12 @@ public abstract class TableUpdater {
 	 * Updates the control. This method will be invoked once after the updator
 	 * is created, and once before any repaint during which the control is
 	 * visible and dirty.
-	 *
+	 * 
 	 * <p>
 	 * Subclasses should overload this method to provide any code that changes
 	 * the appearance of the widget.
 	 * </p>
-	 *
+	 * 
 	 * @param index
 	 * @param item
 	 *            the item to update

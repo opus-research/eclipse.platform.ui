@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -27,7 +26,7 @@ import org.eclipse.ui.Saveable;
 /**
  * A default {@link Saveable} implementation that wrappers a regular
  * workbench part (one that does not itself adapt to Saveable).
- *
+ * 
  * @since 3.2
  */
 public class DefaultSaveable extends Saveable {
@@ -36,7 +35,7 @@ public class DefaultSaveable extends Saveable {
 
 	/**
 	 * Creates a new DefaultSaveable.
-	 *
+	 * 
 	 * @param part
 	 *            the part represented by this model
 	 */
@@ -44,14 +43,24 @@ public class DefaultSaveable extends Saveable {
 		this.part = part;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.Saveable#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		ISaveablePart saveable = SaveableHelper.getSaveable(part);
-		if (saveable != null) {
+		if (part instanceof ISaveablePart) {
+			ISaveablePart saveable = (ISaveablePart) part;
 			saveable.doSave(monitor);
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.Saveable#getName()
+	 */
 	@Override
 	public String getName() {
 		if (part instanceof IWorkbenchPart2) {
@@ -60,6 +69,11 @@ public class DefaultSaveable extends Saveable {
 		return part.getTitle();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.Saveable#getImageDescriptor()
+	 */
 	@Override
 	public ImageDescriptor getImageDescriptor() {
 		Image image = part.getTitleImage();
@@ -69,25 +83,40 @@ public class DefaultSaveable extends Saveable {
 		return ImageDescriptor.createFromImage(image);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.Saveable#getToolTipText()
+	 */
 	@Override
 	public String getToolTipText() {
 		return part.getTitleToolTip();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.Saveable#isDirty()
+	 */
 	@Override
 	public boolean isDirty() {
-		ISaveablePart saveable = SaveableHelper.getSaveable(part);
-		if (saveable != null) {
-			return saveable.isDirty();
+		if (part instanceof ISaveablePart) {
+			return ((ISaveablePart) part).isDirty();
 		}
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		return part.hashCode();
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -104,7 +133,10 @@ public class DefaultSaveable extends Saveable {
 			return false;
 		return true;
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.Saveable#show(org.eclipse.ui.IWorkbenchPage)
+	 */
 	@Override
 	public boolean show(IWorkbenchPage page) {
 		IWorkbenchPartReference reference = page.getReference(part);

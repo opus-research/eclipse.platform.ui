@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.StructuredViewer;
 
 /**
  * NON-API - An interface for updating a viewer's elements.
- *
+ * 
  * @since 1.2
  */
 public abstract class ViewerUpdater implements IViewerUpdater {
@@ -30,7 +30,7 @@ public abstract class ViewerUpdater implements IViewerUpdater {
 
 	/**
 	 * Constructs a ViewerUpdater for updating the specified viewer.
-	 *
+	 * 
 	 * @param viewer
 	 *            the viewer which will be updated through this instance.
 	 */
@@ -38,19 +38,15 @@ public abstract class ViewerUpdater implements IViewerUpdater {
 		this.viewer = viewer;
 	}
 
-	@Override
 	public abstract void insert(Object element, int position);
 
-	@Override
 	public abstract void remove(Object element, int position);
 
-	@Override
 	public void replace(Object oldElement, Object newElement, int position) {
 		remove(oldElement, position);
 		insert(newElement, position);
 	}
 
-	@Override
 	public void move(Object element, int oldPosition, int newPosition) {
 		if (isElementOrderPreserved()) {
 			IStructuredSelection selection = (IStructuredSelection) viewer
@@ -86,9 +82,7 @@ public abstract class ViewerUpdater implements IViewerUpdater {
 		return false;
 	}
 
-	@Override
 	public abstract void add(Object[] elements);
 
-	@Override
 	public abstract void remove(Object[] elements);
 }

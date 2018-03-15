@@ -53,7 +53,7 @@ public class BasicNewFileResourceWizard extends BasicNewResourceWizard {
 	 * @since 3.4
 	 */
 	public static final String WIZARD_ID = "org.eclipse.ui.wizards.new.file"; //$NON-NLS-1$
-
+	
     private WizardNewFileCreationPage mainPage;
 
     /**
@@ -66,20 +66,18 @@ public class BasicNewFileResourceWizard extends BasicNewResourceWizard {
     /* (non-Javadoc)
      * Method declared on IWizard.
      */
-    @Override
-	public void addPages() {
+    public void addPages() {
         super.addPages();
         mainPage = new WizardNewFileCreationPage("newFilePage1", getSelection());//$NON-NLS-1$
         mainPage.setTitle(ResourceMessages.FileResource_pageTitle);
-        mainPage.setDescription(ResourceMessages.FileResource_description);
+        mainPage.setDescription(ResourceMessages.FileResource_description); 
         addPage(mainPage);
     }
 
     /* (non-Javadoc)
      * Method declared on IWorkbenchWizard.
      */
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         super.init(workbench, currentSelection);
         setWindowTitle(ResourceMessages.FileResource_shellTitle);
         setNeedsProgressMonitor(true);
@@ -88,8 +86,7 @@ public class BasicNewFileResourceWizard extends BasicNewResourceWizard {
     /* (non-Javadoc)
      * Method declared on BasicNewResourceWizard.
      */
-    @Override
-	protected void initializeDefaultPageImageDescriptor() {
+    protected void initializeDefaultPageImageDescriptor() {
        ImageDescriptor desc = IDEWorkbenchPlugin.getIDEImageDescriptor("wizban/newfile_wiz.png");//$NON-NLS-1$
 	   setDefaultPageImageDescriptor(desc);
     }
@@ -97,8 +94,7 @@ public class BasicNewFileResourceWizard extends BasicNewResourceWizard {
     /* (non-Javadoc)
      * Method declared on IWizard.
      */
-    @Override
-	public boolean performFinish() {
+    public boolean performFinish() {
         IFile file = mainPage.createNewFile();
         if (file == null) {
 			return false;
@@ -116,7 +112,7 @@ public class BasicNewFileResourceWizard extends BasicNewResourceWizard {
                 }
             }
         } catch (PartInitException e) {
-            DialogUtil.openError(dw.getShell(), ResourceMessages.FileResource_errorMessage,
+            DialogUtil.openError(dw.getShell(), ResourceMessages.FileResource_errorMessage, 
                     e.getMessage(), e);
         }
 

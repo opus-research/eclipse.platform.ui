@@ -16,27 +16,24 @@ import org.eclipse.swt.widgets.Combo;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ComboTextProperty extends WidgetStringValueProperty {
 	/**
-	 *
+	 * 
 	 */
 	public ComboTextProperty() {
 		super(SWT.Modify);
 	}
 
-	@Override
 	String doGetStringValue(Object source) {
 		return ((Combo) source).getText();
 	}
 
-	@Override
 	void doSetStringValue(Object source, String value) {
 		((Combo) source).setText(value != null ? value : ""); //$NON-NLS-1$
 	}
 
-	@Override
 	public String toString() {
 		return "Combo.text <String>"; //$NON-NLS-1$
 	}

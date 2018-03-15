@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class SWTVetoableValueDecorator extends DecoratingVetoableValue
 		implements ISWTObservableValue {
@@ -32,7 +32,6 @@ public class SWTVetoableValueDecorator extends DecoratingVetoableValue
 	private WidgetStringValueProperty property;
 
 	private Listener verifyListener = new Listener() {
-		@Override
 		public void handleEvent(Event event) {
 			String currentText = (String) property.getValue(widget);
 			String newText = currentText.substring(0, event.start) + event.text
@@ -44,7 +43,6 @@ public class SWTVetoableValueDecorator extends DecoratingVetoableValue
 	};
 
 	private Listener disposeListener = new Listener() {
-		@Override
 		public void handleEvent(Event event) {
 			SWTVetoableValueDecorator.this.dispose();
 		}
@@ -67,20 +65,17 @@ public class SWTVetoableValueDecorator extends DecoratingVetoableValue
 				disposeListener);
 	}
 
-	@Override
 	protected void firstListenerAdded() {
 		super.firstListenerAdded();
 		WidgetListenerUtil.asyncAddListener(widget, SWT.Verify, verifyListener);
 	}
 
-	@Override
 	protected void lastListenerRemoved() {
 		WidgetListenerUtil.asyncRemoveListener(widget, SWT.Verify,
 				verifyListener);
 		super.lastListenerRemoved();
 	}
 
-	@Override
 	public synchronized void dispose() {
 		WidgetListenerUtil.asyncRemoveListener(widget, SWT.Verify,
 				verifyListener);
@@ -90,7 +85,6 @@ public class SWTVetoableValueDecorator extends DecoratingVetoableValue
 		super.dispose();
 	}
 
-	@Override
 	public Widget getWidget() {
 		return widget;
 	}

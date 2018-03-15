@@ -22,20 +22,19 @@ import org.eclipse.core.runtime.jobs.Job;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class LockRealm extends Realm {
 
-	private LinkedList<Runnable> queue;
+	private LinkedList queue;
 	private ILock lock;
 	private Job job;
 	private boolean lockAcquired;
 
 	public LockRealm() {
-		queue = new LinkedList<Runnable>();
+		queue = new LinkedList();
 		lock = Job.getJobManager().newLock();
 		job = new Job("Lock Realm Job") {
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				for (Runnable runnable; (runnable = dequeue()) != null;) {
 					acquireLock();
@@ -51,7 +50,6 @@ public class LockRealm extends Realm {
 		job.setSystem(true);
 	}
 
-	@Override
 	protected void syncExec(Runnable runnable) {
 		acquireLock();
 		try {
@@ -61,7 +59,6 @@ public class LockRealm extends Realm {
 		}
 	}
 
-	@Override
 	public void asyncExec(Runnable runnable) {
 		enqueue(runnable);
 		job.schedule();
@@ -81,11 +78,10 @@ public class LockRealm extends Realm {
 			if (queue.isEmpty()) {
 				return null;
 			}
-			return queue.getFirst();
+			return (Runnable) queue.getFirst();
 		}
 	}
 
-	@Override
 	public boolean isCurrent() {
 		return lockAcquired;
 	}

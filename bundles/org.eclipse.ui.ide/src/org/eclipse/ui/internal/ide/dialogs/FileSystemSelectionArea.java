@@ -27,19 +27,19 @@ import org.eclipse.ui.internal.ide.filesystem.FileSystemSupportRegistry;
 /**
  * FileSystemSelectionArea is the area used to select the file system.
  * @since 3.2
- *
+ * 
  */
 
 public class FileSystemSelectionArea {
 
 	private Label fileSystemTitle;
 	private ComboViewer fileSystems;
-
+	
 	/**
 	 * Create a new instance of the receiver.
 	 */
 	public FileSystemSelectionArea(){
-
+		
 	}
 
 	/**
@@ -56,7 +56,11 @@ public class FileSystemSelectionArea {
 		fileSystems.getControl().setFont(composite.getFont());
 
 		fileSystems.setLabelProvider(new LabelProvider() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+			 */
 			public String getText(Object element) {
 				return ((FileSystemConfiguration) element).getLabel();
 			}
@@ -64,18 +68,31 @@ public class FileSystemSelectionArea {
 
 		fileSystems.setContentProvider(new IStructuredContentProvider() {
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+			 */
 			public void dispose() {
 				// Nothing to do
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+			 */
 			public Object[] getElements(Object inputElement) {
 				return FileSystemSupportRegistry.getInstance()
 						.getConfigurations();
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+			 *      java.lang.Object, java.lang.Object)
+			 */
 			public void inputChanged(org.eclipse.jface.viewers.Viewer viewer,
 					Object oldInput, Object newInput) {
 				// Nothing to do
@@ -96,14 +113,14 @@ public class FileSystemSelectionArea {
 	 */
 	public FileSystemConfiguration getSelectedConfiguration() {
 		ISelection selection = fileSystems.getSelection();
-
+		
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection structured = (IStructuredSelection) selection;
 			if (structured.size() == 1) {
 				return (FileSystemConfiguration) structured.getFirstElement();
 			}
 		}
-
+		
 		return null;
 	}
 
@@ -114,6 +131,6 @@ public class FileSystemSelectionArea {
 	public void setEnabled(boolean enabled) {
 		fileSystemTitle.setEnabled(enabled);
 		fileSystems.getControl().setEnabled(enabled);
-
+		
 	}
 }

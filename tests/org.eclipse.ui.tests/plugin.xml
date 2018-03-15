@@ -632,7 +632,7 @@
             extensions="icontest1"/>            
        <editor
             class="org.eclipse.ui.tests.api.MockEditorPart"
-            icon="platform:/plugin/org.eclipse.jdt.ui/icons/full/obj16/class_obj.png"
+            icon="platform:/plugin/org.eclipse.jdt.ui/icons/full/obj16/class_obj.gif"
             default="true"
             name="Plugin Icon Test 2"
             id="org.eclipse.ui.tests.IconTestEditor2"
@@ -4385,13 +4385,6 @@
    
    <extension point="org.eclipse.e4.ui.css.swt.theme">
    		<theme basestylesheeturi="css/mock.css" id="org.eclipse.e4.ui.css.theme.mock" label="mock"/>
-   </extension>
-   <extension
-         point="org.eclipse.ui.ide.editorAssociationOverride">
-      <editorAssociationOverride
-            class="org.eclipse.ui.tests.ide.api.IDETest$TestOverride"
-            id="org.eclipse.ui.tests.editorAssociationOverride1">
-      </editorAssociationOverride>
    </extension>
    
 </plugin>

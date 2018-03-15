@@ -29,11 +29,10 @@ import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- *
+ * 
  * @deprecated should use NewWizardMenu to populate a New submenu instead (see Navigator view)
  * @noextend This class is not intended to be subclassed by clients.
  */
-@Deprecated
 public class CreateFileAction extends SelectionListenerAction {
 
     /**
@@ -45,21 +44,19 @@ public class CreateFileAction extends SelectionListenerAction {
      * The shell in which to show any dialogs.
      */
     protected IShellProvider shellProvider;
-
+   
     /**
      * Creates a new action for creating a file resource.
      *
      * @param shell the shell for any dialogs
-     *
+     * 
      * @deprecated {@link #CreateFileAction(IShellProvider)}
      */
-    @Deprecated
-	public CreateFileAction(final Shell shell) {
+    public CreateFileAction(final Shell shell) {
         super(IDEWorkbenchMessages.CreateFileAction_text);
         Assert.isNotNull(shell);
         shellProvider = new IShellProvider(){
-        	@Override
-			public Shell getShell(){
+        	public Shell getShell(){
         		return shell;
         	}
         };
@@ -68,14 +65,13 @@ public class CreateFileAction extends SelectionListenerAction {
 
     /**
      * Creates a new action for creating a file resource.
-     *
+     * 
      * @param provider the shell for any dialogs
-     *
+     * 
      * @deprecated see deprecated tag on class
      * @since 3.4
      */
-    @Deprecated
-	public CreateFileAction(IShellProvider provider){
+    public CreateFileAction(IShellProvider provider){
     	super(IDEWorkbenchMessages.CreateFileAction_toolTip);
     	Assert.isNotNull(provider);
     	shellProvider = provider;
@@ -97,8 +93,7 @@ public class CreateFileAction extends SelectionListenerAction {
      * <code>IAction</code> method opens a <code>BasicNewFileResourceWizard</code>
      * in a wizard dialog under the shell passed to the constructor.
      */
-    @Override
-	public void run() {
+    public void run() {
         BasicNewFileResourceWizard wizard = new BasicNewFileResourceWizard();
         wizard.init(PlatformUI.getWorkbench(), getStructuredSelection());
         wizard.setNeedsProgressMonitor(true);
@@ -116,8 +111,7 @@ public class CreateFileAction extends SelectionListenerAction {
      * <code>SelectionListenerAction</code> method enables the action only
      * if the selection contains folders and open projects.
      */
-    @Override
-	protected boolean updateSelection(IStructuredSelection s) {
+    protected boolean updateSelection(IStructuredSelection s) {
         if (!super.updateSelection(s)) {
             return false;
         }

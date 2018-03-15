@@ -39,25 +39,23 @@ import org.eclipse.core.internal.databinding.property.list.SimplePropertyObserva
  * <p>
  * In addition, we recommended overriding {@link #toString()} to return a
  * description suitable for debugging purposes.
- *
+ * 
  * @since 1.2
  */
 public abstract class SimpleListProperty extends ListProperty {
-	@Override
 	public IObservableList observe(Realm realm, Object source) {
 		return new SimplePropertyObservableList(realm, source, this);
 	}
 
 	// Accessors
 
-	@Override
 	protected abstract List doGetList(Object source);
 
 	// Mutators
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param list
@@ -74,7 +72,7 @@ public abstract class SimpleListProperty extends ListProperty {
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param list
@@ -85,13 +83,11 @@ public abstract class SimpleListProperty extends ListProperty {
 	 */
 	protected abstract void doSetList(Object source, List list, ListDiff diff);
 
-	@Override
 	protected void doSetList(Object source, List list) {
 		ListDiff diff = Diffs.computeLazyListDiff(doGetList(source), list);
 		doSetList(source, list, diff);
 	}
 
-	@Override
 	protected void doUpdateList(Object source, ListDiff diff) {
 		List list = new ArrayList(doGetList(source));
 		diff.applyTo(list);
@@ -106,7 +102,7 @@ public abstract class SimpleListProperty extends ListProperty {
 	 * <p>
 	 * This method returns null if the source object has no listener APIs for
 	 * this property.
-	 *
+	 * 
 	 * @param listener
 	 *            the property listener to receive events
 	 * @return a native listener which parlays property change events to the

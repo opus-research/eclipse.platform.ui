@@ -43,7 +43,7 @@ import org.eclipse.ui.internal.wizards.datatransfer.WizardFileSystemResourceExpo
  * dialog.open();
  * </pre>
  * During the call to <code>open</code>, the wizard dialog is presented to the
- * user. When the user hits Finish, the user-selected workspace resources
+ * user. When the user hits Finish, the user-selected workspace resources 
  * are exported to the user-specified location in the local file system,
  * the dialog closes, and the call to <code>open</code> returns.
  * </p>
@@ -70,8 +70,7 @@ public class FileSystemExportWizard extends Wizard implements IExportWizard {
     /* (non-Javadoc)
      * Method declared on IWizard.
      */
-    @Override
-	public void addPages() {
+    public void addPages() {
         super.addPages();
         mainPage = new WizardFileSystemResourceExportPage1(selection);
         addPage(mainPage);
@@ -81,8 +80,7 @@ public class FileSystemExportWizard extends Wizard implements IExportWizard {
     /* (non-Javadoc)
      * Method declared on IWorkbenchWizard.
      */
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         this.selection = currentSelection;
         List selectedResources = IDE.computeSelectedResources(currentSelection);
         if (!selectedResources.isEmpty()) {
@@ -113,8 +111,7 @@ public class FileSystemExportWizard extends Wizard implements IExportWizard {
     /* (non-Javadoc)
      * Method declared on IWizard.
      */
-    @Override
-	public boolean performFinish() {
+    public boolean performFinish() {
         return mainPage.finish();
     }
 }

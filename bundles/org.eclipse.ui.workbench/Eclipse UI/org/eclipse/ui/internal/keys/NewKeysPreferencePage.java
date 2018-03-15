@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  *     Remy Chi Jian Suen <remy.suen@gmail.com> -
  *     		Bug 186522 - [KeyBindings] New Keys preference page does not resort by binding with conflicts
  *     		Bug 226342 - [KeyBindings] Keys preference page conflict table is hard to read
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442215
  *******************************************************************************/
 
 package org.eclipse.ui.internal.keys;
@@ -129,7 +127,7 @@ import org.eclipse.ui.keys.IBindingService;
  * Updated in 3.4 to work with a model backed by the real KeyBinding and
  * ParameterizedCommand objects.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public class NewKeysPreferencePage extends PreferencePage implements
@@ -176,7 +174,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 	private Label commandNameValueLabel;
 
 	private Text fBindingText;
-
+	
 	private Text fDescriptionText;
 
 	private ComboViewer fWhenCombo;
@@ -194,7 +192,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 	/**
 	 * A FilteredTree that provides a combo which is used to organize and
 	 * display elements in the tree according to the selected criteria.
-	 *
+	 * 
 	 */
 	protected class CategoryFilterTree extends FilteredTree {
 
@@ -202,7 +200,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 
 		/**
 		 * Constructor for PatternFilteredTree.
-		 *
+		 * 
 		 * @param parent
 		 * @param treeStyle
 		 * @param filter
@@ -335,6 +333,11 @@ public class NewKeysPreferencePage extends PreferencePage implements
 	}
 
 	private static class ListLabelProvider extends LabelProvider {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+		 */
 		@Override
 		public String getText(Object element) {
 			return ((ModelElement) element).getName();
@@ -355,11 +358,16 @@ public class NewKeysPreferencePage extends PreferencePage implements
 			localResourceManager.dispose();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+		 */
 		@Override
 		public String getText(Object element) {
 			String rc = getColumnText(element, 0);
 			if (rc == null) {
-				rc = super.getText(element);
+				super.getText(element);
 			}
 			StringBuffer buf = new StringBuffer(rc);
 			for (int i = 1; i < USER_DELTA_COLUMN; i++) {
@@ -483,6 +491,11 @@ public class NewKeysPreferencePage extends PreferencePage implements
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createContents(Composite parent) {
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
@@ -518,20 +531,20 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		FontMetrics metrics = gc.getFontMetrics();
 		gc.dispose();
 		int height = metrics.getHeight() * 5 / 2;
-
+		
 		GridData gridData = new GridData();
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.horizontalSpan = 2;
 		gridData.heightHint = height;
 		fDescriptionText.setLayoutData(gridData);
-
+		
 		return page;
 	}
 
 	/**
 	 * Creates the button bar with "Filters..." and "Export CVS..." buttons.
-	 *
+	 * 
 	 * @param parent
 	 *            The composite in which the button bar should be placed; never
 	 *            <code>null</code>.
@@ -652,13 +665,13 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		gridData.horizontalSpan = 2;
 		gridData.horizontalAlignment = SWT.FILL;
 		commandNameValueLabel.setLayoutData(gridData);
-
+		
 		final Label commandDescriptionlabel = new Label(leftDataArea, SWT.LEAD);
 		commandDescriptionlabel.setText(NewKeysPreferenceMessages.CommandDescriptionLabel_Text);
 		gridData = new GridData();
 		gridData.verticalAlignment = SWT.BEGINNING;
 		commandDescriptionlabel.setLayoutData(gridData);
-
+		
 		fDescriptionText = new Text(leftDataArea, SWT.MULTI | SWT.WRAP
 				| SWT.BORDER | SWT.READ_ONLY);
 
@@ -825,7 +838,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		rightDataArea.setLayoutData(gridData);
 
 		new Label(rightDataArea, SWT.NONE); // filler
-
+		
 		// The description label.
 		final Label descriptionLabel = new Label(rightDataArea, SWT.NONE);
 		descriptionLabel.setText(NewKeysPreferenceMessages.ConflictsLabel_Text);
@@ -1183,7 +1196,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	private void fill() {
 		fSchemeCombo.setInput(keyController.getSchemeModel());
@@ -1250,18 +1263,23 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		keyController.addPropertyChangeListener(listener);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	 */
 	@Override
 	public void init(IWorkbench workbench) {
 		keyController = new KeyController();
 		keyController.init(workbench);
 
-		commandService = workbench
+		commandService = (ICommandService) workbench
 				.getService(ICommandService.class);
 		fDefaultCategory = commandService.getCategory(null);
-		fBindingService = workbench
+		fBindingService = (IBindingService) workbench
 				.getService(IBindingService.class);
 
-		commandImageService = workbench
+		commandImageService = (ICommandImageService) workbench
 				.getService(ICommandImageService.class);
 	}
 
@@ -1279,7 +1297,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		}
 		if (data instanceof ParameterizedCommand) {
 			Map commandToElement = keyController.getBindingModel().getCommandToElement();
-
+			
 			BindingElement be = (BindingElement)commandToElement.get(data);
 			if(be != null) {
 				fFilteredTree.getViewer().setSelection(new StructuredSelection(be),
@@ -1288,6 +1306,11 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
+	 */
 	@Override
 	public boolean performOk() {
 		keyController.saveBindings(fBindingService);
@@ -1297,7 +1320,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 
 	/**
 	 * Save the state of the receiver.
-	 *
+	 * 
 	 * @param dialogSettings
 	 */
 	public void saveState(IDialogSettings dialogSettings) {

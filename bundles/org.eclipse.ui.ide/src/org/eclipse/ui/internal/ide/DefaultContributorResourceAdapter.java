@@ -18,7 +18,7 @@ import org.eclipse.ui.ide.IContributorResourceAdapter2;
 
 /**
  * The DefaultContributorResourceAdapter is the default
- * implementation of the IContributorResourceAdapter used for
+ * implementation of the IContributorResourceAdapter used for 
  * one to one resource adaption.
  */
 public class DefaultContributorResourceAdapter implements
@@ -47,14 +47,12 @@ public class DefaultContributorResourceAdapter implements
     /*
      * @see IContributorResourceAdapter#getAdaptedResource(IAdaptable)
      */
-    @Override
-	public IResource getAdaptedResource(IAdaptable adaptable) {
-        return adaptable.getAdapter(IResource.class);
+    public IResource getAdaptedResource(IAdaptable adaptable) {
+        return (IResource) adaptable.getAdapter(IResource.class);
     }
 
-    @Override
-	public ResourceMapping getAdaptedResourceMapping(IAdaptable adaptable) {
-        return adaptable.getAdapter(ResourceMapping.class);
+    public ResourceMapping getAdaptedResourceMapping(IAdaptable adaptable) {
+        return (ResourceMapping) adaptable.getAdapter(ResourceMapping.class);
     }
 }
 

@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class WidgetTextWithEventsProperty extends WidgetDelegatingValueProperty {
 	private final int[] events;
@@ -47,7 +47,6 @@ public class WidgetTextWithEventsProperty extends WidgetDelegatingValueProperty 
 					+ event + "] is not supported."); //$NON-NLS-1$
 	}
 
-	@Override
 	protected IValueProperty doGetDelegate(Object source) {
 		if (source instanceof StyledText) {
 			if (styledText == null)

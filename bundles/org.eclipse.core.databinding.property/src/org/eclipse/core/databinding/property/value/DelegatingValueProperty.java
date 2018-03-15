@@ -25,7 +25,7 @@ import org.eclipse.core.internal.databinding.property.value.SetDelegatingValueOb
 
 /**
  * @since 1.2
- *
+ * 
  */
 public abstract class DelegatingValueProperty extends ValueProperty {
 	private final Object valueType;
@@ -43,7 +43,7 @@ public abstract class DelegatingValueProperty extends ValueProperty {
 	 * Returns the property to delegate to for the specified source object.
 	 * Repeated calls to this method with the same source object returns the
 	 * same delegate instance.
-	 *
+	 * 
 	 * @param source
 	 *            the property source (may be null)
 	 * @return the property to delegate to for the specified source object.
@@ -61,69 +61,57 @@ public abstract class DelegatingValueProperty extends ValueProperty {
 	 * Returns the property to delegate to for the specified source object.
 	 * Implementers must ensure that repeated calls to this method with the same
 	 * source object returns the same delegate instance.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @return the property to delegate to for the specified source object.
 	 */
 	protected abstract IValueProperty doGetDelegate(Object source);
 
-	@Override
 	protected Object doGetValue(Object source) {
 		return getDelegate(source).getValue(source);
 	}
 
-	@Override
 	protected void doSetValue(Object source, Object value) {
 		getDelegate(source).setValue(source, value);
 	}
 
-	@Override
 	public Object getValueType() {
 		return valueType;
 	}
 
-	@Override
 	public IObservableValue observe(Object source) {
 		return getDelegate(source).observe(source);
 	}
 
-	@Override
 	public IObservableValue observe(Realm realm, Object source) {
 		return getDelegate(source).observe(realm, source);
 	}
 
-	@Override
 	public IObservableList observeDetail(IObservableList master) {
 		return new ListDelegatingValueObservableList(master, this);
 	}
 
-	@Override
 	public IObservableMap observeDetail(IObservableSet master) {
 		return new SetDelegatingValueObservableMap(master, this);
 	}
 
-	@Override
 	public IObservableMap observeDetail(IObservableMap master) {
 		return new MapDelegatingValueObservableMap(master, this);
 	}
 
 	private class NullValueProperty extends SimpleValueProperty {
-		@Override
 		public Object getValueType() {
 			return valueType;
 		}
 
-		@Override
 		protected Object doGetValue(Object source) {
 			return null;
 		}
 
-		@Override
 		protected void doSetValue(Object source, Object value) {
 		}
 
-		@Override
 		public INativePropertyListener adaptListener(
 				ISimplePropertyListener listener) {
 			return null;

@@ -1,23 +1,8 @@
-/*******************************************************************************
- * Copyright (c) 2014 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 452764
- *******************************************************************************/
-
 package org.eclipse.e4.ui.menu.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.List;
+
+import junit.framework.TestCase;
 
 import org.eclipse.e4.core.commands.CommandServiceAddon;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -59,12 +44,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.internal.menus.MenuPersistence;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 
-public class MMenuItemTest {
+public class MMenuItemTest extends TestCase {
 
 	final static String PDE_SEARCH_AS_ID = "org.eclipse.pde.ui.SearchActionSet";
 
@@ -124,6 +105,10 @@ public class MMenuItemTest {
 		item1.setLabel("mmc.item2");
 		mmc.getChildren().add(item1);
 
+		// exp = UiFactoryImpl.eINSTANCE.createCoreExpression();
+		// exp.setCoreExpressionId("org.eclipse.e4.ui.tests.withMmc1");
+		// mmc.setVisibleWhen(exp);
+
 		application.getMenuContributions().add(mmc);
 	}
 
@@ -136,8 +121,8 @@ public class MMenuItemTest {
 		return (MenuManagerRenderer) renderer;
 	}
 
-	@Before
-	public void setUp() {
+	@Override
+	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		ContextInjectionFactory.make(CommandServiceAddon.class, appContext);
 		ContextInjectionFactory.make(ContextServiceAddon.class, appContext);
@@ -146,17 +131,15 @@ public class MMenuItemTest {
 				PartRenderingEngine.engineURI);
 	}
 
-	@After
-	public void tearDown() {
+	@Override
+	protected void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
 		appContext.dispose();
 	}
 
-	@Test
-	@Ignore("See bug 452765")
-	public void testContributionRecordMerging() {
+	public void testContributionRecordMerging() throws Exception {
 		MApplication application = TestUtil.setupRenderer(appContext);
 		MenuManagerRenderer renderer = appContext
 				.get(MenuManagerRenderer.class);
@@ -186,8 +169,7 @@ public class MMenuItemTest {
 		assertEquals(4, withHandlers.getChildren().size());
 	}
 
-	@Test
-	public void testMenuContribution() {
+	public void testMenuContribution() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menuBar = MenuFactoryImpl.eINSTANCE.createMenu();
 		menuBar.setElementId("org.eclipse.ui.main.menu");
@@ -232,9 +214,7 @@ public class MMenuItemTest {
 		assertEquals("mmc.item1", fileManager.getItems()[3].getId());
 	}
 
-	@Test
-	@Ignore("See bug 452765")
-	public void testMenuContributionGeneration() {
+	public void testMenuContributionGeneration() throws Exception {
 		MApplication application = TestUtil.setupRenderer(appContext);
 		MenuManagerRenderer renderer = appContext
 				.get(MenuManagerRenderer.class);
@@ -285,9 +265,7 @@ public class MMenuItemTest {
 
 	}
 
-	@Test
-	@Ignore("See bug 452765")
-	public void testMenuContributionVisibility() {
+	public void testMenuContributionVisibility() throws Exception {
 		MApplication application = TestUtil.setupRenderer(appContext);
 		MenuManagerRenderer renderer = appContext
 				.get(MenuManagerRenderer.class);
@@ -404,7 +382,6 @@ public class MMenuItemTest {
 
 	}
 
-	@Test
 	public void testMHandledMenuItem_Check_Bug316752() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
@@ -442,7 +419,6 @@ public class MMenuItemTest {
 		assertTrue(menuItemWidget.getSelection());
 	}
 
-	@Test
 	public void testMMenuItem_RadioItems() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
@@ -537,58 +513,47 @@ public class MMenuItemTest {
 		assertEquals(afterExpected, menuItemWidget.getText());
 	}
 
-	@Test
 	public void testMMenuItem_Text_EmptyEmpty() {
 		testMMenuItem_Text("", "", "", "");
 	}
 
-	@Test
 	public void testMMenuItem_Text_EmptyNull() {
 		testMMenuItem_Text("", "", null, "");
 	}
 
-	@Test
 	public void testMMenuItem_Text_EmptyString() {
 		testMMenuItem_Text("", "", "label", "label");
 	}
 
-	@Test
 	public void testMMenuItem_Text_NullEmpty() {
 		testMMenuItem_Text(null, "", "", "");
 	}
 
-	@Test
 	public void testMMenuItem_Text_NullNull() {
 		testMMenuItem_Text(null, "", null, "");
 	}
 
-	@Test
 	public void testMMenuItem_Text_NullString() {
 		testMMenuItem_Text(null, "", "label", "label");
 	}
 
-	@Test
 	public void testMMenuItem_Text_StringEmpty() {
 		testMMenuItem_Text("label", "label", "", "");
 	}
 
-	@Test
 	public void testMMenuItem_Text_StringNull() {
 		testMMenuItem_Text("label", "label", null, "");
 	}
 
-	@Test
 	public void testMMenuItem_Text_StringStringChanged() {
 		testMMenuItem_Text("label", "label", "label2", "label2");
 	}
 
-	@Test
 	public void testMMenuItem_Text_StringStringUnchanged() {
 		testMMenuItem_Text("label", "label", "label", "label");
 	}
 
-	@Test
-	public void testSubMenuCreation() {
+	public void testSubMenuCreation() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menuBar = MenuFactoryImpl.eINSTANCE.createMenu();
 		menuBar.setElementId("org.eclipse.ui.main.menu");
@@ -635,8 +600,7 @@ public class MMenuItemTest {
 		assertEquals(3, fileManager.getSize());
 	}
 
-	@Test
-	public void testTbrItem() {
+	public void testTbrItem() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menuBar = MenuFactoryImpl.eINSTANCE.createMenu();
 		menuBar.setElementId("org.eclipse.ui.main.menu");
@@ -684,9 +648,7 @@ public class MMenuItemTest {
 		assertEquals(2, fileManager.getSize());
 	}
 
-	@Test
-	@Ignore("TODO")
-	public void TODOtestWithVisible() {
+	public void TODOtestWithVisible() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menuBar = MenuFactoryImpl.eINSTANCE.createMenu();
 		menuBar.setElementId("org.eclipse.ui.main.menu");
@@ -773,9 +735,8 @@ public class MMenuItemTest {
 		fileWidget.notifyListeners(SWT.Hide, hide);
 	}
 
-	@Test
-	@Ignore("MenuPersistence no longer processes actionSets")
-	public void XXXXtestActionSetGeneration() {
+	// MenuPersistence no longer processes actionSets
+	public void XXXXtestActionSetGeneration() throws Exception {
 		MApplication application = TestUtil.setupRenderer(appContext);
 		MenuManagerRenderer renderer = appContext
 				.get(MenuManagerRenderer.class);
@@ -823,9 +784,8 @@ public class MMenuItemTest {
 
 	}
 
-	@Test
-	@Ignore("MenuPersistence no longer processes actionSets")
-	public void XXXXtestActionSetSharedBothActive() {
+	// MenuPersistence no longer processes actionSets
+	public void XXXXtestActionSetSharedBothActive() throws Exception {
 		MApplication application = TestUtil.setupRenderer(appContext);
 		MenuManagerRenderer renderer = appContext
 				.get(MenuManagerRenderer.class);
@@ -884,9 +844,8 @@ public class MMenuItemTest {
 
 	}
 
-	@Test
-	@Ignore("MenuPersistence no longer processes actionSets")
-	public void XXXXtestActionSetSharedMenuGeneration() {
+	// MenuPersistence no longer processes actionSets
+	public void XXXXtestActionSetSharedMenuGeneration() throws Exception {
 		MApplication application = TestUtil.setupRenderer(appContext);
 		MenuManagerRenderer renderer = appContext
 				.get(MenuManagerRenderer.class);
@@ -939,9 +898,8 @@ public class MMenuItemTest {
 
 	}
 
-	@Test
-	@Ignore("MenuPersistence no longer processes actionSets")
-	public void XXXXtestActionSetSharedPDEActive() {
+	// MenuPersistence no longer processes actionSets
+	public void XXXXtestActionSetSharedPDEActive() throws Exception {
 		MApplication application = TestUtil.setupRenderer(appContext);
 		MenuManagerRenderer renderer = appContext
 				.get(MenuManagerRenderer.class);
@@ -999,9 +957,8 @@ public class MMenuItemTest {
 
 	}
 
-	@Test
-	@Ignore("MenuPersistence no longer processes actionSets")
-	public void XXXXtestActionSetSharedSearchActive() {
+	// MenuPersistence no longer processes actionSets
+	public void XXXXtestActionSetSharedSearchActive() throws Exception {
 		MApplication application = TestUtil.setupRenderer(appContext);
 		MenuManagerRenderer renderer = appContext
 				.get(MenuManagerRenderer.class);

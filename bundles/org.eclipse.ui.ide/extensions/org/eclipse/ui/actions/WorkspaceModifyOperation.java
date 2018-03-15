@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,18 +12,18 @@ package org.eclipse.ui.actions;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
+
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.IThreadListener;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.dialogs.EventLoopProgressMonitor;
+
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
@@ -96,14 +96,12 @@ public abstract class WorkspaceModifyOperation implements IRunnableWithProgress,
      * invoking the <code>execute</code> method as a workspace runnable
      * (<code>IWorkspaceRunnable</code>).
      */
-    @Override
-	public synchronized final void run(IProgressMonitor monitor)
+    public synchronized final void run(IProgressMonitor monitor)
             throws InvocationTargetException, InterruptedException {
         final InvocationTargetException[] iteHolder = new InvocationTargetException[1];
         try {
             IWorkspaceRunnable workspaceRunnable = new IWorkspaceRunnable() {
-                @Override
-				public void run(IProgressMonitor pm) throws CoreException {
+                public void run(IProgressMonitor pm) throws CoreException {
                     try {
                         execute(pm);
                     } catch (InvocationTargetException e) {
@@ -117,16 +115,6 @@ public abstract class WorkspaceModifyOperation implements IRunnableWithProgress,
                     // CoreException and OperationCanceledException are propagated
                 }
             };
-			// if we are in the UI thread, make sure we use progress monitor
-			// that spins event loop to allow processing of pending asyncExecs
-			if (monitor != null && PlatformUI.isWorkbenchRunning()
-					&& !PlatformUI.getWorkbench().isStarting()) {
-				Display display = PlatformUI.getWorkbench().getDisplay();
-				if (!display.isDisposed()
-						&& display.getThread() == Thread.currentThread()) {
-					monitor = new EventLoopProgressMonitor(monitor);
-				}
-			}
             IDEWorkbenchPlugin.getPluginWorkspace().run(workspaceRunnable,
                     rule, IResource.NONE, monitor);
         } catch (CoreException e) {
@@ -143,7 +131,6 @@ public abstract class WorkspaceModifyOperation implements IRunnableWithProgress,
 	 * @see IThreadListener#threadChange(Thread);
 	 * @since 3.2
 	 */
-	@Override
 	public void threadChange(Thread thread) {
 		//we must make sure we aren't transferring control away from a thread that
 		//already owns a scheduling rule because this is deadlock prone (bug 105491)

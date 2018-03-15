@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.internal.util;
 
@@ -42,21 +41,27 @@ public class FailureDialog extends Dialog {
         super(parentShell);
     }
 
-    @Override
-	protected void configureShell(Shell newShell) {
+    /* (non-Javadoc)
+     * Method declared on Window.
+     */
+    protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText("Dialog Test Failed");
     }
 
-    @Override
-	protected void createButtonsForButtonBar(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.OK_ID, "&OK", true);
         createButton(parent, IDialogConstants.CANCEL_ID,
                 IDialogConstants.CANCEL_LABEL, false);
     }
 
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected Control createDialogArea(Composite parent) {
         // page group
         Composite composite = (Composite) super.createDialogArea(parent);
         composite.setSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -76,33 +81,40 @@ public class FailureDialog extends Dialog {
         return composite;
     }
 
-    @Override
-	protected void okPressed() {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected void okPressed() {
         _log = _text.getText();
         super.okPressed();
     }
 
-	/**
-	 * @return String the text contained in the input area of the dialog.
-	 */
+    /*
+     * @return String the text contained in the input area of
+     * the dialog.
+     */
     String getText() {
-		return (_log == null) ? "Empty entry." : _log;
+        if (_log == null) {
+            return "Empty entry.";
+        } else {
+            return _log;
+        }
     }
 
-	/**
-	 * Sets the text of the input area. This should only be called to set the
-	 * initial text so only call before invoking open().
-	 */
+    /*
+     * Sets the text of the input area.  This should only be
+     * called to set the initial text so only call before invoking
+     * open().
+     */
     void setText(String text) {
         _text.setText(text);
     }
 
-	/**
-	 * Returns a string representation of this class which the text contained in
-	 * the input area of the dialog.
-	 */
-    @Override
-	public String toString() {
+    /*
+     * Returns a string representation of this class which
+     * the text contained in the input area of the dialog.
+     */
+    public String toString() {
         return getText();
     }
 }
