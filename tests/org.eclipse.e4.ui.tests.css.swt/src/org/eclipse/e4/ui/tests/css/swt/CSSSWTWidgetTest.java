@@ -12,8 +12,6 @@
 package org.eclipse.e4.ui.tests.css.swt;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.swt.widgets.Widget;
@@ -47,12 +45,5 @@ public class CSSSWTWidgetTest extends CSSSWTTestCase {
 		Widget widget = createTestLabel("Label { font: Arial 12px; font-weight: bold }");
 		WidgetElement.setCSSClass(widget, cssClass);
 		assertEquals(WidgetElement.getCSSClass(widget), cssClass);
-	}
-
-	@Test
-	public void testHasAttribute() {
-		Widget widget = createTestLabel("");
-		assertTrue(engine.getElement(widget).hasAttribute("style"));
-		assertFalse(engine.getElement(widget).hasAttribute("fooBarAttribute"));
 	}
 }
