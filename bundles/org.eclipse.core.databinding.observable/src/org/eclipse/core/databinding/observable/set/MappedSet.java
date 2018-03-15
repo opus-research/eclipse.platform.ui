@@ -24,6 +24,7 @@ import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.map.IMapChangeListener;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
+import org.eclipse.core.databinding.observable.map.MapChangeEvent;
 import org.eclipse.core.databinding.observable.map.MapDiff;
 
 /**
@@ -50,38 +51,62 @@ public class MappedSet extends ObservableSet {
 	 */
 	private Map valueCounts = new HashMap();
 
-	private ISetChangeListener domainListener;
+	private ISetChangeListener domainListener = new ISetChangeListener() {
+		@Override
+		public void handleSetChange(SetChangeEvent event) {
+			Set additions = new HashSet();
+			for (Iterator it = event.diff.getAdditions().iterator(); it.hasNext();) {
+				Object added = it.next();
+				Object mapValue = wrappedMap.get(added);
+				if (handleAddition(mapValue)) {
+					additions.add(mapValue);
+				}
+			}
+			Set removals = new HashSet();
+			for (Iterator it = event.diff.getRemovals().iterator(); it.hasNext();) {
+				Object removed = it.next();
+				Object mapValue = wrappedMap.get(removed);
+				if (handleRemoval(mapValue)) {
+					removals.add(mapValue);
+				}
+			}
+			fireSetChange(Diffs.createSetDiff(additions, removals));
+		}
+	};
 
-	private IMapChangeListener mapChangeListener = event -> {
-		MapDiff diff = event.diff;
-		Set additions = new HashSet();
-		Set removals = new HashSet();
-		for (Iterator it1 = diff.getRemovedKeys().iterator(); it1.hasNext();) {
-			Object key1 = it1.next();
-			Object oldValue1 = diff.getOldValue(key1);
-			if (handleRemoval(oldValue1)) {
-				removals.add(oldValue1);
+	private IMapChangeListener mapChangeListener = new IMapChangeListener() {
+		@Override
+		public void handleMapChange(MapChangeEvent event) {
+			MapDiff diff = event.diff;
+			Set additions = new HashSet();
+			Set removals = new HashSet();
+			for (Iterator it = diff.getRemovedKeys().iterator(); it.hasNext();) {
+				Object key = it.next();
+				Object oldValue = diff.getOldValue(key);
+				if (handleRemoval(oldValue)) {
+					removals.add(oldValue);
+				}
 			}
+			for (Iterator it = diff.getChangedKeys().iterator(); it.hasNext();) {
+				Object key = it.next();
+				Object oldValue = diff.getOldValue(key);
+				Object newValue = diff.getNewValue(key);
+				if (handleRemoval(oldValue)) {
+					removals.add(oldValue);
+				}
+				if (handleAddition(newValue)) {
+					additions.add(newValue);
+				}
+			}
+			for (Iterator it = diff.getAddedKeys().iterator(); it.hasNext();) {
+				Object key = it.next();
+				Object newValue = diff.getNewValue(key);
+				if (handleAddition(newValue)) {
+					additions.add(newValue);
+				}
+			}
+			fireSetChange(Diffs.createSetDiff(additions, removals));
 		}
-		for (Iterator it2 = diff.getChangedKeys().iterator(); it2.hasNext();) {
-			Object key2 = it2.next();
-			Object oldValue2 = diff.getOldValue(key2);
-			Object newValue1 = diff.getNewValue(key2);
-			if (handleRemoval(oldValue2)) {
-				removals.add(oldValue2);
-			}
-			if (handleAddition(newValue1)) {
-				additions.add(newValue1);
-			}
-		}
-		for (Iterator it3 = diff.getAddedKeys().iterator(); it3.hasNext();) {
-			Object key3 = it3.next();
-			Object newValue2 = diff.getNewValue(key3);
-			if (handleAddition(newValue2)) {
-				additions.add(newValue2);
-			}
-		}
-		fireSetChange(Diffs.createSetDiff(additions, removals));
 	};
 
 	private IObservableSet input;
@@ -102,25 +127,6 @@ public class MappedSet extends ObservableSet {
 		}
 		input.addSetChangeListener(domainListener);
 		map.addMapChangeListener(mapChangeListener);
-		domainListener = event -> {
-			Set additions = new HashSet();
-			for (Iterator it1 = event.diff.getAdditions().iterator(); it1.hasNext();) {
-				Object added = it1.next();
-				Object mapValue1 = wrappedMap.get(added);
-				if (handleAddition(mapValue1)) {
-					additions.add(mapValue1);
-				}
-			}
-			Set removals = new HashSet();
-			for (Iterator it2 = event.diff.getRemovals().iterator(); it2.hasNext();) {
-				Object removed = it2.next();
-				Object mapValue2 = wrappedMap.get(removed);
-				if (handleRemoval(mapValue2)) {
-					removals.add(mapValue2);
-				}
-			}
-			fireSetChange(Diffs.createSetDiff(additions, removals));
-		};
 	}
 
 	/**

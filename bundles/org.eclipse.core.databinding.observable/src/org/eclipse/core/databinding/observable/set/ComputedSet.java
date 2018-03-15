@@ -326,13 +326,16 @@ privateInterface, privateInterface, null);
 		// they may receive change notifications before the runnable below has
 		// been executed. It is their job to figure out what to do with those
 		// notifications.
-		getRealm().exec(() -> {
-			if (dependencies == null) {
-				// We are not currently listening.
-				// But someone is listening for changes. Call getValue()
-				// to make sure we start listening to the observables we
-				// depend on.
-				getSet();
+		getRealm().exec(new Runnable() {
+			@Override
+			public void run() {
+				if (dependencies == null) {
+					// We are not currently listening.
+					// But someone is listening for changes. Call getValue()
+					// to make sure we start listening to the observables we
+					// depend on.
+					getSet();
+				}
 			}
 		});
 	}

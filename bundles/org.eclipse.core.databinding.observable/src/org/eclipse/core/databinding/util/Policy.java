@@ -14,6 +14,8 @@
  *******************************************************************************/
 package org.eclipse.core.databinding.util;
 
+import org.eclipse.core.runtime.IStatus;
+
 /**
  * The Policy class handles settings for behaviour, debug flags and logging
  * within JFace Data Binding.
@@ -38,10 +40,13 @@ public class Policy {
 	 * Returns the dummy log to use if none has been set
 	 */
 	private static ILogger getDummyLog() {
-		return status -> {
-			System.err.println(status.toString());
-			if( status.getException() != null ) {
-				status.getException().printStackTrace(System.err);
+		return new ILogger() {
+			@Override
+			public void log(IStatus status) {
+				System.err.println(status.toString());
+				if( status.getException() != null ) {
+					status.getException().printStackTrace(System.err);
+				}
 			}
 		};
 	}

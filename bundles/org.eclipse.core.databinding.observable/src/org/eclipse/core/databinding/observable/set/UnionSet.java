@@ -96,13 +96,21 @@ public final class UnionSet<E> extends ObservableSet<E> {
 		this.stalenessTracker = new StalenessTracker(childSets.toArray(new IObservableSet[0]), stalenessConsumer);
 	}
 
-	private ISetChangeListener<E> childSetChangeListener = event -> processAddsAndRemoves(event.diff.getAdditions(), event.diff.getRemovals());
+	private ISetChangeListener<E> childSetChangeListener = new ISetChangeListener<E>() {
+		@Override
+		public void handleSetChange(SetChangeEvent<? extends E> event) {
+			processAddsAndRemoves(event.diff.getAdditions(), event.diff.getRemovals());
+		}
+	};
 
-	private IStalenessConsumer stalenessConsumer = stale -> {
-		boolean oldStale = UnionSet.this.stale;
-		UnionSet.this.stale = stale;
-		if (stale && !oldStale) {
-			fireStale();
+	private IStalenessConsumer stalenessConsumer = new IStalenessConsumer() {
+		@Override
+		public void setStale(boolean stale) {
+			boolean oldStale = UnionSet.this.stale;
+			UnionSet.this.stale = stale;
+			if (stale && !oldStale) {
+				fireStale();
+			}
 		}
 	};
 

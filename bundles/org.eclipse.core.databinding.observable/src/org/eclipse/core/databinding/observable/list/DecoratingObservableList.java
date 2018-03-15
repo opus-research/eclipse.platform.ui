@@ -77,7 +77,12 @@ public class DecoratingObservableList<E> extends
 	@Override
 	protected void firstListenerAdded() {
 		if (listChangeListener == null) {
-			listChangeListener = event -> DecoratingObservableList.this.handleListChange(event);
+			listChangeListener = new IListChangeListener<E>() {
+				@Override
+				public void handleListChange(ListChangeEvent<? extends E> event) {
+					DecoratingObservableList.this.handleListChange(event);
+				}
+			};
 		}
 		decorated.addListChangeListener(listChangeListener);
 		super.firstListenerAdded();

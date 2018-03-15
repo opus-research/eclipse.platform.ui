@@ -16,12 +16,15 @@
 package org.eclipse.core.internal.databinding.observable.masterdetail;
 
 import org.eclipse.core.databinding.observable.Diffs;
+import org.eclipse.core.databinding.observable.DisposeEvent;
+import org.eclipse.core.databinding.observable.IDisposeListener;
 import org.eclipse.core.databinding.observable.IObserving;
 import org.eclipse.core.databinding.observable.ObservableTracker;
 import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
 import org.eclipse.core.databinding.observable.value.AbstractObservableValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
+import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.runtime.Assert;
 
 /**
@@ -37,9 +40,12 @@ public class DetailObservableValue<M, T> extends AbstractObservableValue<T>
 
 	private boolean updating = false;
 
-	private IValueChangeListener<T> innerChangeListener = event -> {
-		if (!updating) {
-			fireValueChange(Diffs.unmodifiableDiff(event.diff));
+	private IValueChangeListener<T> innerChangeListener = new IValueChangeListener<T>() {
+		@Override
+		public void handleValueChange(ValueChangeEvent<? extends T> event) {
+			if (!updating) {
+				fireValueChange(Diffs.unmodifiableDiff(event.diff));
+			}
 		}
 	};
 
@@ -69,7 +75,12 @@ public class DetailObservableValue<M, T> extends AbstractObservableValue<T>
 		this.detailType = detailType;
 		this.outerObservableValue = outerObservableValue;
 
-		outerObservableValue.addDisposeListener(staleEvent -> dispose());
+		outerObservableValue.addDisposeListener(new IDisposeListener() {
+			@Override
+			public void handleDispose(DisposeEvent staleEvent) {
+				dispose();
+			}
+		});
 
 		ObservableTracker.setIgnore(true);
 		try {
@@ -80,16 +91,19 @@ public class DetailObservableValue<M, T> extends AbstractObservableValue<T>
 		outerObservableValue.addValueChangeListener(outerChangeListener);
 	}
 
-	IValueChangeListener<M> outerChangeListener = event -> {
-		if (isDisposed())
-			return;
-		ObservableTracker.setIgnore(true);
-		try {
-			T oldValue = doGetValue();
-			updateInnerObservableValue();
-			fireValueChange(Diffs.createValueDiff(oldValue, doGetValue()));
-		} finally {
-			ObservableTracker.setIgnore(false);
+	IValueChangeListener<M> outerChangeListener = new IValueChangeListener<M>() {
+		@Override
+		public void handleValueChange(ValueChangeEvent<? extends M> event) {
+			if (isDisposed())
+				return;
+			ObservableTracker.setIgnore(true);
+			try {
+				T oldValue = doGetValue();
+				updateInnerObservableValue();
+				fireValueChange(Diffs.createValueDiff(oldValue, doGetValue()));
+			} finally {
+				ObservableTracker.setIgnore(false);
+			}
 		}
 	};
 

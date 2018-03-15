@@ -17,6 +17,7 @@ package org.eclipse.core.databinding.beans;
 
 import java.beans.PropertyDescriptor;
 
+import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
@@ -936,8 +937,13 @@ final public class BeansObservables {
 	 */
 	public static IObservableFactory setToMapFactory(final Class beanClass,
 			final String propertyName) {
-		return target -> observeMap((IObservableSet) target, beanClass,
-				propertyName);
+		return new IObservableFactory() {
+			@Override
+			public IObservable createObservable(Object target) {
+				return observeMap((IObservableSet) target, beanClass,
+						propertyName);
+			}
+		};
 	}
 
 	/**
