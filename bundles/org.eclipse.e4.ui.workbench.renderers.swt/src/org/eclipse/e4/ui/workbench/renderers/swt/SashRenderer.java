@@ -33,6 +33,7 @@ import org.osgi.service.event.Event;
  */
 public class SashRenderer extends SWTPartRenderer {
 
+	private static final int UNDEFINED_WEIGHT = -1;
 	private static final int DEFAULT_WEIGHT = 5000;
 
 	private int processedContent = 0;
@@ -131,7 +132,11 @@ public class SashRenderer extends SWTPartRenderer {
 		super.childRendered(parentElement, element);
 
 		// Ensure that the element's 'containerInfo' is initialized
-		ensureLayoutWeight(element);
+		int weight = getLayoutWeight(element);
+		if (weight == UNDEFINED_WEIGHT) {
+			element.setContainerData(Integer.toString(DEFAULT_WEIGHT));
+		}
+
 		forceLayout(parentElement);
 	}
 
@@ -170,21 +175,20 @@ public class SashRenderer extends SWTPartRenderer {
 	}
 
 	/*
-	 * Container data is used by the SashLayout to determine the size of the
-	 * control
+	 *
 	 */
-	private static void ensureLayoutWeight(MUIElement element) {
-		int weight = DEFAULT_WEIGHT;
-
+	private static int getLayoutWeight(MUIElement element) {
 		String info = element.getContainerData();
 		if (info == null || info.length() == 0) {
-			try {
-				int value = Integer.parseInt(info);
-				weight = value;
-			} catch (NumberFormatException e) {
-				// continue to use the default value
-			}
+			element.setContainerData(Integer.toString(10000));
+			info = element.getContainerData();
 		}
-		element.setContainerData(Integer.toString(weight));
+
+		try {
+			int value = Integer.parseInt(info);
+			return value;
+		} catch (NumberFormatException e) {
+			return UNDEFINED_WEIGHT;
+		}
 	}
 }
