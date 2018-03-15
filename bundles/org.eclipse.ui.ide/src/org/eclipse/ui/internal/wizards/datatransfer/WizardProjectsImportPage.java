@@ -72,7 +72,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -340,8 +339,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	private boolean copyFiles = false;
 
-	private boolean importClosed = false;
-
 	private ProjectRecord[] selectedProjects = new ProjectRecord[0];
 
 	// Keep track of the directory that we browsed to last time
@@ -491,12 +488,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 				projectsList.refresh(true);
 			}
 		});
-
-		Button importClosedCheckbox = new Button(optionsGroup, SWT.CHECK);
-		importClosedCheckbox.setText(DataTransferMessages.WizardProjectsImportPage_importClosed);
-		importClosedCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		importClosedCheckbox.addSelectionListener(
-				SelectionListener.widgetSelectedAdapter(e -> importClosed = importClosedCheckbox.getSelection()));
 
 		hideConflictingProjects = new Button(optionsGroup, SWT.CHECK);
 		hideConflictingProjects
@@ -1369,9 +1360,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			SubMonitor subTask = subMonitor.split(1).setWorkRemaining(100);
 			subTask.setTaskName(DataTransferMessages.WizardProjectsImportPage_CreateProjectsTask);
 			project.create(record.description, subTask.split(30));
-			if (!importClosed || copyFiles) {
-				project.open(IResource.BACKGROUND_REFRESH, subTask.split(70));
-			}
+			project.open(IResource.BACKGROUND_REFRESH, subTask.split(70));
 			subTask.setTaskName(""); //$NON-NLS-1$
 		} catch (CoreException e) {
 			return e.getStatus();
@@ -1398,15 +1387,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 				return new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, 2,
 						e.getCause().getLocalizedMessage(), e);
 			}
-
-			if (importClosed) {
-				try {
-					project.close(subMonitor.split(1));
-				} catch (CoreException e) {
-					return e.getStatus();
-				}
-			}
-
 			return operation.getStatus();
 		}
 
