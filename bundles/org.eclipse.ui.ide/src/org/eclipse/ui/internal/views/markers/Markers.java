@@ -326,19 +326,17 @@ class Markers {
 	 * @return {@link MarkerItem}
 	 */
 	public MarkerItem getMarkerItem(IMarker marker) {
-		Map<IMarker, MarkerEntry> entryMap = markerToEntryMap;
-		if (entryMap == null) {
-			entryMap = new HashMap<>();
+		if (markerToEntryMap == null) {
+			markerToEntryMap = new HashMap<>();
 			for (MarkerEntry markerEntry : markerEntryArray) {
 				IMarker nextMarker = markerEntry.getMarker();
 				if (nextMarker != null) {
-					entryMap.put(nextMarker, markerEntry);
+					markerToEntryMap.put(nextMarker, markerEntry);
 				}
 			}
-			markerToEntryMap = entryMap;
 		}
-		if (entryMap.containsKey(marker)) {
-			return entryMap.get(marker);
+		if (markerToEntryMap.containsKey(marker)) {
+			return markerToEntryMap.get(marker);
 		}
 		return null;
 	}
