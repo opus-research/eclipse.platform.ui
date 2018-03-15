@@ -297,7 +297,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		recentWorkspacesForm.getBody().setLayout(new GridLayout());
 		ExpandableComposite expandableComposite = toolkit.createExpandableComposite(recentWorkspacesForm.getBody(),
 				ExpandableComposite.TWISTIE);
-		recentWorkspacesForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		recentWorkspacesForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		expandableComposite.setBackground(composite.getBackground());
 		expandableComposite.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_recentWorkspaces);
 		expandableComposite.setExpanded(launchData.isShowRecentWorkspaces());
