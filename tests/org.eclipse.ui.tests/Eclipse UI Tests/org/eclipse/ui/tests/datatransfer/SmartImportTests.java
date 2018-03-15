@@ -7,6 +7,7 @@
  *
  * Contributors:
  * - Mickael Istria (Red Hat Inc.)
+ * - Lucas Bullen (Red Hat Inc.)
  *******************************************************************************/
 package org.eclipse.ui.tests.datatransfer;
 
@@ -28,6 +29,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
@@ -41,6 +43,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage;
 import org.eclipse.ui.internal.wizards.datatransfer.SmartImportWizard;
@@ -171,6 +174,68 @@ public class SmartImportTests extends UITestCase {
 		assertTrue(implProjectNames.contains("impl"));
 		assertTrue(implProjectNames.contains("module2_impl"));
 		assertTrue(implProjectNames.contains("module3_impl"));
+	}
+
+	@Test
+	public void testImportProjectWithExistingName()
+			throws IOException, OperationCanceledException, InterruptedException {
+		URL url = FileLocator
+				.toFileURL(getClass().getResource("/data/org.eclipse.datatransferArchives/projectSingleModule/module"));
+		File file = new File(url.getFile());
+		runSmartImport(file);
+
+		// Check expected projects are there
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		assertEquals(1, projects.length);
+
+		url = FileLocator
+				.toFileURL(getClass().getResource("/data/org.eclipse.datatransferArchives/project/module"));
+		file = new File(url.getFile());
+
+		SmartImportWizard wizard = new SmartImportWizard();
+		wizard.setInitialImportSource(file);
+		this.dialog = new WizardDialog(getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+		dialog.setBlockOnOpen(false);
+		dialog.open();
+		processEvents();
+		final Button okButton = getFinishButton(dialog.buttonBar);
+		assertNotNull(okButton);
+		processEventsUntil(new Condition() {
+			@Override
+			public boolean compute() {
+				return okButton.isEnabled();
+			}
+		}, -1);
+		SmartImportRootWizardPage page = (SmartImportRootWizardPage) dialog.getCurrentPage();
+		CheckboxTreeViewer treeViewer = getTreeViewer((Composite) page.getControl());
+		assertNotNull(treeViewer);
+		assertEquals(4, treeViewer.getTree().getItemCount());
+		assertEquals(3, treeViewer.getCheckedElements().length);
+
+		wizard.performFinish();
+		waitForJobs(100, 1000); // give the job framework time to schedule the
+								// job
+		wizard.getImportJob().join();
+		waitForJobs(100, 5000); // give some time for asynchronous workspace
+								// jobs to complete
+
+		// Confirm that existing project name project was skipped
+		projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		assertEquals(4, projects.length);
+	}
+
+	private CheckboxTreeViewer getTreeViewer(Composite parent) {
+		for (Control control : parent.getChildren()) {
+			if (control instanceof FilteredTree) {
+				return (CheckboxTreeViewer) ((FilteredTree) control).getViewer();
+			} else if (control instanceof Composite) {
+				CheckboxTreeViewer res = getTreeViewer((Composite) control);
+				if (res != null) {
+					return res;
+				}
+			}
+		}
+		return null;
 	}
 
 	@Test
