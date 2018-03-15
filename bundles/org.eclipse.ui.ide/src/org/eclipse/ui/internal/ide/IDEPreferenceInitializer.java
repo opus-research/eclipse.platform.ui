@@ -20,7 +20,6 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.ide.handlers.ShowInSystemExplorerHandler;
-import org.eclipse.ui.internal.ide.registry.SystemEditorOrTextEditorStrategy;
 import org.eclipse.ui.internal.views.markers.MarkerSupportInternalUtilities;
 
 /**
