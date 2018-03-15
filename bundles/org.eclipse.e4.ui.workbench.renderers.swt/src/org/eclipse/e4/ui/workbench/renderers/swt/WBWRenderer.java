@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,6 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
@@ -51,7 +50,6 @@ import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
 import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
@@ -75,7 +73,6 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
@@ -125,15 +122,9 @@ public class WBWRenderer extends SWTPartRenderer {
 	Logger logger;
 
 	@Inject
-	private IEclipseContext context;
-
-	@Inject
 	private IPresentationEngine engine;
 
 	private ThemeDefinitionChangedHandler themeDefinitionChanged;
-
-	@Inject
-	private EModelService modelService;
 
 	@Inject
 	private Display display;
@@ -183,12 +174,6 @@ public class WBWRenderer extends SWTPartRenderer {
 			theShell.setText(newTitle);
 		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 			theShell.setImage(getImage(windowModel));
-			// child windows may take their shell icon from the parent
-			for (MWindow child : windowModel.getWindows()) {
-				if (child.getRenderer() instanceof WBWRenderer) {
-					((WBWRenderer) child.getRenderer()).handleParentChange(child);
-				}
-			}
 		} else if (UIEvents.UILabel.TOOLTIP.equals(attName) || UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
 			String newTTip = (String) event.getProperty(UIEvents.EventTags.NEW_VALUE);
 			theShell.setToolTipText(newTTip);
@@ -267,52 +252,6 @@ public class WBWRenderer extends SWTPartRenderer {
 		themeDefinitionChanged.handleEvent(event);
 	}
 
-	@Inject
-	@Optional
-	private void subscribeTopicDetachedChanged(@UIEventTopic(UIEvents.Window.TOPIC_WINDOWS) Event event) {
-		/*
-		 * Handle any changes required for parent changes on detached windows.
-		 * This isn't quite straightforward as we don't see TOPIC_PARENT events
-		 * parent changes are only described as ADD and REMOVE on the
-		 * Window.TOPIC_WINDOWS and Application.TOPIC_CHILDREN.
-		 */
-		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MWindow))
-			return;
-
-		if (UIEvents.isREMOVE(event)) {
-			for (Object removed : UIEvents.asIterable(event, UIEvents.EventTags.OLD_VALUE)) {
-				if (removed instanceof MWindow && ((MWindow) removed).getRenderer() instanceof WBWRenderer) {
-					MWindow window = (MWindow) removed;
-					((WBWRenderer) window.getRenderer()).handleParentChange(window);
-				}
-			}
-		} else if (UIEvents.isADD(event)) {
-			for (Object removed : UIEvents.asIterable(event, UIEvents.EventTags.NEW_VALUE)) {
-				if (removed instanceof MWindow && ((MWindow) removed).getRenderer() instanceof WBWRenderer) {
-					MWindow window = (MWindow) removed;
-					((WBWRenderer) window.getRenderer()).handleParentChange(window);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Update this child window with any values that may have been obtained from
-	 * the parent.
-	 *
-	 * @param child
-	 *            the child window (may now be orphaned)
-	 */
-	private void handleParentChange(MWindow child) {
-		// No widget == nothing to update
-		Shell theShell = (Shell) child.getWidget();
-		if (theShell == null)
-			return;
-
-		// Detached windows may take their shell icon from the parent window
-		theShell.setImage(getImage(child));
-	}
-
 	/**
 	 * Closes the provided detached window.
 	 *
@@ -343,8 +282,14 @@ public class WBWRenderer extends SWTPartRenderer {
 	}
 
 	@PostConstruct
-	protected void init() {
+	protected void init(MApplication application) {
 		themeDefinitionChanged = new ThemeDefinitionChangedHandler();
+
+		// install the application global handler (can be overruled in a child
+		// context if needed, or globally changed via the UI event
+		// UILifeCycle.APP_STARTUP_COMPLETE)
+		installSaveHandler(application);
+		installCloseHandler(application);
 	}
 
 	@Override
@@ -443,53 +388,18 @@ public class WBWRenderer extends SWTPartRenderer {
 		// Add the shell into the WBW's context
 		localContext.set(Shell.class, wbwShell);
 		localContext.set(E4Workbench.LOCAL_ACTIVE_SHELL, wbwShell);
-		setCloseHandler(wbwModel);
 		localContext.set(IShellProvider.class, new IShellProvider() {
 			@Override
 			public Shell getShell() {
 				return wbwShell;
 			}
 		});
-		final PartServiceSaveHandler saveHandler = new PartServiceSaveHandler() {
-			@Override
-			public Save promptToSave(MPart dirtyPart) {
-				Shell shell = (Shell) context
-						.get(IServiceConstants.ACTIVE_SHELL);
-				Object[] elements = promptForSave(shell,
-						Collections.singleton(dirtyPart));
-				if (elements == null) {
-					return Save.CANCEL;
-				}
-				return elements.length == 0 ? Save.NO : Save.YES;
-			}
-
-			@Override
-			public Save[] promptToSave(Collection<MPart> dirtyParts) {
-				List<MPart> parts = new ArrayList<>(dirtyParts);
-				Shell shell = (Shell) context
-						.get(IServiceConstants.ACTIVE_SHELL);
-				Save[] response = new Save[dirtyParts.size()];
-				Object[] elements = promptForSave(shell, parts);
-				if (elements == null) {
-					Arrays.fill(response, Save.CANCEL);
-				} else {
-					Arrays.fill(response, Save.NO);
-					for (int i = 0; i < elements.length; i++) {
-						response[parts.indexOf(elements[i])] = Save.YES;
-					}
-				}
-				return response;
-			}
-		};
-		saveHandler.logger = logger;
-		localContext.set(ISaveHandler.class, saveHandler);
 
 		if (wbwModel.getLabel() != null)
 			wbwShell.setText(wbwModel.getLocalizedLabel());
 
-		Image windowImage = getImage(wbwModel);
-		if (windowImage != null) {
-			wbwShell.setImage(windowImage);
+		if (wbwModel.getIconURI() != null && wbwModel.getIconURI().length() > 0) {
+			wbwShell.setImage(getImage(wbwModel));
 		} else {
 			// TODO: This should be added to the model, see bug 308494
 			// it allows for a range of icon sizes that the platform gets to
@@ -540,40 +450,54 @@ public class WBWRenderer extends SWTPartRenderer {
 		return result;
 	}
 
-	@Override
-	public Image getImage(MUILabel element) {
-		Image image = super.getImage(element);
-		if (image == null && element instanceof MWindow) {
-			// Detached windows should take their image from parent window
-			MWindow parent = modelService.getTopLevelWindowFor((MWindow) element);
-			if (parent != null && parent != element) {
-				image = getImage(parent);
+	void installSaveHandler(final MApplication application) {
+		final PartServiceSaveHandler saveHandler = new PartServiceSaveHandler() {
+			@Override
+			public Save promptToSave(MPart dirtyPart) {
+				Shell shell = (Shell) dirtyPart.getContext().get(IServiceConstants.ACTIVE_SHELL);
+				Object[] elements = promptForSave(shell, Collections.singleton(dirtyPart));
+				if (elements == null) {
+					return Save.CANCEL;
+				}
+				return elements.length == 0 ? Save.NO : Save.YES;
 			}
-		}
-		return image;
+
+			@Override
+			public Save[] promptToSave(Collection<MPart> dirtyParts) {
+				List<MPart> parts = new ArrayList<>(dirtyParts);
+				Shell shell = (Shell) application.getContext().get(IServiceConstants.ACTIVE_SHELL);
+				Save[] response = new Save[dirtyParts.size()];
+				Object[] elements = promptForSave(shell, parts);
+				if (elements == null) {
+					Arrays.fill(response, Save.CANCEL);
+				} else {
+					Arrays.fill(response, Save.NO);
+					for (int i = 0; i < elements.length; i++) {
+						response[parts.indexOf(elements[i])] = Save.YES;
+					}
+				}
+				return response;
+			}
+		};
+		saveHandler.logger = logger;
+		application.getContext().set(ISaveHandler.class, saveHandler);
 	}
 
-	private void setCloseHandler(MWindow window) {
-		IEclipseContext context = window.getContext();
-		// no direct model parent, must be a detached window
-		if (window.getParent() == null) {
-			context.set(IWindowCloseHandler.class,
-					new IWindowCloseHandler() {
-						@Override
-						public boolean close(MWindow window) {
-							return closeDetachedWindow(window);
-						}
-					});
-		} else {
-			context.set(IWindowCloseHandler.class,
-					new IWindowCloseHandler() {
-						@Override
-						public boolean close(MWindow window) {
-							EPartService partService = window.getContext().get(EPartService.class);
-							return partService.saveAll(true);
-						}
-					});
-		}
+	void installCloseHandler(MApplication application) {
+		IEclipseContext context = application.getContext();
+		context.set(IWindowCloseHandler.class, new IWindowCloseHandler() {
+
+			@Override
+			public boolean close(MWindow window) {
+				if (window.getParent() == null) {
+					// no direct model parent, must be a detached window
+					return closeDetachedWindow(window);
+				}
+
+				EPartService partService = window.getContext().get(EPartService.class);
+				return partService.saveAll(true);
+			}
+		});
 	}
 
 	@Override
