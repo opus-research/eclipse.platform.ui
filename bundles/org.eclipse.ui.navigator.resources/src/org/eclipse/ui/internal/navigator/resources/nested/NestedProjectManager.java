@@ -56,12 +56,12 @@ public class NestedProjectManager {
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(new IResourceChangeListener() {
 			@Override
 			public void resourceChanged(IResourceChangeEvent event) {
-				if (event.getType() == IResourceChangeEvent.POST_CHANGE
-						&& event.getDelta().getResource().getType() == IResource.PROJECT) {
+				if (event.getDelta().getResource().getType() == IResource.PROJECT
+						|| event.getDelta().getResource().getType() == IResource.ROOT) {
 					refreshProjectsList();
 				}
 			}
-		});
+		}, IResourceChangeEvent.POST_CHANGE);
 	}
 
 	private void refreshProjectsListIfNeeded() {
@@ -125,6 +125,7 @@ public class NestedProjectManager {
 		if (!project.exists()) {
 			return false;
 		}
+		refreshProjectsListIfNeeded();
 		IPath location = project.getLocation();
 		if (location == null) {
 			return false;
@@ -144,6 +145,7 @@ public class NestedProjectManager {
 		if (location == null) {
 			return null;
 		}
+		refreshProjectsListIfNeeded();
 		IProject mostDirectParentProject = null;
 		IPath queriedLocation = location.removeLastSegments(1);
 		while (mostDirectParentProject == null && queriedLocation.segmentCount() > 0) {
@@ -179,6 +181,7 @@ public class NestedProjectManager {
 			IWorkspaceRoot root = (IWorkspaceRoot) container;
 			return root.getProjects();
 		}
+		refreshProjectsListIfNeeded();
 		Set<IProject> res = new HashSet<>();
 		IPath containerLocation = container.getLocation();
 		IPath projectLocation = container.getProject().getLocation();
@@ -209,6 +212,7 @@ public class NestedProjectManager {
 			IWorkspaceRoot root = (IWorkspaceRoot) container;
 			return root.getProjects().length > 0;
 		}
+		refreshProjectsListIfNeeded();
 		IPath containerLocation = container.getLocation();
 		IPath projectLocation = container.getProject().getLocation();
 		if (containerLocation == null || projectLocation == null) {
