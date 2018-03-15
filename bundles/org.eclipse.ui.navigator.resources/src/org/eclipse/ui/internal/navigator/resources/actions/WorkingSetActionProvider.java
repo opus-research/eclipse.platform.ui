@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     anton.leherbauer@windriver.com - bug 212389 [CommonNavigator] working set issues:
  *         missing project, window working set inconsistency
- *     Mickael Istria (Red Hat Inc.) - [266030] Allow "others" working set
  *******************************************************************************/
 
 package org.eclipse.ui.internal.navigator.resources.actions;
@@ -286,13 +285,7 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 				new Status(IStatus.ERROR, WorkbenchNavigatorPlugin.PLUGIN_ID, ""));  //$NON-NLS-1$
 			return;
 		}
-		if (extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS)) {
-			// do not need filter when working sets are used for grouping
-			// a filter would hide the "Others" working set content
-			workingSetFilter.setWorkingSet(null);
-		} else {
-			workingSetFilter.setWorkingSet(emptyWorkingSet ? null : workingSet);
-		}
+		workingSetFilter.setWorkingSet(emptyWorkingSet ? null : workingSet);
 	}
 
 	/**
@@ -314,17 +307,16 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 
 		if (viewer != null) {
 			setWorkingSetFilter(workingSet);
-			if (!extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS)) {
+			if (workingSet == null || emptyWorkingSet
+					|| !extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS)) {
 				if (viewer.getInput() != originalViewerInput) {
 					viewer.setInput(originalViewerInput);
 				} else {
 					viewer.refresh();
 				}
 			} else {
-				IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
-				if (workingSet == null) {
-					viewer.setInput(workingSetManager.createAggregateWorkingSet("", "", new IWorkingSet[] {})); //$NON-NLS-1$ //$NON-NLS-2$
-				} else if (!workingSet.isAggregateWorkingSet()) {
+				if (!workingSet.isAggregateWorkingSet()) {
+					IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
 					viewer.setInput(workingSetManager.createAggregateWorkingSet(
 							"", "", new IWorkingSet[] { workingSet })); //$NON-NLS-1$ //$NON-NLS-2$
 				} else {
