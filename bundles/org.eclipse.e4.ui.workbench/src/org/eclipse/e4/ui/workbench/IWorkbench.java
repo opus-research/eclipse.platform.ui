@@ -15,8 +15,6 @@ import java.net.URI;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 
 /**
  * A running instance of the workbench.
@@ -101,42 +99,6 @@ public interface IWorkbench {
 	 * @since 1.4
 	 */
 	public final static String APPLICATION_CONTEXT_KEY = "applicationContext"; //$NON-NLS-1$
-
-	/**
-	 * This tag is used to specify whether an {@link MPart} or
-	 * {@link MPlaceholder} are shown on top, which means the contents of it can
-	 * be seen in the UI.
-	 * <p>
-	 * This means clients easily find on top elements with this tag and can also
-	 * react on these changes by listening to tag changes.
-	 * </p>
-	 *
-	 * <pre>
-	 * &#64;Inject
-	 * &#64;Optional
-	 * private void subscribeTopicTagsChanged(&#64;UIEventTopic(UIEvents.ApplicationElement.TOPIC_TAGS) Event event) {
-	 * 	Object changedObj = event.getProperty(EventTags.ELEMENT);
-	 *
-	 * 	if (!(changedObj instanceof MUIElement))
-	 * 		return;
-	 *
-	 * 	final MUIElement changedElement = (MUIElement) changedObj;
-	 *
-	 * 	if (UIEvents.isADD(event)) {
-	 * 		if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE, IPresentationEngine.ON_TOP)) {
-	 * 			// element is on top now
-	 * 		}
-	 * 	} else if (UIEvents.isREMOVE(event)) {
-	 * 		if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE, IPresentationEngine.ON_TOP)) {
-	 * 			// element is not on top any more
-	 * 		}
-	 * 	}
-	 * }
-	 * </pre>
-	 *
-	 * @since 1.4
-	 */
-	public static final String ON_TOP = "elementOnTop"; //$NON-NLS-1$
 
 	/**
 	 * Close the workbench instance
