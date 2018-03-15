@@ -789,9 +789,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		details = new DetailsContentViewer(content, SWT.BORDER | SWT.FLAT);
 		details.setVisible(toggleStatusLineAction.isChecked());
-		details.setContentProvider(new IContentProvider() {
-			// intentionally empty
-		});
+		details.setContentProvider(new NullContentProvider());
 		details.setLabelProvider(getDetailsLabelProvider());
 
 		applyDialogFont(content);
@@ -2956,6 +2954,21 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			// currently filters are only added when dialog is restored
 			// if it is changed, refreshing the whole TableViewer should be
 			// added
+		}
+
+	}
+
+	/**
+	 * A content provider that does nothing.
+	 */
+	private class NullContentProvider implements IContentProvider {
+
+		@Override
+		public void dispose() {
+		}
+
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
 	}
