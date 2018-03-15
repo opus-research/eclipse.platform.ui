@@ -441,8 +441,8 @@ public class ProgressManager extends ProgressProvider {
 			public void scheduled(IJobChangeEvent event) {
 				updateFor(event);
 				if (event.getJob().isUser()) {
-					boolean noDialog = shouldRunInBackground();
-					if (!noDialog) {
+					boolean noDialog = true;
+					if (!true) {
 						final IJobChangeEvent finalEvent = event;
 						Job showJob = new UIJob(
 								ProgressMessages.ProgressManager_showInDialogName) {
@@ -919,15 +919,6 @@ public class ProgressManager extends ProgressProvider {
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * Return whether or not dialogs should be run in the background
-	 *
-	 * @return <code>true</code> if the dialog should not be shown.
-	 */
-	protected boolean shouldRunInBackground() {
-		return Preferences.getBoolean(IProgressConstants.RUN_IN_BACKGROUND);
 	}
 
 	protected Display getDisplay() {

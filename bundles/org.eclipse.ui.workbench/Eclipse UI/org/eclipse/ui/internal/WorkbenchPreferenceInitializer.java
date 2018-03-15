@@ -49,7 +49,6 @@ public class WorkbenchPreferenceInitializer extends AbstractPreferenceInitialize
 		IEclipsePreferences node = context.getNode(WorkbenchPlugin
 				.getDefault().getBundle().getSymbolicName());
 
-		node.putBoolean(IPreferenceConstants.RUN_IN_BACKGROUND, true);
 		node.putBoolean(IPreferenceConstants.SHOULD_PROMPT_FOR_ENABLEMENT, true);
 
 		node.putBoolean(IPreferenceConstants.EDITORLIST_PULLDOWN_ACTIVE, false);

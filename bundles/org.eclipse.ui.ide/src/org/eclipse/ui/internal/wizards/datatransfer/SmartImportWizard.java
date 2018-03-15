@@ -54,8 +54,8 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 
 	/**
 	 * Expands an archive onto provided filesystem directory
-	 * @since 3.12
 	 *
+	 * @since 3.12
 	 */
 	private static final class ExpandArchiveIntoFilesystemOperation implements IRunnableWithProgress {
 		private File archive;
@@ -240,7 +240,6 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 		SmartImportJob job = getImportJob();
 		if (projectRootPage.isDetectNestedProject() || projectRootPage.isConfigureProjects()) {
 			SmartImportJobReportDialog dialog = new SmartImportJobReportDialog(null);
-			dialog.setBlockOnOpen(false);
 			getContainer().getShell().setEnabled(false);
 			dialog.show(job, getShell());
 		}
