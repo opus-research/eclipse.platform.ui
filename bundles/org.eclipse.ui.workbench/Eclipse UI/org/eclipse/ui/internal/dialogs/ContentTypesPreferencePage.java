@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -29,6 +30,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -88,6 +90,10 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 	private Button setButton;
 
 	private IWorkbench workbench;
+
+	private Button removeContentTypeButton;
+
+	private Button addChildContentTypeButton;
 
 	private class Spec {
 		String name;
@@ -567,7 +573,6 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			contentTypesViewer.setComparator(new ViewerComparator());
 			contentTypesViewer.setInput(Platform.getContentTypeManager());
 			GridData data = new GridData(GridData.FILL_BOTH);
-			data.horizontalSpan = 2;
 			contentTypesViewer.getControl().setLayoutData(data);
 
 			contentTypesViewer
@@ -593,9 +598,67 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 							charsetField.setEnabled(contentType != null);
 							addButton.setEnabled(contentType != null);
 							setButton.setEnabled(false);
+
+							addChildContentTypeButton.setEnabled(contentType != null);
+							removeContentTypeButton.setEnabled(contentType != null && contentType.isUserDefined());
 						}
 					});
 		}
+		Composite buttonsComposite = new Composite(composite, SWT.NONE);
+		buttonsComposite.setLayoutData(new GridData(SWT.DEFAULT, SWT.TOP, false, false));
+		buttonsComposite.setLayout(new GridLayout(1, false));
+		Button addRootContentTypeButton = new Button(buttonsComposite, SWT.PUSH);
+		setButtonLayoutData(addRootContentTypeButton);
+		addRootContentTypeButton.setText(WorkbenchMessages.ContentTypes_addRootContentTypeButton);
+		addRootContentTypeButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String id = "userCreated" + System.currentTimeMillis(); //$NON-NLS-1$
+				IContentTypeManager manager = (IContentTypeManager) contentTypesViewer.getInput();
+				try {
+					IContentType mewCcontentType = manager.addContentType(id, id, null);
+					contentTypesViewer.refresh();
+					contentTypesViewer.setSelection(new StructuredSelection(mewCcontentType));
+				} catch (CoreException e1) {
+					MessageDialog.openError(getShell(), "Failed", e1.getMessage());
+				}
+			}
+		});
+		addChildContentTypeButton = new Button(buttonsComposite, SWT.PUSH);
+		setButtonLayoutData(addChildContentTypeButton);
+		addChildContentTypeButton.setText(WorkbenchMessages.ContentTypes_addChildContentTypeButton);
+		addChildContentTypeButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String id = "userCreated" + System.currentTimeMillis(); //$NON-NLS-1$
+				IContentTypeManager manager = (IContentTypeManager) contentTypesViewer.getInput();
+				try {
+					IContentType newContentType = manager.addContentType(id, id, getSelectedContentType());
+					contentTypesViewer.refresh(getSelectedContentType());
+					contentTypesViewer.setSelection(new StructuredSelection(newContentType));
+				} catch (CoreException e1) {
+					MessageDialog.openError(getShell(), "Failed", e1.getMessage());
+				}
+			}
+		});
+		addChildContentTypeButton.setEnabled(getSelectedContentType() != null);
+		removeContentTypeButton = new Button(buttonsComposite, SWT.PUSH);
+		setButtonLayoutData(removeContentTypeButton);
+		removeContentTypeButton.setText(WorkbenchMessages.ContentTypes_removeContentTypeButton);
+		removeContentTypeButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IContentType selectedContentType = getSelectedContentType();
+				try {
+					Platform.getContentTypeManager().removeContentType(selectedContentType);
+					contentTypesViewer.refresh();
+				} catch (CoreException e1) {
+					MessageDialog.openError(getShell(), "Failed", e1.getMessage());
+				}
+			}
+		});
+		removeContentTypeButton
+				.setEnabled(getSelectedContentType() != null && getSelectedContentType().isUserDefined());
 	}
 
 	@Override

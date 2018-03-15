@@ -899,6 +899,9 @@ public class WorkbenchMessages extends NLS {
     public static String ContentTypes_editDialog_messageHeader;
     public static String ContentTypes_editDialog_message;
     public static String ContentTypes_editDialog_label;
+	public static String ContentTypes_addRootContentTypeButton;
+	public static String ContentTypes_addChildContentTypeButton;
+	public static String ContentTypes_removeContentTypeButton;
     public static String Edit;
 
     // =========================================================================
