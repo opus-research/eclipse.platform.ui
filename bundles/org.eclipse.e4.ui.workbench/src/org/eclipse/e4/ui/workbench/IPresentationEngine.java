@@ -235,9 +235,8 @@ public interface IPresentationEngine {
 	public static final String ACTIVE = "active"; //$NON-NLS-1$
 
 	/**
-	 * When applied as a tag to an MPartDescriptor marks the part as not restorable.
-	 *
-	 * @since 1.6
+	 * When applied as a tag to an MPartDescriptor marks the part as not
+	 * restorable.
 	 */
 	public static final String NO_RESTORE = "NoRestore"; //$NON-NLS-1$
 
