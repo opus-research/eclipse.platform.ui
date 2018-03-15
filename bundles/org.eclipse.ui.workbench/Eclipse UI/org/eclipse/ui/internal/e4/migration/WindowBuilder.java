@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
@@ -315,12 +314,11 @@ public class WindowBuilder {
 		}
 
 		// restore order of editors in stacks
-		for (Entry<MPartStack, InfoReader> entry : stackToReader.entrySet()) {
-			MPartStack editorStack = entry.getKey();
+		for (MPartStack editorStack : stackToReader.keySet()) {
 			if (editorStack.getChildren().size() < 2) {
 				continue;
 			}
-			InfoReader stackReader = entry.getValue();
+			InfoReader stackReader = stackToReader.get(editorStack);
 			if (stackReader == null) {
 				continue;
 			}

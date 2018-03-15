@@ -38,7 +38,6 @@ public class MenuService implements EMenuService {
 					&& mmenu instanceof MPopupMenu) {
 				Menu menu = registerMenu(parentControl, (MPopupMenu) mmenu, myPart.getContext());
 				if (menu != null) {
-					parentControl.setMenu(menu);
 					return true;
 				}
 				return false;

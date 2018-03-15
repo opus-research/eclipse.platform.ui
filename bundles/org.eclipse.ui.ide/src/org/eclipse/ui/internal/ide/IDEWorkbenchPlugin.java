@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 
 package org.eclipse.ui.internal.ide;
@@ -92,11 +91,6 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
      * Marker image registry; lazily initialized.
      */
     private MarkerImageProviderRegistry markerImageProviderRegistry = null;
-
-	/**
-	 * Unassociated file/editor strategy registry; lazily initialized
-	 */
-	private UnassociatedEditorStrategyRegistry unassociatedEditorStrategyRegistry = null;
 
 	private ResourceManager resourceManager;
 
@@ -211,7 +205,7 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
      */
     public static void log(Class clazz, String methodName, Throwable t) {
         String msg = MessageFormat.format("Exception in {0}.{1}: {2}", //$NON-NLS-1$
-				clazz.getName(), methodName, t);
+                new Object[] { clazz.getName(), methodName, t });
         log(msg, t);
     }
 
@@ -268,17 +262,6 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
         return markerImageProviderRegistry;
     }
 
-	/**
-	 * Returns the unassociated file/editor strategy registry for the workbench.
-	 *
-	 * @return the unassociated file/editor strategy registry
-	 */
-	public synchronized UnassociatedEditorStrategyRegistry getUnassociatedEditorStrategyRegistry() {
-		if (unassociatedEditorStrategyRegistry == null) {
-			unassociatedEditorStrategyRegistry = new UnassociatedEditorStrategyRegistry();
-		}
-		return unassociatedEditorStrategyRegistry;
-	}
 
     /**
      * Returns the about information of all known features,

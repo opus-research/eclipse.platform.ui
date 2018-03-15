@@ -789,9 +789,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		details = new DetailsContentViewer(content, SWT.BORDER | SWT.FLAT);
 		details.setVisible(toggleStatusLineAction.isChecked());
-		details.setContentProvider(new IContentProvider() {
-			// intentionally empty
-		});
+		details.setContentProvider(new NullContentProvider());
 		details.setLabelProvider(getDetailsLabelProvider());
 
 		applyDialogFont(content);
@@ -848,7 +846,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 					.setInput(NLS
 							.bind(
 									WorkbenchMessages.FilteredItemsSelectionDialog_nItemsSelected,
-									Integer.valueOf(selection.size())));
+									new Integer(selection.size())));
 			break;
 		}
 
@@ -1543,7 +1541,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		private ILabelDecorator selectionDecorator;
 
 		// Need to keep our own list of listeners
-		private ListenerList<ILabelProviderListener> listeners = new ListenerList<>();
+		private ListenerList listeners = new ListenerList();
 
 		/**
 		 * Creates a new instance of the class.
@@ -1786,8 +1784,9 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		@Override
 		public void labelProviderChanged(LabelProviderChangedEvent event) {
-			for (ILabelProviderListener l : listeners) {
-				l.labelProviderChanged(event);
+			Object[] l = listeners.getListeners();
+			for (int i = 0; i < listeners.size(); i++) {
+				((ILabelProviderListener) l[i]).labelProviderChanged(event);
 			}
 		}
 	}
@@ -1926,7 +1925,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 							WorkbenchMessages.FilteredItemsSelectionDialog_taskProgressMessage,
 							new Object[] {
 									message,
-									Integer.valueOf((int) ((worked * 100) / totalWork)) });
+									new Integer(
+											(int) ((worked * 100) / totalWork)) });
 
 		}
 
@@ -2954,6 +2954,21 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			// currently filters are only added when dialog is restored
 			// if it is changed, refreshing the whole TableViewer should be
 			// added
+		}
+
+	}
+
+	/**
+	 * A content provider that does nothing.
+	 */
+	private class NullContentProvider implements IContentProvider {
+
+		@Override
+		public void dispose() {
+		}
+
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
 	}

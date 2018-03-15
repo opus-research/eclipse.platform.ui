@@ -29,14 +29,18 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -361,38 +365,52 @@ public class FormText extends Canvas {
 		super(parent, SWT.NO_BACKGROUND | SWT.WRAP | style);
 		setLayout(new FormTextLayout());
 		model = new FormTextModel();
-		addDisposeListener(e -> {
-			model.dispose();
-			disposeResourceTable(true);
-		});
-		addPaintListener(e -> paint(e));
-		addListener(SWT.KeyDown, e -> {
-			if (e.character == '\r') {
-				activateSelectedLink();
-				return;
+		addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				model.dispose();
+				disposeResourceTable(true);
 			}
 		});
-		addListener(SWT.Traverse, e -> {
-			if (DEBUG_FOCUS)
-				System.out.println("Traversal: " + e); //$NON-NLS-1$
-			switch (e.detail) {
-			case SWT.TRAVERSE_PAGE_NEXT:
-			case SWT.TRAVERSE_PAGE_PREVIOUS:
-			case SWT.TRAVERSE_ARROW_NEXT:
-			case SWT.TRAVERSE_ARROW_PREVIOUS:
-				e.doit = false;
-				return;
+		addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent e) {
+				paint(e);
 			}
-			if (!model.hasFocusSegments()) {
-				e.doit = true;
-				return;
+		});
+		addListener(SWT.KeyDown, new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				if (e.character == '\r') {
+					activateSelectedLink();
+					return;
+				}
 			}
-			if (e.detail == SWT.TRAVERSE_TAB_NEXT)
-				e.doit = advance(true);
-			else if (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)
-				e.doit = advance(false);
-			else if (e.detail != SWT.TRAVERSE_RETURN)
-				e.doit = true;
+		});
+		addListener(SWT.Traverse, new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				if (DEBUG_FOCUS)
+					System.out.println("Traversal: " + e); //$NON-NLS-1$
+				switch (e.detail) {
+				case SWT.TRAVERSE_PAGE_NEXT:
+				case SWT.TRAVERSE_PAGE_PREVIOUS:
+				case SWT.TRAVERSE_ARROW_NEXT:
+				case SWT.TRAVERSE_ARROW_PREVIOUS:
+					e.doit = false;
+					return;
+				}
+				if (!model.hasFocusSegments()) {
+					e.doit = true;
+					return;
+				}
+				if (e.detail == SWT.TRAVERSE_TAB_NEXT)
+					e.doit = advance(true);
+				else if (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)
+					e.doit = advance(false);
+				else if (e.detail != SWT.TRAVERSE_RETURN)
+					e.doit = true;
+			}
 		});
 		addFocusListener(new FocusListener() {
 			@Override
@@ -458,7 +476,12 @@ public class FormText extends Canvas {
 				handleMouseHover(e);
 			}
 		});
-		addMouseMoveListener(e -> handleMouseMove(e));
+		addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void mouseMove(MouseEvent e) {
+				handleMouseMove(e);
+			}
+		});
 		initAccessible();
 		ensureBoldFontPresent(getFont());
 		createMenu();
@@ -694,32 +717,36 @@ public class FormText extends Canvas {
 		Paragraph[] paragraphs = model.getParagraphs();
 		if (paragraphs == null)
 			return;
-		Listener listener = e -> {
-			switch (e.type) {
-			case SWT.FocusIn:
-				if (!controlFocusTransfer)
-					syncControlSegmentFocus((Control) e.widget);
-				break;
-			case SWT.Traverse:
-				if (DEBUG_FOCUS)
-					System.out.println("Control traversal: " + e); //$NON-NLS-1$
-				switch (e.detail) {
-				case SWT.TRAVERSE_PAGE_NEXT:
-				case SWT.TRAVERSE_PAGE_PREVIOUS:
-				case SWT.TRAVERSE_ARROW_NEXT:
-				case SWT.TRAVERSE_ARROW_PREVIOUS:
-					e.doit = false;
-					return;
+		Listener listener = new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				switch (e.type) {
+				case SWT.FocusIn:
+					if (!controlFocusTransfer)
+						syncControlSegmentFocus((Control) e.widget);
+					break;
+				case SWT.Traverse:
+					if (DEBUG_FOCUS)
+						System.out.println("Control traversal: " + e); //$NON-NLS-1$
+					switch (e.detail) {
+					case SWT.TRAVERSE_PAGE_NEXT:
+					case SWT.TRAVERSE_PAGE_PREVIOUS:
+					case SWT.TRAVERSE_ARROW_NEXT:
+					case SWT.TRAVERSE_ARROW_PREVIOUS:
+						e.doit = false;
+						return;
+					}
+					Control c = (Control) e.widget;
+					ControlSegment segment = (ControlSegment) c
+							.getData(CONTROL_KEY);
+					if (e.detail == SWT.TRAVERSE_TAB_NEXT)
+						e.doit = advanceControl(c, segment, true);
+					else if (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)
+						e.doit = advanceControl(c, segment, false);
+					if (!e.doit)
+						e.detail = SWT.TRAVERSE_NONE;
+					break;
 				}
-				Control c = (Control) e.widget;
-				ControlSegment segment = (ControlSegment) c.getData(CONTROL_KEY);
-				if (e.detail == SWT.TRAVERSE_TAB_NEXT)
-					e.doit = advanceControl(c, segment, true);
-				else if (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)
-					e.doit = advanceControl(c, segment, false);
-				if (!e.doit)
-					e.detail = SWT.TRAVERSE_NONE;
-				break;
 			}
 		};
 		for (Paragraph p : paragraphs) {
@@ -1249,7 +1276,7 @@ public class FormText extends Canvas {
 				int linkCount = model.getHyperlinkCount();
 				Object[] children = new Object[linkCount];
 				for (int i = 0; i < linkCount; i++) {
-					children[i] = Integer.valueOf(i);
+					children[i] = new Integer(i);
 				}
 				e.children = children;
 			}
