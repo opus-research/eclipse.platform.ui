@@ -197,8 +197,8 @@ public abstract class ObservableCollectionTreeContentProvider implements
 	private Object[] getChildren(Object element, boolean input) {
 		TreeNode node = getOrCreateNode(element, input);
 		Object[] children = node.getChildren().toArray();
-		for (Object childElement : children)
-			getOrCreateNode(childElement, false).addParent(element);
+		for (Object element2 : children)
+			getOrCreateNode(element2, false).addParent(element);
 		knownElements.addAll(node.getChildren());
 		asyncUpdateRealizedElements();
 		return children;

@@ -289,13 +289,13 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 	@Override
 	protected Widget doFindItem(Object element) {
 		Control[] existingChildren = control.getChildren();
-		for (Control controlElement : existingChildren) {
-			if (controlElement.isDisposed()
-					|| controlElement.getData() == null) {
+		for (Control element2 : existingChildren) {
+			if (element2.isDisposed()
+					|| element2.getData() == null) {
 				continue;
 			}
-			if (controlElement.getData().equals(element)) {
-				return controlElement;
+			if (element2.getData().equals(element)) {
+				return element2;
 			}
 		}
 		return null;
