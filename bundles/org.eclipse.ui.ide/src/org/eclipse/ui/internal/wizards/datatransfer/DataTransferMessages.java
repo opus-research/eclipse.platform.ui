@@ -183,7 +183,6 @@ public class DataTransferMessages extends NLS {
 	public static String SmartImportProposals_selectionSummary;
 	public static String SmartImportProposals_folder;
 	public static String SmartImportProposals_importAs;
-	public static String SmartImportProposals_hideExistingProjects;
 
 	public static String SmartImportReport_importedProjects;
 	public static String SmartImportReport_importedProjectsWithCount;
