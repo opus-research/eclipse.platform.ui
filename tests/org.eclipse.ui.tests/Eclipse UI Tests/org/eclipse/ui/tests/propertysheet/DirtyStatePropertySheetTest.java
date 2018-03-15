@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.ISaveablePart;
-import org.eclipse.ui.ISecondarySaveableSource;
+import org.eclipse.ui.internal.ISecondarySaveableSource;
 import org.eclipse.ui.views.properties.PropertySheet;
 import org.eclipse.ui.views.properties.PropertySheetPage;
 import org.junit.Test;
@@ -76,7 +76,7 @@ public class DirtyStatePropertySheetTest extends AbstractPropertySheetTest {
         };
         adapterFactory = new MockAdapterFactory();
         propertySheet = (PropertySheet) activePage.showView(IPageLayout.ID_PROP_SHEET);
-		saveableView = (AdaptingSaveableView) activePage.showView(AdaptingSaveableView.ID_ADAPTING_SAVEABLE);
+        saveableView = (AdaptingSaveableView) activePage.showView(AdaptingSaveableView.ID);
 
         // some basic checks
         assertEquals(activePage.getActivePart(), saveableView);
