@@ -149,8 +149,8 @@ public class AnimationManager {
                 jobs.clear();
                 setAnimated(false);
                 JobInfo[] currentInfos = manager.getJobInfos(showsDebug());
-                for (int i = 0; i < currentInfos.length; i++) {
-                    addJob(currentInfos[i]);
+                for (JobInfo currentInfo : currentInfos) {
+                    addJob(currentInfo);
                 }
             }
 

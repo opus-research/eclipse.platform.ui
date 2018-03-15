@@ -161,9 +161,9 @@ public final class EditorDescriptor implements IEditorDescriptor, Serializable,
     private static Program findProgram(String programName) {
 
         Program[] programs = Program.getPrograms();
-        for (int i = 0; i < programs.length; i++) {
-            if (programs[i].getName().equals(programName)) {
-				return programs[i];
+        for (Program program2 : programs) {
+            if (program2.getName().equals(programName)) {
+				return program2;
 			}
         }
 

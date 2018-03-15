@@ -42,9 +42,7 @@ public final class PreferencesAdapter extends PropertyMapAdapter {
 
         String[] names = store.propertyNames();
 
-        for (int i = 0; i < names.length; i++) {
-            String string = names[i];
-
+        for (String string : names) {
             result.add(string);
         }
 

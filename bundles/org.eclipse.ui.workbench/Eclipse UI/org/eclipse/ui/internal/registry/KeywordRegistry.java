@@ -62,19 +62,19 @@ public final class KeywordRegistry implements IExtensionChangeHandler {
 		IExtensionTracker tracker = PlatformUI.getWorkbench().getExtensionTracker();
         tracker.registerHandler(this, ExtensionTracker.createExtensionPointFilter(getExtensionPointFilter()));
 		IExtension[] extensions = getExtensionPointFilter().getExtensions();
-		for (int i = 0; i < extensions.length; i++) {
+		for (IExtension extension : extensions) {
 			addExtension(PlatformUI.getWorkbench().getExtensionTracker(),
-					extensions[i]);
+					extension);
 		}
 	}
 
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		IConfigurationElement[] elements = extension.getConfigurationElements();
-		for (int i = 0; i < elements.length; i++) {
-			if (elements[i].getName().equals(TAG_KEYWORD)) {
-				String name = elements[i].getAttribute(ATT_LABEL);
-				String id = elements[i].getAttribute(ATT_ID);
+		for (IConfigurationElement element : elements) {
+			if (element.getName().equals(TAG_KEYWORD)) {
+				String name = element.getAttribute(ATT_LABEL);
+				String id = element.getAttribute(ATT_ID);
 				internalKeywordMap.put(id, name);
 				PlatformUI.getWorkbench().getExtensionTracker().registerObject(
 						extension, id, IExtensionTracker.REF_WEAK);
@@ -99,9 +99,9 @@ public final class KeywordRegistry implements IExtensionChangeHandler {
 
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (int i = 0; i < objects.length; i++) {
-			if (objects[i] instanceof String) {
-				internalKeywordMap.remove(objects[i]);
+		for (Object object : objects) {
+			if (object instanceof String) {
+				internalKeywordMap.remove(object);
 			}
 		}
 	}

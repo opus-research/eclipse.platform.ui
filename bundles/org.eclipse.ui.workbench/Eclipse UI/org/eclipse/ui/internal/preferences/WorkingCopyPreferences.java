@@ -95,14 +95,14 @@ public class WorkingCopyPreferences extends EventManager implements
 
 		// clear all values (long way so people get notified)
 		String[] keys = keys();
-		for (int i = 0; i < keys.length; i++) {
-			remove(keys[i]);
+		for (String key : keys) {
+			remove(key);
 		}
 
 		// remove children
 		String[] childNames = childrenNames();
-		for (int i = 0; i < childNames.length; i++) {
-			node(childNames[i]).removeNode();
+		for (String childName : childNames) {
+			node(childName).removeNode();
 		}
 
 		// mark as removed
@@ -123,8 +123,8 @@ public class WorkingCopyPreferences extends EventManager implements
 			return;
 		}
 		String[] childNames = childrenNames();
-		for (int i = 0; i < childNames.length; i++) {
-			((IEclipsePreferences) node(childNames[i])).accept(visitor);
+		for (String childName : childNames) {
+			((IEclipsePreferences) node(childName)).accept(visitor);
 		}
 	}
 
@@ -152,8 +152,8 @@ public class WorkingCopyPreferences extends EventManager implements
 			return;
 		}
 		PreferenceChangeEvent event = new PreferenceChangeEvent(this, key, oldValue, newValue);
-		for (int i = 0; i < listeners.length; i++) {
-			((IPreferenceChangeListener) listeners[i]).preferenceChange(event);
+		for (Object listener : listeners) {
+			((IPreferenceChangeListener) listener).preferenceChange(event);
 		}
 	}
 
