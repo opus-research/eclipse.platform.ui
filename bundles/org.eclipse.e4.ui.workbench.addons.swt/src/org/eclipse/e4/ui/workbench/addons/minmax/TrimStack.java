@@ -1111,7 +1111,11 @@ public class TrimStack {
 			fixToolItemSelection();
 		} else if (!show && isShowing) {
 			if (cachedUseOverlays) {
-				clientAreaComposite.removeControlListener(caResizeListener);
+				// Check to ensure that the client area is non-null since the
+				// trimstack may be currently hosted in the limbo shell
+				if (clientAreaComposite != null) {
+					clientAreaComposite.removeControlListener(caResizeListener);
+				}
 
 				ctrl.setParent(originalParent);
 
