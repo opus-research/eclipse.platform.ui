@@ -155,7 +155,7 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 				.observeSingleSelection(listViewer);
 
 		selectedLodgingObservable.setValue(null);
-		assertTrue(listViewer.getStructuredSelection().isEmpty());
+		assertTrue(listViewer.getSelection().isEmpty());
 
 		ComputedValue selectionExistsObservable = new ComputedValue(
 				boolean.class) {

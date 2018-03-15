@@ -12,6 +12,7 @@
 package org.eclipse.ui.internal;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.graphics.Color;
@@ -68,6 +69,7 @@ public class MessageLine extends CLabel {
             if (message != null && message.length() > 0) {
                 setText(message);
                 setImage(findImage(status));
+				super.setBackground(JFaceColors.getErrorBackground(getDisplay()));
                 return;
             }
         }

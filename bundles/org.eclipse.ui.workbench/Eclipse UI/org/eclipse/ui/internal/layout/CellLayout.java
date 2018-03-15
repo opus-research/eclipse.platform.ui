@@ -636,7 +636,9 @@ public class CellLayout extends Layout {
                         // Determine which controls are in this row
                         gridInfo.getRow(rowControls, idx, computingRows);
 
-                        for (int control : rowControls) {
+                        for (int colIdx = 0; colIdx < rowControls.length; colIdx++) {
+                            int control = rowControls[colIdx];
+
                             // The getRow method will insert -1 into empty cells... skip these.
                             if (control != -1) {
                                 int controlStart = gridInfo.getStartPos(

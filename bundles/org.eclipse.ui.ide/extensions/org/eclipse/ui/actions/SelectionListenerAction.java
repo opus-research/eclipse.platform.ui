@@ -24,7 +24,6 @@ import org.eclipse.core.resources.mapping.ResourceTraversal;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
@@ -109,18 +108,17 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 		resources = null;
 		nonResources = null;
 
-		IStructuredSelection structuredSelection = getStructuredSelection();
-		// assume selection contains mostly resources most times
-		List<IResource> resourcesTmp = new ArrayList<>(structuredSelection.size());
-		List<Object> nonResourcesTmp = new ArrayList<>();
-
-		for (Iterator<?> e = structuredSelection.iterator(); e.hasNext();) {
+		for (Iterator<?> e = getStructuredSelection().iterator(); e.hasNext();) {
 			Object next = e.next();
 
 			IResource resource = Adapters.adapt(next, IResource.class);
 
 			if (resource != null) {
-				resourcesTmp.add(resource);
+				if (resources == null) {
+					// assume selection contains mostly resources most times
+					resources = new ArrayList<>(getStructuredSelection().size());
+				}
+				resources.add(resource);
 				continue;
 			}
 
@@ -136,12 +134,15 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 				}
 
 				if (traversals != null) {
-					for (ResourceTraversal traversal : traversals) {
-						IResource[] traversalResources = traversal.getResources();
+					for (int i = 0; i < traversals.length; i++) {
+						IResource[] traversalResources = traversals[i].getResources();
 						if (traversalResources != null) {
 							resourcesFoundForThisSelection = true;
-							for (IResource traversalResource : traversalResources) {
-								resourcesTmp.add(traversalResource);
+							if (resources == null) {
+								resources = new ArrayList<>(getStructuredSelection().size());
+							}
+							for (int j = 0; j < traversalResources.length; j++) {
+								resources.add(traversalResources[j]);
 							}
 						}
 					}
@@ -152,11 +153,12 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 				continue;
 			}
 
-			nonResourcesTmp.add(next);
+			if (nonResources == null) {
+				// assume selection contains mostly resources most times
+				nonResources = new ArrayList<>(1);
+			}
+			nonResources.add(next);
 		}
-
-		resources = resourcesTmp.isEmpty() ? null : resourcesTmp;
-		nonResources = nonResourcesTmp.isEmpty() ? null : nonResourcesTmp;
 	}
 
 	/**
@@ -172,12 +174,11 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 			selectionDirty = false;
 		}
 
-		List<Object> list = nonResources;
-		if (list == null) {
+		if (nonResources == null) {
 			return Collections.emptyList();
 		}
 
-		return list;
+		return nonResources;
 	}
 
 	/**
@@ -193,11 +194,10 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 			selectionDirty = false;
 		}
 
-		List<IResource> list = resources;
-		if (list == null) {
+		if (resources == null) {
 			return Collections.emptyList();
 		}
-		return list;
+		return resources;
 	}
 
 	/**
