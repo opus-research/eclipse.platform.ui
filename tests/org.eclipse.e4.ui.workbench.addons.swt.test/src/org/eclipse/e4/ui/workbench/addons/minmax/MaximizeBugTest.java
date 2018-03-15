@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -94,9 +93,6 @@ public class MaximizeBugTest {
 	private boolean addSubwindowToPerspective;
 	private Shell shell;
 	private MTrimmedWindow windowSub;
-	private IEclipseContext appContext;
-	private IPresentationEngine renderer;
-	private MTrimmedWindow window;
 
 	public MaximizeBugTest(boolean useCorrectPlaceholderId,
 			boolean usePerspektiveInSubWindow, boolean maximizeMainFirst,
@@ -115,17 +111,14 @@ public class MaximizeBugTest {
 
 	@After
 	public void tearDown() {
-		renderer.removeGui(window);
-		renderer.stop();
 		shell.dispose();
-		appContext.dispose();
 	}
 
 	private void prepareApplicationModel() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 
-		window = BasicFactoryImpl.eINSTANCE
+		MTrimmedWindow window = BasicFactoryImpl.eINSTANCE
 				.createTrimmedWindow();
 		window.setElementId("MainWindow");
 		MPerspectiveStack perspectiveStackMain = AdvancedFactoryImpl.eINSTANCE
@@ -215,11 +208,10 @@ public class MaximizeBugTest {
 		partStackAreaSub.getChildren().add(partAreaSub);
 
 		windowSub.getSharedElements().add(areaSub);
-		if (addSubwindowToPerspective) {
+		if (addSubwindowToPerspective)
 			perspectiveMain.getWindows().add(windowSub);
-		} else {
+		else
 			window.getWindows().add(windowSub);
-		}
 		// set correct ids
 		if (useCorrectPlaceholderId) {
 			placeholderMain.setElementId("org.eclipse.ui.editorss");
@@ -235,18 +227,16 @@ public class MaximizeBugTest {
 		minMaxAddon
 				.setContributionURI("bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.minmax.MinMaxAddon"); //$NON-NLS-1$
 
-		appContext = E4Application.createDefaultContext();
+		IEclipseContext appContext = E4Application.createDefaultContext();
 		appContext.set(Display.class, Display.getDefault());
 		appContext.set(MApplication.class.getName(), application);
 		appContext.set(MWindow.class, window);
 		appContext.set(UISynchronize.class, new UISynchronize() {
 
-			@Override
 			public void syncExec(Runnable runnable) {
 				runnable.run();
 			}
 
-			@Override
 			public void asyncExec(Runnable runnable) {
 				runnable.run();
 			}
@@ -254,10 +244,10 @@ public class MaximizeBugTest {
 		appContext.set(EModelService.class, new ModelServiceImpl(appContext));
 
 		ContextInjectionFactory.setDefault(appContext);
-		renderer = ContextInjectionFactory.make(
+		IPresentationEngine newEngine = ContextInjectionFactory.make(
 				PartRenderingEngine.class, appContext);
 
-		appContext.set(IPresentationEngine.class, renderer);
+		appContext.set(IPresentationEngine.class, newEngine);
 		appContext
 				.set(EPartService.class, ContextInjectionFactory.make(
 						PartServiceImpl.class, appContext));
@@ -293,7 +283,7 @@ public class MaximizeBugTest {
 		appContext.set(CSSRenderingUtils.class, new CSSRenderingUtils());
 		E4Application.initializeServices(application);
 
-		shell = (Shell) renderer.createGui(window);
+		shell = (Shell) newEngine.createGui(window);
 	}
 
 	@Test

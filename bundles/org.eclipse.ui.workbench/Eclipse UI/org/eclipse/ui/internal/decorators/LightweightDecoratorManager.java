@@ -78,12 +78,8 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 			if (decorator == null) {
 				message = WorkbenchMessages.DecoratorError;
 			} else {
-				String name = decorator.getName();
-				if (name == null) {
-					// decorator definition is not accessible anymore
-					name = decorator.getId();
-				}
-				message = NLS.bind(WorkbenchMessages.DecoratorWillBeDisabled, name);
+				message = NLS.bind(WorkbenchMessages.DecoratorWillBeDisabled,
+						decorator.getName());
 			}
 			WorkbenchPlugin.log(message, status);
 			if (decorator != null) {
