@@ -248,21 +248,13 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	@Override
 	public void postStartup() {
-		try {
-			refreshFromLocal();
-			activateProxyService();
-			((Workbench) PlatformUI.getWorkbench()).registerService(
-					ISelectionConversionService.class,
-					new IDESelectionConversionService());
+		refreshFromLocal();
+		activateProxyService();
+		((Workbench) PlatformUI.getWorkbench()).registerService(ISelectionConversionService.class,
+				new IDESelectionConversionService());
 
-			initializeSettingsChangeListener();
-			Display.getCurrent().addListener(SWT.Settings,
-					settingsChangeListener);
-		} finally {
-			// Resume the job manager to allow background jobs to run.
-			// The job manager was suspended by the IDEApplication.start method.
-			Job.getJobManager().resume();
-		}
+		initializeSettingsChangeListener();
+		Display.getCurrent().addListener(SWT.Settings, settingsChangeListener);
 	}
 
 	/**
