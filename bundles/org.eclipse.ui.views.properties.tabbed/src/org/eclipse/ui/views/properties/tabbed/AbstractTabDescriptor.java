@@ -16,11 +16,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.graphics.Image;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import org.eclipse.ui.internal.views.properties.tabbed.TabbedPropertyViewPlugin;
 
 /**
  * An abstract implementation of a tab descriptor for the tabbed property view.
@@ -49,11 +47,10 @@ public abstract class AbstractTabDescriptor implements ITabDescriptor,
 		try {
 			return super.clone();
 		} catch (CloneNotSupportedException exception) {
-			Bundle bundle = FrameworkUtil.getBundle(AbstractTabDescriptor.class);
-			IStatus status = new Status(IStatus.ERROR,
-					bundle.getSymbolicName(), 666, exception
+			IStatus status = new Status(IStatus.ERROR, TabbedPropertyViewPlugin
+					.getPlugin().getBundle().getSymbolicName(), 666, exception
 					.getMessage(), exception);
-			Platform.getLog(bundle).log(status);
+			TabbedPropertyViewPlugin.getPlugin().getLog().log(status);
 		}
 		return null;
 	}
