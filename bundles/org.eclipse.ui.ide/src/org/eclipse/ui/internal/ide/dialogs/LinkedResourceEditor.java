@@ -939,7 +939,7 @@ return true;
 		try {
 			setLinkLocation(resource, location);
 		} catch (Exception e) {
-			IDEWorkbenchPlugin.log(e.getMessage(), e);
+			e.printStackTrace();
 		}
 		reparent(new IResource[] { resource });
 	}

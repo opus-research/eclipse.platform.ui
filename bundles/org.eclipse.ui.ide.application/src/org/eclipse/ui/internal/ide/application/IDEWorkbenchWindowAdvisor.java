@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 
 import org.eclipse.core.resources.IFile;
@@ -212,7 +213,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			}
 
 			// use of LinkedHashMap to preserve insertion order
-			LinkedHashMap<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
+			Map<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
 			buttonLabelToIdMap.put(IDEWorkbenchMessages.PromptOnExitDialog_button_label_exit, IDialogConstants.OK_ID);
 			buttonLabelToIdMap.put(IDialogConstants.CANCEL_LABEL, IDialogConstants.CANCEL_ID);
 			MessageDialogWithToggle dlg =

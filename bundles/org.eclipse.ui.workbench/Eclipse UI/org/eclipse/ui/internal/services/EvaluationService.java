@@ -78,7 +78,8 @@ public final class EvaluationService implements IEvaluationService {
 			}
 			// This ties tool item enablement to variable changes that can
 			// effect the enablement.
-			getEventBroker().send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
+			getEventBroker()
+					.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
 			return true;
 		}
 	};
@@ -298,7 +299,7 @@ public final class EvaluationService implements IEvaluationService {
 			}
 		}
 		endSourceChange(sourceNames);
-		eventBroker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
+		eventBroker.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
 	}
 
 	/**

@@ -207,6 +207,7 @@ public class WorkbenchStatusDialogManagerImpl {
 			WorkbenchPlugin.log(statusAdapter.getStatus());
 			// log the problem with status handling
 			WorkbenchPlugin.log(e);
+			e.printStackTrace();
 		}
 	}
 

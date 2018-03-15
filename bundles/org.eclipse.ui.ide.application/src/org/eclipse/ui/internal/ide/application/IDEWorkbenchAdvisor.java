@@ -235,6 +235,10 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	@Override
 	public void preStartup() {
+
+		// Suspend background jobs while we startup
+		Job.getJobManager().suspend();
+
 		// Register the build actions
 		IProgressService service = PlatformUI.getWorkbench()
 				.getProgressService();
@@ -258,9 +262,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			initializeSettingsChangeListener();
 			Display.getCurrent().addListener(SWT.Settings,
 					settingsChangeListener);
-		} finally {
-			// Resume the job manager to allow background jobs to run.
-			// The job manager was suspended by the IDEApplication.start method.
+		} finally {// Resume background jobs after we startup
 			Job.getJobManager().resume();
 		}
 	}

@@ -26,8 +26,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
 	AllLayoutTests.class,
 	AllUtilityTests.class,
-	AllWidgetsTests.class
-})
+	AllWidgetsTests.class })
 public class AllFormsTests {
 
 }
