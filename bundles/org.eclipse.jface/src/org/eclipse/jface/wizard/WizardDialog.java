@@ -1143,7 +1143,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 				createPageControls();
 				// Ensure the dialog is large enough for the wizard
 				updateSizeForWizard(wizard);
-				pageContainer.requestLayout();
+				pageContainer.layout(true);
 			}
 		} else {
 			// We have already seen this wizard, if it is the previous wizard

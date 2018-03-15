@@ -48,7 +48,7 @@ public class TrimBarRenderer extends SWTPartRenderer {
 			for (MTrimBar bar : barsToLayout) {
 				Composite trimCtrl = (Composite) bar.getWidget();
 				if (trimCtrl != null && !trimCtrl.isDisposed())
-					trimCtrl.requestLayout();
+					trimCtrl.layout();
 			}
 		}
 	}

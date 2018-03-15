@@ -352,7 +352,7 @@ public class MinMaxAddon {
 			@Override
 			public void run() {
 				if (!winShell.isDisposed()) {
-					winShell.requestLayout();
+					winShell.layout(true, true);
 				}
 			}
 		});
@@ -550,7 +550,7 @@ public class MinMaxAddon {
 				ctf.setMaximizeVisible(true);
 				ctf.setMinimized(false);
 				ctf.setMaximized(false);
-				ctf.requestLayout();
+				ctf.layout();
 			}
 		}
 	}

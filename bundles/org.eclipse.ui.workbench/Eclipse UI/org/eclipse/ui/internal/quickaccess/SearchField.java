@@ -499,7 +499,7 @@ public class SearchField {
 
 		shell.setBounds(getConstrainedShellBounds(display, new Rectangle(compBounds.x, compBounds.y
 				+ compBounds.height, width, height)));
-		shell.requestLayout();
+		shell.layout();
 	}
 
 	public void activate(Control previousFocusControl) {

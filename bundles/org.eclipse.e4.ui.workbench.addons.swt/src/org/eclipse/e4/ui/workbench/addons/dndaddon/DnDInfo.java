@@ -81,7 +81,7 @@ class DnDInfo {
 		Point curLoc = dragHost.getDisplay().getCursorLocation();
 		dragHost.setLocation(curLoc.x - offsetX, curLoc.y - offsetY);
 
-		dragHost.requestLayout();
+		dragHost.layout(true);
 	}
 
 	public void setDragHostBounds(Rectangle displayRect) {

@@ -164,7 +164,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 			item.setColor(i);
 		}
 
-		control.requestLayout();
+		control.layout(true);
 		updateForShowingProgress();
 	}
 
@@ -370,7 +370,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 			ProgressInfoItem item = (ProgressInfoItem) existingChildren[i];
 			item.setColor(i);
 		}
-		control.requestLayout();
+		control.layout(true);
 		updateForShowingProgress();
 	}
 
@@ -425,7 +425,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 			item.setColor(i);
 		}
 
-		control.requestLayout();
+		control.layout(true);
 		updateForShowingProgress();
 	}
 

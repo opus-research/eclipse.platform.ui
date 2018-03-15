@@ -262,7 +262,7 @@ public abstract class AbstractColumnLayout extends Layout {
 		// calculate appropriately
 		if (relayout) {
 			relayout = false;
-			composite.requestLayout();
+			composite.layout();
 		}
 	}
 

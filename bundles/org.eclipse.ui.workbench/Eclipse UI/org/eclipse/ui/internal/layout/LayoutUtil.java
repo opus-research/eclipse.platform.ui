@@ -40,7 +40,7 @@ public class LayoutUtil {
         }
 
         if (parent instanceof Shell) {
-            parent.requestLayout();
+            parent.layout(true);
         } else {
             Rectangle currentBounds = parent.getBounds();
 
@@ -49,7 +49,7 @@ public class LayoutUtil {
             // If the parent was resized, then it has already triggered a
             // layout. Otherwise, we need to manually force it to layout again.
             if (currentBounds.equals(parent.getBounds())) {
-                parent.requestLayout();
+                parent.layout(true);
             }
         }
     }

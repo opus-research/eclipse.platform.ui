@@ -480,12 +480,12 @@ public class TitleAreaDialog extends TrayDialog {
 		}
 
 		if (forceLayout) {
-			getShell().requestLayout();
+			getShell().layout();
 		} else {
 			// Do not layout before the dialog area has been created
 			// to avoid incomplete calculations.
 			if (dialogArea != null)
-				workArea.getParent().requestLayout();
+				workArea.getParent().layout(true);
 		}
 
 		int messageLabelUnclippedHeight = messageLabel.computeSize(messageLabel.getSize().x - xTrim, SWT.DEFAULT, true).y;

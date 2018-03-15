@@ -66,7 +66,7 @@ public class PerspectiveStackRenderer extends LazyStackRenderer {
 			Composite psComp = (Composite) ps.getWidget();
 			StackLayout sl = (StackLayout) psComp.getLayout();
 			sl.topControl = ctrl;
-			psComp.requestLayout();
+			psComp.layout();
 		}
 	}
 
@@ -89,7 +89,7 @@ public class PerspectiveStackRenderer extends LazyStackRenderer {
 		StackLayout sl = (StackLayout) psComp.getLayout();
 		if (sl != null) {
 			sl.topControl = ctrl;
-			psComp.requestLayout();
+			psComp.layout();
 		}
 
 		ctrl.moveAbove(null);

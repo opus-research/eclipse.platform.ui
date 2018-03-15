@@ -452,7 +452,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 			boolean customSize = !computedSize.equals(currentSize);
 			data.widthHint = newWidthHint;
 			setLastTreeWidth(newWidthHint);
-			composite.requestLayout();
+			composite.layout(true);
 			// recompute based on new widget size
 			computedSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
 			// if the dialog was of a custom size then increase it only if

@@ -354,7 +354,7 @@ class DnDManager {
 		} else if (feedbackStyle == GHOSTED) {
 			dragCtrl.setParent(dragHost);
 			dragCtrl.setLocation(0, 0);
-			dragHost.requestLayout();
+			dragHost.layout();
 		}
 
 		update();

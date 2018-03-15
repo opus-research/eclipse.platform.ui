@@ -524,7 +524,7 @@ public class DecoratedField {
 		if (formData != null) {
 			// Form data was updated.
 			control.setLayoutData(formData);
-			form.requestLayout();
+			form.layout();
 		}
 	}
 

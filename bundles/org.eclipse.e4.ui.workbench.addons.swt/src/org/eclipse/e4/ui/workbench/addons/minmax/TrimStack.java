@@ -1026,7 +1026,7 @@ public class TrimStack {
 
 				hostPane.addListener(SWT.Traverse, escapeListener);
 
-				hostPane.requestLayout();
+				hostPane.layout(true);
 				hostPane.moveAbove(null);
 				hostPane.setVisible(true);
 

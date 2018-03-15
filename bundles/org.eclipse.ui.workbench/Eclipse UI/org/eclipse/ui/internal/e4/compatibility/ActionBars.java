@@ -84,7 +84,7 @@ public class ActionBars extends SubActionBars {
 
 						// Specifically lay out the CTF
 						if (packParent.getParent() instanceof CTabFolder)
-							packParent.getParent().requestLayout();
+							packParent.getParent().layout(true);
 					}
 				}
 			} else {

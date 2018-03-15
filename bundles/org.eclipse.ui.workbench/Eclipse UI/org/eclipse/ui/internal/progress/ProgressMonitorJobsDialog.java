@@ -105,7 +105,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         if (viewer != null) {
             viewer.getControl().dispose();
             viewer = null;
-            composite.requestLayout();
+            composite.layout();
             shell.setSize(shellSize.x, shellSize.y - viewerHeight);
             detailsButton.setText(ProgressMessages.ProgressMonitorJobsDialog_DetailsTitle);
         } else {
@@ -137,7 +137,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
             viewer.getControl().setLayoutData(viewerData);
             GridData viewerCompositeData = (GridData) viewerComposite.getLayoutData();
             viewerCompositeData.heightHint = convertHeightInCharsToPixels(10);
-            viewerComposite.requestLayout();
+            viewerComposite.layout(true);
             viewer.getControl().setVisible(true);
             viewerHeight = viewerComposite.computeTrim(0, 0, 0, viewerCompositeData.heightHint).height;
             detailsButton.setText(ProgressMessages.ProgressMonitorJobsDialog_HideTitle);

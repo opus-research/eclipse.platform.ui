@@ -119,7 +119,7 @@ public class StatusPart {
         data.verticalSpan = 1;
         detailsArea.setLayoutData(data);
         detailsArea.setLayout(new FillLayout());
-        parent.requestLayout();
+        parent.layout(true);
     }
 
     /**
@@ -161,7 +161,7 @@ public class StatusPart {
             detailsText.setText(getDetails(reason));
 			detailsText.setBackground(detailsText.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
             details = detailsText;
-            detailsArea.requestLayout();
+            detailsArea.layout(true);
         } else {
             detailsButton.setText(IDialogConstants.SHOW_DETAILS_LABEL);
         }

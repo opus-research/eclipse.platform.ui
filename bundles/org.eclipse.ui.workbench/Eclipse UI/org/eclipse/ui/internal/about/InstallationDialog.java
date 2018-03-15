@@ -104,7 +104,7 @@ public class InstallationDialog extends TrayDialog implements
 
 			GridLayout compositeLayout = (GridLayout) composite.getLayout();
 			compositeLayout.numColumns = visibleChildren;
-			composite.requestLayout();
+			composite.layout(true);
 		}
 
 		protected void setButtonLayoutData(FontMetrics metrics, Control button,
@@ -264,7 +264,7 @@ public class InstallationDialog extends TrayDialog implements
 				createButtons(page);
 				item.setData(page);
 				item.addDisposeListener(e -> page.dispose());
-				pageComposite.requestLayout();
+				pageComposite.layout(true, true);
 
 			} catch (CoreException e1) {
 				Label label = new Label(pageComposite, SWT.NONE);
@@ -285,7 +285,7 @@ public class InstallationDialog extends TrayDialog implements
 		// cascade through all children because the buttons have changed and
 		// because tray dialog inserts an extra composite in the button bar
 		// hierarchy.
-		getButtonBar().getParent().requestLayout();
+		getButtonBar().getParent().layout(true, true);
 
 	}
 

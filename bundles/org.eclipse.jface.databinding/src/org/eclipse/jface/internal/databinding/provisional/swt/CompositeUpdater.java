@@ -158,7 +158,7 @@ public abstract class CompositeUpdater {
 					disposeWidget(listDiffEntry.getPosition());
 				}
 			}
-			theComposite.requestLayout();
+			theComposite.layout();
 		}
 
 	}

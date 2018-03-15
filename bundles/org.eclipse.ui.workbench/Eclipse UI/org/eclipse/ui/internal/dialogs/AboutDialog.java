@@ -335,7 +335,7 @@ public class AboutDialog extends TrayDialog {
 					}
     				inresize[0] = true;
     				// required because of bugzilla report 4579
-    				textComposite.requestLayout();
+    				textComposite.layout(true);
     				// required because you want to change the height that the
     				// scrollbar will scroll over when the width changes.
     				int width = textComposite.getClientArea().width;

@@ -2125,7 +2125,7 @@ class FilterEditDialog extends TrayDialog {
 					filter.setArguments(""); //$NON-NLS-1$
 				setupPatternLine();
 				currentCustomFilterArgumentUI.selectionChanged();
-				getShell().requestLayout();
+				getShell().layout(true);
 				Point size = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
 				Point shellSize = getShell().getSize();
 				size.x = Math.max(size.x, shellSize.x);
@@ -2548,7 +2548,7 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 							IDEWorkbenchMessages.ResourceFilterPage_multiMatcher_FileLength, null));
 				}
 			}
-			shell.requestLayout();
+			shell.layout(true, true);
 		}
 	}
 
@@ -2838,7 +2838,7 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 		if (fContentAssistField != null)
 			fContentAssistField.setEnabled(isUsingRegularExpression);
 
-		shell.requestLayout();
+		shell.layout(true, true);
 		if (initializationComplete) {
 			Point size = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 			Point shellSize = shell.getSize();
@@ -3147,7 +3147,7 @@ class DefaultCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 
 		if (fContentAssistField != null)
 			fContentAssistField.setEnabled(filter.getId().equals(REGEX_FILTER_ID));
-		argumentComposite.requestLayout();
+		argumentComposite.layout(true);
 	}
 
 	private void createArgumentsArea(Font font, Composite composite) {

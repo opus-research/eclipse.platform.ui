@@ -286,6 +286,6 @@ public abstract class WizardPropertyPage extends PropertyPage {
 		}
 
 		createWizardPageContent(fWizardPageContainer);
-		fWizardPageContainer.getParent().requestLayout();
+		fWizardPageContainer.getParent().layout(true, true);
 	}
 }

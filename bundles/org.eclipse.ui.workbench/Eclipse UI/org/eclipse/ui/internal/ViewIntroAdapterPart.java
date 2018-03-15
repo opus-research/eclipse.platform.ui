@@ -236,7 +236,7 @@ public final class ViewIntroAdapterPart extends ViewPart {
 		}
 
 		if (layout) {
-			window.getShell().requestLayout();
+			window.getShell().layout();
 		}
 	}
 }
