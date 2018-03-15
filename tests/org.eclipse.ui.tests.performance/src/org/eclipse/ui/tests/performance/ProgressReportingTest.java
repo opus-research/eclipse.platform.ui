@@ -20,16 +20,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  * offer progress monitoring.
  */
 public class ProgressReportingTest extends BasicPerformanceTest {
-
-	public static final int ITERATIONS = 10000000;
-
-	/**
-	 * Number of iterations for the run-in-foreground tests, since some of them
-	 * are known to be extremely slow. Please delete this constant and replace
-	 * with "ITERATIONS" once we've fixed the performance problems in these
-	 * seriously-bad use-cases.
-	 */
-	public static final int VERY_SLOW_OPERATION_ITERATIONS = 100000;
+	public static final int ITERATIONS = 1000000;
 
 	/**
 	 * Maximum time to run each test. Increase to get better results during
@@ -234,10 +225,7 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	}
 
 	/**
-	 * Test the cost of subMonitor.split(). Note that if
-	 * {@link SubMonitor#split} is performing cancellation checks at the correct
-	 * rate, this test should be no more than 15% slower than
-	 * {@link #testJobSubMonitorNewChild}.
+	 * Test the cost of subMonitor.split()
 	 */
 	public void testJobSubMonitorSplit() throws Exception {
 		openTestWindow();
@@ -249,28 +237,6 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 				long result = 0;
 				while (i < ITERATIONS) {
 					subMonitor.split(1);
-					result += i;
-					i++;
-				}
-
-				endAsyncTest(result);
-			}).schedule();
-		});
-	}
-
-	/**
-	 * Test the cost of subMonitor.newChild()
-	 */
-	public void testJobSubMonitorNewChild() throws Exception {
-		openTestWindow();
-		setRunInBackground(true);
-		runAsyncTest(() -> {
-			Job.create("Test Job", monitor -> {
-				SubMonitor subMonitor = SubMonitor.convert(monitor, ITERATIONS);
-				int i = 0;
-				long result = 0;
-				while (i < ITERATIONS) {
-					subMonitor.newChild(1);
 					result += i;
 					i++;
 				}
@@ -310,10 +276,10 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 		setRunInBackground(false);
 		runAsyncTest(() -> {
 			Job j = Job.create("Test Job", monitor -> {
-				monitor.beginTask("Test Job", VERY_SLOW_OPERATION_ITERATIONS);
+				monitor.beginTask("Test Job", ITERATIONS);
 				int i = 0;
 				long result = 0;
-				while (i < VERY_SLOW_OPERATION_ITERATIONS) {
+				while (i < ITERATIONS) {
 					result += i;
 					i++;
 				}
@@ -333,10 +299,10 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 		setRunInBackground(false);
 		runAsyncTest(() -> {
 			Job j = Job.create("Test Job", monitor -> {
-				monitor.beginTask("Test Job", VERY_SLOW_OPERATION_ITERATIONS);
+				monitor.beginTask("Test Job", ITERATIONS);
 				int i = 0;
 				long result = 0;
-				while (i < VERY_SLOW_OPERATION_ITERATIONS) {
+				while (i < ITERATIONS) {
 					monitor.worked(1);
 					result += i;
 					i++;
@@ -357,10 +323,10 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 		setRunInBackground(false);
 		runAsyncTest(() -> {
 			Job j = Job.create("Test Job", monitor -> {
-				monitor.beginTask("Test Job", VERY_SLOW_OPERATION_ITERATIONS);
+				monitor.beginTask("Test Job", ITERATIONS);
 				int i = 0;
 				long result = 0;
-				while (i < VERY_SLOW_OPERATION_ITERATIONS) {
+				while (i < ITERATIONS) {
 					monitor.setTaskName(Integer.toString(i));
 					result += i;
 					i++;
@@ -381,10 +347,10 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 		setRunInBackground(false);
 		runAsyncTest(() -> {
 			Job j = Job.create("Test Job", monitor -> {
-				monitor.beginTask("Test Job", VERY_SLOW_OPERATION_ITERATIONS);
+				monitor.beginTask("Test Job", ITERATIONS);
 				int i = 0;
 				long result = 0;
-				while (i < VERY_SLOW_OPERATION_ITERATIONS) {
+				while (i < ITERATIONS) {
 					monitor.subTask(Integer.toString(i));
 					result += i;
 					i++;
@@ -405,10 +371,10 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 		setRunInBackground(false);
 		runAsyncTest(() -> {
 			Job j = Job.create("Test Job", monitor -> {
-				monitor.beginTask("Test Job", VERY_SLOW_OPERATION_ITERATIONS);
+				monitor.beginTask("Test Job", ITERATIONS);
 				int i = 0;
 				long result = 0;
-				while (i < VERY_SLOW_OPERATION_ITERATIONS) {
+				while (i < ITERATIONS) {
 					if (monitor.isCanceled()) {
 						throw new OperationCanceledException();
 					}
