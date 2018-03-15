@@ -523,8 +523,9 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 			throw new NullPointerException("Cannot fire a null event"); //$NON-NLS-1$
 		}
 
-		for (Object listener : getListeners()) {
-			final ICommandListener commandListener = (ICommandListener) listener;
+		final Object[] listeners = getListeners();
+		for (Object listener2 : listeners) {
+			final ICommandListener listener = (ICommandListener) listener2;
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void handleException(Throwable exception) {
@@ -532,7 +533,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 
 				@Override
 				public void run() throws Exception {
-					commandListener.commandChanged(commandEvent);
+					listener.commandChanged(commandEvent);
 				}
 			});
 		}

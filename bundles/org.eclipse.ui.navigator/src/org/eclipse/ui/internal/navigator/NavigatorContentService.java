@@ -325,8 +325,8 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		}
 		synchronized (this) {
 			for (NavigatorContentExtension navigatorContentExtension : contentExtensions.values()) {
-				navigatorContentExtension.dispose();
-			}
+navigatorContentExtension.dispose();
+}
 		}
 		getActivationService().removeExtensionActivationListener(this);
 		assistant.dispose();
@@ -1104,7 +1104,8 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		}
 		List<SafeDelegateTreeContentProvider> resultProvidersList = new ArrayList<SafeDelegateTreeContentProvider>();
 		for (NavigatorContentExtension navigatorContentExtension : theDescriptorInstances) {
-			resultProvidersList.add(navigatorContentExtension.internalGetContentProvider());
+			resultProvidersList.add(navigatorContentExtension
+					.internalGetContentProvider());
 		}
 		return resultProvidersList
 				.toArray(new ITreeContentProvider[resultProvidersList.size()]);
@@ -1117,11 +1118,14 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		}
 		Set<NavigatorContentExtension> resultInstances = new TreeSet<NavigatorContentExtension>(ExtensionSequenceNumberComparator.INSTANCE);
 		for (INavigatorContentDescriptor iNavigatorContentDescriptor : theDescriptors) {
-			NavigatorContentExtension extension = getExtension(iNavigatorContentDescriptor, toLoadAllIfNecessary);
-			if (extension != null) {
-				resultInstances.add(extension);
-			}
-		}
+NavigatorContentExtension extension = getExtension(
+			iNavigatorContentDescriptor,
+			toLoadAllIfNecessary);
+if (extension != null) {
+		resultInstances.add(extension);
+
+}
+}
 		return resultInstances;
 	}
 

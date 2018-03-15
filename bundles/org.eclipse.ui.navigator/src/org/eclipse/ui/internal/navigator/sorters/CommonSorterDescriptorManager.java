@@ -140,8 +140,9 @@ public class CommonSorterDescriptorManager {
 
 						if (children.length > 0) {
 							Set<CommonSorterDescriptor> localSorters = getCommonSorters(contentDescriptor);
-							for (IConfigurationElement configurationElement : children) {
-								localSorters.add(new CommonSorterDescriptor(configurationElement));
+							for (IConfigurationElement element2 : children) {
+								localSorters.add(new CommonSorterDescriptor(
+										element2));
 							}
 							return true;
 						}
