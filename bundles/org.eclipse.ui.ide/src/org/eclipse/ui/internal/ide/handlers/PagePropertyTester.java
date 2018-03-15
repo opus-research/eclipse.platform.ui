@@ -30,9 +30,6 @@ public class PagePropertyTester extends PropertyTester {
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
 		if (receiver instanceof Shell) {
 			Shell shell = (Shell) receiver;
-			if (shell.isDisposed()) {
-				return false;
-			}
 			Object shellData = shell.getData();
 			if (shellData instanceof FilteredPreferenceDialog) {
 				FilteredPreferenceDialog propertyDialog = (FilteredPreferenceDialog) shellData;
@@ -43,7 +40,7 @@ public class PagePropertyTester extends PropertyTester {
 			}
 		}
 
-		return false;
+		return true;
 	}
 
 }
