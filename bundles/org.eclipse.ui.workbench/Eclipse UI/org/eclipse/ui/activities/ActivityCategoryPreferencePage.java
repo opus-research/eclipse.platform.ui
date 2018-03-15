@@ -306,8 +306,8 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
         composite.setLayoutData(data);
 
         Button enableAll = new Button(composite, SWT.PUSH);
-        enableAll.addSelectionListener(widgetSelectedAdapter(e -> workingCopy.setEnabledActivityIds(workingCopy
-		        .getDefinedActivityIds())));
+		enableAll.addSelectionListener(
+				widgetSelectedAdapter(e -> workingCopy.setEnabledActivityIds(workingCopy.getDefinedActivityIds())));
         enableAll.setText(ActivityMessages.ActivityEnabler_selectAll);
         setButtonLayoutData(enableAll);
 
@@ -364,50 +364,44 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
         label.setText(strings.getProperty(CATEGORY_NAME, ActivityMessages.ActivityEnabler_categories));
         Table table = new Table(composite, SWT.CHECK | SWT.BORDER | SWT.SINGLE);
         table.addSelectionListener(widgetSelectedAdapter(e -> {
-			if (e.detail == SWT.CHECK) {
-				TableItem tableItem = (TableItem) e.item;
+        	if (e.detail == SWT.CHECK) {
+        		TableItem tableItem = (TableItem) e.item;
 
-				ICategory category = (ICategory) tableItem.getData();
-				if (isLocked(category)) {
-					tableItem.setChecked(true);
-					e.doit = false; // veto the check
-					return;
-				}
-				Set activitySet = WorkbenchActivityHelper
-						.getActivityIdsForCategory(category);
-				if (tableItem.getChecked()) {
-					activitySet.addAll(workingCopy.getEnabledActivityIds());
-				} else {
-					HashSet newSet = new HashSet(workingCopy
-							.getEnabledActivityIds());
-					newSet.removeAll(activitySet);
-					activitySet = newSet;
-				}
+        		ICategory category = (ICategory) tableItem.getData();
+        		if (isLocked(category)) {
+        			tableItem.setChecked(true);
+        			e.doit = false; // veto the check
+        			return;
+        		}
+				Set activitySet = WorkbenchActivityHelper.getActivityIdsForCategory(category);
+        		if (tableItem.getChecked()) {
+        			activitySet.addAll(workingCopy.getEnabledActivityIds());
+        		} else {
+        			HashSet newSet = new HashSet(workingCopy.getEnabledActivityIds());
+        			newSet.removeAll(activitySet);
+        			activitySet = newSet;
+        		}
 
-				workingCopy.setEnabledActivityIds(activitySet);
-				updateCategoryCheckState(); // even though we're reacting to
-				// a check change we may need to
-				// refresh a greying change.
-				// Just process the whole thing.
-			}
-		}));
+        		workingCopy.setEnabledActivityIds(activitySet);
+        		updateCategoryCheckState(); // even though we're reacting to
+        		// a check change we may need to
+        		// refresh a greying change.
+        		// Just process the whole thing.
+        	}
+        }));
         categoryViewer = new CheckboxTableViewer(table);
-        categoryViewer.getControl().setLayoutData(
-                new GridData(GridData.FILL_BOTH));
+		categoryViewer.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
         categoryViewer.setContentProvider(new CategoryContentProvider());
-        CategoryLabelProvider categoryLabelProvider = new CategoryLabelProvider(
-                true);
+        CategoryLabelProvider categoryLabelProvider = new CategoryLabelProvider(true);
         workingCopy.addActivityManagerListener(categoryLabelProvider);
         categoryViewer.setLabelProvider(categoryLabelProvider);
         categoryViewer.setComparator(new ViewerComparator());
         categoryViewer.addFilter(new EmptyCategoryFilter());
 
-        categoryViewer
-                .addSelectionChangedListener(event -> {
-				    ICategory element = (ICategory) ((IStructuredSelection) event
-				            .getSelection()).getFirstElement();
-				    setDetails(element);
-				});
+		categoryViewer.addSelectionChangedListener(event -> {
+			ICategory element = (ICategory) ((IStructuredSelection) event.getSelection()).getFirstElement();
+			setDetails(element);
+		});
         categoryViewer.setInput(workingCopy.getDefinedCategoryIds());
 
 		updateCategoryCheckState();

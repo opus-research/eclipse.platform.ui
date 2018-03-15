@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -20,6 +18,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -117,8 +117,15 @@ public class NavigationHistoryAction extends PageEventAction {
 							Integer.valueOf(entriesCount[i]));
     			}
     			item.setText(text);
-				item.addSelectionListener(widgetSelectedAdapter(
-						e -> history.shiftCurrentEntry((NavigationHistoryEntry) e.widget.getData(), forward)));
+    			item.addSelectionListener(new SelectionAdapter() {
+    				@Override
+					public void widgetSelected(SelectionEvent e) {
+    					history
+    					.shiftCurrentEntry(
+    							(NavigationHistoryEntry) e.widget
+    							.getData(), forward);
+    				}
+    			});
     		}
     	}
     	recreateMenu = false;
