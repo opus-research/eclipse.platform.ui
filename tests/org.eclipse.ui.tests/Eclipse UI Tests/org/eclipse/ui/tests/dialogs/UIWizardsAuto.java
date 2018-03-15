@@ -71,9 +71,10 @@ public class UIWizardsAuto extends TestCase {
                 .getDialogSettings();
         IDialogSettings wizardSettings = workbenchSettings
                 .getSection("ExportResourcesAction");
-        if (wizardSettings == null)
-            wizardSettings = workbenchSettings
+        if (wizardSettings == null) {
+			wizardSettings = workbenchSettings
                     .addNewSection("ExportResourcesAction");
+		}
         wizard.setDialogSettings(wizardSettings);
         wizard.setForcePreviousAndNextButtons(true);
         WizardDialog dialog = new WizardDialog(getShell(), wizard);
@@ -97,9 +98,10 @@ public class UIWizardsAuto extends TestCase {
                 .getDialogSettings();
         IDialogSettings wizardSettings = workbenchSettings
                 .getSection("ImportResourcesAction");
-        if (wizardSettings == null)
-            wizardSettings = workbenchSettings
+        if (wizardSettings == null) {
+			wizardSettings = workbenchSettings
                     .addNewSection("ImportResourcesAction");
+		}
         wizard.setDialogSettings(wizardSettings);
         wizard.setForcePreviousAndNextButtons(true);
 
@@ -120,7 +122,8 @@ public class UIWizardsAuto extends TestCase {
     /**
      * @see junit.framework.TestCase#tearDown()
      */
-    protected void tearDown() throws Exception {
+    @Override
+	protected void tearDown() throws Exception {
         super.tearDown();
         try {
             if (project != null) {
@@ -139,7 +142,7 @@ public class UIWizardsAuto extends TestCase {
 
     /**
      * 1GJWD2E: ITPUI:ALL - Test classes should not be released in public packages.
-     * 
+     *
      public void testFileSystemExport() {
      Dialog dialog = exportWizard( DataTransferTestStub.newFileSystemResourceExportPage1(null) );
      DialogCheck.assertDialogTexts(dialog, this);
@@ -156,7 +159,7 @@ public class UIWizardsAuto extends TestCase {
 
     /**
      * 1GJWD2E: ITPUI:ALL - Test classes should not be released in public packages.
-     * 
+     *
      public void testFileSystemImport() {
      Dialog dialog = importWizard( DataTransferTestStub.newFileSystemResourceImportPage1(WorkbenchPlugin.getDefault().getWorkbench(), StructuredSelection.EMPTY) );
      DialogCheck.assertDialogTexts(dialog, this);
@@ -179,11 +182,12 @@ public class UIWizardsAuto extends TestCase {
     }
 
     /**
-     * Test for bug 30719 [Linked Resources] NullPointerException when setting filename for WizardNewFileCreationPage 
+     * Test for bug 30719 [Linked Resources] NullPointerException when setting filename for WizardNewFileCreationPage
      */
     public void testNewFile2() {
         BasicNewFileResourceWizard wizard = new BasicNewFileResourceWizard() {
-            public void addPages() {
+            @Override
+			public void addPages() {
                 super.addPages();
                 IWizardPage page = getPage("newFilePage1");
                 assertTrue("Expected newFilePage1",
@@ -204,7 +208,7 @@ public class UIWizardsAuto extends TestCase {
         wizard.setNeedsProgressMonitor(true);
         WizardDialog dialog = new WizardDialog(getShell(), wizard);
         dialog.create();
-        dialog.getShell().setText("CreateFileAction_title"); 
+        dialog.getShell().setText("CreateFileAction_title");
         WorkbenchHelp.setHelp(dialog.getShell(),
                 IIDEHelpContextIds.NEW_FILE_WIZARD);
         DialogCheck.assertDialogTexts(dialog, this);
@@ -216,7 +220,7 @@ public class UIWizardsAuto extends TestCase {
         wizard.setNeedsProgressMonitor(true);
         WizardDialog dialog = new WizardDialog(getShell(), wizard);
         dialog.create();
-        dialog.getShell().setText("CreateFolderAction_title"); 
+        dialog.getShell().setText("CreateFolderAction_title");
         WorkbenchHelp.setHelp(dialog.getShell(),
                 IIDEHelpContextIds.NEW_FOLDER_WIZARD);
         DialogCheck.assertDialogTexts(dialog, this);
@@ -254,7 +258,7 @@ public class UIWizardsAuto extends TestCase {
         dialog.getShell().setSize(
                 Math.max(SIZING_WIZARD_WIDTH_2, dialog.getShell().getSize().x),
                 SIZING_WIZARD_HEIGHT_2);
-        dialog.getShell().setText("CreateFileAction_title"); 	
+        dialog.getShell().setText("CreateFileAction_title");
         dialog.showPage(page);
         WorkbenchHelp.setHelp(dialog.getShell(),
                 IIDEHelpContextIds.NEW_PROJECT_WIZARD);
@@ -290,29 +294,30 @@ public class UIWizardsAuto extends TestCase {
         WorkbenchHelp.setHelp(dialog.getShell(), IWorkbenchHelpContextIds.NEW_WIZARD);
         DialogCheck.assertDialogTexts(dialog, this);
     }
-    
+
     public void testWizardWindowTitle() {
-    	
+
         checkWizardWindowTitle(null);
         checkWizardWindowTitle("My New Wizard"); //$NON-NLS-1$
-        
+
     }
 
 	private void checkWizardWindowTitle(String windowTitle) {
-		
+
 		NewWizard newWizard = new NewWizard();
         newWizard.setWindowTitle(windowTitle);
-        
+
         initNewWizard(newWizard);
 
         WizardDialog dialog = new WizardDialog(getShell(), newWizard);
         dialog.create();
 
-        if(windowTitle == null)
-        	windowTitle = WorkbenchMessages.NewWizard_title;
-        	
+        if(windowTitle == null) {
+			windowTitle = WorkbenchMessages.NewWizard_title;
+		}
+
         assertEquals(windowTitle, dialog.getShell().getText());
-        
+
         dialog.close();
 	}
 
@@ -320,17 +325,20 @@ public class UIWizardsAuto extends TestCase {
 		ISelection selection = getWorkbench().getActiveWorkbenchWindow()
                 .getSelectionService().getSelection();
         IStructuredSelection selectionToPass = null;
-        if (selection instanceof IStructuredSelection)
-            selectionToPass = (IStructuredSelection) selection;
-        else
-            selectionToPass = StructuredSelection.EMPTY;
+        if (selection instanceof IStructuredSelection) {
+			selectionToPass = (IStructuredSelection) selection;
+		} else {
+			selectionToPass = StructuredSelection.EMPTY;
+		}
         wizard.init(getWorkbench(), selectionToPass);
         IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault()
                 .getDialogSettings();
         IDialogSettings wizardSettings = workbenchSettings
                 .getSection("NewWizardAction");//$NON-NLS-1$
         if (wizardSettings == null)
-            wizardSettings = workbenchSettings.addNewSection("NewWizardAction");//$NON-NLS-1$
+		 {
+			wizardSettings = workbenchSettings.addNewSection("NewWizardAction");//$NON-NLS-1$
+		}
         wizard.setDialogSettings(wizardSettings);
         wizard.setForcePreviousAndNextButtons(true);
 	}

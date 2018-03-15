@@ -26,26 +26,27 @@ public class StatusToStringConverterTest extends TestCase {
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		
+
 		converter = new StatusToStringConverter();
 	}
-	
+
 	public void testConvertedValueIsMessageOfStatus() throws Exception {
 		String message = "this is my message";
 		IStatus status = ValidationStatus.error(message);
 		assertEquals(message, converter.convert(status));
 	}
-	
+
 	public void testFromTypeIsIStatus() throws Exception {
 		assertEquals(IStatus.class, converter.getFromType());
 	}
-	
+
 	public void testToTypeIsString() throws Exception {
 		assertEquals(String.class, converter.getToType());
 	}
-	
+
 	public void testIllegalArgumentExceptionIsThrownWithNullInput() throws Exception {
 		try {
 			converter.convert(null);

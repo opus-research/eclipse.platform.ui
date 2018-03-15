@@ -42,9 +42,10 @@ import org.eclipse.ui.internal.ide.dialogs.WelcomeEditorInput;
 
 /**
  * The quick start (Welcome...) action.
- * 
+ *
  * @deprecated the IDE now uses the new intro mechanism
  */
+@Deprecated
 public class QuickStartAction extends Action implements
         ActionFactory.IWorkbenchAction {
 
@@ -87,7 +88,8 @@ public class QuickStartAction extends Action implements
      * The user has invoked this action.  Prompts for a feature with a welcome page,
      * then opens the corresponding welcome page.
      */
-    public void run() {
+    @Override
+	public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
@@ -107,7 +109,7 @@ public class QuickStartAction extends Action implements
 
     /**
      * Prompts the user for a feature that has a welcome page.
-     * 
+     *
      * @return the chosen feature, or <code>null</code> if none was chosen
      */
     private AboutInfo promptForFeature() throws WorkbenchException {
@@ -153,7 +155,7 @@ public class QuickStartAction extends Action implements
 
     /**
      * Opens the welcome page for the given feature.
-     * 
+     *
      * @param featureId the about info for the feature
      * @return <code>true</code> if successful, <code>false</code> otherwise
      * @throws WorkbenchException
@@ -169,7 +171,7 @@ public class QuickStartAction extends Action implements
     /**
      * Returns the about info for the feature with the given id, or <code>null</code>
      * if there is no such feature.
-     * 
+     *
      * @return the about info for the feature with the given id, or <code>null</code>
      *   if there is no such feature.
      */
@@ -187,7 +189,7 @@ public class QuickStartAction extends Action implements
 
     /**
      * Opens the welcome page for a feature.
-     * 
+     *
      * @param feature the about info for the feature
      * @return <code>true</code> if successful, <code>false</code> otherwise
      */
@@ -222,7 +224,7 @@ public class QuickStartAction extends Action implements
         if (page == null) {
         	return false;
         }
-        
+
         page.setEditorAreaVisible(true);
 
         // create input
@@ -256,11 +258,8 @@ public class QuickStartAction extends Action implements
         return true;
     }
 
-    /* (non-Javadoc)
-     * Method declared on ActionFactory.IWorkbenchAction.
-     * @since 3.0
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (workbenchWindow == null) {
             // action has already been disposed
             return;

@@ -29,7 +29,7 @@ public class DecoratorTestCase extends AbstractNavigatorTest implements
 
 	/**
 	 * Constructor for DecoratorTestCase.
-	 * 
+	 *
 	 * @param testName
 	 */
 	public DecoratorTestCase(String testName) {
@@ -39,6 +39,7 @@ public class DecoratorTestCase extends AbstractNavigatorTest implements
 	/**
 	 * Sets up the hierarchy.
 	 */
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		createTestFile();
@@ -48,10 +49,11 @@ public class DecoratorTestCase extends AbstractNavigatorTest implements
 
 		DecoratorDefinition[] definitions = WorkbenchPlugin.getDefault()
 				.getDecoratorManager().getAllDecoratorDefinitions();
-		for (int i = 0; i < definitions.length; i++) {
-			if (definitions[i].getId().equals(
-					"org.eclipse.ui.tests.adaptable.decorator"))
-				definition = definitions[i];
+		for (DecoratorDefinition definition2 : definitions) {
+			if (definition2.getId().equals(
+					"org.eclipse.ui.tests.adaptable.decorator")) {
+				definition = definition2;
+			}
 		}
 	}
 
@@ -62,6 +64,7 @@ public class DecoratorTestCase extends AbstractNavigatorTest implements
 	/**
 	 * Remove the listener.
 	 */
+	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		getDecoratorManager().removeListener(this);
@@ -104,6 +107,7 @@ public class DecoratorTestCase extends AbstractNavigatorTest implements
 	/*
 	 * @see ILabelProviderListener#labelProviderChanged(LabelProviderChangedEvent)
 	 */
+	@Override
 	public void labelProviderChanged(LabelProviderChangedEvent event) {
 		updated = true;
 	}

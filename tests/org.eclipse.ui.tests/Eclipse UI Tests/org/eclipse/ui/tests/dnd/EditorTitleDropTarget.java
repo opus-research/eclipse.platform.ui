@@ -31,21 +31,18 @@ public class EditorTitleDropTarget extends WorkbenchWindowDropTarget {
         return getPage().getEditors()[editorIdx];
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.dnd.TestDropTarget#getName()
-     */
-    public String toString() {
+    @Override
+	public String toString() {
         return "editor " + editorIdx + " title area";
     }
-    
-    public Shell getShell() {
+
+    @Override
+	public Shell getShell() {
     	return getPart().getSite().getShell();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.dnd.TestDropTarget#getLocation()
-     */
-    public Point getLocation() {
+    @Override
+	public Point getLocation() {
         Rectangle bounds = DragOperations.getDisplayBounds(DragOperations
                 .getPane(getPart()));
 

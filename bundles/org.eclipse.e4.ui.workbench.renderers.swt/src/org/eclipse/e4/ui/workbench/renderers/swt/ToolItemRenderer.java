@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -74,9 +74,9 @@ public class ToolItemRenderer extends SWTPartRenderer {
 	private static final String TIR_STATIC_CONTEXT = "HCI-staticContext"; //$NON-NLS-1$
 
 	@Inject
-	Logger logger;
+	private Logger logger;
 	@Inject
-	IEventBroker eventBroker;
+	private IEventBroker eventBroker;
 
 	private EventHandler itemUpdater = new EventHandler() {
 		@Override
@@ -245,14 +245,6 @@ public class ToolItemRenderer extends SWTPartRenderer {
 		return newItem;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#hideChild
-	 * (org.eclipse.e4.ui.model.application.MElementContainer,
-	 * org.eclipse.e4.ui.model.application.MUIElement)
-	 */
 	@Override
 	public void hideChild(MElementContainer<MUIElement> parentElement,
 			MUIElement child) {
@@ -265,13 +257,6 @@ public class ToolItemRenderer extends SWTPartRenderer {
 			widget.dispose();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#hookControllerLogic
-	 * (org.eclipse.e4.ui.model.application.MUIElement)
-	 */
 	@Override
 	public void hookControllerLogic(MUIElement me) {
 		// If the item is a CHECK or RADIO update the model's state to match

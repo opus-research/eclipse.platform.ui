@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   IBM Corporation - initial API and implementation 
+ *   IBM Corporation - initial API and implementation
  *   Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog
  *     font should be activated and used by other components.
  *******************************************************************************/
@@ -44,13 +44,13 @@ import org.eclipse.ui.internal.ide.misc.ContainerSelectionGroup;
  *    new ContainerSelectionDialog(getShell(), initialSelection, allowNewContainerName(), msg);
  *	dialog.open();
  *	Object[] result = dialog.getResult();
- * </pre> 	
+ * </pre>
  * </p>
  * @noextend This class is not intended to be subclassed by clients.
  */
 public class ContainerSelectionDialog extends SelectionDialog {
     /**
-	 * 
+	 *
 	 */
 	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
@@ -74,7 +74,7 @@ public class ContainerSelectionDialog extends SelectionDialog {
 
     /**
      * Creates a resource container selection dialog rooted at the given resource.
-     * All selections are considered valid. 
+     * All selections are considered valid.
      *
      * @param parentShell the parent shell
      * @param initialRoot the initial selection in the tree
@@ -98,24 +98,21 @@ public class ContainerSelectionDialog extends SelectionDialog {
         setShellStyle(getShellStyle() | SWT.SHEET);
     }
 
-    /* (non-Javadoc)
-     * Method declared in Window.
-     */
-    protected void configureShell(Shell shell) {
+    @Override
+	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         PlatformUI.getWorkbench().getHelpSystem()
                 .setHelp(shell, IIDEHelpContextIds.CONTAINER_SELECTION_DIALOG);
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
-    protected Control createDialogArea(Composite parent) {
-        // create composite 
+    @Override
+	protected Control createDialogArea(Composite parent) {
+        // create composite
         Composite area = (Composite) super.createDialogArea(parent);
 
         Listener listener = new Listener() {
-            public void handleEvent(Event event) {
+            @Override
+			public void handleEvent(Event event) {
                 if (statusMessage != null && validator != null) {
                     String errorMsg = validator.isValid(group
                             .getContainerFullPath());
@@ -146,11 +143,12 @@ public class ContainerSelectionDialog extends SelectionDialog {
     }
 
     /**
-     * The <code>ContainerSelectionDialog</code> implementation of this 
+     * The <code>ContainerSelectionDialog</code> implementation of this
      * <code>Dialog</code> method builds a list of the selected resource containers
      * for later retrieval by the client and closes this dialog.
      */
-    protected void okPressed() {
+    @Override
+	protected void okPressed() {
 
         List chosenContainerPathList = new ArrayList();
         IPath returnValue = group.getContainerFullPath();
@@ -162,8 +160,8 @@ public class ContainerSelectionDialog extends SelectionDialog {
     }
 
     /**
-     * Sets the validator to use.  
-     * 
+     * Sets the validator to use.
+     *
      * @param validator A selection validator
      */
     public void setValidator(ISelectionValidator validator) {
@@ -173,7 +171,7 @@ public class ContainerSelectionDialog extends SelectionDialog {
     /**
      * Set whether or not closed projects should be shown
      * in the selection dialog.
-     * 
+     *
      * @param show Whether or not to show closed projects.
      */
     public void showClosedProjects(boolean show) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 Oakland Software Incorporated and others.
+ * Copyright (c) 2010, 2015 Oakland Software Incorporated and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,17 +7,20 @@
  *
  * Contributors:
  *     Oakland Software Incorporated - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 457870
  *******************************************************************************/
 package org.eclipse.ui.tests.navigator;
 
-import org.eclipse.jface.viewers.StructuredSelection;
+import static org.junit.Assert.assertEquals;
 
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.tests.harness.util.DisplayHelper;
 import org.eclipse.ui.tests.navigator.extension.TestLinkHelper;
+import org.junit.Test;
 
 public class LinkHelperTest extends NavigatorTestBase {
 
@@ -28,7 +31,8 @@ public class LinkHelperTest extends NavigatorTestBase {
 		_navigatorInstanceId = TEST_VIEWER_LINK_HELPER;
 	}
 
-	
+
+	@Test
 	public void testLinkHelperSelectionChange() throws Exception {
 
 		System.out.println("SelectionChange start");
@@ -39,12 +43,12 @@ public class LinkHelperTest extends NavigatorTestBase {
 		IDE.openEditor(activePage, _p2.getFile("file2.txt"));
 
 		_commonNavigator.setLinkingEnabled(true);
-		
+
 		_viewer.setSelection(new StructuredSelection(_p2.getFile("file1.txt"))); //$NON-NLS-1$
 		DisplayHelper.sleep(SLEEP_TIME);
 
 		_commonNavigator.getViewSite().getPage().activate(_commonNavigator);
-		
+
 		System.out.println("before set 2");
 		_viewer.setSelection(new StructuredSelection(_p2.getFile("file2.txt"))); //$NON-NLS-1$
 		DisplayHelper.sleep(SLEEP_TIME);
@@ -65,9 +69,10 @@ public class LinkHelperTest extends NavigatorTestBase {
 			DisplayHelper.sleep(100000000);
 	}
 
+	@Test
 	public void testLinkHelperEditorActivation() throws Exception {
 		System.out.println("EditorActivation start");
-		
+
 		_commonNavigator.setLinkingEnabled(false);
 		DisplayHelper.sleep(SLEEP_TIME);
 
@@ -88,7 +93,7 @@ public class LinkHelperTest extends NavigatorTestBase {
 		System.out.println("EditorActivation 1 Done: " + TestLinkHelper.instance);
 		assertEquals(1, TestLinkHelper.instance.findSelectionCount);
 		assertEquals(0, TestLinkHelper.instance.activateEditorCount);
-		
+
 		TestLinkHelper.instance.resetTest();
 
 		System.out.println("before activate 2");
@@ -97,7 +102,7 @@ public class LinkHelperTest extends NavigatorTestBase {
 		System.out.println("EditorActivation 2 Done: " + TestLinkHelper.instance);
 		assertEquals(1, TestLinkHelper.instance.findSelectionCount);
 		assertEquals(0, TestLinkHelper.instance.activateEditorCount);
-		
+
 
 	}
 

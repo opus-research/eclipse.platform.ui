@@ -43,7 +43,7 @@ import org.eclipse.ui.views.contentoutline.ContentOutline;
 
 /**
  * Tests various aspects of command state.
- * 
+ *
  * @since 3.2
  */
 public class HandlerActivationTest extends UITestCase {
@@ -57,11 +57,7 @@ public class HandlerActivationTest extends UITestCase {
 			contextId = id;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-		 */
+		@Override
 		public Object execute(ExecutionEvent event) {
 			executionCount++;
 			return null;
@@ -70,6 +66,7 @@ public class HandlerActivationTest extends UITestCase {
 	}
 
 	static class OutlineOnlyHandler extends AbstractHandler {
+		@Override
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			IWorkbenchPart part = HandlerUtil.getActivePartChecked(event);
 			if (!(part instanceof ContentOutline)) {
@@ -79,6 +76,7 @@ public class HandlerActivationTest extends UITestCase {
 			return null;
 		}
 
+		@Override
 		public void setEnabled(Object evaluationContext) {
 			IWorkbenchPart part = (IWorkbenchPart) HandlerUtil.getVariable(
 					evaluationContext, ISources.ACTIVE_PART_NAME);
@@ -135,18 +133,18 @@ public class HandlerActivationTest extends UITestCase {
 
 	/**
 	 * Constructor for <code>HandlerActivationTest</code>.
-	 * 
+	 *
 	 * @param name
 	 *            The name of the test
 	 */
 	public HandlerActivationTest(String name) {
 		super(name);
 		services = PlatformUI.getWorkbench();
-		contextService = (IContextService) services
+		contextService = services
 				.getService(IContextService.class);
-		commandService = (ICommandService) services
+		commandService = services
 				.getService(ICommandService.class);
-		handlerService = (IHandlerService) services
+		handlerService = services
 				.getService(IHandlerService.class);
 	}
 
@@ -186,14 +184,9 @@ public class HandlerActivationTest extends UITestCase {
 		makeHandler(handlerId, contextId, expression);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
-	 */
+	@Override
 	protected void doSetUp() throws Exception {
-		for (int i = 0; i < CREATE_CONTEXTS.length; i++) {
-			final String[] contextInfo = CREATE_CONTEXTS[i];
+		for (final String[] contextInfo : CREATE_CONTEXTS) {
 			final Context context = contextService.getContext(contextInfo[0]);
 			if (!context.isDefined()) {
 				context.define(contextInfo[1], contextInfo[2], contextInfo[3]);
@@ -209,11 +202,7 @@ public class HandlerActivationTest extends UITestCase {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
-	 */
+	@Override
 	protected void doTearDown() throws Exception {
 		handlerService.deactivateHandlers(testHandlerActivations.values());
 		testHandlerActivations.clear();
@@ -265,20 +254,21 @@ public class HandlerActivationTest extends UITestCase {
 		testHandlerActivations.put(handler, handlerService.activateHandler(
 				CMD_ID, currentHandler, expression));
 	}
-	
-	
+
+
 	public void testExceptionThrowingHandler(){
-		
+
 		try {
 			handlerService.executeCommand("org.eclipse.ui.tests.command.handlerException", null);
 			fail("An exception should be thrown for this handler");
 		} catch (Exception e) {
-			if(!(e instanceof ExecutionException))
+			if(!(e instanceof ExecutionException)) {
 				fail("Unexpected exception while executing command", e);
+			}
 		}
 	}
-	
-	
+
+
 	public void testBasicHandler() throws Exception {
 
 		createHandlerActivation(C1_ID, H1,
@@ -447,14 +437,14 @@ public class HandlerActivationTest extends UITestCase {
 		IEvaluationContext outlineContext = handlerService.createContextSnapshot(false);
 		handlerService.executeCommand(pcmd, null);
 		assertTrue(cmd.isEnabled());
-		
+
 		try {
 			handlerService.executeCommandInContext(pcmd, null, oldContext);
 			fail("this should not be executable");
 		} catch (NotEnabledException e) {
 			// good
 		}
-		
+
 		assertTrue(cmd.isEnabled());
 		handlerService.executeCommandInContext(pcmd, null, outlineContext);
 	}

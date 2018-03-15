@@ -34,7 +34,7 @@ class PurgeCompletedAction extends TaskAction {
 
     /**
      * Creates the action.
-     * 
+     *
      * @param tasklist the task list
      * @param id the id
      */
@@ -47,7 +47,8 @@ class PurgeCompletedAction extends TaskAction {
     /**
      * Fetches all the completed tasks in the workspace and deletes them.
      */
-    public void run() {
+    @Override
+	public void run() {
         IResource resource = getTaskList().getResource();
         int depth = getTaskList().getResourceDepth();
         IMarker[] tasks;
@@ -56,7 +57,7 @@ class PurgeCompletedAction extends TaskAction {
         } catch (CoreException e) {
             ErrorDialog.openError(
                     getShell(),
-                    TaskListMessages.PurgeCompleted_errorMessage, null, e.getStatus()); 
+                    TaskListMessages.PurgeCompleted_errorMessage, null, e.getStatus());
 
         	return;
         }
@@ -69,8 +70,8 @@ class PurgeCompletedAction extends TaskAction {
         }
         // Check if there is anything to do
         if (completed.size() == 0) {
-            MessageDialog.openInformation(getShell(), TaskListMessages.PurgeCompleted_title, 
-                    TaskListMessages.PurgeCompleted_noneCompleted); 
+            MessageDialog.openInformation(getShell(), TaskListMessages.PurgeCompleted_title,
+                    TaskListMessages.PurgeCompleted_noneCompleted);
             return;
         }
 

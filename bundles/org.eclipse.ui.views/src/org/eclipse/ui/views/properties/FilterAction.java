@@ -20,7 +20,7 @@ import org.eclipse.ui.PlatformUI;
     /**
      * Create the Filter action. This action is used to show
      * or hide expert properties.
-     * 
+     *
      * @param viewer the viewer
      * @param name the name
      */
@@ -34,7 +34,8 @@ import org.eclipse.ui.PlatformUI;
      * Toggle the display of expert properties.
      */
 
-    public void run() {
+    @Override
+	public void run() {
         PropertySheetViewer ps = getPropertySheet();
         ps.deactivateCellEditor();
         if (isChecked()) {

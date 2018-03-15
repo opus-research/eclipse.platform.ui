@@ -114,7 +114,7 @@ public class WindowReader extends MementoReader {
 	}
 
 	List<PerspectiveReader> getPerspectiveReaders() {
-		List<PerspectiveReader> perspectives = new ArrayList<PerspectiveReader>();
+		List<PerspectiveReader> perspectives = new ArrayList<>();
 		IMemento perspContainer = getPerspectiveContainer();
 		if (perspContainer != null) {
 			IMemento[] perspectiveMems = perspContainer
@@ -156,7 +156,7 @@ public class WindowReader extends MementoReader {
 
 	List<InfoReader> getEditorStacks() {
 		IMemento editorArea = getEditorArea();
-		List<InfoReader> readers = new ArrayList<InfoReader>();
+		List<InfoReader> readers = new ArrayList<>();
 		if (editorArea != null) {
 			IMemento[] editorStackMems = editorArea.getChildren(IWorkbenchConstants.TAG_INFO);
 			for (IMemento memento : editorStackMems) {
@@ -184,7 +184,7 @@ public class WindowReader extends MementoReader {
 	}
 
 	List<EditorReader> getEditors() {
-		List<EditorReader> readers = new ArrayList<EditorReader>();
+		List<EditorReader> readers = new ArrayList<>();
 		IMemento editors = getEditorsMemento();
 		if (editors != null) {
 			IMemento[] editorMems = editors.getChildren(IWorkbenchConstants.TAG_EDITOR);
@@ -204,7 +204,7 @@ public class WindowReader extends MementoReader {
 	}
 
 	List<ViewReader> getViews() {
-		List<ViewReader> readers = new ArrayList<ViewReader>();
+		List<ViewReader> readers = new ArrayList<>();
 		IMemento page = getPage();
 		if (page == null) {
 			return readers;

@@ -24,11 +24,12 @@ public class TestPropertyPage extends PropertyPage implements
 		//Create a new instance of the receiver
 	}
 
+	@Override
 	protected Control createContents(Composite parent) {
 		Label label = new Label(parent,SWT.NONE);
 		label.setText("Test page");
 		return label;
-		
+
 	}
 
 }

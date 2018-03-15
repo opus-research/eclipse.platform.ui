@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,11 +8,9 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
-
 package org.eclipse.ui;
 
 import java.util.Map;
-
 import org.eclipse.jface.util.IPropertyChangeListener;
 
 /**
@@ -23,7 +21,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
  * <p>
  * Setting a property must fire a PropertyChangeEvent.
  * </p>
- * 
+ *
  * @since 3.3
  */
 public interface IWorkbenchPart3 extends IWorkbenchPart2 {
@@ -33,7 +31,7 @@ public interface IWorkbenchPart3 extends IWorkbenchPart2 {
 	 * <b>Note:</b> this is a different set of properties than the ones covered
 	 * by the IWorkbenchPartConstants.PROP_* constants.
 	 * </p>
-	 * 
+	 *
 	 * @param listener
 	 *            Must not be <code>null</code>.
 	 */
@@ -45,7 +43,7 @@ public interface IWorkbenchPart3 extends IWorkbenchPart2 {
 	 * <b>Note:</b> this is a different set of properties than the ones covered
 	 * by the IWorkbenchPartConstants.PROP_* constants.
 	 * </p>
-	 * 
+	 *
 	 * @param listener
 	 *            Must not be <code>null</code>.
 	 */
@@ -53,7 +51,7 @@ public interface IWorkbenchPart3 extends IWorkbenchPart2 {
 
 	/**
 	 * Return the value for the arbitrary property key, or <code>null</code>.
-	 * 
+	 *
 	 * @param key
 	 *            the arbitrary property. Must not be <code>null</code>.
 	 * @return the property value, or <code>null</code>.
@@ -66,7 +64,7 @@ public interface IWorkbenchPart3 extends IWorkbenchPart2 {
 	 * <p>
 	 * A default implementation has been added to WorkbenchPart.
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 *            the arbitrary property. Must not be <code>null</code>.
 	 * @param value
@@ -78,8 +76,8 @@ public interface IWorkbenchPart3 extends IWorkbenchPart2 {
 	/**
 	 * Return an unmodifiable map of the arbitrary properties. This method can
 	 * be used to save the properties during workbench save/restore.
-	 * 
+	 *
 	 * @return A Map of the properties. Must not be <code>null</code>.
 	 */
-	public Map getPartProperties();
+	public Map<String, String> getPartProperties();
 }

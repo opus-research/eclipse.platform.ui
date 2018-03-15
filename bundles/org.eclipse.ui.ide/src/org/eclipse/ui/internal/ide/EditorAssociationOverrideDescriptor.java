@@ -31,7 +31,7 @@ import com.ibm.icu.text.MessageFormat;
 
 /**
  * Describes a contribution to the 'org.eclipse.ui.ide.editorAssociationOverride' extension point.
- * 
+ *
  * @since 3.8
  * @noinstantiate This class is not intended to be instantiated by clients.
  */
@@ -50,7 +50,7 @@ public final class EditorAssociationOverrideDescriptor {
 
 	/**
 	 * Returns descriptors for all editor association override extensions.
-	 * 
+	 *
 	 * @return an array with the contributed editor association overrides
 	 */
 	public static EditorAssociationOverrideDescriptor[] getContributedEditorAssociationOverrides() {
@@ -72,7 +72,7 @@ public final class EditorAssociationOverrideDescriptor {
 
 	/**
 	 * Creates a new {@link IEditorAssociationOverride}.
-	 * 
+	 *
 	 * @return the editor association override or <code>null</code> if the plug-in isn't loaded yet
 	 * @throws CoreException if a failure occurred during creation
 	 */
@@ -84,6 +84,7 @@ public final class EditorAssociationOverrideDescriptor {
 			/*
 			 * @see org.eclipse.core.runtime.ISafeRunnable#run()
 			 */
+			@Override
 			public void run() throws Exception {
 //		 		String pluginId = fElement.getContributor().getName();
 				result[0]= (IEditorAssociationOverride)fElement.createExecutableExtension(CLASS_ATTRIBUTE);
@@ -91,6 +92,7 @@ public final class EditorAssociationOverrideDescriptor {
 			/*
 			 * @see org.eclipse.jface.util.SafeRunnable#handleException(java.lang.Throwable)
 			 */
+			@Override
 			public void handleException(Throwable ex) {
 				super.handleException(ex);
 				exception[0]= ex;
@@ -110,7 +112,7 @@ public final class EditorAssociationOverrideDescriptor {
 
 	/**
 	 * Returns the editor association override's id.
-	 * 
+	 *
 	 * @return the editor association override's id
 	 */
 	public String getId() {
@@ -119,7 +121,7 @@ public final class EditorAssociationOverrideDescriptor {
 
 	/**
 	 * Returns the editor association override's name.
-	 * 
+	 *
 	 * @return the editor association override's name
 	 */
 	public String getName() {
@@ -128,19 +130,21 @@ public final class EditorAssociationOverrideDescriptor {
 
 	/**
 	 * Returns the editor association override's description.
-	 * 
+	 *
 	 * @return the editor association override's description or <code>null</code> if not provided
 	 */
 	public String getDescription() {
 		return fElement.getAttribute(DESCRIPTION_ATTRIBUTE);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || !obj.getClass().equals(this.getClass()) || getId() == null)
 			return false;
 		return getId().equals(((EditorAssociationOverrideDescriptor)obj).getId());
 	}
 
+	@Override
 	public int hashCode() {
 		return getId().hashCode();
 	}

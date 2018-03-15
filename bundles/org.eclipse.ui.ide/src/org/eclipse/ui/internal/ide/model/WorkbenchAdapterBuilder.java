@@ -14,15 +14,17 @@ import org.eclipse.ui.ide.IDE;
 
 /**
  * Registers the adapters on core constructs used in the workbench UI.
- * 
+ *
  * @deprecated advisors should call the org.eclipse.ui.ide.IDE method
  */
+@Deprecated
 public final class WorkbenchAdapterBuilder {
 	/**
 	 * Creates extenders and registers
-	 * 
+	 *
 	 * @deprecated advisors should call the org.eclipse.ui.ide.IDE method
 	 */
+	@Deprecated
 	public static void registerAdapters() {
 		IDE.registerAdapters();
 	}

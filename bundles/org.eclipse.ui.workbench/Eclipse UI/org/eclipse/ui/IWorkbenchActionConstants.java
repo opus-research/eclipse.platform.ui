@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440975, 431862
  *******************************************************************************/
 package org.eclipse.ui;
 
@@ -108,14 +109,14 @@ package org.eclipse.ui;
  * <code>
  *   IAction copyHandler = ...;
  *   view.getSite().getActionBars().setGlobalActionHandler(
- *       IWorkbenchActionConstants.COPY, 
+ *       IWorkbenchActionConstants.COPY,
  *       copyHandler);
  * </code>
  * For editors, this should be done in the <code>IEditorActionBarContributor</code>.
  * </p>
- *  
+ *
  * @see org.eclipse.ui.IActionBars#setGlobalActionHandler
- * 
+ *
  * Note: many of the remaining non-deprecated constants here are IDE-specific
  *   and should be deprecated and moved to a constant pool at the IDE layer
  *   (e.g. IIDEActionConstants).
@@ -168,6 +169,13 @@ public interface IWorkbenchActionConstants {
 
     // menu reorg
 
+	/**
+	 * Name of standard Perspective menu (value <code>"perspective"</code>).
+	 *
+	 * @since 3.107
+	 */
+   public static final String M_PERSPECTIVE = MENU_PREFIX + "perspective"; //$NON-NLS-1$
+
     /**
      * Name of standard Navigate menu (value <code>"navigate"</code>).
      */
@@ -194,11 +202,11 @@ public interface IWorkbenchActionConstants {
      * Name of standard Help menu (value <code>"help"</code>).
      */
     public static final String M_HELP = MENU_PREFIX + "help"; //$NON-NLS-1$
-    
+
     /**
-     * ID of the Project configure popup menu, can be used in 
+     * ID of the Project configure popup menu, can be used in
      * menuContributions and objectContributions.
-     * 
+     *
      * @since 3.5
      */
     public static final String M_PROJECT_CONFIGURE = "org.eclipse.ui.projectConfigure"; //$NON-NLS-1$
@@ -222,7 +230,7 @@ public interface IWorkbenchActionConstants {
 
     /**
      * File menu: name of standard New action (value <code>"new"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use
      * <code>org.eclipse.ui.ActionFactory.NEW.getId()</code>
      * instead.
@@ -237,7 +245,7 @@ public interface IWorkbenchActionConstants {
 
     /**
      * File menu: name of standard Close action (value <code>"close"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#CLOSE
      * ActionFactory.CLOSE.getId()} instead.
      */
@@ -246,7 +254,7 @@ public interface IWorkbenchActionConstants {
 
     /**
      * File menu: name of standard Close All action (value <code>"closeAll"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#CLOSE_ALL
      * ActionFactory.CLOSE_ALL.getId()} instead.
      */
@@ -260,7 +268,7 @@ public interface IWorkbenchActionConstants {
 
     /**
      * File menu: name of standard Save action (value <code>"save"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#SAVE
      * ActionFactory.SAVE.getId()} instead.
      */
@@ -269,7 +277,7 @@ public interface IWorkbenchActionConstants {
 
     /**
      * File menu: name of standard Save As action (value <code>"saveAs"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#SAVE_AS
      * ActionFactory.SAVE_AS.getId()} instead.
      */
@@ -278,7 +286,7 @@ public interface IWorkbenchActionConstants {
 
     /**
      * File menu: name of standard Save All action (value <code>"saveAll"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#SAVE_ALL
      * ActionFactory.SAVE_ALL.getId()} instead.
      */
@@ -291,9 +299,9 @@ public interface IWorkbenchActionConstants {
     public static final String SAVE_EXT = "save.ext"; // Group. //$NON-NLS-1$
 
     /**
-     * File menu: name of standard Print global action 
+     * File menu: name of standard Print global action
      * (value <code>"print"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#PRINT
      * ActionFactory.PRINT.getId()} instead.
      */
@@ -308,7 +316,7 @@ public interface IWorkbenchActionConstants {
 
     /**
      * File menu: name of standard Import action (value <code>"import"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use
      * <code>org.eclipse.ui.ActionFactory.IMPORT.getId()</code>
      * instead.
@@ -318,7 +326,7 @@ public interface IWorkbenchActionConstants {
 
     /**
      * File menu: name of standard Export action (value <code>"export"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use
      * <code>org.eclipse.ui.ActionFactory.EXPORT.getId()</code>
      * instead.
@@ -339,7 +347,7 @@ public interface IWorkbenchActionConstants {
 
     /**
      * File menu: name of standard Quit action (value <code>"quit"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#QUIT
      * ActionFactory.QUIT.getId()} instead.
      */
@@ -358,9 +366,9 @@ public interface IWorkbenchActionConstants {
     public static final String EDIT_END = "editEnd"; // Group. //$NON-NLS-1$
 
     /**
-     * Edit menu: name of standard Undo global action 
+     * Edit menu: name of standard Undo global action
      * (value <code>"undo"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#UNDO
      * ActionFactory.UNDO.getId()} instead.
      */
@@ -368,9 +376,9 @@ public interface IWorkbenchActionConstants {
 	public static final String UNDO = "undo"; // Global action. //$NON-NLS-1$
 
     /**
-     * Edit menu: name of standard Redo global action 
+     * Edit menu: name of standard Redo global action
      * (value <code>"redo"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#REDO
      * ActionFactory.REDO.getId()} instead.
      */
@@ -383,9 +391,9 @@ public interface IWorkbenchActionConstants {
     public static final String UNDO_EXT = "undo.ext"; // Group. //$NON-NLS-1$
 
     /**
-     * Edit menu: name of standard Cut global action 
+     * Edit menu: name of standard Cut global action
      * (value <code>"cut"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#CUT
      * ActionFactory.CUT.getId()} instead.
      */
@@ -395,7 +403,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Edit menu: name of standard Copy global action
      * (value <code>"copy"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#COPY
      * ActionFactory.COPY.getId()} instead.
      */
@@ -403,9 +411,9 @@ public interface IWorkbenchActionConstants {
 	public static final String COPY = "copy"; // Global action. //$NON-NLS-1$
 
     /**
-     * Edit menu: name of standard Paste global action 
+     * Edit menu: name of standard Paste global action
      * (value <code>"paste"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#PASTE
      * ActionFactory.PASTE.getId()} instead.
      */
@@ -418,9 +426,9 @@ public interface IWorkbenchActionConstants {
     public static final String CUT_EXT = "cut.ext"; // Group. //$NON-NLS-1$
 
     /**
-     * Edit menu: name of standard Delete global action 
+     * Edit menu: name of standard Delete global action
      * (value <code>"delete"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#DELETE
      * ActionFactory.DELETE.getId()} instead.
      */
@@ -430,7 +438,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Edit menu: name of standard Find global action
      * (value <code>"find"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#FIND
      * ActionFactory.FIND.getId()} instead.
      */
@@ -445,7 +453,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Edit menu: name of standard Select All global action
      * (value <code>"selectAll"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#SELECT_ALL
      * ActionFactory.SELECT_ALL.getId()} instead.
      */
@@ -455,7 +463,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Edit menu: name of standard Add Bookmark global action
      * (value <code>"bookmark"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use
      * <code>org.eclipse.ui.ide.IDEActionFactory.BOOKMARK.getId()</code>
      * instead.
@@ -466,7 +474,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Edit menu: name of standard Add Task global action
      * (value <code>"addTask"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use
      * <code>org.eclipse.ui.ide.IDEActionFactory.ADD_TASK.getId()</code>
      * instead.
@@ -499,9 +507,9 @@ public interface IWorkbenchActionConstants {
     public static final String BUILD_EXT = "build.ext"; // Group. //$NON-NLS-1$
 
     /**
-     * Workbench menu: name of standard Build action 
+     * Workbench menu: name of standard Build action
      * (value <code>"build"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use
      * <code>org.eclipse.ui.ide.IDEActionFactory.BUILD.getId()</code>
      * instead.
@@ -510,9 +518,9 @@ public interface IWorkbenchActionConstants {
 	public static final String BUILD = "build"; //$NON-NLS-1$
 
     /**
-     * Workbench menu: name of standard Rebuild All action 
+     * Workbench menu: name of standard Rebuild All action
      * (value <code>"rebuildAll"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use
      * <code>org.eclipse.ui.ide.IDEActionFactory.REBUILD_ALL.getId()</code>
      * instead.
@@ -523,59 +531,59 @@ public interface IWorkbenchActionConstants {
     // Workbench toolbar ids:
     /**
      * Workbench toolbar id for file toolbar group.
-     * 
+     *
      * @since 2.1
      */
     public static final String TOOLBAR_FILE = "org.eclipse.ui.workbench.file"; //$NON-NLS-1$
 
     /**
      * Workbench toolbar id for navigate toolbar group.
-     * 
+     *
      * @since 2.1
      */
     public static final String TOOLBAR_NAVIGATE = "org.eclipse.ui.workbench.navigate"; //$NON-NLS-1$
 
     /**
      * Workbench toolbar id for help toolbar group.
-     * 
+     *
      * @since 3.1
      */
-    public static final String TOOLBAR_HELP = "org.eclipse.ui.workbench.help"; //$NON-NLS-1$    
+    public static final String TOOLBAR_HELP = "org.eclipse.ui.workbench.help"; //$NON-NLS-1$
 
-    // Workbench toolbar group ids.  To add an item at the beginning of the group, 
+    // Workbench toolbar group ids.  To add an item at the beginning of the group,
     // use the GROUP id.  To add an item at the end of the group, use the EXT id.
-   
+
     /**
      * Group id for pin toolbar group.
-     * 
+     *
      * @since 2.1
      */
     public static final String PIN_GROUP = "pin.group"; //$NON-NLS-1$
 
     /**
      * Group id for history toolbar group.
-     * 
+     *
      * @since 2.1
      */
     public static final String HISTORY_GROUP = "history.group"; //$NON-NLS-1$
 
     /**
      * Group id for new toolbar group.
-     * 
+     *
      * @since 2.1
      */
     public static final String NEW_GROUP = "new.group"; //$NON-NLS-1$
 
     /**
      * Group id for save group.
-     * 
+     *
      * @since 2.1
      */
     public static final String SAVE_GROUP = "save.group"; //$NON-NLS-1$
-    
+
     /**
      * Group id for build group.
-     * 
+     *
      * @since 2.1
      */
     public static final String BUILD_GROUP = "build.group"; //$NON-NLS-1$
@@ -603,14 +611,14 @@ public interface IWorkbenchActionConstants {
 
     /**
      * Pop-up menu: name of group for Show In actions (value <code>"group.showIn"</code>).
-     * 
+     *
      * @since 2.1
      */
     public static final String GROUP_SHOW_IN = "group.showIn"; //$NON-NLS-1$
 
     /**
      * Coolbar: name of group for application created actions
-     * 
+     *
      * @since 3.0
      */
     public static final String GROUP_APP = "group.application"; //$NON-NLS-1$
@@ -619,13 +627,13 @@ public interface IWorkbenchActionConstants {
      * Toolbar: name of group for editor action bars.
      */
     public static final String GROUP_EDITOR = "group.editor"; //$NON-NLS-1$
-    
+
     /**
      * Coolbar: name of group for help actions and contributions
-     * 
+     *
      * @since 3.1
      */
-    public static final String GROUP_HELP = "group.help"; //$NON-NLS-1$    
+    public static final String GROUP_HELP = "group.help"; //$NON-NLS-1$
 
     // Standard view actions:
     /**
@@ -651,7 +659,7 @@ public interface IWorkbenchActionConstants {
     /**
      * File menu: name of standard Revert global action
      * (value <code>"revert"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#REVERT
      * ActionFactory.REVERT.getId()} instead.
      */
@@ -661,7 +669,7 @@ public interface IWorkbenchActionConstants {
     /**
      * File menu: name of standard Refresh global action
      * (value <code>"refresh"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#REFRESH
      * ActionFactory.REFRESH.getId()} instead.
      */
@@ -671,7 +679,7 @@ public interface IWorkbenchActionConstants {
     /**
      * File menu: name of standard Properties global action
      * (value <code>"properties"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#PROPERTIES
      * ActionFactory.PROPERTIES.getId()} instead.
      */
@@ -681,7 +689,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Edit menu: name of standard Move global action
      * (value <code>"move"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#MOVE
      * ActionFactory.MOVE.getId()} instead.
      */
@@ -691,7 +699,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Edit menu: name of standard Rename global action
      * (value <code>"rename"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#RENAME
      * ActionFactory.RENAME.getId()} instead.
      */
@@ -703,6 +711,23 @@ public interface IWorkbenchActionConstants {
      * (value <code>"addTask"</code>).
      */
     //	public static final String ADD_TASK = "addTask";	// Global action. //$NON-NLS-1$
+
+	/**
+	 * Perspective menu: name of group for start of menu (value
+	 * <code>"perspectiveStart"</code>).
+	 *
+	 * @since 3.107
+	 */
+	public static final String PERSPECTIVE_START = "perspectiveStart"; // Group. //$NON-NLS-1$
+
+	/**
+	 * Perspective menu: name of group for end of menu (value
+	 * <code>"perspectiveStartEnd"</code> ).
+	 *
+	 * @since 3.107
+	 */
+	public static final String PERSPECTIVE_END = "perspectiveStartEnd"; // Group. //$NON-NLS-1$
+
     /**
      * Navigate menu: name of group for start of menu
      * (value <code>"navStart"</code>).
@@ -748,18 +773,18 @@ public interface IWorkbenchActionConstants {
     /**
      * Navigate menu: name of standard Sync With Editor global action (value
      * <code>"syncEditor"</code>).
-     * 
-     * @deprecated this action will be removed soon; use SHOW_IN instead 
+     *
+     * @deprecated this action will be removed soon; use SHOW_IN instead
      */
     @Deprecated
 	public static final String SYNC_EDITOR = "syncEditor"; // Global action. //$NON-NLS-1$
 
     /**
-     * Navigate menu: name of standard Show In... action 
+     * Navigate menu: name of standard Show In... action
      * (value <code>"showIn"</code>).
-     * 
+     *
      * @since 2.1
-     * 
+     *
      * @deprecated
      */
     @Deprecated
@@ -768,7 +793,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Navigate menu: name of standard Back global action
      * (value <code>"back"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#BACK
      * ActionFactory.BACK.getId()} instead.
      */
@@ -778,7 +803,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Navigate menu: name of standard Forward global action
      * (value <code>"forward"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#FORWARD
      * ActionFactory.FORWARD.getId()} instead.
      */
@@ -794,7 +819,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Navigate menu: name of standard Next global action
      * (value <code>"next"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#NEXT
      * ActionFactory.NEXT.getId()} instead.
      */
@@ -804,7 +829,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Navigate menu: name of standard Up global action
      * (value <code>"previous"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#PREVIOUS
      * ActionFactory.PREVIOUS.getId()} instead.
      */
@@ -826,7 +851,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Project menu: name of standard Build Project global action
      * (value <code>"buildProject"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use
      * <code>org.eclipse.ui.ide.IDEActionFactory.BUILD_PROJECT.getId()</code>
      * instead.
@@ -837,7 +862,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Project menu: name of standard Rebuild Project global action
      * (value <code>"rebuildProject"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use
      * <code>org.eclipse.ui.ide.IDEActionFactory.REBUILD_PROJECT.getId()</code>
      * instead.
@@ -848,7 +873,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Project menu: name of standard Open Project global action
      * (value <code>"openProject"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use
      * <code>org.eclipse.ui.ide.IDEActionFactory.OPEN_PROJECT.getId()</code>
      * instead.
@@ -859,7 +884,7 @@ public interface IWorkbenchActionConstants {
     /**
      * Project menu: name of standard Close Project global action
      * (value <code>"closeProject"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use
      * <code>org.eclipse.ui.ide.IDEActionFactory.CLOSE_PROJECT.getId()</code>
      * instead.
@@ -882,9 +907,9 @@ public interface IWorkbenchActionConstants {
     public static final String HELP_END = "helpEnd"; // Group. //$NON-NLS-1$
 
     /**
-     * Help menu: name of standard About action 
+     * Help menu: name of standard About action
      * (value <code>"about"</code>).
-     * 
+     *
      * @deprecated in 3.0. Use {@link org.eclipse.ui.actions.ActionFactory#ABOUT
      * ActionFactory.ABOUT.getId()} instead.
      */
@@ -893,7 +918,7 @@ public interface IWorkbenchActionConstants {
 
     /**
      * Standard global actions in a workbench window.
-     * 
+     *
      * @deprecated in 3.0
      */
     @Deprecated

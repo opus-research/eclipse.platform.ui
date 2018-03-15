@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Broadcom Corp. - James Blackburn -  Fix for Bug 305529 -  
+ *     Broadcom Corp. - James Blackburn -  Fix for Bug 305529 -
  *     					[Markers] NPE in MarkerFieldEditor if MarkerFieldConfiguration scope is unset
  *******************************************************************************/
 
@@ -48,9 +48,9 @@ import org.eclipse.ui.views.markers.internal.MarkerType;
 
 /**
  * MarkerFieldFilterGroup is the representation of a grouping of marker filters.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 class MarkerFieldFilterGroup {
 
@@ -60,7 +60,7 @@ class MarkerFieldFilterGroup {
 
 	/**
 	 * The attribute values for the scope
-	 * 
+	 *
 	 */
 
 	private static final String ATTRIBUTE_SCOPE = "scope"; //$NON-NLS-1$
@@ -90,7 +90,7 @@ class MarkerFieldFilterGroup {
 	 * Constant for on working set.
 	 */
 	static final int ON_WORKING_SET = 4;
-	
+
 	static final String TAG_ENABLED = "enabled"; //$NON-NLS-1$
 	private static final String TAG_SCOPE = "scope"; //$NON-NLS-1$
 	private static final String TAG_FIELD_FILTER_ENTRY = "fieldFilter"; //$NON-NLS-1$
@@ -103,12 +103,12 @@ class MarkerFieldFilterGroup {
 
 	private IConfigurationElement element;
 
-	private Map EMPTY_MAP = new HashMap();
+	private Map<String, String> EMPTY_MAP = new HashMap<>();
 	private boolean enabled = true;
 	protected MarkerFieldFilter[] fieldFilters;
 	private int scope;
 	private int limit;
-	
+
 	private String name;
 	private String id;
 
@@ -121,26 +121,24 @@ class MarkerFieldFilterGroup {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param configurationElement
 	 * @param markerBuilder
 	 */
-	public MarkerFieldFilterGroup(IConfigurationElement configurationElement,
-			MarkerContentGenerator markerBuilder) {
+	public MarkerFieldFilterGroup(IConfigurationElement configurationElement, MarkerContentGenerator markerBuilder) {
 		element = configurationElement;
 		generator = markerBuilder;
 		initializeWorkingSet();
 		scope = processScope();
 
-		if (configurationElement == null)
+		if (configurationElement == null) {
 			return;
-		String stringValue = configurationElement
-				.getAttribute(MarkerSupportRegistry.ENABLED);
+		}
+		String stringValue = configurationElement.getAttribute(MarkerSupportRegistry.ENABLED);
 		if (MarkerSupportInternalUtilities.FALSE.equals(stringValue)) {
 			enabled = false;
 		}
-		stringValue = configurationElement
-				.getAttribute(MarkerSupportRegistry.FILTER_LIMIT);
+		stringValue = configurationElement.getAttribute(MarkerSupportRegistry.FILTER_LIMIT);
 		if (stringValue == null || stringValue.length() == 0) {
 			limit = -1;
 		}
@@ -148,16 +146,16 @@ class MarkerFieldFilterGroup {
 
 	/**
 	 * Get the root types for the receiver
-	 * 
+	 *
 	 * @return Collection of {@link MarkerType}
 	 */
-	Collection getAllTypes() {
+	Collection<MarkerType> getAllTypes() {
 		return generator.getMarkerTypes();
 	}
 
 	/**
 	 * Get the filters registered on the receiver.
-	 * 
+	 *
 	 * @return MarkerFieldFilter[]
 	 */
 	private MarkerFieldFilter[] getFieldFilters() {
@@ -171,22 +169,22 @@ class MarkerFieldFilterGroup {
 	 * Calculate the filters for the receiver.
 	 */
 	protected void calculateFilters() {
-		Map values = getValues();
-		Collection filters = new ArrayList();
+		Map<String, String> values = getValues();
+		Collection<MarkerFieldFilter> filters = new ArrayList<>();
 		MarkerField[] fields = generator.getVisibleFields();
 		for (int i = 0; i < fields.length; i++) {
-			MarkerFieldFilter fieldFilter = MarkerSupportInternalUtilities
-					.generateFilter(fields[i]);
+			MarkerFieldFilter fieldFilter = MarkerSupportInternalUtilities.generateFilter(fields[i]);
 			if (fieldFilter != null) {
 				filters.add(fieldFilter);
 
 				// The type filter needs information from the generator
-				if (fieldFilter instanceof MarkerTypeFieldFilter)
+				if (fieldFilter instanceof MarkerTypeFieldFilter) {
 					// Show everything by default
-					((MarkerTypeFieldFilter) fieldFilter)
-							.setContentGenerator(generator);
-				if (values != null)
+					((MarkerTypeFieldFilter) fieldFilter).setContentGenerator(generator);
+				}
+				if (values != null) {
 					fieldFilter.initialize(values);
+				}
 			}
 		}
 		MarkerFieldFilter[] newFilters = new MarkerFieldFilter[filters.size()];
@@ -197,47 +195,48 @@ class MarkerFieldFilterGroup {
 	/**
 	 * Return the MarkerFieldFilter for field or <code>null</code> if there
 	 * isn't one.
-	 * 
+	 *
 	 * @param field
 	 * @return MarkerFieldFilter
 	 */
 	public MarkerFieldFilter getFilter(MarkerField field) {
 		MarkerFieldFilter[] filters = getFieldFilters();
 		for (int i = 0; i < filters.length; i++) {
-			if (filters[i].getField().equals(field))
+			if (filters[i].getField().equals(field)) {
 				return filters[i];
+			}
 		}
 		return null;
 	}
 
 	/**
 	 * Return the id of the receiver.
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getID() {
 		if (id == null) {
-			if (element == null)
+			if (element == null) {
 				id = USER + String.valueOf(System.currentTimeMillis());
-			else
-				id = element
-						.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_NAME);
+			} else {
+				id = element.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_NAME);
+			}
 		}
 		return id;
 	}
 
 	/**
 	 * Return the name of the receiver.
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getName() {
 		if (name == null) {
-			if (element == null)
+			if (element == null) {
 				name = MarkerSupportInternalUtilities.EMPTY_STRING;
-			else
-				name = element
-						.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_NAME);
+			} else {
+				name = element.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_NAME);
+			}
 		}
 		return name;
 	}
@@ -245,7 +244,7 @@ class MarkerFieldFilterGroup {
 	/**
 	 * Return the resources in the working set. If it is empty then return the
 	 * workspace root.
-	 * 
+	 *
 	 * @return IResource[]
 	 */
 	IResource[] getResourcesInWorkingSet() {
@@ -255,28 +254,27 @@ class MarkerFieldFilterGroup {
 
 		//Return workspace root for aggregates with no containing workingsets,ex. window working set
 		if (workingSet.isAggregateWorkingSet()&&workingSet.isEmpty()){
-			if(((AggregateWorkingSet) workingSet).getComponents().length==0)
+			if(((AggregateWorkingSet) workingSet).getComponents().length==0) {
 				return new IResource[] { ResourcesPlugin.getWorkspace().getRoot()};
+			}
 		}
-		
+
 		IAdaptable[] elements = workingSet.getElements();
-		List result = new ArrayList(elements.length);
+		List<IResource> result = new ArrayList<>(elements.length);
 
 		for (int idx = 0; idx < elements.length; idx++) {
-			IResource next = (IResource) elements[idx]
-					.getAdapter(IResource.class);
-
+			IResource next = elements[idx].getAdapter(IResource.class);
 			if (next != null) {
 				result.add(next);
 			}
 		}
 
-		return (IResource[]) result.toArray(new IResource[result.size()]);
+		return result.toArray(new IResource[result.size()]);
 	}
 
 	/**
 	 * Return the value of the scope.
-	 * 
+	 *
 	 * @return int
 	 * @see #ON_ANY
 	 * @see #ON_ANY_IN_SAME_CONTAINER
@@ -284,16 +282,17 @@ class MarkerFieldFilterGroup {
 	 * @see #ON_SELECTED_ONLY
 	 * @see #ON_WORKING_SET
 	 */
+	@SuppressWarnings("javadoc")
 	public int getScope() {
 		return scope;
 	}
 
 	/**
 	 * Get the values defined for the receiver.
-	 * 
+	 *
 	 * @return Map of values to apply to a {@link MarkerFieldFilter}
 	 */
-	private Map getValues() {
+	private Map<String, String> getValues() {
 
 		try {
 			String className = null;
@@ -310,12 +309,11 @@ class MarkerFieldFilterGroup {
 			return null;
 		}
 		return EMPTY_MAP;
-
 	}
 
 	/**
 	 * Get the working set for the receiver.
-	 * 
+	 *
 	 * @return IWorkingSet
 	 */
 	IWorkingSet getWorkingSet() {
@@ -327,14 +325,13 @@ class MarkerFieldFilterGroup {
 	 */
 	private void computeWorkingSetResources() {
 		if(workingSet!=null){
-			 /* MarkerFieldFilterGroup will have to re-get the resources in 
+			 /* MarkerFieldFilterGroup will have to re-get the resources in
 			 * a working set for every marker it filters using the select method
-			 * Or we may do this once before the markers are filtered.		 
+			 * Or we may do this once before the markers are filtered.
 			 */
 			wSetResources=getResourcesInWorkingSet();
-		}else{			
-			wSetResources = new IResource[] { ResourcesPlugin.getWorkspace()
-					.getRoot() };
+		}else{
+			wSetResources = new IResource[] { ResourcesPlugin.getWorkspace().getRoot() };
 		}
 	}
 
@@ -344,7 +341,9 @@ class MarkerFieldFilterGroup {
 	 * @return boolean
 	 */
 	private boolean isInWorkingSet(IResource resource) {
-		if(wSetResources==null)computeWorkingSetResources();
+		if (wSetResources == null) {
+			computeWorkingSetResources();
+		}
 		for (int i = 0; i < wSetResources.length; i++) {
 			if(wSetResources[i].getFullPath().isPrefixOf(resource.getFullPath())){
 				return true;
@@ -352,30 +351,29 @@ class MarkerFieldFilterGroup {
 		}
 		return false;
 	}
+
 	/**
 	 * Initialise the working set for the receiver. Use the window working set
 	 * for the working set and set the scope to ON_WORKING_SET if they are to be
 	 * used by default.
 	 */
 	private void initializeWorkingSet() {
-
-		IWorkbenchWindow window = PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow();
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (window != null) {
 			IWorkbenchPage page = window.getActivePage();
 			if (page != null) {
 				setWorkingSet(page.getAggregateWorkingSet());
 				if ((PlatformUI.getPreferenceStore()
-						.getBoolean(IWorkbenchPreferenceConstants.USE_WINDOW_WORKING_SET_BY_DEFAULT)))
+						.getBoolean(IWorkbenchPreferenceConstants.USE_WINDOW_WORKING_SET_BY_DEFAULT))) {
 					setScope(ON_WORKING_SET);
-
+				}
 			}
 		}
 	}
 
 	/**
 	 * Return whether or not the receiver is enabled.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public boolean isEnabled() {
@@ -384,7 +382,7 @@ class MarkerFieldFilterGroup {
 
 	/**
 	 * Return whether or not this is a system or user group.
-	 * 
+	 *
 	 * @return boolean <code>true</code> if it is a system group.
 	 */
 	public boolean isSystem() {
@@ -393,54 +391,54 @@ class MarkerFieldFilterGroup {
 
 	/**
 	 * Load the settings from the legacy child.
-	 * 
+	 *
 	 * @param memento
 	 */
 	void legacyLoadSettings(IMemento memento) {
 
 		String enabledString = memento.getString(TAG_ENABLED);
-		if (enabledString != null && enabledString.length() > 0)
+		if (enabledString != null && enabledString.length() > 0) {
 			enabled = Boolean.valueOf(enabledString).booleanValue();
+		}
 
-		Integer resourceSetting = memento
-				.getInteger(MarkerFilter.TAG_ON_RESOURCE);
+		Integer resourceSetting = memento.getInteger(MarkerFilter.TAG_ON_RESOURCE);
 
-		if (resourceSetting != null)
+		if (resourceSetting != null) {
 			scope = resourceSetting.intValue();
+		}
 
 		String workingSetName = memento.getString(TAG_WORKING_SET);
 
-		if (workingSetName != null)
-			setWorkingSet(PlatformUI.getWorkbench().getWorkingSetManager()
-					.getWorkingSet(workingSetName));
+		if (workingSetName != null) {
+			setWorkingSet(PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSet(workingSetName));
+		}
 
 		if (element == null) {
 			String nameString = memento.getID();
-			if (nameString != null && nameString.length() > 0)
+			if (nameString != null && nameString.length() > 0) {
 				name = nameString;
+			}
 			String idString = memento.getString(IMemento.TAG_ID);
-			if (idString != null && idString.length() > 0)
+			if (idString != null && idString.length() > 0) {
 				id = idString;
-
+			}
 		}
 
 		MarkerFieldFilter[] filters = getFieldFilters();
 		for (int i = 0; i < filters.length; i++) {
-			if (filters[i] instanceof CompatibilityFieldFilter)
-				((CompatibilityFieldFilter) filters[i]).loadLegacySettings(
-						memento, generator);
+			if (filters[i] instanceof CompatibilityFieldFilter) {
+				((CompatibilityFieldFilter) filters[i]).loadLegacySettings(memento, generator);
+			}
 		}
-
 	}
 
 	/**
 	 * Load the current settings from the child.
-	 * 
+	 *
 	 * @param memento -
 	 *            the memento to load from
 	 */
 	void loadSettings(IMemento memento) {
-
 		String stringValue = memento.getString(TAG_ENABLED);
 		if (stringValue != null && stringValue.length() > 0){
 			enabled = Boolean.valueOf(stringValue).booleanValue();
@@ -449,69 +447,62 @@ class MarkerFieldFilterGroup {
 
 		String workingSetName = memento.getString(TAG_WORKING_SET);
 
-		if (workingSetName != null)
-			setWorkingSet(PlatformUI.getWorkbench().getWorkingSetManager()
-					.getWorkingSet(workingSetName));
+		if (workingSetName != null) {
+			setWorkingSet(PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSet(workingSetName));
+		}
 
 		stringValue = memento.getString(TAG_LIMIT);
 		if (stringValue != null && stringValue.length() > 0) {
 			setLimit(Integer.parseInt(stringValue));
 		}
-		
-		Map filterMap = new HashMap();
+
+		Map<String, MarkerFieldFilter> filterMap = new HashMap<>();
 		MarkerFieldFilter[] filters = getFieldFilters();
 		for (int i = 0; i < filters.length; i++) {
-			filterMap.put(MarkerSupportInternalUtilities.getId(filters[i]
-					.getField()), filters[i]);
-
+			filterMap.put(MarkerSupportInternalUtilities.getId(filters[i].getField()), filters[i]);
 		}
 
 		IMemento[] children = memento.getChildren(TAG_FIELD_FILTER_ENTRY);
 		for (int i = 0; i < children.length; i++) {
 			IMemento childMemento = children[i];
-			String id = childMemento.getID();
-			if (filterMap.containsKey(id)) {
-				MarkerFieldFilter filter = (MarkerFieldFilter) filterMap
-						.get(id);
+			String filterId = childMemento.getID();
+			if (filterMap.containsKey(filterId)) {
+				MarkerFieldFilter filter = filterMap.get(filterId);
 				if (filter instanceof MarkerTypeFieldFilter) {
-					((MarkerTypeFieldFilter) filter)
-							.setContentGenerator(generator);
+					((MarkerTypeFieldFilter) filter).setContentGenerator(generator);
 				}
 				filter.loadSettings(childMemento);
 			}
-
 		}
 
 		if (element == null) {
-			String nameString = memento
-					.getString(MarkerSupportInternalUtilities.ATTRIBUTE_NAME);
-			if (nameString != null && nameString.length() > 0)
+			String nameString = memento	.getString(MarkerSupportInternalUtilities.ATTRIBUTE_NAME);
+			if (nameString != null && nameString.length() > 0) {
 				name = nameString;
+			}
 			String idString = memento.getString(IMemento.TAG_ID);
-			if (idString != null && idString.length() > 0)
+			if (idString != null && idString.length() > 0) {
 				id = idString;
-
+			}
 		}
-
 	}
 
 	/**
 	 * Make a working copy of the receiver.
-	 * 
+	 *
 	 * @return MarkerFieldFilterGroup or <code> null</code> if it failed.
 	 */
 	MarkerFieldFilterGroup makeWorkingCopy() {
-		MarkerFieldFilterGroup clone = new MarkerFieldFilterGroup(this.element,
-				this.generator);
-		if (populateClone(clone))
+		MarkerFieldFilterGroup clone = new MarkerFieldFilterGroup(this.element, this.generator);
+		if (populateClone(clone)) {
 			return clone;
+		}
 		return null;
-
 	}
 
 	/**
 	 * Populate the clone and return true if successful.
-	 * 
+	 *
 	 * @param clone
 	 */
 	protected boolean populateClone(MarkerFieldFilterGroup clone) {
@@ -524,8 +515,7 @@ class MarkerFieldFilterGroup {
 		clone.id = id;
 		for (int i = 0; i < fieldFilters.length; i++) {
 			try {
-				clone.fieldFilters[i] = (MarkerFieldFilter) fieldFilters[i]
-						.getClass().newInstance();
+				clone.fieldFilters[i] = fieldFilters[i].getClass().newInstance();
 				fieldFilters[i].populateWorkingCopy(clone.fieldFilters[i]);
 			} catch (InstantiationException e) {
 				StatusManager.getManager().handle(
@@ -538,38 +528,35 @@ class MarkerFieldFilterGroup {
 								.getLocalizedMessage(), e), StatusManager.SHOW);
 				return false;
 			}
-
 		}
 		return true;
 	}
 
 	/**
 	 * Process the scope attribute.
-	 * 
+	 *
 	 * @return int
 	 */
 	private int processScope() {
-
-		if (element == null)
+		if (element == null) {
 			return ON_ANY;
-
+		}
 		String scopeValue = element.getAttribute(ATTRIBUTE_SCOPE);
-
-		if (ATTRIBUTE_ON_SELECTED_ONLY.equals(scopeValue))
+		if (ATTRIBUTE_ON_SELECTED_ONLY.equals(scopeValue)) {
 			return ON_SELECTED_ONLY;
-
-		if (ATTRIBUTE_ON_SELECTED_AND_CHILDREN.equals(scopeValue))
+		}
+		if (ATTRIBUTE_ON_SELECTED_AND_CHILDREN.equals(scopeValue)) {
 			return ON_SELECTED_AND_CHILDREN;
-
-		if (ATTRIBUTE_ON_ANY_IN_SAME_CONTAINER.equals(scopeValue))
+		}
+		if (ATTRIBUTE_ON_ANY_IN_SAME_CONTAINER.equals(scopeValue)) {
 			return ON_ANY_IN_SAME_CONTAINER;
-
+		}
 		return ON_ANY;
 	}
 
 	/**
 	 * Save the settings for the receiver in the memento.
-	 * 
+	 *
 	 * @param memento
 	 */
 	void saveFilterSettings(IMemento memento) {
@@ -582,29 +569,24 @@ class MarkerFieldFilterGroup {
 		}
 
 		if (element == null) {
-			memento.putString(MarkerSupportInternalUtilities.ATTRIBUTE_NAME,
-					getName());
+			memento.putString(MarkerSupportInternalUtilities.ATTRIBUTE_NAME, getName());
 			memento.putString(IMemento.TAG_ID, getID());
 		}
 		MarkerFieldFilter[] filters = getFieldFilters();
 
 		for (int i = 0; i < filters.length; i++) {
-			IMemento child = memento
-					.createChild(TAG_FIELD_FILTER_ENTRY,
-							MarkerSupportInternalUtilities.getId(filters[i]
-									.getField()));
+			IMemento child = memento.createChild(TAG_FIELD_FILTER_ENTRY,
+					MarkerSupportInternalUtilities.getId(filters[i].getField()));
 			filters[i].saveSettings(child);
-
 		}
-
 	}
 
 	/**
 	 * Return whether or not this IMarker is being shown.
-	 * 
+	 *
 	 * @param marker
 	 * @return <code>true</code> if it is being shown
-	 */	
+	 */
 	public boolean select(IMarker marker) {
 		testEntry.setMarker(marker);
 		return select(testEntry);
@@ -612,29 +594,31 @@ class MarkerFieldFilterGroup {
 
 	/**
 	 * Return whether or not this MarkerEntry can be shown.
-	 * @param testEntry 
-	 * 
+	 *
+	 * @param entry
+	 *
 	 * @return <code>true</code> if it can be shown
-	 */	
-	public boolean select(MarkerEntry testEntry) {
+	 */
+	public boolean select(MarkerEntry entry) {
 		MarkerFieldFilter[] filters = getFieldFilters();
 		if (scope == ON_WORKING_SET && workingSet != null) {
 			if (!workingSet.isAggregateWorkingSet()){
-					if(!isInWorkingSet(testEntry.getMarker().getResource())){
-						return false;
-					}
+				if (!isInWorkingSet(entry.getMarker().getResource())) {
+					return false;
+				}
 			}
 			//skip this for aggregates with no containing workingsets, ex. window working set
 			else if(((AggregateWorkingSet) workingSet).getComponents().length!=0){
-					if(!isInWorkingSet(testEntry.getMarker().getResource())){
-						return false;
-					}
+				if (!isInWorkingSet(entry.getMarker().getResource())) {
+					return false;
+				}
 			}
 		}
 
 		for (int i = 0; i < filters.length; i++) {
-			if (filters[i].select(testEntry))
+			if (filters[i].select(entry)) {
 				continue;
+			}
 			return false;
 		}
 		return true;
@@ -642,7 +626,7 @@ class MarkerFieldFilterGroup {
 
 	/**
 	 * Set whether or not the receiver is enabled.
-	 * 
+	 *
 	 * @param enabled
 	 *            The enabled to set.
 	 */
@@ -652,7 +636,7 @@ class MarkerFieldFilterGroup {
 
 	/**
 	 * Set the name of the receiver.
-	 * 
+	 *
 	 * @param newName
 	 */
 	public void setName(String newName) {
@@ -662,7 +646,7 @@ class MarkerFieldFilterGroup {
 
 	/**
 	 * Set the scope of the receiver.
-	 * 
+	 *
 	 * @param newScope
 	 */
 	public void setScope(int newScope) {
@@ -671,13 +655,13 @@ class MarkerFieldFilterGroup {
 
 	/**
 	 * Set the working set of the receiver.
-	 * 
+	 *
 	 * @param workingSet
 	 */
 	void setWorkingSet(IWorkingSet workingSet) {
 		this.workingSet = workingSet;
 	}
-	
+
 	/**
 	 * @return Returns -1 for no limit else the limit.
 	 */
@@ -695,17 +679,17 @@ class MarkerFieldFilterGroup {
 
 	/**
 	 * Refresh the MarkerFieldFilterGroup .
-	 */	
+	 */
 	void refresh() {
 		if (getScope() == ON_WORKING_SET) {
 			computeWorkingSetResources();
 		}
 	}
-	
+
 	public boolean selectByFilters(MarkerEntry entry) {
 		return select(entry);
 	}
-	
+
 	public boolean selectByScope(MarkerEntry entry, IResource[] resources) {
 		int scopeVal = getScope();
 		switch (scopeVal) {

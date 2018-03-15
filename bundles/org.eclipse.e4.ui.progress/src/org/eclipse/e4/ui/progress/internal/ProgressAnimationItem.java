@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -65,12 +65,12 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	// ProgressBar flags
 	private int flags;
-	
+
 	private FinishedJobs finishedJobs;
 
 	/**
 	 * Create an instance of the receiver in the supplied region.
-	 * 
+	 *
 	 * @param region
 	 *            The ProgressRegion that contains the receiver.
 	 * @param flags
@@ -114,7 +114,12 @@ public class ProgressAnimationItem extends AnimationItem implements
 						removeTopElement(ji);
 					}
 
-					execute(ji, job);
+					// To fix a bug (335543) introduced in 3.6.1.
+					// doAction() should return if progress region button was
+					// selected to open a job result action or command.
+					if (execute(ji, job)) {
+						return;
+					}
 				}
 			}
 		}
@@ -126,14 +131,16 @@ public class ProgressAnimationItem extends AnimationItem implements
 	/**
 	 * @param ji
 	 * @param job
+	 * @return <code>true</code> if Action or Command is executed
 	 */
-	private void execute(JobInfo ji, Job job) {
+	private boolean execute(JobInfo ji, Job job) {
 
 		Object prop = job.getProperty(IProgressConstants.ACTION_PROPERTY);
 		if (prop instanceof IAction && ((IAction) prop).isEnabled()) {
 			IAction action = (IAction) prop;
 			action.run();
 			removeTopElement(ji);
+			return true;
 		}
 
 		prop = job.getProperty(IProgressConstants.COMMAND_PROPERTY);
@@ -141,7 +148,9 @@ public class ProgressAnimationItem extends AnimationItem implements
 			ParameterizedCommand command = (ParameterizedCommand) prop;
 			getEHandlerService().executeHandler(command);
 			removeTopElement(ji);
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -223,7 +232,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 		toolButton.setToolTipText(tt);
     	toolbar.setVisible(true);
 		toolbar.getParent().layout(); // must layout
-		
+
     	toolbar.getAccessible().addAccessibleListener(new AccessibleAdapter() {
         	public void getName(AccessibleEvent e) {
         		e.result = tt;
@@ -233,7 +242,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.progress.AnimationItem#createAnimationItem(org.eclipse.swt.widgets.Composite)
 	 */
 	protected Control createAnimationItem(Composite parent) {
@@ -241,7 +250,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 		if (okImage == null) {
 			Display display = parent.getDisplay();
 			ImageTools imageTools = ImageTools.getInstance();
-			
+
 			noneImage = imageTools.getImage("progress/progress_none.png", display); //$NON-NLS-1$
 			okImage = imageTools.getImage("progress/progress_ok.png", display); //$NON-NLS-1$
 			errorImage = imageTools.getImage("progress/progress_error.png", display); //$NON-NLS-1$
@@ -316,7 +325,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.progress.AnimationItem#getControl()
 	 */
 	public Control getControl() {
@@ -325,7 +334,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationDone()
 	 */
 	void animationDone() {
@@ -347,7 +356,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationStart()
 	 */
 	void animationStart() {
@@ -377,11 +386,11 @@ public class ProgressAnimationItem extends AnimationItem implements
 			}
 		});
 	}
-	
+
 	protected StatusReporter getStatusReporter() {
 	    return Services.getInstance().getStatusReporter();
     }
-	
+
 	protected EHandlerService getEHandlerService() {
 		return Services.getInstance().getEHandlerService();
 	}

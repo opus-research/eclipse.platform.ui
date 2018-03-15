@@ -36,10 +36,12 @@ public class ExtendedSourceViewer extends SourceViewer {
     /*
      * @see Viewer#getSelection()
      */
-    public ISelection getSelection() {
+    @Override
+	public ISelection getSelection() {
         Point p = getSelectedRange();
-        if (p.x == -1 || p.y == -1)
-            return TextSelection.emptySelection();
+        if (p.x == -1 || p.y == -1) {
+			return TextSelection.emptySelection();
+		}
 
         return new ExtendedTextSelection(getDocument(), p.x, p.y);
     }
@@ -50,7 +52,8 @@ public class ExtendedSourceViewer extends SourceViewer {
      * @param offset the offset of the newly selected range
      * @param length the length of the newly selected range
      */
-    protected void selectionChanged(int offset, int length) {
+    @Override
+	protected void selectionChanged(int offset, int length) {
         ISelection selection = new ExtendedTextSelection(getDocument(), offset,
                 length);
         SelectionChangedEvent event = new SelectionChangedEvent(this, selection);

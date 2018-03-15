@@ -21,27 +21,30 @@ import org.eclipse.swt.widgets.DateTime;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class DateTimeSelectionProperty extends WidgetValueProperty {
 	/**
-	 * 
+	 *
 	 */
 	public DateTimeSelectionProperty() {
 		super(SWT.Selection);
 	}
 
+	@Override
 	public Object getValueType() {
 		return Date.class;
 	}
 
 	// One calendar per thread to preserve thread-safety
 	private static final ThreadLocal calendar = new ThreadLocal() {
+		@Override
 		protected Object initialValue() {
 			return Calendar.getInstance();
 		}
 	};
 
+	@Override
 	protected Object doGetValue(Object source) {
 		DateTime dateTime = (DateTime) source;
 
@@ -59,6 +62,7 @@ public class DateTimeSelectionProperty extends WidgetValueProperty {
 		return cal.getTime();
 	}
 
+	@Override
 	protected void doSetValue(Object source, Object value) {
 		DateTime dateTime = (DateTime) source;
 

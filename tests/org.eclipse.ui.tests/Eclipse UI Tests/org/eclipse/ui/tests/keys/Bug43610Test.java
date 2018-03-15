@@ -22,14 +22,14 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Test for Bug 43610.
- * 
+ *
  * @since 3.0
  */
 public class Bug43610Test extends UITestCase {
 
 	/**
 	 * Constructs a new instance of this test case.
-	 * 
+	 *
 	 * @param testName
 	 *            The name of the test
 	 */
@@ -49,6 +49,7 @@ public class Bug43610Test extends UITestCase {
 		// Set up a working environment.
 		Display display = Display.getCurrent();
 		Listener listener = new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				if (event.stateMask == SWT.SHIFT) {
 					assertEquals(
@@ -66,8 +67,9 @@ public class Bug43610Test extends UITestCase {
 			AutomationUtil.performKeyCodeEvent(display, SWT.KeyDown, SWT.ESC);
 			AutomationUtil.performKeyCodeEvent(display, SWT.KeyUp, SWT.ESC);
 
-			while (display.readAndDispatch())
+			while (display.readAndDispatch()) {
 				;
+			}
 
 		} finally {
 			// Clean up the working environment.

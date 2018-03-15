@@ -25,12 +25,12 @@ import org.eclipse.core.internal.databinding.observable.Util;
 
 /**
  * @since 1.1
- * 
+ *
  */
 public abstract class MapDiff implements IDiff {
 	/**
 	 * Returns true if the diff has no added, removed or changed entries.
-	 * 
+	 *
 	 * @return true if the diff has no added, removed or changed entries.
 	 * @since 1.2
 	 */
@@ -41,7 +41,7 @@ public abstract class MapDiff implements IDiff {
 
 	/**
 	 * Applies the changes in this diff to the given map
-	 * 
+	 *
 	 * @param map
 	 *            the map to which the diff will be applied
 	 * @since 1.2
@@ -66,7 +66,7 @@ public abstract class MapDiff implements IDiff {
 	 * <p>
 	 * <b>Note</b>: the returned map is only valid until structural changes are
 	 * made to the passed-in map.
-	 * 
+	 *
 	 * @param map
 	 *            the map over which the diff will be simulated
 	 * @return an unmodifiable map showing what <code>map</code> would look like
@@ -91,16 +91,19 @@ public abstract class MapDiff implements IDiff {
 
 		}
 
+		@Override
 		public void clear() {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public boolean containsKey(Object key) {
 			return diff.getAddedKeys().contains(key)
 					|| (map.containsKey(key) && !diff.getRemovedKeys()
 							.contains(key));
 		}
 
+		@Override
 		public Set entrySet() {
 			if (entrySet == null) {
 				entrySet = new DeltaMapEntrySet(map, diff);
@@ -108,6 +111,7 @@ public abstract class MapDiff implements IDiff {
 			return entrySet;
 		}
 
+		@Override
 		public Object get(Object key) {
 			if (diff.getAddedKeys().contains(key))
 				return diff.getNewValue(key);
@@ -118,14 +122,17 @@ public abstract class MapDiff implements IDiff {
 			return map.get(key);
 		}
 
+		@Override
 		public Object put(Object arg0, Object arg1) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public void putAll(Map arg0) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public Object remove(Object key) {
 			throw new UnsupportedOperationException();
 		}
@@ -142,6 +149,7 @@ public abstract class MapDiff implements IDiff {
 			this.diff = diff;
 		}
 
+		@Override
 		public Iterator iterator() {
 			return new Iterator() {
 				Iterator origEntries = map.entrySet().iterator();
@@ -150,10 +158,12 @@ public abstract class MapDiff implements IDiff {
 				boolean haveNext = false;
 				Map.Entry next;
 
+				@Override
 				public boolean hasNext() {
 					return findNext();
 				}
 
+				@Override
 				public Object next() {
 					if (!findNext())
 						throw new NoSuchElementException();
@@ -198,6 +208,7 @@ public abstract class MapDiff implements IDiff {
 					}
 				}
 
+				@Override
 				public void remove() {
 					throw new UnsupportedOperationException();
 				}
@@ -205,6 +216,7 @@ public abstract class MapDiff implements IDiff {
 			};
 		}
 
+		@Override
 		public int size() {
 			return map.size() + diff.getAddedKeys().size()
 					- diff.getRemovedKeys().size();
@@ -213,10 +225,12 @@ public abstract class MapDiff implements IDiff {
 	}
 
 	private abstract static class AbstractMapEntry implements Map.Entry {
+		@Override
 		public Object setValue(Object arg0) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public boolean equals(Object obj) {
 			if (!(obj instanceof Map.Entry))
 				return false;
@@ -225,6 +239,7 @@ public abstract class MapDiff implements IDiff {
 					&& Util.equals(this.getValue(), that.getValue());
 		}
 
+		@Override
 		public int hashCode() {
 			Object key = getKey();
 			Object value = getValue();
@@ -243,10 +258,12 @@ public abstract class MapDiff implements IDiff {
 			this.entry = entry;
 		}
 
+		@Override
 		public Object getKey() {
 			return entry.getKey();
 		}
 
+		@Override
 		public Object getValue() {
 			return entry.getValue();
 		}
@@ -262,10 +279,12 @@ public abstract class MapDiff implements IDiff {
 			this.diff = diff;
 		}
 
+		@Override
 		public Object getKey() {
 			return key;
 		}
 
+		@Override
 		public Object getValue() {
 			return diff.getNewValue(key);
 		}
@@ -290,7 +309,7 @@ public abstract class MapDiff implements IDiff {
 	/**
 	 * Returns the old value for the given key, which must be an element of
 	 * {@link #getRemovedKeys()} or {@link #getChangedKeys()}.
-	 * 
+	 *
 	 * @param key
 	 * @return the old value for the given key.
 	 */
@@ -299,7 +318,7 @@ public abstract class MapDiff implements IDiff {
 	/**
 	 * Returns the new value for the given key, which must be an element of
 	 * {@link #getChangedKeys()} or {@link #getAddedKeys()}.
-	 * 
+	 *
 	 * @param key
 	 * @return the new value for the given key.
 	 */

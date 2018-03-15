@@ -30,15 +30,16 @@ import org.eclipse.ui.part.FileEditorInput;
 
 /**
  * Default Handler for 'Build Project' command
- * 
+ *
  * @since 4.3
- * 
+ *
  */
 public class BuildProjectHandler extends AbstractHandler {
 
 	/**
 	 * @throws ExecutionException
 	 */
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 		if (window != null) {
@@ -79,10 +80,8 @@ public class BuildProjectHandler extends AbstractHandler {
 		return new BuildAction(window,
 				IncrementalProjectBuilder.INCREMENTAL_BUILD);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.commands.AbstractHandler#setEnabled(java.lang.Object)
-	 */
+
+	@Override
 	public void setEnabled(Object evaluationContext) {
 		boolean enabled = false;
 		if ((evaluationContext instanceof IEvaluationContext)) {
@@ -95,5 +94,5 @@ public class BuildProjectHandler extends AbstractHandler {
 		}
 		setBaseEnabled(enabled);
 	}
-	
+
 }

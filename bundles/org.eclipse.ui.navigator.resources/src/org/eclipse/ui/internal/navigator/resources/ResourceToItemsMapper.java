@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,10 +26,10 @@ import org.eclipse.core.runtime.IAdaptable;
  * changes.  When objects are added to the Viewer's map, this is called to see
  * if there is an associated resource.  If so, it's added to the map here.
  * When resource change notifications happen, this map is checked, and if the
- * resource is found, this class causes the Viewer to be updated.  If the 
+ * resource is found, this class causes the Viewer to be updated.  If the
  * resource is not found, the notification can be ignored because the object
  * corresponding to the resource is not present in the viewer.
- * 
+ *
  */
 public class ResourceToItemsMapper implements ICommonViewerMapper {
 
@@ -121,11 +121,11 @@ public class ResourceToItemsMapper implements ICommonViewerMapper {
 	public boolean handlesObject(Object object) {
 		return object instanceof IResource;
 	}
-	
+
 
 	/**
 	 * Must be called from the UI thread.
-	 * 
+	 *
 	 * @param changedResource
 	 *            Changed resource
 	 */
@@ -155,7 +155,7 @@ public class ResourceToItemsMapper implements ICommonViewerMapper {
 		if (element instanceof IResource)
 			return (IResource) element;
 		if (element instanceof IAdaptable)
-			return (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+			return ((IAdaptable) element).getAdapter(IResource.class);
 		return null;
 	}
 }

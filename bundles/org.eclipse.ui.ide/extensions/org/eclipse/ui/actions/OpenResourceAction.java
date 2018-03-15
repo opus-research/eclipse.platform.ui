@@ -64,12 +64,13 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 
 	/**
 	 * Creates a new action.
-	 * 
+	 *
 	 * @param shell
 	 *            the shell for any dialogs
-	 *    
+	 *
 	 * @deprecated {@link #OpenResourceAction(IShellProvider)}
 	 */
+	@Deprecated
 	public OpenResourceAction(Shell shell) {
 		super(shell, IDEWorkbenchMessages.OpenResourceAction_text);
 		initAction();
@@ -77,7 +78,7 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 
 	/**
 	 * Creates a new action.
-	 * 
+	 *
 	 * @param provider
 	 * 				the shell for any dialogs
 	 * @since 3.4
@@ -110,23 +111,17 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 		return count;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on WorkspaceAction.
-	 */
+	@Override
 	protected String getOperationMessage() {
 		return IDEWorkbenchMessages.OpenResourceAction_operationMessage;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on WorkspaceAction.
-	 */
+	@Override
 	protected String getProblemsMessage() {
 		return IDEWorkbenchMessages.OpenResourceAction_problemMessage;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on WorkspaceAction.
-	 */
+	@Override
 	protected String getProblemsTitle() {
 		return IDEWorkbenchMessages.OpenResourceAction_dialogTitle;
 	}
@@ -149,6 +144,7 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 		return closedInSelection < countClosedProjects();
 	}
 
+	@Override
 	protected void invokeOperation(IResource resource, IProgressMonitor monitor) throws CoreException {
 		((IProject) resource).open(monitor);
 	}
@@ -156,7 +152,7 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 	/**
 	 * Returns the preference for whether to open required projects when opening
 	 * a project. Consults the preference and prompts the user if necessary.
-	 * 
+	 *
 	 * @return <code>true</code> if referenced projects should be opened, and
 	 *         <code>false</code> otherwise.
 	 */
@@ -184,6 +180,7 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 	 * Handles a resource changed event by updating the enablement if one of the
 	 * selected projects is opened or closed.
 	 */
+	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
 		// Warning: code duplicated in CloseResourceAction
 		List sel = getSelectedResources();
@@ -205,10 +202,7 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IAction; overrides method on
-	 * WorkspaceAction.
-	 */
+	@Override
 	public void run() {
 		try {
 			runOpenWithReferences();
@@ -245,6 +239,7 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 					}
 					if (openProjectReferences && hasOtherClosedProjects()) {
 						Display.getDefault().syncExec(new Runnable() {
+							@Override
 							public void run() {
 								try {
 								openProjectReferences = promptToOpenWithReferences();
@@ -266,6 +261,7 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 				}
 			}
 
+			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
 				try {
 					// at most we can only open all projects currently closed
@@ -285,9 +281,7 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 		job.schedule();
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on WorkspaceAction.
-	 */
+	@Override
 	protected boolean shouldPerformResourcePruning() {
 		return false;
 	}
@@ -297,6 +291,7 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 	 * <code>SelectionListenerAction</code> method ensures that this action is
 	 * enabled only if one of the selections is a closed project.
 	 */
+	@Override
 	protected boolean updateSelection(IStructuredSelection s) {
 		// don't call super since we want to enable if closed project is
 		// selected.

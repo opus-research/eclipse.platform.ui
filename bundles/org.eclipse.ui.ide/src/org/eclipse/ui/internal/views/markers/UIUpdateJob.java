@@ -24,12 +24,12 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 /**
  * The UIUpdateJob runs in the UI thread and is responsible updating the Markers
  * view UI with newly updated markers.
- * 
+ *
  * @since 3.6
- * 
+ *
  */
 class UIUpdateJob extends WorkbenchJob {
-	
+
 	private ExtendedMarkersView view;
 
 	private boolean updating;
@@ -49,11 +49,12 @@ class UIUpdateJob extends WorkbenchJob {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.
 	 * IProgressMonitor)
 	 */
+	@Override
 	public IStatus runInUIThread(IProgressMonitor monitor) {
 		if(monitor.isCanceled()){
 			return Status.CANCEL_STATUS;
@@ -62,7 +63,7 @@ class UIUpdateJob extends WorkbenchJob {
 		if (viewer.getControl().isDisposed()) {
 			return Status.CANCEL_STATUS;
 		}
-		
+
 		Markers clone = view.getActiveViewerInputClone();
 		try {
 			updating = true;
@@ -72,7 +73,7 @@ class UIUpdateJob extends WorkbenchJob {
 			if (monitor.isCanceled()) {
 				return Status.CANCEL_STATUS;
 			}
-			
+
 			//view.indicateUpdating(MarkerMessages.MarkerView_19,
 			//		true);
 
@@ -88,7 +89,7 @@ class UIUpdateJob extends WorkbenchJob {
 
 			if (monitor.isCanceled())
 				return Status.CANCEL_STATUS;
-			/* 
+			/*
 			 * always use a clone for Thread safety. We avoid setting the clone
 			 * as new input as we would offset the benefits of optimization in
 			 * TreeViewer.
@@ -143,9 +144,10 @@ class UIUpdateJob extends WorkbenchJob {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.runtime.jobs.Job#shouldRun()
 	 */
+	@Override
 	public boolean shouldRun() {
 		if (!PlatformUI.isWorkbenchRunning()) {
 			return false;
@@ -155,9 +157,10 @@ class UIUpdateJob extends WorkbenchJob {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
 	 */
+	@Override
 	public boolean belongsTo(Object family) {
 		if (family.equals(view.MARKERSVIEW_UPDATE_JOB_FAMILY)) {
 			return true;

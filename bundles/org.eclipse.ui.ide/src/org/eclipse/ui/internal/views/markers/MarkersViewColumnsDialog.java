@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,23 +22,24 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.internal.views.markers.MarkersViewColumnsDialog.FieldEntry;
 import org.eclipse.ui.views.markers.MarkerField;
 
 /**
  * MarkersViewSettingDialog is the dialog for showing marker preferences.
- * 
- * 
+ *
+ *
  * @since 3.7
  * @author Hitesh Soliwal
- * 
+ *
  */
-public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
+public class MarkersViewColumnsDialog extends ViewerColumnsDialog<FieldEntry> {
 
 	private ExtendedMarkersView extendedView;
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param view
 	 *            - the view this is being launched from
 	 */
@@ -48,124 +49,86 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 		initialize(false);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
-	 * .Shell)
-	 */
+	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText(JFaceResources
-				.getString("ConfigureColumnsDialog_Title")); //$NON-NLS-1$
+		newShell.setText(JFaceResources.getString("ConfigureColumnsDialog_Title")); //$NON-NLS-1$
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#getShellStyle()
-	 */
+	@Override
 	protected int getShellStyle() {
 		return super.getShellStyle() | SWT.RESIZE;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
-	 * .Composite)
-	 */
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		Control control = super.createDialogArea(parent);
 		return control;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-	 */
+	@Override
 	protected void okPressed() {
 		extendedView.setVisibleFields(getVisibleFields(), getNewWidths());
 		super.okPressed();
 	}
 
-	/**
-	 */
 	private int[] getNewWidths() {
-		List visible = getVisible();
+		List<FieldEntry> visible = getVisible();
 		int[] widths = new int[visible.size()];
 		int i = 0;
-		Iterator iterator = visible.iterator();
+		Iterator<FieldEntry> iterator = visible.iterator();
 		while (iterator.hasNext()) {
-			widths[i] = ((FieldEntry) iterator.next()).width;
+			widths[i] = iterator.next().width;
 			i++;
 		}
 		return widths;
 	}
 
-	private Collection getVisibleFields() {
-		List visible = getVisible();
-		List list = new ArrayList(visible.size());
-		Iterator iterator = visible.iterator();
+	private Collection<MarkerField> getVisibleFields() {
+		List<FieldEntry> visible = getVisible();
+		ArrayList<MarkerField> list = new ArrayList<>(visible.size());
+		Iterator<FieldEntry> iterator = visible.iterator();
 		while (iterator.hasNext()) {
-			list.add(((FieldEntry) iterator.next()).field);
+			list.add(iterator.next().field);
 		}
 		return list;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.preferences.ViewSettingsDialog#performDefaults()
-	 */
+	@Override
 	protected void performDefaults() {
 		initialize(true);
 		super.performDefaults();
 	}
 
-	/**
-	 */
 	void initialize(boolean defaultWidths) {
-		MarkerField[] allFields = extendedView.getBuilder().getGenerator()
-				.getAllFields();
+		MarkerField[] allFields = extendedView.getBuilder().getGenerator().getAllFields();
 		MarkerField[] visibleFields = null;
 		if (defaultWidths) {
-			visibleFields = extendedView.getBuilder().getGenerator()
-					.getInitialVisible();
+			visibleFields = extendedView.getBuilder().getGenerator().getInitialVisible();
 		} else {
-			visibleFields = extendedView.getBuilder().getGenerator()
-					.getVisibleFields();
+			visibleFields = extendedView.getBuilder().getGenerator().getVisibleFields();
 		}
-		List visible = getVisible();
-		List nonVisible = getNonVisible();
+		List<FieldEntry> visible = getVisible();
+		List<FieldEntry> nonVisible = getNonVisible();
 		visible.clear();
 		nonVisible.clear();
 		FieldEntry entry = null;
 		for (int i = 0; i < allFields.length; i++) {
 			if (!contains(visibleFields, allFields[i])) {
 				entry = new FieldEntry(allFields[i], -1);
-				entry.width = extendedView.getFieldWidth(entry.field,
-						defaultWidths ? 0 : -1, !defaultWidths);
+				entry.width = extendedView.getFieldWidth(entry.field, defaultWidths ? 0 : -1, !defaultWidths);
 				entry.visible = false;
 				nonVisible.add(entry);
 			}
 		}
 		for (int i = 0; i < visibleFields.length; i++) {
 			entry = new FieldEntry(visibleFields[i], -1);
-			entry.width = extendedView.getFieldWidth(entry.field,
-					defaultWidths ? 0 : -1, !defaultWidths);
+			entry.width = extendedView.getFieldWidth(entry.field, defaultWidths ? 0 : -1, !defaultWidths);
 			entry.visible = true;
 			visible.add(entry);
 		}
 	}
 
-	/**
-	 * @param visibleFields
-	 * @param field
-	 */
 	private boolean contains(MarkerField[] visibleFields, MarkerField field) {
 		for (int i = 0; i < visibleFields.length; i++) {
 			if (visibleFields[i].equals(field)) {
@@ -175,85 +138,78 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.views.markers.ViewerColumnsDialog#getLabelProvider
-	 * ()
-	 */
+	@Override
 	protected ITableLabelProvider getLabelProvider() {
 		return new TableLabelProvider() {
+			@Override
 			public String getText(Object element) {
 				return ((FieldEntry) element).field.getName();
 			}
 		};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.views.markers.ViewerColumnsDialog#
-	 * getColumnInfoProvider()
-	 */
-	protected IColumnInfoProvider getColumnInfoProvider() {
+	@Override
+	protected IColumnInfoProvider<FieldEntry> getColumnInfoProvider() {
 
-		return new IColumnInfoProvider() {
-			public int getColumnIndex(Object columnObj) {
+		return new IColumnInfoProvider<FieldEntry>() {
+			@Override
+			public int getColumnIndex(FieldEntry columnObj) {
 				return getVisible().indexOf(columnObj);
 			}
 
-			public int getColumnWidth(Object columnObj) {
-				FieldEntry field = (FieldEntry) columnObj;
+			@Override
+			public int getColumnWidth(FieldEntry columnObj) {
+				FieldEntry field = columnObj;
 				if (field.width <= 0) {
-					field.width = extendedView.getFieldWidth(field.field,
-							field.width, false);
+					field.width = extendedView.getFieldWidth(field.field, field.width, false);
 				}
 				return field.width;
 			}
 
-			public boolean isColumnVisible(Object columnObj) {
-				return ((FieldEntry) columnObj).visible;
+			@Override
+			public boolean isColumnVisible(FieldEntry columnObj) {
+				return columnObj.visible;
 			}
 
-			public boolean isColumnMovable(Object columnObj) {
+			@Override
+			public boolean isColumnMovable(FieldEntry columnObj) {
 				return true;
 			}
 
-			public boolean isColumnResizable(Object columnObj) {
+			@Override
+			public boolean isColumnResizable(FieldEntry columnObj) {
 				return true;
 			}
 		};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.views.markers.ViewerColumnsDialog#getColumnUpdater
-	 * ()
-	 */
-	protected IColumnUpdater getColumnUpdater() {
+	@Override
+	protected IColumnUpdater<FieldEntry> getColumnUpdater() {
 
-		return new IColumnUpdater() {
-			public void setColumnVisible(Object columnObj, boolean visible) {
-				((FieldEntry) columnObj).visible = visible;
+		return new IColumnUpdater<FieldEntry>() {
+			@Override
+			public void setColumnVisible(FieldEntry columnObj, boolean visible) {
+				columnObj.visible = visible;
 			}
 
-			public void setColumnMovable(Object columnObj, boolean movable) {
+			@Override
+			public void setColumnMovable(FieldEntry columnObj, boolean movable) {
 				// not implemented
 			}
 
-			public void setColumnIndex(Object columnObj, int index) {
+			@Override
+			public void setColumnIndex(FieldEntry columnObj, int index) {
 				// ignore
 			}
 
-			public void setColumnResizable(Object columnObj, boolean resizable) {
+			@Override
+			public void setColumnResizable(FieldEntry columnObj, boolean resizable) {
 				// ignore
 			}
 
-			public void setColumnWidth(Object columnObj, int newWidth) {
-				((FieldEntry) columnObj).width = newWidth;
+			@Override
+			public void setColumnWidth(FieldEntry columnObj, int newWidth) {
+				columnObj.width = newWidth;
 			}
 		};
 	}
@@ -269,6 +225,7 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 			visible = false;
 		}
 
+		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
@@ -276,19 +233,25 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 			return result;
 		}
 
+		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null)
+			}
+			if (obj == null) {
 				return false;
-			if (getClass() != obj.getClass())
+			}
+			if (getClass() != obj.getClass()) {
 				return false;
+			}
 			FieldEntry other = (FieldEntry) obj;
 			if (field == null) {
-				if (other.field != null)
+				if (other.field != null) {
 					return false;
-			} else if (!field.equals(other.field))
+				}
+			} else if (!field.equals(other.field)) {
 				return false;
+			}
 			return true;
 		}
 

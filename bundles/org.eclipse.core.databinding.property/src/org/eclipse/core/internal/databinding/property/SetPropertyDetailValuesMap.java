@@ -29,7 +29,7 @@ import org.eclipse.core.internal.databinding.identity.IdentityMap;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class SetPropertyDetailValuesMap extends MapProperty {
 	private final ISetProperty masterProperty;
@@ -45,14 +45,17 @@ public class SetPropertyDetailValuesMap extends MapProperty {
 		this.detailProperty = detailProperty;
 	}
 
+	@Override
 	public Object getKeyType() {
 		return masterProperty.getElementType();
 	}
 
+	@Override
 	public Object getValueType() {
 		return detailProperty.getValueType();
 	}
 
+	@Override
 	protected Map doGetMap(Object source) {
 		Set set = masterProperty.getSet(source);
 		Map map = new IdentityMap();
@@ -63,6 +66,7 @@ public class SetPropertyDetailValuesMap extends MapProperty {
 		return map;
 	}
 
+	@Override
 	protected void doUpdateMap(Object source, MapDiff diff) {
 		if (!diff.getAddedKeys().isEmpty())
 			throw new UnsupportedOperationException(toString()
@@ -77,6 +81,7 @@ public class SetPropertyDetailValuesMap extends MapProperty {
 		}
 	}
 
+	@Override
 	public IObservableMap observe(Realm realm, Object source) {
 		IObservableSet masterSet;
 
@@ -92,6 +97,7 @@ public class SetPropertyDetailValuesMap extends MapProperty {
 		return detailMap;
 	}
 
+	@Override
 	public IObservableMap observeDetail(IObservableValue master) {
 		IObservableSet masterSet;
 
@@ -107,6 +113,7 @@ public class SetPropertyDetailValuesMap extends MapProperty {
 		return detailMap;
 	}
 
+	@Override
 	public String toString() {
 		return masterProperty + " => " + detailProperty; //$NON-NLS-1$
 	}

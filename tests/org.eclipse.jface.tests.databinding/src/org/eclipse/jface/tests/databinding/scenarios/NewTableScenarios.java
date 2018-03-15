@@ -44,6 +44,7 @@ public class NewTableScenarios extends ScenariosTestCase {
 
 	private TableColumn fancyColumn;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		getComposite().setLayout(new FillLayout());
@@ -68,6 +69,7 @@ public class NewTableScenarios extends ScenariosTestCase {
 				getShell().getDisplay().getSystemImage(SWT.ICON_INFORMATION), };
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		// do any teardown work here
 		super.tearDown();
@@ -87,7 +89,7 @@ public class NewTableScenarios extends ScenariosTestCase {
 	public void testScenario01() {
 //		// Factory for directly creating IObservables for beans
 //		JavaBeans javaBeans = new JavaBeans();
-//		
+//
 //		// Wrap the TableViewer in an IObservableCollectionWithLabels
 //		IObservableCollectionWithLabels accountTable = new TableViewerObservableTable(
 //				tableViewer);
@@ -96,14 +98,14 @@ public class NewTableScenarios extends ScenariosTestCase {
 //		IReadableSet accountSet = javaBeans.createReadableSet(catalog,
 //				new PropertyDescriptor("accounts", Catalog.class, "getAccounts", null),
 //				Account.class);
-//		
+//
 //		// Create an observable cell provider to track the given accounts' properties.
 //		IObservableCellProvider accountCellProvider = javaBeans.createObservableCellProvider(
 //				accountSet, new String[] { "firstName", "lastName", "state" });
 //
 //		// bind
 //		getDbc().bind(accountTable, accountCellProvider, null);
-//		
+//
 //		// uncomment next line to see result interactively
 //		// interact();
 //

@@ -17,6 +17,7 @@ package org.eclipse.ui.views.properties;
  * @deprecated These messages are not API and should not be referenced
  * outside of this plug-in.
  */
+@Deprecated
 class IDEPropertiesMessages {
     private IDEPropertiesMessages() {
         // prevent instantiation of class
@@ -24,7 +25,7 @@ class IDEPropertiesMessages {
 
     /**
      * Returns the formatted message for the given key in
-     * the resource bundle. 
+     * the resource bundle.
      *
      * @param key the resource name
      * @param args the message arguments

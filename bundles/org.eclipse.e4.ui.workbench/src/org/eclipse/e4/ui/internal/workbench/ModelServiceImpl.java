@@ -148,7 +148,9 @@ public class ModelServiceImpl implements EModelService {
 		boolean classMatch = clazz == null ? true : clazz.isInstance(searchRoot);
 		if (classMatch && matcher.select(searchRoot)) {
 			if (!elements.contains(searchRoot)) {
-				elements.add((T) searchRoot);
+				@SuppressWarnings("unchecked")
+				T element = (T) searchRoot;
+				elements.add(element);
 			}
 		}
 		if (searchRoot instanceof MApplication && (searchFlags == ANYWHERE)) {
@@ -196,8 +198,8 @@ public class ModelServiceImpl implements EModelService {
 			if (searchRoot instanceof MPerspectiveStack) {
 				if ((searchFlags & IN_ANY_PERSPECTIVE) != 0) {
 					// Search *all* the perspectives
-					MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) searchRoot;
-					List<MUIElement> children = container.getChildren();
+					MElementContainer<? extends MUIElement> container = (MPerspectiveStack) searchRoot;
+					List<? extends MUIElement> children = container.getChildren();
 					for (MUIElement child : children) {
 						findElementsRecursive(child, clazz, matcher, elements, searchFlags);
 					}
@@ -216,6 +218,7 @@ public class ModelServiceImpl implements EModelService {
 					}
 				}
 			} else {
+				@SuppressWarnings("unchecked")
 				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) searchRoot;
 				List<MUIElement> children = container.getChildren();
 				for (MUIElement child : children) {
@@ -338,6 +341,7 @@ public class ModelServiceImpl implements EModelService {
 			return 0;
 		}
 
+		@SuppressWarnings("unchecked")
 		MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) element;
 		int count = 0;
 		List<MUIElement> kids = container.getChildren();
@@ -414,9 +418,9 @@ public class ModelServiceImpl implements EModelService {
 		return element;
 	}
 
-	private List<MPlaceholder> getNullRefPlaceHolders(MUIElement element, MWindow refWin,
-			boolean resolveAlways) {
-		// use appContext as MApplication.getContext() is null during the processing of
+	private List<MPlaceholder> getNullRefPlaceHolders(MUIElement element, MWindow refWin, boolean resolveAlways) {
+		// use appContext as MApplication.getContext() is null during the
+		// processing of
 		// the model processor classes
 		EPlaceholderResolver resolver = appContext.get(EPlaceholderResolver.class);
 		// Re-resolve any placeholder references
@@ -518,7 +522,9 @@ public class ModelServiceImpl implements EModelService {
 				element.setToBeRendered(true);
 			}
 
-			((MElementContainer<MUIElement>) parent).setSelectedElement(element);
+			@SuppressWarnings("unchecked")
+			MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) parent;
+			container.setSelectedElement(element);
 			if (window != parent) {
 				showElementInWindow(window, parent);
 			}
@@ -579,7 +585,11 @@ public class ModelServiceImpl implements EModelService {
 		int curIndex = curParent.getChildren().indexOf(element);
 
 		// Move the model element
-		newParent.getChildren().add(index, element);
+		if (index == -1) {
+			newParent.getChildren().add(element);
+		} else {
+			newParent.getChildren().add(index, element);
+		}
 
 		if (leavePlaceholder) {
 			MPlaceholder ph = MAdvancedFactory.INSTANCE.createPlaceholder();

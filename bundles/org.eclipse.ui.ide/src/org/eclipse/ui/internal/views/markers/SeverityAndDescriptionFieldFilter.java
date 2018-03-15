@@ -19,9 +19,9 @@ import org.eclipse.ui.views.markers.MarkerFieldFilter;
 /**
  * SeverityAndDescriptionFieldFilter is the filter for the severity and
  * description field.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public abstract class SeverityAndDescriptionFieldFilter extends DescriptionFieldFilter {
 
@@ -40,9 +40,10 @@ public abstract class SeverityAndDescriptionFieldFilter extends DescriptionField
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilter#initialize(java.util.Map)
 	 */
+	@Override
 	public void initialize(Map values) {
 		Object value = values.get(IMarker.SEVERITY);
 		if (value != null && value instanceof Integer) {
@@ -62,9 +63,10 @@ public abstract class SeverityAndDescriptionFieldFilter extends DescriptionField
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilter#populateWorkingCopy(org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilter)
 	 */
+	@Override
 	public void populateWorkingCopy(MarkerFieldFilter copy) {
 		super.populateWorkingCopy(copy);
 		((SeverityAndDescriptionFieldFilter) copy).selectedSeverities = this.selectedSeverities;
@@ -73,9 +75,10 @@ public abstract class SeverityAndDescriptionFieldFilter extends DescriptionField
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilter#saveSettings(org.eclipse.ui.IMemento)
 	 */
+	@Override
 	public void saveSettings(IMemento memento) {
 		super.saveSettings(memento);
 		memento.putInteger(TAG_SELECTED_SEVERITIES, selectedSeverities);
@@ -84,9 +87,10 @@ public abstract class SeverityAndDescriptionFieldFilter extends DescriptionField
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilter#loadSettings(org.eclipse.ui.IMemento)
 	 */
+	@Override
 	public void loadSettings(IMemento memento) {
 		super.loadSettings(memento);
 		selectedSeverities = memento.getInteger(TAG_SELECTED_SEVERITIES)
@@ -96,13 +100,13 @@ public abstract class SeverityAndDescriptionFieldFilter extends DescriptionField
 	/**
 	 * Compare the selected severity and the severity of the marker to see if
 	 * they match
-	 * 
+	 *
 	 * @param markerSeverity
 	 */
 	protected boolean checkSeverity(int markerSeverity) {
 		// Convert from the marker to the filter
 		return (1 << markerSeverity & selectedSeverities) > 0;
-	
+
 	}
 
 }

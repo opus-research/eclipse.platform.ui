@@ -26,7 +26,7 @@ import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class ExplicitlyBusyView extends ViewPart {
 
@@ -39,6 +39,7 @@ public class ExplicitlyBusyView extends ViewPart {
 			super(name);
 		}
 
+		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			try {
 				Thread.sleep(5000);
@@ -48,19 +49,21 @@ public class ExplicitlyBusyView extends ViewPart {
 			return Status.OK_STATUS;
 		}
 
+		@Override
 		public boolean belongsTo(Object family) {
 			return family == ExplicitlyBusyView.this.family;
 		}
 	}
 
+	@Override
 	public void createPartControl(Composite parent) {
-		progressService = (IWorkbenchSiteProgressService) getSite().getAdapter(
-				IWorkbenchSiteProgressService.class);
+		progressService = getSite().getAdapter(IWorkbenchSiteProgressService.class);
 		progressService.showBusyForFamily(family);
 		{
 			final Button button = new Button(parent, SWT.CHECK);
 			button.setText("Busy");
 			button.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					if (button.getSelection()) {
 						progressService.incrementBusy();
@@ -74,6 +77,7 @@ public class ExplicitlyBusyView extends ViewPart {
 			Button button = new Button(parent, SWT.PUSH);
 			button.setText("Increment Busy");
 			button.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					progressService.incrementBusy();
 				}
@@ -83,6 +87,7 @@ public class ExplicitlyBusyView extends ViewPart {
 			Button button = new Button(parent, SWT.PUSH);
 			button.setText("Decrement Busy");
 			button.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					progressService.decrementBusy();
 				}
@@ -92,6 +97,7 @@ public class ExplicitlyBusyView extends ViewPart {
 			Button button = new Button(parent, SWT.PUSH);
 			button.setText("Spawn Job");
 			button.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					new SomeJob("Some Job " + counter++).schedule();
 				}
@@ -100,6 +106,7 @@ public class ExplicitlyBusyView extends ViewPart {
 		GridLayoutFactory.swtDefaults().applyTo(parent);
 	}
 
+	@Override
 	public void setFocus() {
 	}
 

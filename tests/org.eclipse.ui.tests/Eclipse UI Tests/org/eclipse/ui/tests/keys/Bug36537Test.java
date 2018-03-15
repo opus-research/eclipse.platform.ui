@@ -27,14 +27,14 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Tests Bug 36537
- * 
+ *
  * @since 3.0
  */
 public class Bug36537Test extends UITestCase {
 
 	/**
 	 * Constructor for Bug36537Test.
-	 * 
+	 *
 	 * @param name
 	 *            The name of the test
 	 */
@@ -49,8 +49,7 @@ public class Bug36537Test extends UITestCase {
 	public void testForRedundantKeySequenceBindings() {
 		final IWorkbenchWindow window = openTestWindow();
 		final IWorkbench workbench = window.getWorkbench();
-		final IBindingService bindingService = (IBindingService) workbench
-				.getAdapter(IBindingService.class);
+		final IBindingService bindingService = workbench.getAdapter(IBindingService.class);
 		final Binding[] bindings = bindingService.getBindings();
 		final int bindingCount = bindings.length;
 		Map keySequenceBindingsByKeySequence = new HashMap();

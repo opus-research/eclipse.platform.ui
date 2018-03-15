@@ -30,20 +30,21 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * @since 3.2
- * 
+ *
  */
-public class ObservableCollectionTreeContentProviderTest extends
-		AbstractDefaultRealmTestCase {
+public class ObservableCollectionTreeContentProviderTest extends AbstractDefaultRealmTestCase {
 	private Shell shell;
 	private TreeViewer viewer;
 	ObservableListTreeContentProvider contentProvider;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
 		viewer = new TreeViewer(shell);
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		shell.dispose();
 		shell = null;
@@ -54,37 +55,35 @@ public class ObservableCollectionTreeContentProviderTest extends
 	public void testGetKnownElements_ExcludesInput() {
 		final Object input = new Object();
 		Object[] rootElements = new Object[] { "one", "two", "three" };
-		final IObservableList rootElementList = new WritableList(Arrays
-				.asList(rootElements), null);
-		contentProvider = new ObservableListTreeContentProvider(
-				new IObservableFactory() {
-					public IObservable createObservable(Object target) {
-						if (target == input)
-							return rootElementList;
-						return null;
-					}
-				}, null);
+		final IObservableList rootElementList = new WritableList(Arrays.asList(rootElements), null);
+		contentProvider = new ObservableListTreeContentProvider(new IObservableFactory() {
+			@Override
+			public IObservable createObservable(Object target) {
+				if (target == input)
+					return rootElementList;
+				return null;
+			}
+		}, null);
 		viewer.setContentProvider(contentProvider);
 		viewer.setInput(input);
 		contentProvider.getElements(input);
 
 		IObservableSet knownElements = contentProvider.getKnownElements();
 		assertFalse(knownElements.contains(input));
-		assertEquals(new HashSet(Arrays.asList(rootElements)), knownElements);
+		assertEquals(new HashSet<Object>(Arrays.asList(rootElements)), knownElements);
 	}
 
 	public void testGetKnownElements_DisposedWithoutModificationOnContentProviderDispose() {
 		final Object input = new Object();
-		final IObservableList rootElementList = new WritableList(Collections
-				.singletonList("element"), null);
-		contentProvider = new ObservableListTreeContentProvider(
-				new IObservableFactory() {
-					public IObservable createObservable(Object target) {
-						if (target == input)
-							return rootElementList;
-						return null;
-					}
-				}, null);
+		final IObservableList rootElementList = new WritableList(Collections.singletonList("element"), null);
+		contentProvider = new ObservableListTreeContentProvider(new IObservableFactory() {
+			@Override
+			public IObservable createObservable(Object target) {
+				if (target == input)
+					return rootElementList;
+				return null;
+			}
+		}, null);
 		contentProvider.inputChanged(viewer, null, input);
 
 		IObservableSet knownElements = contentProvider.getKnownElements();
@@ -94,10 +93,8 @@ public class ObservableCollectionTreeContentProviderTest extends
 		contentProvider.getElements(input);
 		assertEquals(1, knownElements.size());
 
-		DisposeEventTracker disposeTracker = DisposeEventTracker
-				.observe(knownElements);
-		ChangeEventTracker changeTracker = ChangeEventTracker
-				.observe(knownElements);
+		DisposeEventTracker disposeTracker = DisposeEventTracker.observe(knownElements);
+		ChangeEventTracker changeTracker = ChangeEventTracker.observe(knownElements);
 
 		contentProvider.dispose();
 

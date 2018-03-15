@@ -32,7 +32,7 @@ import org.eclipse.ui.internal.views.properties.PropertiesMessages;
 
     /**
      * Creates the action.
-     * 
+     *
      * @param viewer the viewer
      * @param name the name
      * @param clipboard the clipboard
@@ -48,7 +48,8 @@ import org.eclipse.ui.internal.views.properties.PropertiesMessages;
     /**
      * Performs this action.
      */
-    public void run() {
+    @Override
+	public void run() {
         // Get the selected property
         IStructuredSelection selection = (IStructuredSelection) getPropertySheet()
                 .getSelection();
@@ -68,9 +69,9 @@ import org.eclipse.ui.internal.views.properties.PropertiesMessages;
         setClipboard(buffer.toString());
     }
 
-    /** 
+    /**
      * Updates enablement based on the current selection.
-     * 
+     *
      * @param sel the selection
      */
     public void selectionChanged(IStructuredSelection sel) {

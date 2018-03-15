@@ -33,6 +33,7 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 	public void testRunAndMonitor_GetterCalled() throws Exception {
 		final IObservable observable = new ObservableStub();
 		IObservable[] result = ObservableTracker.runAndMonitor(new Runnable() {
+			@Override
 			public void run() {
 				ObservableTracker.getterCalled(observable);
 			}
@@ -66,12 +67,12 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 
 	public void testRunAndCollect() throws Exception {
 		final IObservable[] created = new IObservable[1];
-		IObservable[] collected = ObservableTracker
-				.runAndCollect(new Runnable() {
-					public void run() {
-						created[0] = new ObservableStub();
-					}
-				});
+		IObservable[] collected = ObservableTracker.runAndCollect(new Runnable() {
+			@Override
+			public void run() {
+				created[0] = new ObservableStub();
+			}
+		});
 		assertEquals(1, collected.length);
 		assertSame(created[0], collected[0]);
 	}
@@ -79,8 +80,10 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 	public void testRunAndIgnore_RunAndMonitor() throws Exception {
 		final IObservable observable = new ObservableStub();
 		IObservable[] result = ObservableTracker.runAndMonitor(new Runnable() {
+			@Override
 			public void run() {
 				ObservableTracker.runAndIgnore(new Runnable() {
+					@Override
 					public void run() {
 						ObservableTracker.getterCalled(observable);
 					}
@@ -92,8 +95,10 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 
 	public void testRunAndIgnore_RunAndCollect() throws Exception {
 		IObservable[] result = ObservableTracker.runAndCollect(new Runnable() {
+			@Override
 			public void run() {
 				ObservableTracker.runAndIgnore(new Runnable() {
+					@Override
 					public void run() {
 						new ObservableStub();
 					}
@@ -106,6 +111,7 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 	public void testSetIgnore_RunAndMonitor() throws Exception {
 		final IObservable observable = new ObservableStub();
 		IObservable[] result = ObservableTracker.runAndMonitor(new Runnable() {
+			@Override
 			public void run() {
 				ObservableTracker.setIgnore(true);
 				ObservableTracker.getterCalled(observable);
@@ -117,6 +123,7 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 
 	public void testSetIgnore_RunAndCollect() throws Exception {
 		IObservable[] result = ObservableTracker.runAndCollect(new Runnable() {
+			@Override
 			public void run() {
 				ObservableTracker.setIgnore(true);
 				new ObservableStub();
@@ -127,68 +134,69 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 	}
 
 	public void testSetIgnore_Nested_RunAndCollect() throws Exception {
-		final List list = new ArrayList();
+		final List<ObservableStub> list = new ArrayList<ObservableStub>();
 
-		Set collected = new IdentitySet(Arrays.asList(ObservableTracker
-				.runAndCollect(new Runnable() {
-					public void run() {
-						list.add(new ObservableStub()); // list[0] collected
-						ObservableTracker.setIgnore(true);
-						list.add(new ObservableStub()); // list[1] ignored
-						ObservableTracker.setIgnore(true);
-						list.add(new ObservableStub()); // list[2] ignored
-						ObservableTracker.setIgnore(false);
-						list.add(new ObservableStub()); // list[3] ignored
-						ObservableTracker.setIgnore(false);
-						list.add(new ObservableStub()); // list[4] collected
-					}
-				})));
+		Set collected = new IdentitySet(Arrays.asList(ObservableTracker.runAndCollect(new Runnable() {
+			@Override
+			public void run() {
+				list.add(new ObservableStub()); // list[0] collected
+				ObservableTracker.setIgnore(true);
+				list.add(new ObservableStub()); // list[1] ignored
+				ObservableTracker.setIgnore(true);
+				list.add(new ObservableStub()); // list[2] ignored
+				ObservableTracker.setIgnore(false);
+				list.add(new ObservableStub()); // list[3] ignored
+				ObservableTracker.setIgnore(false);
+				list.add(new ObservableStub()); // list[4] collected
+			}
+		})));
 
 		// Have to compare result in identity set because ObservableTracker may
 		// not return them in the same order they were collected
-		Set expected = new IdentitySet();
+		Set<ObservableStub> expected = new IdentitySet();
 		expected.add(list.get(0));
 		expected.add(list.get(4));
 		assertEquals(expected, collected);
 	}
 
 	public void testSetIgnore_Nested_RunAndMonitor() throws Exception {
-		final IObservable[] observables = { new ObservableStub(),
-				new ObservableStub(), new ObservableStub(),
+		final IObservable[] observables = { new ObservableStub(), new ObservableStub(), new ObservableStub(),
 				new ObservableStub(), new ObservableStub() };
 
-		Set result = new IdentitySet(Arrays.asList(ObservableTracker
-				.runAndMonitor(new Runnable() {
-					public void run() {
-						ObservableTracker.getterCalled(observables[0]); // monitored
-						ObservableTracker.setIgnore(true);
-						ObservableTracker.getterCalled(observables[1]); // ignored
-						ObservableTracker.setIgnore(true);
-						ObservableTracker.getterCalled(observables[2]); // ignored
-						ObservableTracker.setIgnore(false);
-						ObservableTracker.getterCalled(observables[3]); // ignored
-						ObservableTracker.setIgnore(false);
-						ObservableTracker.getterCalled(observables[4]); // monitored
-					}
-				}, null, null)));
+		Set result = new IdentitySet(Arrays.asList(ObservableTracker.runAndMonitor(new Runnable() {
+			@Override
+			public void run() {
+				ObservableTracker.getterCalled(observables[0]); // monitored
+				ObservableTracker.setIgnore(true);
+				ObservableTracker.getterCalled(observables[1]); // ignored
+				ObservableTracker.setIgnore(true);
+				ObservableTracker.getterCalled(observables[2]); // ignored
+				ObservableTracker.setIgnore(false);
+				ObservableTracker.getterCalled(observables[3]); // ignored
+				ObservableTracker.setIgnore(false);
+				ObservableTracker.getterCalled(observables[4]); // monitored
+			}
+		}, null, null)));
 
 		// Have to compare result in identity set because ObservableTracker may
 		// not return them in the same order they were monitored
-		Set expected = new IdentitySet();
+		Set<IObservable> expected = new IdentitySet();
 		expected.add(observables[0]);
 		expected.add(observables[4]);
 		assertEquals(expected, result);
 	}
 
 	public void testSetIgnore_RunAndMonitor_UnmatchedIgnore_LogsError() {
-		final List log = new ArrayList();
+		final List<IStatus> log = new ArrayList<IStatus>();
 		Policy.setLog(new ILogger() {
+			@Override
 			public void log(IStatus status) {
 				log.add(status);
 			}
 		});
 
 		ObservableTracker.runAndMonitor(new Runnable() {
+			@Override
 			public void run() {
 				ObservableTracker.setIgnore(true);
 				// do not call call setIgnore(false)
@@ -196,20 +204,22 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 		}, null, null);
 
 		assertEquals(1, log.size());
-		IStatus status = (IStatus) log.get(0);
+		IStatus status = log.get(0);
 		assertEquals(IStatus.ERROR, status.getSeverity());
 		assertTrue(status.getMessage().indexOf("setIgnore") != -1);
 	}
 
 	public void testSetIgnore_RunAndCollect_UnmatchedIgnore_LogsError() {
-		final List log = new ArrayList();
+		final List<IStatus> log = new ArrayList<IStatus>();
 		Policy.setLog(new ILogger() {
+			@Override
 			public void log(IStatus status) {
 				log.add(status);
 			}
 		});
 
 		ObservableTracker.runAndCollect(new Runnable() {
+			@Override
 			public void run() {
 				ObservableTracker.setIgnore(true);
 				// do not call call setIgnore(false)
@@ -217,7 +227,7 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 		});
 
 		assertEquals(1, log.size());
-		IStatus status = (IStatus) log.get(0);
+		IStatus status = log.get(0);
 		assertEquals(IStatus.ERROR, status.getSeverity());
 		assertTrue(status.getMessage().indexOf("setIgnore") != -1);
 	}
@@ -239,6 +249,7 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 			super(realm);
 		}
 
+		@Override
 		public boolean isStale() {
 			return false;
 		}

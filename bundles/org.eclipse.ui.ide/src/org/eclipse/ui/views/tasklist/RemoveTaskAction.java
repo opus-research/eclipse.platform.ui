@@ -32,7 +32,7 @@ class RemoveTaskAction extends TaskAction {
 
     /**
      * Creates the action.
-     * 
+     *
      * @param tasklist the task list
      * @param id the id
      */
@@ -45,7 +45,8 @@ class RemoveTaskAction extends TaskAction {
     /**
      * Removes all the tasks in the current selection from the task list.
      */
-    public void run() {
+    @Override
+	public void run() {
         TaskList taskList = getTaskList();
         TableViewer viewer = taskList.getTableViewer();
         IStructuredSelection selection = (IStructuredSelection) viewer
