@@ -476,15 +476,25 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			final MToolBar child = children.get(i);
 			final Object obj = child.getTransientData().get(OBJECT);
 			if (obj != null && obj.equals(item)) {
+
 				if (child instanceof MToolBarElement) {
 					renderer.clearModelToContribution((MToolBarElement) child, item);
 				}
 
 				if (item instanceof IToolBarContributionItem) {
-					IToolBarManager parent = ((IToolBarContributionItem) item).getToolBarManager();
-					if (parent instanceof ToolBarManager) {
-						renderer.clearModelToManager(child, (ToolBarManager) parent);
+
+					final List<MToolBarElement> toolbarElements = child.getChildren();
+					for (int j = 0; j < toolbarElements.size(); j++) {
+						final MToolBarElement toolBarElement = toolbarElements.get(j);
+						IContributionItem toolbarElementItem = renderer.getContribution(toolBarElement);
+						renderer.clearModelToContribution(toolBarElement, toolbarElementItem);
 					}
+
+					IToolBarManager toolbarManager = ((IToolBarContributionItem) item).getToolBarManager();
+					if (toolbarManager instanceof ToolBarManager) {
+						renderer.clearModelToManager(child, (ToolBarManager) toolbarManager);
+					}
+
 				}
 				workbenchTrimElements.remove(child);
 
