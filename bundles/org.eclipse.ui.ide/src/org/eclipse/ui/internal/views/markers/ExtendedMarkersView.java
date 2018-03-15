@@ -12,7 +12,6 @@
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442440
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 446864, 466927
  *     Mickael Istria (Red Hat Inc.) - Bug 486901
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.views.markers;
 
@@ -32,8 +31,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.help.IContext;
 import org.eclipse.help.IContextProvider;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.EditingSupport;
@@ -72,6 +75,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
@@ -152,6 +156,9 @@ public class ExtendedMarkersView extends ViewPart {
 
 	private MarkersTreeViewer viewer;
 
+	private Action filterAction;
+
+
 	/**
 	 * Tells whether the tree has been painted.
 	 * @since 3.7
@@ -161,9 +168,6 @@ public class ExtendedMarkersView extends ViewPart {
 	private ISelectionListener pageSelectionListener;
 	private IPartListener2 partListener;
 	private Clipboard clipboard;
-
-	// private IPropertyChangeListener preferenceListener;
-
 	private IMemento memento;
 	private String[] defaultGeneratorIds = new String[0];
 
@@ -185,27 +189,6 @@ public class ExtendedMarkersView extends ViewPart {
 		defaultGeneratorIds = new String[] { contentGeneratorId };
 	}
 
-	/**
-	 * Create a preference listener for any preference updates.
-	 */
-	// TODO: this is not needed as the preference dialog will refresh anyway
-//	private void initializePreferenceListener() {
-//		preferenceListener = new IPropertyChangeListener() {
-//			public void propertyChange(PropertyChangeEvent event) {
-//				String propertyName = event.getProperty();
-//				if (propertyName
-//						.equals(IDEInternalPreferences.USE_MARKER_LIMITS)
-//						|| propertyName
-//								.equals(IDEInternalPreferences.MARKER_LIMITS_VALUE)) {
-//					viewer.refresh();
-//					updateTitle();
-//				}
-//			}
-//		};
-//		IDEWorkbenchPlugin.getDefault().getPreferenceStore()
-//				.addPropertyChangeListener(preferenceListener);
-//	}
-
 
 	/**
 	 * Add all concrete {@link MarkerSupportItem} elements associated with the
@@ -222,8 +205,8 @@ public class ExtendedMarkersView extends ViewPart {
 		}
 
 		MarkerSupportItem[] children = markerItem.getChildren();
-		for (int i = 0; i < children.length; i++) {
-			addAllConcreteItems(children[i], allMarkers);
+		for (MarkerSupportItem element : children) {
+			addAllConcreteItems(element, allMarkers);
 		}
 
 	}
@@ -249,8 +232,8 @@ public class ExtendedMarkersView extends ViewPart {
 		if (markerItem.getMarker() != null)
 			allMarkers.add(markerItem.getMarker());
 		MarkerSupportItem[] children = markerItem.getChildren();
-		for (int i = 0; i < children.length; i++) {
-			addMarkers(children[i], allMarkers);
+		for (MarkerSupportItem element : children) {
+			addMarkers(element, allMarkers);
 
 		}
 
@@ -363,6 +346,27 @@ public class ExtendedMarkersView extends ViewPart {
 	}
 
 	/**
+	 * Create the Filter action for the receiver.
+	 */
+	private void createFilterAction() {
+		filterAction = new Action(MarkerMessages.configureFiltersCommand_title) { // $NON-NLS-1$
+			@Override
+			public void run() {
+				openFiltersDialog();
+			}
+		};
+		filterAction.setToolTipText(MarkerMessages.configureFiltersCommand_title);// $NON-NLS-1$
+		ImageDescriptor id = IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/filter_ps.png"); //$NON-NLS-1$
+		if (id != null) {
+			filterAction.setImageDescriptor(id);
+		}
+		id = IDEWorkbenchPlugin.getIDEImageDescriptor("/dlcl16/filter_ps.png"); //$NON-NLS-1$
+		if (id != null) {
+			filterAction.setDisabledImageDescriptor(id);
+		}
+	}
+
+	/**
 	 *
 	 * @param markerField
 	 * @param preferredWidth
@@ -374,9 +378,9 @@ public class ExtendedMarkersView extends ViewPart {
 
 		if (considerUIWidths) {
 			TreeColumn[] columns= tree.getColumns();
-			for (int i= 0; i < columns.length; i++) {
-				if (markerField.equals(columns[i].getData(MARKER_FIELD))) {
-					return columns[i].getWidth();
+			for (TreeColumn column : columns) {
+				if (markerField.equals(column.getData(MARKER_FIELD))) {
+					return column.getWidth();
 				}
 			}
 		}
@@ -425,6 +429,8 @@ public class ExtendedMarkersView extends ViewPart {
 
 		initDragAndDrop();
 
+		initToolBar();
+
 		getSite().setSelectionProvider(viewer);
 
 		IUndoContext undoContext= getUndoContext();
@@ -434,6 +440,7 @@ public class ExtendedMarkersView extends ViewPart {
 		redoAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_REDO);
 		getViewSite().getActionBars().setGlobalActionHandler(ActionFactory.UNDO.getId(), undoAction);
 		getViewSite().getActionBars().setGlobalActionHandler(ActionFactory.REDO.getId(), redoAction);
+
 
 		startView();
 
@@ -606,11 +613,6 @@ public class ExtendedMarkersView extends ViewPart {
 		if (clipboard != null)
 			clipboard.dispose();
 
-		/*
-		 * IDEWorkbenchPlugin.getDefault().getPreferenceStore()
-		 * .removePropertyChangeListener(preferenceListener);
-		 */
-
 		getSite().getPage().removePostSelectionListener(pageSelectionListener);
 		getSite().getPage().removePartListener(partListener);
 
@@ -628,8 +630,8 @@ public class ExtendedMarkersView extends ViewPart {
 	MarkerSupportItem[] getAllConcreteItems() {
 		MarkerSupportItem[] elements =getActiveViewerInputClone().getElements();
 		Collection<MarkerSupportItem> allMarkers = new ArrayList<>();
-		for (int i = 0; i < elements.length; i++) {
-			addAllConcreteItems(elements[i], allMarkers);
+		for (MarkerSupportItem element : elements) {
+			addAllConcreteItems(element, allMarkers);
 		}
 		MarkerSupportItem[] markers = new MarkerSupportItem[allMarkers.size()];
 		allMarkers.toArray(markers);
@@ -653,8 +655,8 @@ public class ExtendedMarkersView extends ViewPart {
 	IMarker[] getAllMarkers() {
 		MarkerSupportItem[] elements =getActiveViewerInputClone().getElements();
 		Collection<IMarker> allMarkers = new ArrayList<>();
-		for (int i = 0; i < elements.length; i++) {
-			addMarkers(elements[i], allMarkers);
+		for (MarkerSupportItem element : elements) {
+			addMarkers(element, allMarkers);
 
 		}
 		IMarker[] markers = new IMarker[allMarkers.size()];
@@ -685,10 +687,10 @@ public class ExtendedMarkersView extends ViewPart {
 					IMemento[] mementoCategories = expanded.getChildren(TAG_CATEGORY);
 					MarkerCategory[] markerCategories =getActiveViewerInputClone().getCategories();
 					if (markerCategories != null) {
-						for (int i = 0; i < markerCategories.length; i++) {
-							for (int j = 0; j < mementoCategories.length; j++) {
-								if (markerCategories[i].getName().equals(mementoCategories[j].getID())) {
-									categoriesToExpand.add(markerCategories[i].getName());
+						for (MarkerCategory markerCategorie : markerCategories) {
+							for (IMemento mementoCategorie : mementoCategories) {
+								if (markerCategorie.getName().equals(mementoCategorie.getID())) {
+									categoriesToExpand.add(markerCategorie.getName());
 								}
 							}
 						}
@@ -874,8 +876,8 @@ public class ExtendedMarkersView extends ViewPart {
 					lastCategory = (MarkerCategory) next;
 					final MarkerEntry[] children = (MarkerEntry[]) lastCategory.getChildren();
 
-					for(int j = 0; j < children.length; j++) {
-						result.add(children[j].getMarker());
+					for (MarkerEntry element : children) {
+						result.add(element.getMarker());
 					}
 				}
 			}
@@ -911,9 +913,9 @@ public class ExtendedMarkersView extends ViewPart {
 		// Categories might be null if building is still happening
 		if (categories != null && builder.isShowingHierarchy()) {
 
-			for (int i = 0; i < categories.length; i++) {
+			for (MarkerSupportItem categorie : categories) {
 
-				int childCount = categories[i].getChildrenCount();
+				int childCount = categorie.getChildrenCount();
 				if (markerLimitsEnabled) {
 					childCount = Math.min(childCount, markerLimit);
 				}
@@ -1142,9 +1144,9 @@ public class ExtendedMarkersView extends ViewPart {
 	 */
 	void openSelectedMarkers() {
 		IMarker[] markers = getOpenableMarkers();
-		for (int i = 0; i < markers.length; i++) {
+		for (IMarker marker : markers) {
 			IWorkbenchPage page = getSite().getPage();
-			openMarkerInEditor(markers[i], page);
+			openMarkerInEditor(marker, page);
 		}
 	}
 
@@ -1264,9 +1266,8 @@ public class ExtendedMarkersView extends ViewPart {
 	 */
 	void setPrimarySortField(MarkerField field) {
 		TreeColumn[] columns = viewer.getTree().getColumns();
-		for (int i = 0; i < columns.length; i++) {
-			TreeColumn treeColumn = columns[i];
-			if (columns[i].getData(MARKER_FIELD).equals(field)) {
+		for (TreeColumn treeColumn : columns) {
+			if (treeColumn.getData(MARKER_FIELD).equals(field)) {
 				setPrimarySortField(field, treeColumn);
 				return;
 			}
@@ -1386,12 +1387,16 @@ public class ExtendedMarkersView extends ViewPart {
 		if (counts[0].intValue() == 0 && counts[1].intValue() == 0) {
 			// In case of tasks view and bookmarks view, show only selection
 			// count
-			return MessageFormat.format(MarkerMessages.marker_statusSelectedCount, entries.length);
+			return MessageFormat.format(MarkerMessages.marker_statusSelectedCount, new Object[] { entries.length });
 		}
-		return MessageFormat.format(MarkerMessages.marker_statusSummarySelected, entries.length,
-				/* combine infos and others */
-				MessageFormat.format(MarkerMessages.errorsAndWarningsSummaryBreakdown, counts[0], counts[1],
-						counts[2] + counts[3]));
+		return MessageFormat
+				.format(
+						MarkerMessages.marker_statusSummarySelected,
+						new Object[] { entries.length,
+								MessageFormat
+										.format(
+												MarkerMessages.errorsAndWarningsSummaryBreakdown,
+												counts[0], counts[1], /* combine infos and others */ counts[2] + counts[3])});
 	}
 
 	/**
@@ -1441,6 +1446,17 @@ public class ExtendedMarkersView extends ViewPart {
 		};
 
 		viewer.addDragSupport(operations, transferTypes, listener);
+	}
+
+	/**
+	 * Add additional actions to the tool bar.
+	 */
+	private void initToolBar() {
+		IActionBars bars = getViewSite().getActionBars();
+		IToolBarManager tm = bars.getToolBarManager();
+		createFilterAction();
+		tm.add(new Separator("FilterGroup")); //$NON-NLS-1$
+		tm.add(filterAction);
 	}
 
 	/**
@@ -1680,8 +1696,7 @@ public class ExtendedMarkersView extends ViewPart {
 			// try to adapt them in resources and add it to the
 			// selectedElements
 			List<Object> selectedElements = new ArrayList<>();
-			for (Iterator<Object> iterator = objectsToAdapt.iterator(); iterator.hasNext();) {
-				Object object = iterator.next();
+			for (Object object : objectsToAdapt) {
 				Object resElement = MarkerResourceUtil.adapt2ResourceElement(object);
 				if (resElement != null) {
 					selectedElements.add(resElement);

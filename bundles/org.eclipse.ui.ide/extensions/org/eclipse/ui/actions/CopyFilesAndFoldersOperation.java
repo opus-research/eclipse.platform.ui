@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Serge Beauchamp (Freescale Semiconductor) - Bug 229633
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -652,7 +651,8 @@ public class CopyFilesAndFoldersOperation {
 		IDEWorkbenchPlugin.getDefault().getLog().log(
 				StatusUtil.newStatus(IStatus.ERROR, MessageFormat.format(
 						"Exception in {0}.performCopy(): {1}", //$NON-NLS-1$
-						getClass().getName(), e.getTargetException()), null));
+						new Object[] { getClass().getName(),
+								e.getTargetException() }), null));
 		displayError(NLS
 				.bind(
 						IDEWorkbenchMessages.CopyFilesAndFoldersOperation_internalError,
@@ -1295,9 +1295,13 @@ public class CopyFilesAndFoldersOperation {
 				copyMoveOp.setCreateLinks(createLinks);
 				copyMoveOp.setRelativeVariable(relativeVariable);
 			}
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, monitor,
-							WorkspaceUndoUtil.getUIInfoAdapter(messageShell));
+			// If we are copying files and folders, do not execute the operation
+			// in the undo history, since the creation of a new file is not
+			// added to undo history and modification of a file is not added to
+			// the same undo history and therefore a redo cannot be properly
+			// done. Just execute it directly so it won't be added to the undo
+			// history.
+			op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(messageShell));
 		} catch (ExecutionException e) {
 			if (e.getCause() instanceof CoreException) {
 				recordError((CoreException) e.getCause());
@@ -1347,9 +1351,13 @@ public class CopyFilesAndFoldersOperation {
 					destinationPaths,
 					IDEWorkbenchMessages.CopyFilesAndFoldersOperation_copyTitle);
 			op.setModelProviderIds(getModelProviderIds());
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, monitor,
-							WorkspaceUndoUtil.getUIInfoAdapter(messageShell));
+			// If we are copying files and folders, do not execute the operation
+			// in the undo history, since the creation of a new file is not
+			// added to undo history and modification of a file is not added to
+			// the same undo history and therefore a redo cannot be properly
+			// done. Just execute it directly so it won't be added to the undo
+			// history.
+			op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(messageShell));
 		} catch (ExecutionException e) {
 			if (e.getCause() instanceof CoreException) {
 				recordError((CoreException) e.getCause());

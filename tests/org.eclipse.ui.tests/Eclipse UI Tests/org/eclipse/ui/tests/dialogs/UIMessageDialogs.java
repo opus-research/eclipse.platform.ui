@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 package org.eclipse.ui.tests.dialogs;
 
@@ -130,7 +130,8 @@ public class UIMessageDialogs extends TestCase {
         Dialog dialog = new MessageDialog(
                 getShell(),
                 ResourceNavigatorMessages.DropAdapter_question,
-				null, MessageFormat.format(ResourceNavigatorMessages.DropAdapter_overwriteQuery, DUMMY_RELATIVE_PATH),
+                null, MessageFormat.format(ResourceNavigatorMessages.DropAdapter_overwriteQuery,
+                        new Object[] { DUMMY_RELATIVE_PATH }),
                 MessageDialog.QUESTION, 0,
                         IDialogConstants.YES_LABEL,
                         IDialogConstants.YES_TO_ALL_LABEL,
@@ -212,9 +213,10 @@ public class UIMessageDialogs extends TestCase {
     public void testOverwritePerspective() {
         Dialog dialog = new MessageDialog(getShell(), WorkbenchMessages.SavePerspective_overwriteTitle, null,
                 NLS.bind(WorkbenchMessages.SavePerspective_overwriteQuestion, (new Object[] { "Dummy Perspective" })),
-                MessageDialog.QUESTION, new String[] {
-                        IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL,
-                        IDialogConstants.CANCEL_LABEL }, 0);
+                MessageDialog.QUESTION, 0,
+                IDialogConstants.YES_LABEL,
+                IDialogConstants.NO_LABEL,
+                IDialogConstants.CANCEL_LABEL);
         DialogCheck.assertDialog(dialog, this);
     }
 
@@ -263,11 +265,11 @@ public class UIMessageDialogs extends TestCase {
     }
 
     public void testWizardOverwrite() {
-        Dialog dialog = new MessageDialog(getShell(), "OK?", null, "Exists", MessageDialog.QUESTION,
-                new String[] { IDialogConstants.YES_LABEL,
-                        IDialogConstants.YES_TO_ALL_LABEL,
-                        IDialogConstants.NO_LABEL,
-                        IDialogConstants.CANCEL_LABEL }, 0);
+        Dialog dialog = new MessageDialog(getShell(), "OK?", null, "Exists", MessageDialog.QUESTION, 0,
+                IDialogConstants.YES_LABEL,
+                IDialogConstants.YES_TO_ALL_LABEL,
+                IDialogConstants.NO_LABEL,
+                IDialogConstants.CANCEL_LABEL);
         DialogCheck.assertDialog(dialog, this);
     }
 }

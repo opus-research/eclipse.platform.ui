@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
@@ -169,7 +168,8 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 							// the href to its id
 							String commandGroupLink = MessageFormat.format(
 									"<a href=\"{0}\">{1}</a>", //$NON-NLS-1$
-									actionSet.descriptor.getId(), actionSet.descriptor.getLabel());
+									new Object[] { actionSet.descriptor.getId(),
+											actionSet.descriptor.getLabel() });
 
 							if (commandGroupList == null) {
 								commandGroupList = commandGroupLink;
@@ -214,7 +214,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 		// Show key binding info
 		if (showKeyBindings && CustomizePerspectiveDialog.getCommandID(item) != null) {
 			// See if there is a command associated with the command id
-			ICommandService commandService = (ICommandService) dialog.window
+			ICommandService commandService = dialog.window
 					.getService(ICommandService.class);
 			Command command = commandService.getCommand(CustomizePerspectiveDialog.getCommandID(item));
 
@@ -389,8 +389,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 	 * Gets the keybindings associated with a ContributionItem.
 	 */
 	static Binding[] getKeyBindings(WorkbenchWindow window, DisplayItem item) {
-		IBindingService bindingService = (IBindingService) window
-				.getService(IBindingService.class);
+		IBindingService bindingService = window.getService(IBindingService.class);
 
 		if (!(bindingService instanceof BindingService)) {
 			return new Binding[0];
