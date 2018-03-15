@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Axel Richard <axel.richard@obeo.fr> - initial API and implementation, Bug 492401
+ *     Axel Richard <axel.richard@obeo.fr> - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -15,15 +15,11 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -38,7 +34,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.internal.IPreferenceConstants;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
-import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
  * Preference page that allows to enable auto-save for textual editors.
@@ -58,7 +53,9 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 
 	private Label resetMessage;
 
-	private StyledText noteMessage;
+	private Label noteLabel;
+
+	private Label noteMessage;
 
 	private IPropertyChangeListener validityChangeListener = new IPropertyChangeListener() {
 		@Override
@@ -148,6 +145,7 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 	public void dispose() {
 		intervalField.setPropertyChangeListener(null);
 		noteMessage.dispose();
+		noteLabel.dispose();
 		resetMessage.dispose();
 		intervalField.dispose();
 		intervalComposite.dispose();
@@ -216,7 +214,8 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 	 */
 	protected void setAutoSaveIntervalTextValue(int interval) {
 		if (intervalField != null && intervalComposite != null
-				&& !intervalField.getTextControl(intervalComposite).isDisposed() && autoSaveButton != null
+				&& !intervalField.getTextControl(intervalComposite).isDisposed()
+				&& autoSaveButton != null
 				&& !autoSaveButton.isDisposed() && autoSaveButton.getSelection()) {
 			intervalField.setStringValue(String.valueOf(interval));
 		}
@@ -272,6 +271,7 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 				getPreferenceStore().setValue(IPreferenceConstants.SAVE_AUTOMATICALLY, autoSave);
 				final Display display = autoSaveButton.getDisplay();
 				noteMessage.setEnabled(autoSave);
+				noteLabel.setEnabled(autoSave);
 				resetMessage.setEnabled(autoSave);
 				intervalField.getTextControl(intervalComposite).setEnabled(autoSave);
 				intervalField.getLabelControl(intervalComposite).setEnabled(autoSave);
@@ -279,11 +279,13 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 				autoSaveGroup.setEnabled(autoSave);
 				if (autoSave) {
 					noteMessage.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+					noteLabel.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 					resetMessage.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 					intervalField.getLabelControl(intervalComposite)
 							.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 				} else {
 					noteMessage.setForeground(display.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+					noteLabel.setForeground(display.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 					resetMessage.setForeground(display.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 					intervalField.getLabelControl(intervalComposite)
 							.setForeground(display.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
@@ -368,26 +370,15 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 		final GridData noteCompositeData = new GridData(SWT.FILL, SWT.FILL, true, false);
 		noteComposite.setLayoutData(noteCompositeData);
 
-		noteMessage = new StyledText(noteComposite, SWT.WRAP);
-		noteMessage.setEditable(false);
-		noteMessage.setEnabled(autoSaveButton.getSelection());
-		noteMessage.setText(IDEWorkbenchMessages.AutoSavePreferencPage_noteLabel + " " //$NON-NLS-1$
-				+ IDEWorkbenchMessages.AutoSavePreferencPage_noteMessage);
-		final TextStyle boldStyle = new TextStyle();
-		boldStyle.font = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-		final StyleRange range = new StyleRange(boldStyle);
-		range.length = IDEWorkbenchMessages.AutoSavePreferencPage_noteLabel.length();
-		noteMessage.setStyleRange(range);
-		// need to set transparent background image (see
-		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=297633)
-		noteMessage.setBackgroundImage(
-				IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/transparent_pixel.png").createImage()); //$NON-NLS-1$
+		noteLabel = new Label(noteComposite, SWT.NONE);
+		noteLabel.setText(IDEWorkbenchMessages.AutoSavePreferencPage_noteLabel);
+		noteLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
-		noteMessage.setJustify(true);
+		noteMessage = new Label(noteComposite, SWT.WRAP);
+		noteMessage.setText(IDEWorkbenchMessages.AutoSavePreferencPage_noteMessage);
 		final GridData noteMessageData = new GridData(SWT.FILL, SWT.FILL, true, false);
 		noteMessageData.widthHint = 350;
 		noteMessage.setLayoutData(noteMessageData);
-
 	}
 
 }
