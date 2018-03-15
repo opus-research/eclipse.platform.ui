@@ -192,7 +192,7 @@ public class ProgressManagerUtil {
 			return textValue;
 		}
 		int length = textValue.length();
-		int charsToClip = Math.round(0.9995f * length
+		int charsToClip = Math.round(0.95f * length
 				* (1 - ((float) maxWidth / maxExtent)));
 		int secondWord = findSecondWhitespace(textValue, gc, maxWidth);
 		int pivot = ((length - secondWord) / 2) + secondWord;
