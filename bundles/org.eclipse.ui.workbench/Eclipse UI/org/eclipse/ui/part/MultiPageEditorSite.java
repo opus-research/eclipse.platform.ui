@@ -45,6 +45,7 @@ import org.eclipse.ui.internal.services.IServiceLocatorCreator;
 import org.eclipse.ui.internal.services.IWorkbenchLocationService;
 import org.eclipse.ui.internal.services.ServiceLocator;
 import org.eclipse.ui.internal.services.WorkbenchLocationService;
+import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.services.IServiceScopes;
 
 /**
@@ -132,7 +133,12 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 				.getService(IServiceLocatorCreator.class);
 		context = site.getModel().getContext().createChild("MultiPageEditorSite"); //$NON-NLS-1$
 		serviceLocator = (ServiceLocator) slc.createServiceLocator(
-				multiPageEditor.getSite(), null, () -> getMultiPageEditor().close(), context);
+				multiPageEditor.getSite(), null, new IDisposable(){
+					@Override
+					public void dispose() {
+						getMultiPageEditor().close();
+					}
+				}, context);
 
 		initializeDefaultServices();
 	}
@@ -147,7 +153,12 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 						getWorkbenchWindow(), getMultiPageEditor().getSite(),
 						this, null, 3));
 		serviceLocator.registerService(IMultiPageEditorSiteHolder.class,
-				(IMultiPageEditorSiteHolder) () -> MultiPageEditorSite.this);
+				new IMultiPageEditorSiteHolder() {
+					@Override
+					public MultiPageEditorSite getSite() {
+						return MultiPageEditorSite.this;
+					}
+				});
 
 		context.set(IContextService.class.getName(), new ContextFunction() {
 			@Override
@@ -368,7 +379,12 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 	 */
 	private ISelectionChangedListener getPostSelectionChangedListener() {
 		if (postSelectionChangedListener == null) {
-			postSelectionChangedListener = event -> MultiPageEditorSite.this.handlePostSelectionChanged(event);
+			postSelectionChangedListener = new ISelectionChangedListener() {
+				@Override
+				public void selectionChanged(SelectionChangedEvent event) {
+					MultiPageEditorSite.this.handlePostSelectionChanged(event);
+				}
+			};
 		}
 		return postSelectionChangedListener;
 	}
@@ -393,7 +409,12 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 	 */
 	private ISelectionChangedListener getSelectionChangedListener() {
 		if (selectionChangedListener == null) {
-			selectionChangedListener = event -> MultiPageEditorSite.this.handleSelectionChanged(event);
+			selectionChangedListener = new ISelectionChangedListener() {
+				@Override
+				public void selectionChanged(SelectionChangedEvent event) {
+					MultiPageEditorSite.this.handleSelectionChanged(event);
+				}
+			};
 		}
 		return selectionChangedListener;
 	}

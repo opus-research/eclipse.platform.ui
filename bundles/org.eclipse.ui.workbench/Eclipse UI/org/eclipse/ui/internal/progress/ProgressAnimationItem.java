@@ -27,6 +27,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.accessibility.AccessibleListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -294,12 +296,15 @@ public class ProgressAnimationItem extends AnimationItem implements
 		}
 
 		top = new Composite(parent, SWT.NULL);
-		top.addDisposeListener(e -> {
-			FinishedJobs.getInstance().removeListener(
-					ProgressAnimationItem.this);
-			noneImage.dispose();
-			okImage.dispose();
-			errorImage.dispose();
+		top.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				FinishedJobs.getInstance().removeListener(
+						ProgressAnimationItem.this);
+				noneImage.dispose();
+				okImage.dispose();
+				errorImage.dispose();
+			}
 		});
 
 		boolean isCarbon = Util.isMac();
