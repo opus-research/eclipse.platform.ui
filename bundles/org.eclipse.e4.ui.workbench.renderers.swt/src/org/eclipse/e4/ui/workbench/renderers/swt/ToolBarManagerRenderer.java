@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -35,7 +34,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
@@ -105,9 +103,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<>();
 
 	private ToolItemUpdater enablementUpdater = new ToolItemUpdater();
-
-	@Inject
-	private Logger logger;
 
 	@Inject
 	private MApplication application;
@@ -351,14 +346,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 		};
 		context.runAndTrack(enablementUpdater);
-	}
-
-	@PreDestroy
-	void preDestroy() {
-		if (logger.isDebugEnabled()) {
-			System.out.printf("TBMR:dispose: modelToManager size = %d, managerToModel size = %d\n", //$NON-NLS-1$
-					modelToManager.size(), managerToModel.size());
-		}
 	}
 
 	@Override
@@ -818,10 +805,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public void linkModelToManager(MToolBar model, ToolBarManager manager) {
 		modelToManager.put(model, manager);
 		managerToModel.put(manager, model);
-		if (logger.isDebugEnabled()) {
-			System.out.printf("TBMR:linkModelToManager: modelToManager size = %d, managerToModel size = %d\n", //$NON-NLS-1$
-					modelToManager.size(), managerToModel.size());
-		}
 	}
 
 	/**
@@ -829,19 +812,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 * @param manager
 	 */
 	public void clearModelToManager(MToolBar model, ToolBarManager manager) {
-		for (MToolBarElement element : model.getChildren()) {
-			if (element instanceof MToolBar) {
-				clearModelToManager((MToolBar) element, getManager((MToolBar) element));
-			}
-			IContributionItem ici = getContribution(element);
-			clearModelToContribution(element, ici);
-		}
 		modelToManager.remove(model);
 		managerToModel.remove(manager);
-		if (logger.isDebugEnabled()) {
-			System.out.printf("TBMR:clearModelToManager: modelToManager size = %d, managerToModel size = %d\n", //$NON-NLS-1$
-					modelToManager.size(), managerToModel.size());
-		}
 	}
 
 	/**
@@ -874,12 +846,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 * @param item
 	 */
 	public void clearModelToContribution(MToolBarElement model, IContributionItem item) {
-		if (model instanceof MToolBar) {
-			for (MToolBarElement element : ((MToolBar) model).getChildren()) {
-				IContributionItem ici = getContribution(element);
-				clearModelToContribution(element, ici);
-			}
-		}
 		modelToContribution.remove(model);
 		contributionToModel.remove(item);
 	}
