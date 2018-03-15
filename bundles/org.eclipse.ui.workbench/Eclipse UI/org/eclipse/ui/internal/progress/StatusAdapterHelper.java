@@ -12,7 +12,6 @@
 package org.eclipse.ui.internal.progress;
 
 import java.util.HashMap;
-
 import org.eclipse.ui.progress.IProgressConstants;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 
@@ -62,7 +61,8 @@ public class StatusAdapterHelper {
 			return null;
 		}
 		StatusAdapter statusAdapter = (StatusAdapter) map.remove(info);
-		statusAdapter.setProperty(
+		if (statusAdapter != null)
+			statusAdapter.setProperty(
 				IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY,
 				Boolean.FALSE);
 		return statusAdapter;
