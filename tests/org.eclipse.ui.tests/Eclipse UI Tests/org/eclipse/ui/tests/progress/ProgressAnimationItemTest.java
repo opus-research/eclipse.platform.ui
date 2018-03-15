@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Tasktop Technologies and others.
+ * Copyright (c) 2015, 2017 Tasktop Technologies and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,8 +61,7 @@ public class ProgressAnimationItemTest {
 	public void testSingleJobRefreshOnce() throws Exception {
 		createAndScheduleJob();
 
-		waitAndReadAndDispatch();
-
+		ProgressManager.getInstance().notifyListeners();
 		refresh();
 
 		assertSingleAccessibleListener();
@@ -73,8 +72,7 @@ public class ProgressAnimationItemTest {
 		createAndScheduleJob();
 		createAndScheduleJob();
 
-		waitAndReadAndDispatch();
-
+		ProgressManager.getInstance().notifyListeners();
 		refresh();
 
 		assertSingleAccessibleListener();
@@ -84,17 +82,11 @@ public class ProgressAnimationItemTest {
 	public void testSingleJobRefreshTwice() throws Exception {
 		createAndScheduleJob();
 
-		waitAndReadAndDispatch();
-
+		ProgressManager.getInstance().notifyListeners();
 		refresh();
 		refresh();
 
 		assertSingleAccessibleListener();
-	}
-
-	private void waitAndReadAndDispatch() throws InterruptedException {
-		while (PlatformUI.getWorkbench().getDisplay().readAndDispatch()) {
-		}
 	}
 
 	private ProgressAnimationItem createProgressAnimationItem(Composite composite) {
@@ -106,8 +98,6 @@ public class ProgressAnimationItemTest {
 	private static void createAndScheduleJob() throws InterruptedException {
 		DummyJob job = new DummyJob("Keep me", Status.OK_STATUS);
 		job.setProperty(IProgressConstants.KEEP_PROPERTY, true);
-		ExtendedJobInfo info = new ExtendedJobInfo(job);
-		ProgressManager.getInstance().addJobInfo(info);
 		job.schedule();
 		job.join();
 	}
@@ -140,7 +130,7 @@ public class ProgressAnimationItemTest {
 	private static int getAccessibleListenersSize(Accessible accessible) throws Exception {
 		Field f = Accessible.class.getDeclaredField("accessibleListeners");
 		f.setAccessible(true);
-		Collection accessibleListeners = (Collection) f.get(accessible);
+		Collection<?> accessibleListeners = (Collection<?>) f.get(accessible);
 		return accessibleListeners == null ? 0 : accessibleListeners.size();
 	}
 

@@ -548,6 +548,10 @@
       <keyword
             id="org.eclipse.ui.ide.save"
             label="%PreferenceKeywords.Save"/>
+      <keyword
+            id="org.eclipse.ui.ide.open"
+            label="%PreferenceKeywords.Open">
+      </keyword>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -605,6 +609,9 @@
          <keywordReference id="org.eclipse.ui.ide.editing"/>
          <keywordReference id="org.eclipse.ui.ide.editors"/>
          <keywordReference id="org.eclipse.ui.ide.unassociated"/>
+         <keywordReference
+               id="org.eclipse.ui.ide.open">
+         </keywordReference>
       </page>
       <page
             name="%PreferencePages.Views"
@@ -681,6 +688,7 @@
             name="%PreferencePages.ContentTypes">
          <keywordReference id="org.eclipse.ui.ide.editing"/>
          <keywordReference id="org.eclipse.ui.ide.encoding"/>
+         <keywordReference id="org.eclipse.ui.ide.editors"/>
       </page>
    </extension>
    <extension
@@ -1193,14 +1201,14 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
       <key
             commandId="org.eclipse.ui.window.fullscreenmode"
-            contextId="org.eclipse.ui.contexts.window"
+            contextId="org.eclipse.ui.contexts.dialogAndWindow"
             platform="win32"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+F11">
       </key>
       <key
             commandId="org.eclipse.ui.window.fullscreenmode"
-            contextId="org.eclipse.ui.contexts.window"
+            contextId="org.eclipse.ui.contexts.dialogAndWindow"
             platform="gtk"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+F11">
@@ -1733,6 +1741,11 @@
                   tooltip="%menu.toggleCoolbar.tooltip">
             </command>
             <command
+                  commandId="org.eclipse.ui.window.togglestatusbar"
+                  style="push"
+                  tooltip="%menu.toggleStatusBar.tooltip">
+            </command>
+            <command
                   commandId="org.eclipse.ui.window.fullscreenmode"
                   style="push">
             </command>
@@ -1773,12 +1786,14 @@
             <command
                   commandId="org.eclipse.ui.ide.markers.copyDescription"
                   label="%command.copyDescription.label"
+                  mnemonic="%command.copyDescription.mnemonic"
                   style="push">
             </command>
             <command
                   commandId="org.eclipse.ui.ide.markers.copyMarkerResourceQualifiedName"
                   icon="icons/full/elcl16/cpyqual_menu.png"
                   label="%command.copyMarkerResourceQualifiedName.label"
+                  mnemonic="%command.copyMarkerResourceQualifiedName.mnemonic"
                   style="push">
             </command>
          </menu>
@@ -2512,19 +2527,19 @@
    <extension
          point="org.eclipse.ui.ide.unassociatedEditorStrategy">
       <strategy
-            class="org.eclipse.ui.internal.ide.SystemEditorOrTextEditorStrategy"
+            class="org.eclipse.ui.internal.ide.registry.SystemEditorOrTextEditorStrategy"
             id="org.eclipse.ui.ide.systemEditorThenTextEditor"
             interactive="false"
             label="%systemEditorThenTextEditor">
       </strategy>
       <strategy
-            class="org.eclipse.ui.internal.ide.TextEditorStrategy"
+            class="org.eclipse.ui.internal.ide.registry.TextEditorStrategy"
             id="org.eclipse.ui.ide.textEditor"
             interactive="false"
             label="%textEditor">
       </strategy>
       <strategy
-            class="org.eclipse.ui.internal.ide.AskUserViaPopupUnassociatedEditorStrategy"
+            class="org.eclipse.ui.internal.ide.registry.AskUserViaPopupUnassociatedEditorStrategy"
             id="org.eclipse.ui.ide.askUserForUnassociatedEditor"
             interactive="true"
             label="%askUserViaPopup">

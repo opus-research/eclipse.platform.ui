@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2016 Patrik Suzzi and others.
+ * Copyright (c) 2017 Patrik Suzzi and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090, 504091
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090, 504091, 509232, 506019
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -43,8 +43,6 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -57,6 +55,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -86,9 +86,13 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 
 	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
+	private boolean bypassFocusLost;
+
 	private Object selection;
 
 	protected IWorkbenchWindow window;
+
+	protected WorkbenchPage page;
 
 	// true to go to next and false to go to previous part
 	protected boolean gotoDirection;
@@ -119,11 +123,10 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-
-		IWorkbenchPage page = window.getActivePage();
+		page = (WorkbenchPage) window.getActivePage();
 		IWorkbenchPart activePart= page.getActivePart();
 		getTriggers();
-		openDialog((WorkbenchPage) page, activePart);
+		openDialog(page, activePart);
 		clearTriggers();
 		activate(page, selection);
 
@@ -192,7 +195,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 		table.setBackground(getBackground());
 
 		tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
-		tableViewerColumn.setLabelProvider(getColumnLabelProvider());
+		setLabelProvider(tableViewerColumn);
 		tc = tableViewerColumn.getColumn();
 		tc.setResizable(false);
 
@@ -220,14 +223,17 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 			break;
 		default:
 			int i;
+			int currentItemIndex = getCurrentItemIndex();
 			if (gotoDirection) {
-				i= getCurrentItemIndex() + 1;
-				if (i >= tableItemCount)
-					i= 0;
+				i= currentItemIndex + 1;
+				if (i >= tableItemCount) {
+					i = 0;
+				}
 			} else {
-				i= getCurrentItemIndex() - 1;
-				if (i < 0)
-					i= tableItemCount - 1;
+				i= currentItemIndex - 1;
+				if (i < 0) {
+					i = tableItemCount - 1;
+				}
 			}
 			table.setSelection(i);
 		}
@@ -336,7 +342,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 				}
 				// check if the focus is still in dialog elements
 				Control fc = dialog.getDisplay().getFocusControl();
-				if (fc != text && fc != table && fc != dialog) {
+				if (fc != text && fc != table && fc != dialog && !bypassFocusLost) {
 					// otherwise, close
 					cancel(dialog);
 				}
@@ -451,13 +457,16 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 
 	/**
 	 * Add modify listener to the search text, trigger search each time text
-	 * changes
+	 * changes. After the search the first matching result is selected. 
 	 */
 	protected void addModifyListener(Text text) {
 		text.addModifyListener(e -> {
 			String searchText = ((Text) e.widget).getText();
 			setMatcherString(searchText);
 			tableViewer.refresh();
+			if (tableViewer.getTable().getColumnCount() > 0) {
+				tableViewer.getTable().select(0);
+			}
 		});
 	}
 
@@ -476,14 +485,22 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 				case SWT.KEYPAD_CR:
 					ok(dialog, table);
 					break;
+				case SWT.PAGE_DOWN:
 				case SWT.ARROW_DOWN:
 					moveForward();
 					break;
+				case SWT.PAGE_UP:
 				case SWT.ARROW_UP:
 					moveBackward();
 					break;
 				case SWT.ESC:
 					cancel(dialog);
+					break;
+				case SWT.DEL:
+					// no filter text, closes selected item
+					if (text.getText().length() == 0) {
+						deleteSelectedItem();
+					}
 					break;
 				}
 			}
@@ -496,7 +513,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 	}
 
 	protected Color getForeground(){
-		return dialog.getDisplay().getSystemColor(SWT.COLOR_TITLE_FOREGROUND);
+		return dialog.getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND);
 	}
 	protected Color getBackground() {
 		return dialog.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
@@ -538,9 +555,13 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 					}
 
 					moveBackward();
+				} else if (keyCode == SWT.DEL && isFiltered()) {
+					e.doit = false;
+					deleteSelectedItem();
 				} else if (keyCode != SWT.ALT && keyCode != SWT.COMMAND
 						&& keyCode != SWT.CTRL && keyCode != SWT.SHIFT
 						&& keyCode != SWT.ARROW_DOWN && keyCode != SWT.ARROW_UP
+						&& keyCode != SWT.PAGE_DOWN && keyCode != SWT.PAGE_UP
 						&& keyCode != SWT.ARROW_LEFT
 						&& keyCode != SWT.ARROW_RIGHT) {
 					if (!isFiltered()) {
@@ -561,11 +582,12 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 							cancel(dialog);
 						}
 					}
-				} else if (keyCode == SWT.ARROW_DOWN && table.getSelectionIndex() == table.getItemCount() - 1) {
+				} else if ((keyCode == SWT.ARROW_DOWN || keyCode == SWT.PAGE_DOWN)
+						&& table.getSelectionIndex() == table.getItemCount() - 1) {
 					/** DOWN is managed by table, except when "rotating" */
 					moveForward();
 					e.doit = false;
-				} else if (keyCode == SWT.ARROW_UP && table.getSelectionIndex() == 0) {
+				} else if ((keyCode == SWT.ARROW_UP || keyCode == SWT.PAGE_UP) && table.getSelectionIndex() == 0) {
 					/** UP is managed by table, except when "rotating" */
 					moveBackward();
 					e.doit = false;
@@ -629,6 +651,44 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 		}
 	}
 
+	/** deletes the currently selected item */
+	private void deleteSelectedItem() {
+		int index = table.getSelectionIndex();
+		if (index == -1 || index >= table.getItemCount()) {
+			return;
+		}
+		TableItem item = table.getItem(index);
+		close(item);
+	}
+
+	/** closes the given item */
+	private void close(TableItem ti) {
+		// currently works for editors only (Ctrl+E)
+		if (ti.getData() instanceof EditorReference) {
+			int index = table.indexOf(ti);
+			EditorReference ed = (EditorReference) ti.getData();
+			bypassFocusLost = true;
+			page.closeEditors(new IEditorReference[] { ed }, true);
+			bypassFocusLost = false;
+			// reset focus when closing active editor
+			table.setFocus();
+			tableViewer.setInput(getInput(page));
+
+			if (table.getItemCount() == 0) {
+				cancel(dialog);
+			}
+
+			if (table.isDisposed()) {
+				return;
+			}
+
+			if (index > 0 && index <= table.getItemCount()) {
+				index -= 1;
+			}
+			table.setSelection(index);
+		}
+	}
+
 	/**
 	 * Adds a listener to the given table that blocks all traversal operations.
 	 *
@@ -637,18 +697,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 	 *            must not be <code>null</code>.
 	 */
 	protected final void addTraverseListener(final Table table) {
-		table.addTraverseListener(new TraverseListener() {
-			/**
-			 * Blocks all key traversal events.
-			 *
-			 * @param event
-			 *            The trigger event; must not be <code>null</code>.
-			 */
-			@Override
-			public final void keyTraversed(final TraverseEvent event) {
-				event.doit = false;
-			}
-		});
+		table.addTraverseListener(event -> event.doit = false);
 	}
 
 	/**
@@ -724,12 +773,29 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 
 			@Override
 			public void mouseDown(MouseEvent e) {
-				ok(dialog, table);
+				if (e.button == 3) {
+					// right click, nop
+				} else {
+					ok(dialog, table);
+				}
 			}
 
 			@Override
 			public void mouseUp(MouseEvent e) {
-				ok(dialog, table);
+				if (e.button == 3) {
+					if (table.equals(e.getSource())) {
+						TableItem ti = table.getItem(new Point(e.x, e.y));
+						if (ti != null && ti.getData() instanceof EditorReference) {
+							Menu menu = new Menu(table);
+							MenuItem mi = new MenuItem(menu, SWT.NONE);
+							mi.setText(WorkbenchMessages.FilteredTableBaseHandler_Close);
+							mi.addListener(SWT.Selection, se -> close(ti));
+							menu.setVisible(true);
+						}
+					}
+				} else {
+					ok(dialog, table);
+				}
 			}
 		});
 	}
@@ -757,6 +823,26 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 		return perspectiveLabelProvider;
 	}
 
+	/** Returns the text for the given {@link WorkbenchPartReference} */
+	protected String getWorkbenchPartReferenceText(WorkbenchPartReference ref) {
+		if (ref.isDirty()) {
+			return "*" + ref.getTitle(); //$NON-NLS-1$
+		}
+		return ref.getTitle();
+	}
+
+	/**
+	 * Sets the label provider for the only column visible in the table.
+	 * Subclasses can override this method to style the table, using a
+	 * StyledCellLabelProvider.
+	 *
+	 * @param tableViewerColumn
+	 * @return
+	 */
+	protected void setLabelProvider(TableViewerColumn tableViewerColumn) {
+		tableViewerColumn.setLabelProvider(getColumnLabelProvider());
+	}
+
 	/** Default ColumnLabelProvider. The table has only one column */
 	protected ColumnLabelProvider getColumnLabelProvider() {
 		return new ColumnLabelProvider() {
@@ -765,11 +851,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 				if (element instanceof FilteredTableItem) {
 					return ((FilteredTableItem) element).text;
 				} else if (element instanceof WorkbenchPartReference) {
-					WorkbenchPartReference ref = ((WorkbenchPartReference) element);
-					if (ref.isDirty()) {
-						return "*" + ref.getTitle(); //$NON-NLS-1$
-					}
-					return ref.getTitle();
+					return getWorkbenchPartReferenceText((WorkbenchPartReference) element);
 				} else if (element instanceof IPerspectiveDescriptor) {
 					IPerspectiveDescriptor desc = (IPerspectiveDescriptor) element;
 					String text = getPerspectiveLabelProvider().getText(desc);
@@ -820,7 +902,6 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 	protected String getTableHeader(IWorkbenchPart activePart) {
 		return EMPTY_STRING;
 	}
-
 
 	public Object getSelection() {
 		return selection;

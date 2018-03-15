@@ -185,8 +185,8 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 		@Override
 		public void onExtensionActivation(String aViewerId, String[] theNavigatorExtensionIds, boolean isActive) {
 
-			for (int i = 0; i < theNavigatorExtensionIds.length; i++) {
-				if (WorkingSetsContentProvider.EXTENSION_ID.equals(theNavigatorExtensionIds[i])) {
+			for (String theNavigatorExtensionId : theNavigatorExtensionIds) {
+				if (WorkingSetsContentProvider.EXTENSION_ID.equals(theNavigatorExtensionId)) {
 					if (isActive) {
 						extensionStateModel = contentService.findStateModel(WorkingSetsContentProvider.EXTENSION_ID);
 						workingSetRootModeActionGroup.setStateModel(extensionStateModel);
@@ -268,9 +268,9 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 	private void setWorkingSetFilter(IWorkingSet workingSet, boolean firstTime) {
 		ResourceWorkingSetFilter workingSetFilter = null;
 		ViewerFilter[] filters = viewer.getFilters();
-		for (int i = 0; i < filters.length; i++) {
-			if (filters[i] instanceof ResourceWorkingSetFilter) {
-				workingSetFilter = (ResourceWorkingSetFilter) filters[i];
+		for (ViewerFilter filter : filters) {
+			if (filter instanceof ResourceWorkingSetFilter) {
+				workingSetFilter = (ResourceWorkingSetFilter) filter;
 				break;
 			}
 		}
@@ -286,9 +286,7 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 				new Status(IStatus.ERROR, WorkbenchNavigatorPlugin.PLUGIN_ID, ""));  //$NON-NLS-1$
 			return;
 		}
-		if (extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS)
-		    && extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_OTHERS_WORKING_SET)) {
-			// do not need filter when working sets are used for grouping
+		if (extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS)) {
 			// a filter would hide the "Others" working set content
 			workingSetFilter.setWorkingSet(null);
 		} else {

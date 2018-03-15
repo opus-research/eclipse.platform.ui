@@ -57,7 +57,6 @@ import org.eclipse.ui.internal.testing.WorkbenchPartTestable;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
-import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.services.IServiceScopes;
 import org.eclipse.ui.testing.IWorkbenchPartTestable;
 
@@ -197,11 +196,8 @@ public abstract class PartSite implements IWorkbenchPartSite {
 				.get(IServiceLocatorCreator.class);
 		IWorkbenchWindow workbenchWindow = getWorkbenchWindow();
 		this.serviceLocator = (ServiceLocator) slc.createServiceLocator(workbenchWindow, null,
-				new IDisposable() {
-					@Override
-					public void dispose() {
-						// not sure what to do here
-					}
+				() -> {
+					// not sure what to do here
 				}, e4Context);
 		initializeDefaultServices();
 	}
@@ -631,7 +627,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 */
 	@Override
 	public String toString() {
-		final StringBuffer buffer = new StringBuffer();
+		final StringBuilder buffer = new StringBuilder();
 		buffer.append("PartSite(id="); //$NON-NLS-1$
 		buffer.append(getId());
 		buffer.append(",pluginId="); //$NON-NLS-1$

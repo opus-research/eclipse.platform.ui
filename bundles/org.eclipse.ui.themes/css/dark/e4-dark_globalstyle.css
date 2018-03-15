@@ -43,6 +43,7 @@ ViewForm > ToolBar, /* SWT-BUG: ToolBar do not inherit rules from ViewForm */
    element without a CSS id, a CSS class and a seekable Widget name, cannot be overridden
    by a subsequent more specific rule used to correct the style for seekable elements (<1>): */
 TabFolder > Composite > *, /* Composite > CommitSearchPage$... */
+CTabFolder > Composite > *, /* Composite > CommitSearchPage$... */
 TabFolder > Composite > * > * /* [style~='SWT.NO_BACKGROUND'] <- generate E4 non-sense bugs in apparently not related other rules */, /* Composite > ContentMergeViewer$... > TextMergeViewer$... */
 DocCommentOwnerComposite > Group > *, /* Group > DocCommentOwnerComposite$... */
 TabFolder > Composite > ScrolledComposite > *, /* ScrolledComposite > ControlListViewer$... */
@@ -53,7 +54,8 @@ Shell > Composite > Composite > Composite > *, /* Composite > FilteredPreference
 ScrolledComposite > Composite > Composite > Composite > *, /* Composite > NewKeysPreferencePage$... */
 Shell > Composite > Composite > Composite > Composite > Composite > *, /* Composite > ShowRefactoringHistoryWizardPage$... */
 Shell[style~='SWT.RADIO'][style~='SWT.CASCADE'][style~='SWT.SHADOW_ETCHED_IN'][style~='SWT.SHADOW_ETCHED_OUT'][style~='SWT.RESIZE'][style~='SWT.MENU'][style~='SWT.FULL_SELECTION'][style~='SWT.DATE'] > Composite > *, /* Composite > RefactoringWizardDialog$... */
-Shell[style~='SWT.RADIO'][style~='SWT.CASCADE'][style~='SWT.SHADOW_ETCHED_IN'][style~='SWT.SHADOW_ETCHED_OUT'][style~='SWT.RESIZE'][style~='SWT.MENU'][style~='SWT.FULL_SELECTION'][style~='SWT.DATE'] > Composite > * > * /* Composite > RefactoringWizardDialog$... */ {
+Shell[style~='SWT.RADIO'][style~='SWT.CASCADE'][style~='SWT.SHADOW_ETCHED_IN'][style~='SWT.SHADOW_ETCHED_OUT'][style~='SWT.RESIZE'][style~='SWT.MENU'][style~='SWT.FULL_SELECTION'][style~='SWT.DATE'] > Composite > * > *, /* Composite > RefactoringWizardDialog$... */ 
+Group > StyledText {
     background-color:#515658;
     color:#eeeeee;
 }
@@ -94,7 +96,6 @@ Text {
     background-color: #515658;
     color: #cccccc;
 }
-
 
 SashForm > StyledText {
 	/*	Fix StyledText inside a SashForm */
@@ -396,6 +397,12 @@ HeapStatus {
  	color: black;
 }
 
+Table,
+Tree {
+	swt-header-color: #CCC;
+	swt-header-background-color: #383D3F;
+}
+
 Twistie {
     color: #E8E4DF;
 }
@@ -429,6 +436,11 @@ Twistie {
 .MPartSashContainer {
     background-color: #515658;
     color: #EEEEEE;
+}
+
+HeapStatus {
+	background-color: #4F5355;
+	color: #EEEEEE;
 }
 
 PageSiteComposite, PageSiteComposite > CImageLabel {
@@ -486,4 +498,27 @@ StyledText {
 
 Link {
 	swt-link-foreground-color: '#org-eclipse-ui-workbench-LINK_COLOR'
+}
+
+ExpandableComposite {
+    swt-titlebar-color: #cccccc;
+}
+
+TabbedPropertyTitle > CLabel{
+	color: #9AC9D8;
+}
+
+TabbedPropertyTitle {
+	swt-backgroundGradientStart-color:  #505F70;
+	swt-backgroundGradientEnd-color:    #505F70;
+	swt-backgroundBottomKeyline1-color: #505F70;
+	swt-backgroundBottomKeyline2-color: #505F70;
+}
+
+TabbedPropertyList {
+	swt-tabAreaBackground-color : #515658;   /*same as canvas*/
+	swt-tabBackground-color     : '#org-eclipse-ui-workbench-ACTIVE_NOFOCUS_TAB_BG_START';
+	swt-tabNormalShadow-color   : '#org-eclipse-ui-workbench-INACTIVE_TAB_OUTLINE_COLOR';             /* color of shadow lines around the tabs */
+	swt-tabDarkShadow-color     : '#org-eclipse-ui-workbench-ACTIVE_NOFOCUS_TAB_SELECTED_TEXT_COLOR'; /* line color of the tiny scroll triangle (at top / at bottom) */
+	color                       : '#org-eclipse-ui-workbench-ACTIVE_NOFOCUS_TAB_SELECTED_TEXT_COLOR'; /* text color in the tab / tab area */
 }

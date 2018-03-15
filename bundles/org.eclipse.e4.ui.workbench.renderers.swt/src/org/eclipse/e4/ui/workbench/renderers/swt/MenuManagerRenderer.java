@@ -18,6 +18,7 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 391430, 472654, 460886
  *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 473779
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 506306
+ *     Axel Richard <axel.richard@oebo.fr> - Bug 354538
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -45,8 +46,8 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
+import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
@@ -79,13 +80,12 @@ import org.eclipse.jface.action.SubContributionItem;
 import org.eclipse.jface.internal.MenuManagerEventHelper;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Decorations;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 
 /**
  * Create a contribute part.
@@ -233,20 +233,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
-	@Inject
-	@Optional
-	private void subscribeSelectionUpdated(@UIEventTopic(UIEvents.Item.TOPIC_SELECTED) Event event) {
-		// Ensure that this event is for a MToolItem
-		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
-			return;
-
-		MMenuItem itemModel = (MMenuItem) event.getProperty(UIEvents.EventTags.ELEMENT);
-		IContributionItem ici = getContribution(itemModel);
-		if (ici != null) {
-			ici.update();
-		}
-	};
-
 
 	/**
 	 * @param event
@@ -291,10 +277,25 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
+
+	private EventHandler selectionUpdater = event -> {
+		// Ensure that this event is for a MToolItem
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
+			return;
+
+		MMenuItem itemModel = (MMenuItem) event.getProperty(UIEvents.EventTags.ELEMENT);
+		IContributionItem ici = getContribution(itemModel);
+		if (ici != null) {
+			ici.update();
+		}
+	};
+
 	private MenuManagerRendererFilter rendererFilter;
 
 	@PostConstruct
 	public void init() {
+		eventBroker.subscribe(UIEvents.Item.TOPIC_SELECTED, selectionUpdater);
+
 		context.set(MenuManagerRenderer.class, this);
 		Display display = context.get(Display.class);
 		rendererFilter = ContextInjectionFactory.make(MenuManagerRendererFilter.class, context);
@@ -326,6 +327,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	@PreDestroy
 	public void contextDisposed() {
+		eventBroker.unsubscribe(selectionUpdater);
+
 		ContextInjectionFactory.uninject(MenuManagerEventHelper.getInstance().getShowHelper(), context);
 		MenuManagerEventHelper.getInstance().setShowHelper(null);
 		ContextInjectionFactory.uninject(MenuManagerEventHelper.getInstance().getHideHelper(), context);
@@ -343,6 +346,10 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			rendererFilter = null;
 		}
 		context.remove(MenuManagerRenderer.class);
+		if (Policy.DEBUG_RENDERER) {
+			logger.debug("\nMMR:dispose: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
+					modelToManager.size(), managerToModel.size());
+		}
 	}
 
 	@Override
@@ -405,14 +412,11 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			processContributions(menuModel, menuModel.getElementId(), menuBar, menuModel instanceof MPopupMenu);
 		}
 		if (newMenu != null) {
-			newMenu.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(DisposeEvent e) {
-					cleanUp(menuModel);
-					MenuManager manager = getManager(menuModel);
-					if (manager != null) {
-						manager.markDirty();
-					}
+			newMenu.addDisposeListener(e -> {
+				cleanUp(menuModel);
+				MenuManager manager = getManager(menuModel);
+				if (manager != null) {
+					manager.markDirty();
 				}
 			});
 		}
@@ -638,8 +642,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		List<MUIElement> parts = container.getChildren();
 		if (parts != null) {
 			MUIElement[] plist = parts.toArray(new MUIElement[parts.size()]);
-			for (int i = 0; i < plist.length; i++) {
-				MUIElement childME = plist[i];
+			for (MUIElement childME : plist) {
 				modelProcessSwitch(parentManager, (MMenuElement) childME);
 			}
 		}
@@ -681,8 +684,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		List<MMenuElement> parts = menuModel.getChildren();
 		if (parts != null) {
 			MMenuElement[] plist = parts.toArray(new MMenuElement[parts.size()]);
-			for (int i = 0; i < plist.length; i++) {
-				MMenuElement childME = plist[i];
+			for (MMenuElement childME : plist) {
 				modelProcessSwitch(menuManager, childME);
 			}
 		}
@@ -875,15 +877,31 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	public void linkModelToManager(MMenu model, MenuManager manager) {
 		modelToManager.put(model, manager);
 		managerToModel.put(manager, model);
+		if (Policy.DEBUG_RENDERER) {
+			logger.debug("\nMMR:linkModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
+					modelToManager.size(), managerToModel.size());
+		}
 	}
 
 	public void clearModelToManager(MMenu model, MenuManager manager) {
 		for (MMenuElement element : model.getChildren()) {
+			if (element instanceof MMenu) {
+				clearModelToManager((MMenu) element, getManager((MMenu) element));
+			}
 			IContributionItem ici = getContribution(element);
 			clearModelToContribution(element, ici);
 		}
-		modelToManager.remove(model);
-		managerToModel.remove(manager);
+		MenuManager remove = modelToManager.remove(model);
+		if (manager == null) {
+			managerToModel.remove(remove);
+		} else {
+			managerToModel.remove(manager);
+		}
+
+		if (Policy.DEBUG_RENDERER) {
+			logger.debug("\nMMR:clearModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
+					modelToManager.size(), managerToModel.size());
+		}
 	}
 
 	public IContributionItem getContribution(MMenuElement model) {
@@ -897,11 +915,27 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	public void linkModelToContribution(MMenuElement model, IContributionItem item) {
 		modelToContribution.put(model, item);
 		contributionToModel.put(item, model);
+		if (Policy.DEBUG_RENDERER) {
+			logger.debug(
+					"\nMMR:linkModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
+					modelToContribution.size(), contributionToModel.size());
+		}
 	}
 
 	public void clearModelToContribution(MMenuElement model, IContributionItem item) {
+		if (model instanceof MMenu) {
+			for (MMenuElement element : ((MMenu) model).getChildren()) {
+				IContributionItem ici = getContribution(element);
+				clearModelToContribution(element, ici);
+			}
+		}
 		modelToContribution.remove(model);
 		contributionToModel.remove(item);
+		if (Policy.DEBUG_RENDERER) {
+			logger.debug(
+					"\nMMR:clearModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
+					modelToContribution.size(), contributionToModel.size());
+		}
 	}
 
 	public ContributionRecord getContributionRecord(MMenuElement element) {
@@ -1090,9 +1124,9 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 				visible = ((Boolean) rc).booleanValue();
 			}
 		}
-		if (visible && (element.getVisibleWhen() instanceof MCoreExpression)) {
+		if (visible && element.getVisibleWhen() != null) {
 			evaluated = true;
-			visible = ContributionsAnalyzer.isVisible((MCoreExpression) element.getVisibleWhen(), evalContext);
+			visible = ContributionsAnalyzer.isVisible(element.getVisibleWhen(), evalContext);
 		}
 		if (evaluated && visible != current) {
 			element.setVisible(visible);
@@ -1117,7 +1151,9 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 				ici = getManager(menuElement);
 				clearModelToManager(menuElement, (MenuManager) ici);
 			} else {
-				clearModelToContribution(menuModel, ici);
+				// Bug 518036: the call below removes too much.
+				// clearModelToContribution(menuModel, ici);
+				contributionToModel.remove(ici);
 			}
 			menuManager.remove(ici);
 			clearModelToContribution(mMenuElement, ici);
@@ -1187,18 +1223,14 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			if (this.mgrToUpdate.isEmpty()) {
 				Display display = context.get(Display.class);
 				if (display != null && !display.isDisposed()) {
-					display.timerExec(100, new Runnable() {
-
-						@Override
-						public void run() {
-							Collection<IContributionManager> toUpdate = new LinkedHashSet<>();
-							synchronized (mgrToUpdate) {
-								toUpdate.addAll(mgrToUpdate);
-								mgrToUpdate.clear();
-							}
-							for (IContributionManager mgr : toUpdate) {
-								mgr.update(false);
-							}
+					display.timerExec(100, () -> {
+						Collection<IContributionManager> toUpdate = new LinkedHashSet<>();
+						synchronized (mgrToUpdate) {
+							toUpdate.addAll(mgrToUpdate);
+							mgrToUpdate.clear();
+						}
+						for (IContributionManager mgr1 : toUpdate) {
+							mgr1.update(false);
 						}
 					});
 				}

@@ -121,6 +121,16 @@ public interface IDEInternalPreferences {
 	public static final String SHOW_LOCATION_NAME = "SHOW_LOCATION_NAME"; //$NON-NLS-1$
 
 	/**
+	 * Whether to show the perspective name in the window title.
+	 */
+	public static final String SHOW_PERSPECTIVE_IN_TITLE = "SHOW_PERSPECTIVE_IN_TITLE"; //$NON-NLS-1$
+
+	/**
+	 * Whether to show the product name in the window title.
+	 */
+	public static final String SHOW_PRODUCT_IN_TITLE = "SHOW_PRODUCT_IN_TITLE"; //$NON-NLS-1$
+
+	/**
 	 * System explore command, used to launch file manager showing selected
 	 * resource.
 	 */
@@ -130,5 +140,10 @@ public interface IDEInternalPreferences {
      * Warn the user that the workspace is going to be upgraded because the IDE is newer
      */
     public static final String WARN_ABOUT_WORKSPACE_INCOMPATIBILITY = "WARN_ABOUT_WORKSPACE_INCOMPATIBILITY"; //$NON-NLS-1$
+
+    /**
+     * Show Problems view decorations on startup
+     */
+	public static final String SHOW_PROBLEMS_VIEW_DECORATIONS_ON_STARTUP = "SHOW_PROBLEMS_VIEW_DECORATIONS_ON_STARTUP"; //$NON-NLS-1$
 
 }

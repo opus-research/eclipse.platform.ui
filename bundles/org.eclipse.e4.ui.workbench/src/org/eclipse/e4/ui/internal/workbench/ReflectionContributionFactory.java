@@ -91,7 +91,7 @@ public class ReflectionContributionFactory implements IContributionFactory {
 				Activator.log(LogService.LOG_ERROR, message);
 				return null;
 			}
-			StringBuffer resource = new StringBuffer(uri.segment(1));
+			StringBuilder resource = new StringBuilder(uri.segment(1));
 			for (int i = 2; i < uri.segmentCount(); i++) {
 				resource.append('/');
 				resource.append(uri.segment(i));
@@ -131,17 +131,12 @@ public class ReflectionContributionFactory implements IContributionFactory {
 		languages = new HashMap<>();
 		String extId = "org.eclipse.e4.languages"; //$NON-NLS-1$
 		IConfigurationElement[] languageElements = registry.getConfigurationElementsFor(extId);
-		for (int i = 0; i < languageElements.length; i++) {
-			IConfigurationElement languageElement = languageElements[i];
+		for (IConfigurationElement languageElement : languageElements) {
 			try {
 				languages.put(languageElement.getAttribute("name"), //$NON-NLS-1$
 						languageElement.createExecutableExtension("contributionFactory")); //$NON-NLS-1$
-			} catch (InvalidRegistryObjectException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (InvalidRegistryObjectException | CoreException e) {
+				Activator.log(LogService.LOG_ERROR, e.getMessage(), e);
 			}
 		}
 	}

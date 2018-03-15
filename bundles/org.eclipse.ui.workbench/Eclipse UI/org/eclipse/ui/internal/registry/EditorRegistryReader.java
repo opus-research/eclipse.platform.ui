@@ -87,7 +87,7 @@ public class EditorRegistryReader extends RegistryReader {
 		}
 
 		if (descriptor != null && contentType != null) {
-			editorRegistry.addContentTypeBinding(contentType, descriptor, false);
+			editorRegistry.addContentTypeBindingFromPlugin(contentType, descriptor, false);
 		}
 		return true;
 	}
@@ -131,8 +131,8 @@ public class EditorRegistryReader extends RegistryReader {
         }
 
 		IConfigurationElement [] bindings = element.getChildren(IWorkbenchRegistryConstants.TAG_CONTENT_TYPE_BINDING);
-		for (int i = 0; i < bindings.length; i++) {
-			String contentTypeId = bindings[i].getAttribute(IWorkbenchRegistryConstants.ATT_CONTENT_TYPE_ID);
+		for (IConfigurationElement binding : bindings) {
+			String contentTypeId = binding.getAttribute(IWorkbenchRegistryConstants.ATT_CONTENT_TYPE_ID);
 			if (contentTypeId == null) {
 				continue;
 			}

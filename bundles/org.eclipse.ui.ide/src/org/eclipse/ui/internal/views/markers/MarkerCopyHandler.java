@@ -76,7 +76,7 @@ public class MarkerCopyHandler extends MarkerViewHandler {
 	 * @return the marker report
 	 */
 	static String createMarkerReport(ExtendedMarkersView view, IMarker[] markers) {
-		StringBuffer report = new StringBuffer();
+		StringBuilder report = new StringBuilder();
 
 		MarkerField[] fields = view.getVisibleFields();
 
@@ -93,11 +93,11 @@ public class MarkerCopyHandler extends MarkerViewHandler {
 			}
 		}
 
-		for (int i = 0; i < markers.length; i++) {
+		for (IMarker marker : markers) {
 
 			for (int j = 0; j < fields.length; j++) {
 				report.append(fields[j].getValue(MarkerSupportInternalUtilities
-						.newMarkerItem(markers[i])));
+						.newMarkerItem(marker)));
 				if (j == fields.length - 1) {
 					report.append(NEWLINE);
 				} else {

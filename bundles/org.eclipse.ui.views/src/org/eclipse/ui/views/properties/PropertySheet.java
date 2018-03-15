@@ -136,7 +136,14 @@ public class PropertySheet extends PageBookView
 	 */
 	private HashSet<String> ignoredViews;
 
+	/** the view was hidden */
 	private boolean wasHidden;
+
+	/**
+	 * the selection update which was made during the view was hidden need to be
+	 * propagated to IPropertySheetPage
+	 */
+	private boolean selectionUpdatePending;
 
 	private final SaveablesTracker saveablesTracker;
 
@@ -345,7 +352,14 @@ public class PropertySheet extends PageBookView
     @Override
 	protected boolean isImportant(IWorkbenchPart part) {
 		// Don't interfere with other property views
-    	String partID = part.getSite().getId();
+		if (part == null) {
+			return false;
+		}
+    	IWorkbenchPartSite site = part.getSite();
+		if (site == null) {
+			return false;
+		}
+		String partID = site.getId();
 		boolean isPropertyView = getSite().getId().equals(partID);
 		return !isPinned() && !isPropertyView && !isViewIgnored(partID);
     }
@@ -363,6 +377,11 @@ public class PropertySheet extends PageBookView
 	@Override
 	protected void partVisible(IWorkbenchPart part) {
 	    super.partVisible(part);
+		if (wasHidden && part == this) {
+			if (selectionUpdatePending) {
+				showSelectionAndDescription();
+			}
+		}
 	}
 
     @Override
@@ -385,12 +404,8 @@ public class PropertySheet extends PageBookView
 		if (wasHidden && part == this) {
 			wasHidden = false;
 			super.partActivated(part);
-			if (currentPart != null) {
-				IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
-				if (page != null) {
-					page.selectionChanged(currentPart, currentSelection);
-				}
-				updateContentDescription();
+			if (selectionUpdatePending) {
+				showSelectionAndDescription();
 			}
 			return;
 		}
@@ -455,16 +470,12 @@ public class PropertySheet extends PageBookView
 
 		boolean visible = getSite() != null && getSite().getPage().isPartVisible(this);
 		if (!visible) {
+			selectionUpdatePending = true;
 			return;
 		}
 
         // pass the selection to the page
-        IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
-        if (page != null) {
-			page.selectionChanged(currentPart, currentSelection);
-		}
-
-        updateContentDescription();
+		showSelectionAndDescription();
     }
 
 	private void updateContentDescription() {
@@ -475,6 +486,18 @@ public class PropertySheet extends PageBookView
 		}
 		// since our selection changes, our dirty state might change too
 		firePropertyChange(IWorkbenchPartConstants.PROP_DIRTY);
+	}
+
+	private void showSelectionAndDescription() {
+		selectionUpdatePending = false;
+		if (currentPart == null || currentSelection == null) {
+			return;
+		}
+		IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
+		if (page != null) {
+			page.selectionChanged(currentPart, currentSelection);
+		}
+		updateContentDescription();
 	}
 
 	/**
@@ -580,9 +603,12 @@ public class PropertySheet extends PageBookView
 		if (!isPinned()
 				&& aContext instanceof PropertyShowInContext) {
 			PropertyShowInContext context = (PropertyShowInContext) aContext;
-			partActivated(context.getPart());
-			selectionChanged(context.getPart(), context.getSelection());
-			return true;
+			IWorkbenchPart part = context.getPart();
+			if (part != null) {
+				partActivated(part);
+				selectionChanged(part, context.getSelection());
+				return true;
+			}
 		}
 		return false;
 	}

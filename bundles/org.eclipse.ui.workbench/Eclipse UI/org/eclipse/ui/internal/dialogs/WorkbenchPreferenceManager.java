@@ -16,8 +16,6 @@ import java.util.Iterator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IRegistryChangeEvent;
-import org.eclipse.core.runtime.IRegistryChangeListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
@@ -52,18 +50,11 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 
 		// add a listener for keyword deltas. If any occur clear all page caches
 		Platform.getExtensionRegistry().addRegistryChangeListener(
-				new IRegistryChangeListener() {
-
-					@Override
-					public void registryChanged(IRegistryChangeEvent event) {
-						if (event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
-								IWorkbenchRegistryConstants.PL_KEYWORDS).length > 0) {
-							for (Iterator j = getElements(
-									PreferenceManager.POST_ORDER).iterator(); j
-									.hasNext();) {
-								((WorkbenchPreferenceNode) j.next())
-										.clearKeywords();
-							}
+				event -> {
+					if (event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
+							IWorkbenchRegistryConstants.PL_KEYWORDS).length > 0) {
+						for (Object element : getElements(PreferenceManager.POST_ORDER)) {
+							((WorkbenchPreferenceNode) element).clearKeywords();
 						}
 					}
 				});
@@ -100,19 +91,17 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 		PlatformUI.getWorkbench().getExtensionTracker().registerObject(
 				node.getConfigurationElement().getDeclaringExtension(), node,
 				IExtensionTracker.REF_WEAK);
-		IPreferenceNode[] subNodes = node.getSubNodes();
-		for (int i = 0; i < subNodes.length; i++) {
-			registerNode((WorkbenchPreferenceNode) subNodes[i]);
+		for (IPreferenceNode subNode : node.getSubNodes()) {
+			registerNode((WorkbenchPreferenceNode) subNode);
 		}
 
 	}
 
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
-		IConfigurationElement[] elements = extension.getConfigurationElements();
-		for (int i = 0; i < elements.length; i++) {
+		for (IConfigurationElement configElement : extension.getConfigurationElements()) {
 			WorkbenchPreferenceNode node = PreferencePageRegistryReader
-					.createNode(elements[i]);
+					.createNode(configElement);
 			if (node == null) {
 				continue;
 			}
@@ -122,10 +111,7 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 				addToRoot(node);
 			} else {
 				IPreferenceNode parent = null;
-				for (Iterator j = getElements(PreferenceManager.POST_ORDER)
-						.iterator(); j.hasNext();) {
-					IPreferenceNode element = (IPreferenceNode) j
-							.next();
+				for (IPreferenceNode element : getElements(PreferenceManager.POST_ORDER)) {
 					if (category.equals(element.getId())) {
 						parent = element;
 						break;
@@ -150,9 +136,9 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (int i = 0; i < objects.length; i++) {
-			if (objects[i] instanceof IPreferenceNode) {
-				IPreferenceNode wNode = (IPreferenceNode) objects[i];
+		for (Object object : objects) {
+			if (object instanceof IPreferenceNode) {
+				IPreferenceNode wNode = (IPreferenceNode) object;
 				wNode.disposeResources();
 				deepRemove(getRoot(), wNode);
 			}
@@ -181,9 +167,8 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 			return true;
 		}
 
-		IPreferenceNode[] subNodes = parent.getSubNodes();
-		for (int i = 0; i < subNodes.length; i++) {
-			if (deepRemove(subNodes[i], nodeToRemove)) {
+		for (IPreferenceNode subNode : parent.getSubNodes()) {
+			if (deepRemove(subNode, nodeToRemove)) {
 				return true;
 			}
 		}

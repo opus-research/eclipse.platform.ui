@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Ralf M Petter<ralf.petter@gmail.com> - Bug 259846
+ *     Karsten Thoms<karsten.thoms@itemis.de> - Bug 521493
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 
@@ -91,7 +93,7 @@ public class FormTextModel {
 	public String getAccessibleText() {
 		if (paragraphs == null)
 			return ""; //$NON-NLS-1$
-		StringBuffer sbuf = new StringBuffer();
+		StringBuilder sbuf = new StringBuilder();
 		for (int i = 0; i < paragraphs.size(); i++) {
 			Paragraph paragraph = paragraphs.get(i);
 			String text = paragraph.getAccessibleText();
@@ -108,6 +110,7 @@ public class FormTextModel {
 			reset();
 			return;
 		}
+		taggedText = taggedText.replace("&", "&amp;"); //$NON-NLS-1$//$NON-NLS-2$
 		InputStream stream = new ByteArrayInputStream(taggedText.getBytes(StandardCharsets.UTF_8));
 		parseInputStream(stream, expandURLs);
 	}
@@ -349,7 +352,7 @@ public class FormTextModel {
 		}
 	}
 
-	private void appendText(String value, StringBuffer buf, int[] spaceCounter) {
+	private void appendText(String value, StringBuilder buf, int[] spaceCounter) {
 		if (!whitespaceNormalized)
 			buf.append(value);
 		else {
@@ -376,7 +379,7 @@ public class FormTextModel {
 
 	private String getNormalizedText(String text) {
 		int[] spaceCounter = new int[1];
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 
 		if (text == null)
 			return null;
@@ -385,12 +388,20 @@ public class FormTextModel {
 	}
 
 	private String getSingleNodeText(Node node) {
-		return getNormalizedText(node.getNodeValue());
+		String text = getNormalizedText(node.getNodeValue());
+		if (!whitespaceNormalized)
+			return text;
+		if (text.length() > 0 && node.getPreviousSibling() == null && isIgnorableWhiteSpace(text.substring(0, 1), true))
+			return text.substring(1);
+		if (text.length() > 1 && node.getNextSibling() == null
+				&& isIgnorableWhiteSpace(text.substring(text.length() - 1), true))
+			return text.substring(0, text.length() - 1);
+		return text;
 	}
 
 	private String getNodeText(Node node) {
 		NodeList children = node.getChildNodes();
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		int[] spaceCounter = new int[1];
 
 		for (int i = 0; i < children.getLength(); i++) {
@@ -400,7 +411,10 @@ public class FormTextModel {
 				appendText(value, buf, spaceCounter);
 			}
 		}
-		return buf.toString().trim();
+		if (whitespaceNormalized) {
+			return buf.toString().trim();
+		}
+		return buf.toString();
 	}
 
 	private ParagraphSegment processHyperlinkSegment(Node link,
