@@ -52,7 +52,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -618,11 +617,10 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 	private void refreshProposals() {
 		try {
-			if (sourceIsValid()) {
-				Point initialSelection = rootDirectoryText.getSelection();
-				getContainer().run(true, true, new IRunnableWithProgress() {
-					@Override
-					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+			getContainer().run(true, true, new IRunnableWithProgress() {
+				@Override
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					if (sourceIsValid()) {
 						SmartImportRootWizardPage.this.potentialProjects = getWizard().getImportJob()
 								.getImportProposals(monitor);
 						if (!potentialProjects.containsKey(getWizard().getImportJob().getRoot())) {
@@ -637,15 +635,13 @@ public class SmartImportRootWizardPage extends WizardPage {
 									.remove(project.getLocation().toFile());
 							SmartImportRootWizardPage.this.alreadyExistingProjects.add(project.getLocation().toFile());
 						}
+					} else {
+						SmartImportRootWizardPage.this.potentialProjects = Collections.emptyMap();
+						SmartImportRootWizardPage.this.notAlreadyExistingProjects = Collections.emptySet();
+						SmartImportRootWizardPage.this.alreadyExistingProjects = Collections.emptySet();
 					}
-				});
-				// restore selection as getContainer().run(...) looses it
-				rootDirectoryText.setSelection(initialSelection);
-			} else {
-				SmartImportRootWizardPage.this.potentialProjects = Collections.emptyMap();
-				SmartImportRootWizardPage.this.notAlreadyExistingProjects = Collections.emptySet();
-				SmartImportRootWizardPage.this.alreadyExistingProjects = Collections.emptySet();
-			}
+				}
+			});
 			tree.setInput(potentialProjects);
 			tree.setCheckedElements(this.notAlreadyExistingProjects.toArray());
 		} catch (Exception ex) {
