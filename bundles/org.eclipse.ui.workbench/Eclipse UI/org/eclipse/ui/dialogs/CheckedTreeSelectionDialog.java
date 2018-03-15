@@ -138,7 +138,7 @@ public class CheckedTreeSelectionDialog extends SelectionStatusDialog {
      *            the initial selection.
      */
     public void setInitialSelection(Object selection) {
-		setInitialSelections(selection);
+        setInitialSelections(new Object[] { selection });
     }
 
     /**

@@ -112,7 +112,7 @@ public class FeatureSelectionDialog extends SelectionDialog {
         // Find primary feature
         for (AboutInfo feature : features) {
             if (feature.getFeatureId().equals(primaryFeatureId)) {
-				setInitialSelections(feature);
+                setInitialSelections(new Object[] { feature });
                 return;
             }
         }
