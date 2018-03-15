@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.CommandException;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -55,31 +54,6 @@ import org.eclipse.swt.widgets.Widget;
  * </p>
  */
 public class KeyBindingDispatcher {
-
-	/**
-	 * A list of interceptors, which may affect how commands are handled.
-	 */
-	private final ListenerList<IKeyBindingInterceptor> fInterceptors = new ListenerList<>();
-
-	/**
-	 * Adds an interceptor to the keybinding dispatcher.
-	 *
-	 * @param interceptor
-	 *            the interceptor to be added.
-	 */
-	public void addInterceptor(IKeyBindingInterceptor interceptor) {
-		fInterceptors.add(interceptor);
-	}
-
-	/**
-	 * Removes an interceptor from the keybinding dispatcher.
-	 *
-	 * @param interceptor
-	 *            the interceptor to be removed.
-	 */
-	public void removeInterceptor(IKeyBindingInterceptor interceptor) {
-		fInterceptors.remove(interceptor);
-	}
 
 	private KeyAssistDialog keyAssistDialog = null;
 
@@ -326,10 +300,7 @@ public class KeyBindingDispatcher {
 		} finally {
 			staticContext.dispose();
 		}
-		for (IKeyBindingInterceptor interceptor : fInterceptors) {
-			interceptor.postExecuteCommand(parameterizedCommand, trigger, commandDefined, commandHandled);
-		}
-		return commandDefined && commandHandled;
+		return (commandDefined && commandHandled);
 	}
 
 	/**
@@ -515,8 +486,7 @@ public class KeyBindingDispatcher {
 	/**
 	 * @param potentialKeyStrokes
 	 * @param event
-	 * @return true if the key should be eaten (event.doit = false) and false
-	 *         otherwise.
+	 * @return
 	 */
 	public boolean press(List<KeyStroke> potentialKeyStrokes, Event event) {
 		KeySequence errorSequence = null;
@@ -532,12 +502,6 @@ public class KeyBindingDispatcher {
 
 			} else if (isPerfectMatch(sequenceAfterKeyStroke)) {
 				final ParameterizedCommand cmd = getPerfectMatch(sequenceAfterKeyStroke);
-
-				for (IKeyBindingInterceptor interceptor : fInterceptors) {
-					if (interceptor.executeCommand(cmd, event)) {
-						return false;
-					}
-				}
 				try {
 					return executeCommand(cmd, event) || !sequenceBeforeKeyStroke.isEmpty();
 				} catch (final CommandException e) {

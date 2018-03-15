@@ -34,7 +34,6 @@ import org.eclipse.e4.ui.bindings.BindingServiceAddon;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.bindings.internal.BindingTable;
 import org.eclipse.e4.ui.bindings.internal.BindingTableManager;
-import org.eclipse.e4.ui.bindings.keys.IKeyBindingInterceptor;
 import org.eclipse.e4.ui.bindings.keys.KeyBindingDispatcher;
 import org.eclipse.e4.ui.services.ContextServiceAddon;
 import org.eclipse.e4.ui.services.EContextService;
@@ -126,11 +125,6 @@ public class KeyDispatcherTest {
 
 	@Before
 	public void setUp() {
-		// Dispose of the current default to make sure the current state doesn't
-		// mess with our tests.
-		display = Display.getDefault();
-		display.dispose();
-
 		display = Display.getDefault();
 		IEclipseContext globalContext = Activator.getDefault().getGlobalContext();
 		workbenchContext = globalContext.createChild("workbenchContext");
@@ -184,7 +178,16 @@ public class KeyDispatcherTest {
 
 		Shell shell = new Shell(display, SWT.NONE);
 
-		notifyKeyDownKeyUp(shell);
+		Event event = new Event();
+		event.type = SWT.KeyDown;
+		event.keyCode = SWT.CTRL;
+		shell.notifyListeners(SWT.KeyDown, event);
+
+		event = new Event();
+		event.type = SWT.KeyDown;
+		event.stateMask = SWT.CTRL;
+		event.keyCode = 'A';
+		shell.notifyListeners(SWT.KeyDown, event);
 
 		assertTrue(handler.q2);
 	}
@@ -308,67 +311,6 @@ public class KeyDispatcherTest {
 		processEvents();
 
 		assertEquals("(", text.getText());
-	}
-
-	private static class KeyBindingInterceptor implements IKeyBindingInterceptor {
-
-		private boolean interceptCommand = true;
-		StringBuilder buffer = new StringBuilder();
-
-		@Override
-		public void postExecuteCommand(ParameterizedCommand parameterizedCommand, Event trigger, boolean commandDefined,
-				boolean commandHandled) {
-			buffer.append("postExecute:" + parameterizedCommand.getId() + "\n");
-		}
-
-		@Override
-		public boolean executeCommand(ParameterizedCommand parameterizedCommand, Event event) {
-			buffer.append("executeCommand:" + parameterizedCommand.getId() + "\n");
-			if (interceptCommand) {
-				return true;
-			}
-			return false;
-		}
-	}
-
-	@Test
-	public void testInterceptor() {
-		KeyBindingDispatcher dispatcher = new KeyBindingDispatcher();
-		ContextInjectionFactory.inject(dispatcher, workbenchContext);
-		final Listener listener = dispatcher.getKeyDownFilter();
-		display.addFilter(SWT.KeyDown, listener);
-		display.addFilter(SWT.Traverse, listener);
-
-		KeyBindingInterceptor interceptor = new KeyBindingInterceptor();
-		dispatcher.addInterceptor(interceptor);
-
-		assertFalse(handler.q2);
-
-		Shell shell = new Shell(display, SWT.NONE);
-
-		notifyKeyDownKeyUp(shell);
-		assertFalse(handler.q2);
-
-		interceptor.interceptCommand = false;
-		notifyKeyDownKeyUp(shell);
-		assertTrue(handler.q2);
-
-		// Note: only postExecute on the case where it wasn't intercepted.
-		assertEquals("executeCommand:test.id1\nexecuteCommand:test.id1\npostExecute:test.id1\n",
-				interceptor.buffer.toString());
-	}
-
-	private void notifyKeyDownKeyUp(Shell shell) {
-		Event event = new Event();
-		event.type = SWT.KeyDown;
-		event.keyCode = SWT.CTRL;
-		shell.notifyListeners(SWT.KeyDown, event);
-
-		event = new Event();
-		event.type = SWT.KeyDown;
-		event.stateMask = SWT.CTRL;
-		event.keyCode = 'A';
-		shell.notifyListeners(SWT.KeyDown, event);
 	}
 
 	private void processEvents() {
