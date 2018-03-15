@@ -18,8 +18,6 @@
 package org.eclipse.ui.dialogs;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -233,25 +231,24 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 			return projectName;
 		}
 
-		String newName = computeNewName(projectName);
+		int counter = 1;
 		while (true) {
-			if (!workspace.getRoot().getProject(newName).exists()) {
-				return newName;
+			String nameSegment;
+			if (counter > 1) {
+				nameSegment = NLS.bind(IDEWorkbenchMessages.CopyProjectAction_copyNameTwoArgs, counter, projectName);
+			} else {
+				nameSegment = NLS.bind(
+						IDEWorkbenchMessages.CopyProjectAction_copyNameOneArg,
+						projectName);
 			}
-			newName = computeNewName(newName);
-		}
-	}
 
-	private static String computeNewName(String str) {
-		String fileNameNoExtension = str;
-		Pattern p = Pattern.compile("[0-9]+$"); //$NON-NLS-1$
-		Matcher m = p.matcher(fileNameNoExtension);
-		if (m.find()) {
-			// String ends with a number: increment it by 1
-			int newNumber = Integer.parseInt(m.group()) + 1;
-			return m.replaceFirst(Integer.toString(newNumber));
+			if (!workspace.getRoot().getProject(nameSegment).exists()) {
+				return nameSegment;
+			}
+
+			counter++;
 		}
-		return fileNameNoExtension + "2"; //$NON-NLS-1$
+
 	}
 
 	/**
