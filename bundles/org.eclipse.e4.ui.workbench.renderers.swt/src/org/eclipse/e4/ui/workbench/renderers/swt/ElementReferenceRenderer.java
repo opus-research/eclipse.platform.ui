@@ -96,9 +96,6 @@ public class ElementReferenceRenderer extends SWTPartRenderer {
 		// Remove the element ref from the rendered list
 		Set<MPlaceholder> refs = renderedMap.get(refElement);
 		refs.remove(ph);
-		if (refs.isEmpty()) {
-			renderedMap.remove(refElement);
-		}
 
 		IEclipseContext curContext = modelService.getContainingContext(ph);
 
