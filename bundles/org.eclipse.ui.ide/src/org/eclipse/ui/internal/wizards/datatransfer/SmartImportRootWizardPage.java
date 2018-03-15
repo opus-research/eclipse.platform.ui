@@ -309,13 +309,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ImportExportWizard importWizard = new ImportExportWizard(ImportExportWizard.IMPORT);
-				IStructuredSelection sel = null;
-				if (selection != null) {
-					sel = new StructuredSelection(selection);
-				} else {
-					sel = new StructuredSelection();
-				}
-				importWizard.init(PlatformUI.getWorkbench(), sel);
+				importWizard.init(PlatformUI.getWorkbench(), new StructuredSelection(selection));
 				IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault().getDialogSettings();
 				IDialogSettings wizardSettings = workbenchSettings.getSection("ImportExportAction"); //$NON-NLS-1$
 				if (wizardSettings == null) {
