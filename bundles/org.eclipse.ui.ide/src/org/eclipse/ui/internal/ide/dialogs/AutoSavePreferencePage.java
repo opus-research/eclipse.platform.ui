@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Axel Richard <axel.richard@obeo.fr> - initial API and implementation, Bug 492401
+ *     Axel Richard <axel.richard@obeo.fr> - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -15,7 +15,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -215,7 +214,8 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 	 */
 	protected void setAutoSaveIntervalTextValue(int interval) {
 		if (intervalField != null && intervalComposite != null
-				&& !intervalField.getTextControl(intervalComposite).isDisposed() && autoSaveButton != null
+				&& !intervalField.getTextControl(intervalComposite).isDisposed()
+				&& autoSaveButton != null
 				&& !autoSaveButton.isDisposed() && autoSaveButton.getSelection()) {
 			intervalField.setStringValue(String.valueOf(interval));
 		}
@@ -372,7 +372,6 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 
 		noteLabel = new Label(noteComposite, SWT.NONE);
 		noteLabel.setText(IDEWorkbenchMessages.AutoSavePreferencPage_noteLabel);
-		noteLabel.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
 		noteLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
 		noteMessage = new Label(noteComposite, SWT.WRAP);
@@ -380,7 +379,6 @@ public class AutoSavePreferencePage extends PreferencePage implements IWorkbench
 		final GridData noteMessageData = new GridData(SWT.FILL, SWT.FILL, true, false);
 		noteMessageData.widthHint = 350;
 		noteMessage.setLayoutData(noteMessageData);
-
 	}
 
 }
