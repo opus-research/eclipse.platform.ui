@@ -14,6 +14,10 @@
 
 package org.eclipse.core.tests.internal.databinding.observable;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.IObservableCollection;
 import org.eclipse.core.databinding.observable.Realm;
@@ -21,14 +25,9 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.internal.databinding.identity.IdentityObservableSet;
 import org.eclipse.jface.databinding.conformance.MutableObservableSetContractTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableCollectionContractDelegate;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
 
-import junit.framework.TestSuite;
-
-@RunWith(AllTests.class)
-public class IdentityObservableSetTest {
-	public static junit.framework.Test suite() {
+public class IdentityObservableSetTest extends TestCase {
+	public static Test suite() {
 		TestSuite suite = new TestSuite(IdentityObservableSetTest.class
 				.getName());
 		suite.addTest(MutableObservableSetContractTest.suite(new Delegate()));

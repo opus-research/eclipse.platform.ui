@@ -14,12 +14,6 @@
 
 package org.eclipse.core.tests.internal.databinding.observable.masterdetail;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.map.WritableMap;
@@ -33,7 +27,6 @@ import org.eclipse.core.internal.databinding.observable.masterdetail.DetailObser
 import org.eclipse.core.runtime.AssertionFailedException;
 import org.eclipse.jface.databinding.conformance.util.DisposeEventTracker;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Test;
 
 /**
  * @since 3.2
@@ -46,7 +39,6 @@ public class DetailObservableMapTest extends AbstractDefaultRealmTestCase {
 	 *
 	 * @throws Exception
 	 */
-	@Test
 	public void testKeyValueTypeNull() throws Exception {
 		WritableValue observableValue = new WritableValue();
 
@@ -76,7 +68,6 @@ public class DetailObservableMapTest extends AbstractDefaultRealmTestCase {
 	 *
 	 * @throws Exception
 	 */
-	@Test
 	public void testKeyValueTypeNotNull() throws Exception {
 		WritableValue observableValue = new WritableValue();
 
@@ -99,7 +90,6 @@ public class DetailObservableMapTest extends AbstractDefaultRealmTestCase {
 	 * Asserts that the master observable value is not disposed upon disposing
 	 * its detail observable value (bug 241318).
 	 */
-	@Test
 	public void testMasterNotDisposedWhenDetailDisposed() {
 		class OuterObservable extends WritableValue {
 			boolean disposed = false;
@@ -122,7 +112,6 @@ public class DetailObservableMapTest extends AbstractDefaultRealmTestCase {
 		assertFalse(outerObservable.disposed);
 	}
 
-	@Test
 	public void testDisposeMasterDisposesDetail() {
 		IObservableValue master = new WritableValue();
 		WritableMapFactory factory = new WritableMapFactory();
@@ -139,7 +128,6 @@ public class DetailObservableMapTest extends AbstractDefaultRealmTestCase {
 		assertTrue(detailObservable.isDisposed());
 	}
 
-	@Test
 	public void testDisposeWhileFiringEvents() {
 		IObservableValue master = new WritableValue();
 		WritableMapFactory factory = new WritableMapFactory();

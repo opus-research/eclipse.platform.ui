@@ -11,9 +11,6 @@
 
 package org.eclipse.jface.tests.internal.databinding.viewers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Collections;
 
 import org.eclipse.core.databinding.observable.list.IObservableList;
@@ -25,9 +22,6 @@ import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @since 3.2
@@ -39,22 +33,21 @@ public class ObservableCollectionContentProviderTest extends
 	private TableViewer viewer;
 	ObservableListContentProvider contentProvider;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
 		viewer = new TableViewer(shell);
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		shell.dispose();
 		shell = null;
 		viewer = null;
 		super.tearDown();
 	}
 
-	@Test
 	public void testGetKnownElements_DisposedWithoutModificationOnContentProviderDispose() {
 		final IObservableList input = new WritableList(Collections
 				.singletonList("element"), null);

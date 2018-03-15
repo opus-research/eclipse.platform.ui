@@ -12,13 +12,11 @@
 
 package org.eclipse.core.tests.databinding.observable.list;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.AbstractObservable;
 import org.eclipse.core.databinding.observable.IObservable;
@@ -32,33 +30,23 @@ import org.eclipse.jface.databinding.conformance.ObservableListContractTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableCollectionContractDelegate;
 import org.eclipse.jface.databinding.conformance.util.ListChangeEventTracker;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
-
-import junit.framework.TestSuite;
 
 public class ComputedListTest extends AbstractDefaultRealmTestCase {
 	ComputedListStub list;
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 		list = new ComputedListStub();
 		list.size(); // Force list to compute
 	}
 
-	@Test
 	public void testDependency_Staleness() {
 		assertFalse(list.isStale());
 		list.dependency.fireStale();
 		assertTrue(list.isStale());
 	}
 
-	@Test
 	public void testDependency_FiresListChange() {
 		assertEquals(list.nextComputation, list);
 
@@ -72,7 +60,6 @@ public class ComputedListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(expectedList, list);
 	}
 
-	@Test
 	public void testDependency_NoStaleEventIfAlreadyDirty() {
 		list.dependency.fireChange();
 		list.addStaleListener(new IStaleListener() {
@@ -84,7 +71,6 @@ public class ComputedListTest extends AbstractDefaultRealmTestCase {
 		list.dependency.fireStale();
 	}
 
-	@Test
 	public void testDependency_ListChangeEventFiresOnlyWhenNotDirty() {
 		ListChangeEventTracker tracker = ListChangeEventTracker.observe(list);
 
@@ -149,18 +135,11 @@ public class ComputedListTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Test
-	public void testSuite() throws Exception {
-		JUnitCore.runClasses(Suite.class);
-	}
-
-	@RunWith(AllTests.class)
-	public static class Suite {
-		public static junit.framework.Test suite() {
-			TestSuite suite = new TestSuite(ComputedListTest.class.getName());
-			suite.addTest(ObservableListContractTest.suite(new Delegate()));
-			return suite;
-		}
+	public static Test suite() {
+		TestSuite suite = new TestSuite(ComputedListTest.class.getName());
+		suite.addTestSuite(ComputedListTest.class);
+		suite.addTest(ObservableListContractTest.suite(new Delegate()));
+		return suite;
 	}
 
 	static class Delegate extends AbstractObservableCollectionContractDelegate {

@@ -14,10 +14,8 @@
 
 package org.eclipse.core.tests.databinding.observable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.AbstractObservable;
 import org.eclipse.core.databinding.observable.DisposeEvent;
@@ -35,13 +33,6 @@ import org.eclipse.jface.databinding.conformance.util.CurrentRealm;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
 import org.eclipse.jface.databinding.conformance.util.StaleEventTracker;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
-
-import junit.framework.TestSuite;
 
 /**
  * Tests for AbstractObservable.
@@ -52,13 +43,11 @@ public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 	private ObservableStub observable;
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 		observable = new ObservableStub(Realm.getDefault());
 	}
 
-	@Test
 	public void testStaleListener() throws Exception {
 		assertFalse(observable.hasListeners());
 
@@ -106,7 +95,6 @@ public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 		assertFalse(observable.hasListeners());
 	}
 
-	@Test
 	public void testChangeListener() throws Exception {
 		assertFalse(observable.hasListeners());
 
@@ -154,7 +142,6 @@ public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 		assertFalse(observable.hasListeners());
 	}
 
-	@Test
 	public void testHasListenersWithChangeAndStaleListeners() throws Exception {
 		ChangeEventTracker changeListener = new ChangeEventTracker();
 		StaleEventTracker staleListener = new StaleEventTracker();
@@ -188,7 +175,6 @@ public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 		assertTrue(observable.lastListenerRemoved);
 	}
 
-	@Test
 	public void testFireStaleRealmChecks() throws Exception {
 		RealmTester.setDefault(new CurrentRealm(true));
 
@@ -201,7 +187,6 @@ public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
-	@Test
 	public void testFireChangeRealmChecks() throws Exception {
 		RealmTester.setDefault(new CurrentRealm(true));
 
@@ -214,7 +199,6 @@ public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
-	@Test
 	public void testAddDisposeListener_HasListenersFalse() {
 		IDisposeListener disposeListener = new IDisposeListener() {
 			@Override
@@ -250,20 +234,13 @@ public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 		assertTrue(observable.lastListenerRemoved);
 	}
 
-	@Test
-	public void testSuite() throws Exception {
-		JUnitCore.runClasses(Suite.class);
-	}
-
-	@RunWith(AllTests.class)
-	public static class Suite {
-		public static junit.framework.Test suite() {
-			TestSuite suite = new TestSuite(AbstractObservableTest.class.getName());
-			Delegate delegate = new Delegate();
-			suite.addTest(ObservableContractTest.suite(delegate));
-			suite.addTest(ObservableStaleContractTest.suite(delegate));
-			return suite;
-		}
+	public static Test suite() {
+		TestSuite suite = new TestSuite(AbstractObservableTest.class.getName());
+		suite.addTestSuite(AbstractObservableTest.class);
+		Delegate delegate = new Delegate();
+		suite.addTest(ObservableContractTest.suite(delegate));
+		suite.addTest(ObservableStaleContractTest.suite(delegate));
+		return suite;
 	}
 
 	/* package */static class Delegate extends

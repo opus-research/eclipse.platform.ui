@@ -12,10 +12,6 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.databinding.scenarios;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
@@ -48,9 +44,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import com.ibm.icu.text.NumberFormat;
 
@@ -65,21 +58,20 @@ public class PropertyScenarios extends ScenariosTestCase {
 
     private Adventure adventure;
 
-    @Before
-	public void setUp() throws Exception {
+    @Override
+	protected void setUp() throws Exception {
         super.setUp();
         // do any setup work here
         adventure = SampleData.WINTER_HOLIDAY;
     }
 
-    @After
-	public void tearDown() throws Exception {
+    @Override
+	protected void tearDown() throws Exception {
         // do any teardown work here
         super.tearDown();
     }
 
-    @Test
-	public void testEnterText() {
+    public void testEnterText() {
         // just to make sure enterText() generates a FocusOut event.
         Text text = new Text(getComposite(), SWT.BORDER);
         final boolean[] focusLostHolder = { false };
@@ -99,8 +91,7 @@ public class PropertyScenarios extends ScenariosTestCase {
         assertTrue(focusLostHolder[0]);
     }
 
-    @Test
-	public void testScenario01() {
+    public void testScenario01() {
         Text text = new Text(getComposite(), SWT.BORDER);
         getDbc().bindValue(SWTObservables.observeText(text, SWT.Modify),
                 BeansObservables.observeValue(adventure, "name"));
@@ -119,8 +110,7 @@ public class PropertyScenarios extends ScenariosTestCase {
         assertEquals("barfoo", text.getText());
     }
 
-    @Test
-	public void testScenario02() {
+    public void testScenario02() {
         // Binding the name property of an Adventure object to the contents of
         // Text controls, no conversion, no validation. The Text widget editable
         // is set to false.by the developer (can not change the name)
@@ -131,8 +121,7 @@ public class PropertyScenarios extends ScenariosTestCase {
         assertEquals(adventure.getName(), text.getText());
     }
 
-    @Test
-	public void testScenario03() {
+    public void testScenario03() {
         // Binding of a read-only property of an Adventure object to the
         // contents of Text controls, no conversion, no validation. Text control
         // is not editable as a side effect of binding to a read-only property..
@@ -149,8 +138,7 @@ public class PropertyScenarios extends ScenariosTestCase {
         assertEquals(Integer.valueOf(cart.getLodgingDays()).toString(), text.getText());
     }
 
-    @Test
-	public void testScenario04() {
+    public void testScenario04() {
         // Binding a nested property of an Adventure object to the content of a
         // Text control, no conversion, no validation.
         Text text = new Text(getComposite(), SWT.BORDER);
@@ -191,8 +179,7 @@ public class PropertyScenarios extends ScenariosTestCase {
 
     }
 
-    @Test
-	public void testScenario05() {
+    public void testScenario05() {
         // Binding the name property of an Adventure object to the contents of
         // Text controls where conversion occurs � the model data is held all
         // in
@@ -253,8 +240,7 @@ public class PropertyScenarios extends ScenariosTestCase {
         assertEquals("LOWERCASE", adventure.getName());
     }
 
-    @Test
-	public void testScenario06() {
+    public void testScenario06() {
         // Binding the name property of an Adventure object to the contents of
         // Text controls where validation occurs and the name cannot be longer
         // than 15 characters and cannot contain spaces
@@ -303,8 +289,7 @@ public class PropertyScenarios extends ScenariosTestCase {
         assertEquals("anothervalid", adventure.getName());
     }
 
-    @Test
-	public void testScenario07() {
+    public void testScenario07() {
         // Binding the price property of an Adventure to a Text control. Price
         // is a double and Text accepts String so conversion will have to occur.
         // Validation ensure that the value is positive
@@ -371,8 +356,7 @@ public class PropertyScenarios extends ScenariosTestCase {
         assertTrue(AggregateValidationStatus.getStatusMaxSeverity(getDbc().getBindings()).isOK());
     }
 
-    @Test
-	public void testScenario08() {
+    public void testScenario08() {
         // Binding the price property of an Adventure to a Text control but with
         // custom conversion � the double will be validated to only have two
         // decimal places and displayed with a leading currency symbol, and can
@@ -449,8 +433,7 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
         assertTrue(AggregateValidationStatus.getStatusMaxSeverity(getDbc().getBindings()).isOK());
     }
 
-    @Test
-	public void testScenario09() {
+    public void testScenario09() {
         // Binding a boolean property to a CheckBox. Adventure will have a
         // Boolean property �petsAllowed�
         Button checkbox = new Button(getComposite(), SWT.CHECK);
@@ -468,8 +451,7 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
         assertEquals(true, checkbox.getSelection());
     }
 
-    @Test
-	public void testScenario10() {
+    public void testScenario10() {
         // Binding a Transportation departure time to a Text control that
         // formats and validates the time to and from a String. There are
         // property bindings that bind elements of the GUI to elements to GUI
@@ -477,8 +459,7 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
         // TODO fail("not implemented");
     }
 
-    @Test
-	public void testScenario11() {
+    public void testScenario11() {
         // Binding the max value of a spinner to another spinner.
         Spinner spinner1 = new Spinner(getComposite(), SWT.NONE);
         spinner1.setSelection(10);
@@ -495,8 +476,7 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
         assertEquals(10, spinner2.getMaximum());
     }
 
-    @Test
-	public void testScenario12() {
+    public void testScenario12() {
         // Binding the enabled state of several Text controls to a check box.
         // There will be two check boxes, so as each is enabled/disabled the
         // other one follows as do the states of the Text controls.
@@ -546,8 +526,7 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
         assertEquals(true, checkbox1.getSelection());
     }
 
-    @Test
-	public void testScenario13() {
+    public void testScenario13() {
         Text text = new Text(getComposite(), SWT.BORDER);
 
         getDbc().bindValue(SWTObservables.observeText(text, SWT.FocusOut), BeansObservables.observeValue(adventure, "name"));
@@ -567,8 +546,7 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
         assertEquals("barfoo", text.getText());
     }
 
-    @Test
-	public void testScenario14() {
+    public void testScenario14() {
         Text t1 = new Text(getComposite(), SWT.BORDER);
         Text t2 = new Text(getComposite(), SWT.BORDER);
 
@@ -600,8 +578,7 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
 
     }
 
-    @Test
-	public void testScenario15() {
+    public void testScenario15() {
         Text text = new Text(getComposite(), SWT.NONE);
         Account account = new Account();
         account.setExpiryDate(new Date());

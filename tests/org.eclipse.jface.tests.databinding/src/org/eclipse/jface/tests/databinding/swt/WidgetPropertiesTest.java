@@ -12,9 +12,6 @@
 
 package org.eclipse.jface.tests.databinding.swt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
 import org.eclipse.jface.databinding.swt.DisplayRealm;
@@ -45,9 +42,6 @@ import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @since 3.2
@@ -62,8 +56,8 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 	private Image image1;
 	private Image image2;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		shell = getShell();
@@ -77,8 +71,8 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		RealmTester.setDefault(DisplayRealm.getRealm(shell.getDisplay()));
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		super.tearDown();
 
 		RealmTester.setDefault(null);
@@ -89,7 +83,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		return new Shell(SWT.V_SCROLL);
 	}
 
-	@Test
 	public void testImage_ObserveButton() {
 		Button button = /* who's got the */new Button(shell, SWT.PUSH);
 		button.setImage(image1);
@@ -101,7 +94,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertSame(image2, button.getImage());
 	}
 
-	@Test
 	public void testImage_ObserveCLabel() {
 		CLabel label = new CLabel(shell, SWT.NONE);
 		label.setImage(image1);
@@ -113,7 +105,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertSame(image2, label.getImage());
 	}
 
-	@Test
 	public void testImage_ObserveLabel() {
 		Label label = new Label(shell, SWT.NONE);
 		label.setImage(image1);
@@ -125,7 +116,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertSame(image2, label.getImage());
 	}
 
-	@Test
 	public void testText_ObserveButton() {
 		Button button = /* who's got a */new Button(shell, SWT.PUSH);
 		button.setText(string1);
@@ -137,7 +127,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(string2, button.getText());
 	}
 
-	@Test
 	public void testTooltipText_ObserveCTabItem() {
 		CTabFolder tf = new CTabFolder(shell, SWT.NONE);
 		CTabItem item = new CTabItem(tf, SWT.NONE);
@@ -151,7 +140,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(string2, item.getToolTipText());
 	}
 
-	@Test
 	public void testTooltipText_ObserveControl() {
 		Control control = new Label(shell, SWT.NONE);
 		control.setToolTipText(string1);
@@ -164,7 +152,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(string2, control.getToolTipText());
 	}
 
-	@Test
 	public void testTooltipText_ObserveTabItem() {
 		TabFolder tf = new TabFolder(shell, SWT.NONE);
 		TabItem item = new TabItem(tf, SWT.NONE);
@@ -178,7 +165,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(string2, item.getToolTipText());
 	}
 
-	@Test
 	public void testTooltipText_ObserveTableColumn() {
 		Table table = new Table(shell, SWT.NONE);
 		TableColumn column = new TableColumn(table, SWT.NONE);
@@ -192,7 +178,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(string2, column.getToolTipText());
 	}
 
-	@Test
 	public void testTooltipText_ObserveToolItem() {
 		ToolBar bar = new ToolBar(shell, SWT.NONE);
 		ToolItem item = new ToolItem(bar, SWT.NONE);
@@ -206,7 +191,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(string2, item.getToolTipText());
 	}
 
-	@Test
 	public void testTooltipText_ObserveTrayItem() {
 		Tray tray = shell.getDisplay().getSystemTray();
 		TrayItem item = new TrayItem(tray, SWT.NONE);
@@ -225,7 +209,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		}
 	}
 
-	@Test
 	public void testTooltipText_ObserveTreeColumn() {
 		Tree tree = new Tree(shell, SWT.NONE);
 		TreeColumn column = new TreeColumn(tree, SWT.NONE);
@@ -239,7 +222,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(string2, column.getToolTipText());
 	}
 
-	@Test
 	public void testEnabled_ObserveMenu() {
 		Menu menu = new Menu(shell, SWT.BAR);
 		IObservableValue observable = WidgetProperties.enabled().observe(menu);
@@ -253,7 +235,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(false, menu.getEnabled());
 	}
 
-	@Test
 	public void testEnabled_ObserveMenuItem() {
 		Menu menu = new Menu(shell, SWT.BAR);
 		MenuItem item = new MenuItem(menu, SWT.PUSH);
@@ -268,7 +249,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(false, item.getEnabled());
 	}
 
-	@Test
 	public void testSelection_ObserveMenuItem() {
 		Menu menu = new Menu(shell, SWT.BAR);
 		MenuItem item = new MenuItem(menu, SWT.CHECK);
@@ -284,7 +264,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(false, item.getSelection());
 	}
 
-	@Test
 	public void testEnabled_ObserveScrollBar() {
 		ScrollBar bar = shell.getVerticalBar();
 		IObservableValue observable = WidgetProperties.enabled().observe(bar);
@@ -298,7 +277,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(false, bar.getEnabled());
 	}
 
-	@Test
 	public void testEnabled_ObserveToolItem() {
 		ToolBar bar = new ToolBar(shell, SWT.HORIZONTAL);
 		ToolItem item = new ToolItem(bar, SWT.PUSH);
@@ -313,7 +291,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(false, item.getEnabled());
 	}
 
-	@Test
 	public void testEditable_ObserveText() {
 		Text text = new Text(shell, SWT.NONE);
 		IObservableValue observable = WidgetProperties.editable().observe(text);
@@ -327,7 +304,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(true, text.getEditable());
 	}
 
-	@Test
 	public void testEditable_ObserveCCombo() {
 		CCombo combo = new CCombo(shell, SWT.NONE);
 		IObservableValue observable = WidgetProperties.editable()
@@ -342,7 +318,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		assertEquals(true, combo.getEditable());
 	}
 
-	@Test
 	public void testEditable_ObserveStyledText() {
 		StyledText styledText = new StyledText(shell, SWT.NONE);
 		IObservableValue observable = WidgetProperties.editable().observe(

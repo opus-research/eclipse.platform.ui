@@ -14,13 +14,12 @@
 
 package org.eclipse.core.tests.internal.databinding.observable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.IObservable;
@@ -37,21 +36,13 @@ import org.eclipse.jface.databinding.conformance.util.ChangeEventTracker;
 import org.eclipse.jface.databinding.conformance.util.SetChangeEventTracker;
 import org.eclipse.jface.databinding.conformance.util.StaleEventTracker;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
-
-import junit.framework.TestSuite;
 
 public class UnmodifiableObservableSetTest extends AbstractDefaultRealmTestCase {
 	UnmodifiableObservableSet unmodifiable;
 	MutableObservableSet mutable;
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		Set set = new HashSet();
@@ -63,7 +54,6 @@ public class UnmodifiableObservableSetTest extends AbstractDefaultRealmTestCase 
 				.unmodifiableObservableSet(mutable);
 	}
 
-	@Test
 	public void testFiresChangeEvents() throws Exception {
 		ChangeEventTracker mutableListener = new ChangeEventTracker();
 		ChangeEventTracker unmodifiableListener = new ChangeEventTracker();
@@ -78,7 +68,6 @@ public class UnmodifiableObservableSetTest extends AbstractDefaultRealmTestCase 
 		assertEquals(1, unmodifiableListener.count);
 	}
 
-	@Test
 	public void testFiresSetChangeEvents() throws Exception {
 		SetChangeEventTracker mutableListener = new SetChangeEventTracker();
 		SetChangeEventTracker unmodifiableListener = new SetChangeEventTracker();
@@ -108,7 +97,6 @@ public class UnmodifiableObservableSetTest extends AbstractDefaultRealmTestCase 
 		assertEquals(3, unmodifiable.size());
 	}
 
-	@Test
 	public void testFiresStaleEvents() throws Exception {
 		StaleEventTracker mutableListener = new StaleEventTracker();
 		StaleEventTracker unmodifiableListener = new StaleEventTracker();
@@ -127,7 +115,6 @@ public class UnmodifiableObservableSetTest extends AbstractDefaultRealmTestCase 
 		assertTrue(unmodifiable.isStale());
 	}
 
-	@Test
 	public void testIsStale() throws Exception {
 		assertFalse(mutable.isStale());
 		assertFalse(unmodifiable.isStale());
@@ -155,18 +142,11 @@ public class UnmodifiableObservableSetTest extends AbstractDefaultRealmTestCase 
 		}
 	}
 
-	@Test
-	public void testSuite() throws Exception {
-		JUnitCore.runClasses(Suite.class);
-	}
-
-	@RunWith(AllTests.class)
-	public static class Suite {
-		public static junit.framework.Test suite() {
-			TestSuite suite = new TestSuite(UnmodifiableObservableSetTest.class.getName());
-			suite.addTest(ObservableCollectionContractTest.suite(new Delegate()));
-			return suite;
-		}
+	public static Test suite() {
+		TestSuite suite = new TestSuite(UnmodifiableObservableSetTest.class.getName());
+		suite.addTestSuite(UnmodifiableObservableSetTest.class);
+		suite.addTest(ObservableCollectionContractTest.suite(new Delegate()));
+		return suite;
 	}
 
 	private static class Delegate extends

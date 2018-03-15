@@ -12,6 +12,9 @@
 
 package org.eclipse.jface.tests.internal.databinding.swt;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -24,10 +27,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Before;
-import org.junit.Test;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
@@ -45,8 +44,8 @@ public class LabelObservableValueTest extends ObservableDelegateTest {
 		super(testName, new Delegate());
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		delegate = (Delegate) getObservableContractDelegate();
@@ -60,7 +59,6 @@ public class LabelObservableValueTest extends ObservableDelegateTest {
 				DisplayRealm.getRealm(Display.getDefault()));
 	}
 
-	@Test
 	public void testSetValue() throws Exception {
 		// preconditions
 		assertEquals("", label.getText());
@@ -72,7 +70,7 @@ public class LabelObservableValueTest extends ObservableDelegateTest {
 		assertEquals("observable value", value, observable.getValue());
 	}
 
-	public static junit.framework.Test suite() {
+	public static Test suite() {
 		TestSuite suite = new TestSuite(LabelObservableValueTest.class
 				.toString());
 		suite.addTestSuite(LabelObservableValueTest.class);

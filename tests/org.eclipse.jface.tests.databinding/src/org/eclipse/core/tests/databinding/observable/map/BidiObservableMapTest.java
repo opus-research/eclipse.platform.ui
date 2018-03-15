@@ -11,11 +11,6 @@
 
 package org.eclipse.core.tests.databinding.observable.map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,8 +21,6 @@ import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.map.WritableMap;
 import org.eclipse.jface.databinding.conformance.util.ChangeEventTracker;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @since 3.2
@@ -41,8 +34,8 @@ public class BidiObservableMapTest extends AbstractDefaultRealmTestCase {
 	private Object value1;
 	private Object value2;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 		wrappedMap = new WritableMap();
 		bidiMap = new BidiObservableMap(wrappedMap);
@@ -52,7 +45,6 @@ public class BidiObservableMapTest extends AbstractDefaultRealmTestCase {
 		value2 = new Object();
 	}
 
-	@Test
 	public void testConstructor_NullArgument() {
 		try {
 			new BidirectionalMap(null);
@@ -77,7 +69,6 @@ public class BidiObservableMapTest extends AbstractDefaultRealmTestCase {
 		// assuming tearDown() afterward
 	}
 
-	@Test
 	public void testGetKeys_Empty() throws Exception {
 		withAndWithoutListeners(new Runnable() {
 			@Override
@@ -87,7 +78,6 @@ public class BidiObservableMapTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
-	@Test
 	public void testGetKeys_NullKey() throws Exception {
 		withAndWithoutListeners(new Runnable() {
 			@Override
@@ -99,7 +89,6 @@ public class BidiObservableMapTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
-	@Test
 	public void testGetKeys_NullValue() throws Exception {
 		withAndWithoutListeners(new Runnable() {
 			@Override
@@ -110,7 +99,6 @@ public class BidiObservableMapTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
-	@Test
 	public void testGetKeys_SinglePut() throws Exception {
 		withAndWithoutListeners(new Runnable() {
 			@Override
@@ -122,7 +110,6 @@ public class BidiObservableMapTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
-	@Test
 	public void testGetKeys_ReplaceValue() throws Exception {
 		withAndWithoutListeners(new Runnable() {
 			@Override
@@ -139,7 +126,6 @@ public class BidiObservableMapTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
-	@Test
 	public void testGetKeys_MultipleKeysWithSameValue() throws Exception {
 		withAndWithoutListeners(new Runnable() {
 			@Override
@@ -155,7 +141,6 @@ public class BidiObservableMapTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
-	@Test
 	public void testContainsValue_PutAndRemove() throws Exception {
 		withAndWithoutListeners(new Runnable() {
 			@Override

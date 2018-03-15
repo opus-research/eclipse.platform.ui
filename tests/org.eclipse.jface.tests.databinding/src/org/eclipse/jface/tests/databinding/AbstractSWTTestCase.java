@@ -13,8 +13,6 @@
 package org.eclipse.jface.tests.databinding;
 
 import org.eclipse.swt.widgets.Shell;
-import org.junit.After;
-import org.junit.Before;
 
 /**
  * Abstract test case that handles disposing of the Shell after each test.
@@ -25,14 +23,12 @@ public abstract class AbstractSWTTestCase extends AbstractDefaultRealmTestCase {
 	private Shell shell;
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 	}
 
 	@Override
-	@After
-	public void tearDown() throws Exception {
+	protected void tearDown() throws Exception {
 		if (shell != null && !shell.isDisposed()) {
 			shell.dispose();
 		}

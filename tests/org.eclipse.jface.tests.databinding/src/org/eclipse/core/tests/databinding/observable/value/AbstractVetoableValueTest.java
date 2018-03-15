@@ -11,21 +11,19 @@
 
 package org.eclipse.core.tests.databinding.observable.value;
 
-import static org.junit.Assert.assertEquals;
+import junit.framework.TestCase;
 
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.AbstractVetoableValue;
 import org.eclipse.core.databinding.observable.value.ValueDiff;
 import org.eclipse.jface.databinding.conformance.util.CurrentRealm;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
-import org.junit.Test;
 
 /**
  * @since 3.2
  */
-public class AbstractVetoableValueTest {
-    @Test
-	public void testSetValueInvokesDoSetApprovedValue() throws Exception {
+public class AbstractVetoableValueTest extends TestCase {
+    public void testSetValueInvokesDoSetApprovedValue() throws Exception {
         class VetoableValue extends VetoableValueStub {
             int count;
             Object value;
@@ -52,8 +50,7 @@ public class AbstractVetoableValueTest {
         assertEquals(value, vetoableValue.value);
     }
 
-    @Test
-	public void testFireValueChangeRealmChecks() throws Exception {
+    public void testFireValueChangeRealmChecks() throws Exception {
     	RealmTester.exerciseCurrent(new Runnable() {
 			@Override
 			public void run() {

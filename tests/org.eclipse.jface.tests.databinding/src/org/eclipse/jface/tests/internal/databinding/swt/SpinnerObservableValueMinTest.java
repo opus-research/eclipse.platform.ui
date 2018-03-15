@@ -12,6 +12,9 @@
 
 package org.eclipse.jface.tests.internal.databinding.swt;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -24,10 +27,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
-import org.junit.Before;
-import org.junit.Test;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
@@ -47,8 +46,8 @@ public class SpinnerObservableValueMinTest extends ObservableDelegateTest {
 		super(testName, new Delegate());
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		delegate = (Delegate) getObservableContractDelegate();
@@ -62,21 +61,19 @@ public class SpinnerObservableValueMinTest extends ObservableDelegateTest {
 				DisplayRealm.getRealm(Display.getDefault()));
 	}
 
-	@Test
 	public void testGetValue() throws Exception {
 		int min = 100;
 		spinner.setMinimum(min);
 		assertEquals(Integer.valueOf(min), observable.getValue());
 	}
 
-	@Test
 	public void testSetValue() throws Exception {
 		int min = 100;
 		observable.setValue(Integer.valueOf(min));
 		assertEquals(min, spinner.getMinimum());
 	}
 
-	public static junit.framework.Test suite() {
+	public static Test suite() {
 		TestSuite suite = new TestSuite(SpinnerObservableValueMinTest.class
 				.toString());
 		suite.addTestSuite(SpinnerObservableValueMinTest.class);

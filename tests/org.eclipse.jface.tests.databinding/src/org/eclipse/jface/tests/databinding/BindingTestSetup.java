@@ -11,28 +11,32 @@
 
 package org.eclipse.jface.tests.databinding;
 
-import static org.junit.Assert.fail;
-
 import java.util.Locale;
 
 import org.eclipse.core.databinding.util.ILogger;
 import org.eclipse.core.databinding.util.Policy;
 import org.eclipse.core.runtime.IStatus;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
+
+import junit.extensions.TestSetup;
+import junit.framework.Test;
 
 /**
  * @since 3.2
  *
  */
-public class BindingTestSetup extends TestWatcher {
+public class BindingTestSetup extends TestSetup {
 
 	private Locale oldLocale;
 	private ILogger oldLogger;
 	private org.eclipse.jface.util.ILogger oldJFaceLogger;
 
+	public BindingTestSetup(Test test) {
+		super(test);
+	}
+
 	@Override
-	protected void starting(Description description) {
+	protected void setUp() throws Exception {
+		super.setUp();
 		oldLocale = Locale.getDefault();
 		Locale.setDefault(Locale.US);
 		oldLogger = Policy.getLog();
@@ -60,9 +64,10 @@ public class BindingTestSetup extends TestWatcher {
 	}
 
 	@Override
-	protected void finished(Description description) {
+	protected void tearDown() throws Exception {
 		Locale.setDefault(oldLocale);
 		Policy.setLog(oldLogger);
 		org.eclipse.jface.util.Policy.setLog(oldJFaceLogger);
+		super.tearDown();
 	}
 }

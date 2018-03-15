@@ -12,10 +12,6 @@
 
 package org.eclipse.jface.tests.databinding.viewers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -31,9 +27,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 public class ObservableListTreeContentProviderTest extends
 		AbstractDefaultRealmTestCase {
@@ -43,8 +36,8 @@ public class ObservableListTreeContentProviderTest extends
 	private ObservableListTreeContentProvider contentProvider;
 	private Object input;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
 		tree = new Tree(shell, SWT.NONE);
@@ -52,8 +45,8 @@ public class ObservableListTreeContentProviderTest extends
 		input = new Object();
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		shell.dispose();
 		tree = null;
 		viewer = null;
@@ -67,7 +60,6 @@ public class ObservableListTreeContentProviderTest extends
 		viewer.setInput(input);
 	}
 
-	@Test
 	public void testConstructor_NullArgumentThrowsException() {
 		try {
 			initContentProvider(null);
@@ -76,7 +68,6 @@ public class ObservableListTreeContentProviderTest extends
 		}
 	}
 
-	@Test
 	public void testGetElements_ChangesFollowObservedList() {
 		final IObservableList elements = new WritableList();
 		final Object input = new Object();
@@ -103,7 +94,6 @@ public class ObservableListTreeContentProviderTest extends
 				contentProvider.getElements(input)));
 	}
 
-	@Test
 	public void testViewerUpdate_RemoveElementAfterMutation() {
 		final IObservableList children = new WritableList();
 		initContentProvider(new IObservableFactory() {
@@ -122,7 +112,6 @@ public class ObservableListTreeContentProviderTest extends
 		assertEquals(0, tree.getItemCount());
 	}
 
-	@Test
 	public void testInputChanged_ClearsKnownElements() {
 		input = new Object();
 		final Object input2 = new Object();
@@ -149,7 +138,6 @@ public class ObservableListTreeContentProviderTest extends
 		assertEquals(Collections.EMPTY_SET, knownElements);
 	}
 
-	@Test
 	public void testInputChanged_ClearsRealizedElements() {
 		input = new Object();
 		final Object input2 = new Object();

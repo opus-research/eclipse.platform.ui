@@ -12,6 +12,9 @@
 
 package org.eclipse.jface.tests.internal.databinding.swt;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -24,10 +27,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
-import org.junit.Before;
-import org.junit.Test;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
@@ -47,8 +46,8 @@ public class SpinnerObservableValueSelectionTest extends ObservableDelegateTest 
 		super(testName, new Delegate());
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		delegate = (Delegate) getObservableContractDelegate();
@@ -62,21 +61,19 @@ public class SpinnerObservableValueSelectionTest extends ObservableDelegateTest 
 				DisplayRealm.getRealm(Display.getDefault()));
 	}
 
-	@Test
 	public void testGetValue() throws Exception {
 		int value = 100;
 		spinner.setSelection(value);
 		assertEquals(Integer.valueOf(value), observable.getValue());
 	}
 
-	@Test
 	public void testSetValue() throws Exception {
 		int value = 100;
 		observable.setValue(Integer.valueOf(value));
 		assertEquals(value, spinner.getSelection());
 	}
 
-	public static junit.framework.Test suite() {
+	public static Test suite() {
 		TestSuite suite = new TestSuite(
 				SpinnerObservableValueSelectionTest.class.toString());
 		suite.addTestSuite(SpinnerObservableValueSelectionTest.class);

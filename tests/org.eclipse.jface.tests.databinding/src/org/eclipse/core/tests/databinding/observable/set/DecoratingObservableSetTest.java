@@ -16,6 +16,9 @@ package org.eclipse.core.tests.databinding.observable.set;
 
 import java.util.Collections;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.IObservableCollection;
 import org.eclipse.core.databinding.observable.Realm;
@@ -25,14 +28,12 @@ import org.eclipse.core.databinding.observable.set.WritableSet;
 import org.eclipse.jface.databinding.conformance.MutableObservableCollectionContractTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableCollectionContractDelegate;
 
-import junit.framework.TestSuite;
-
 /**
  * @since 3.2
  *
  */
 public class DecoratingObservableSetTest {
-	public static junit.framework.Test suite() {
+	public static Test suite() {
 		TestSuite suite = new TestSuite(DecoratingObservableSetTest.class
 				.getName());
 		suite.addTest(MutableObservableCollectionContractTest

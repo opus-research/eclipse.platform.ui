@@ -13,11 +13,13 @@
 
 package org.eclipse.core.tests.databinding.observable.list;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.IObservable;
@@ -32,34 +34,25 @@ import org.eclipse.jface.databinding.conformance.ObservableListContractTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableCollectionContractDelegate;
 import org.eclipse.jface.databinding.conformance.util.CurrentRealm;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
  */
-public class ObservableListTest {
+public class ObservableListTest extends TestCase {
 	private ObservableListStub list;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		RealmTester.setDefault(new CurrentRealm(true));
 
 		list = new ObservableListStub(new ArrayList(0), Object.class);
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		RealmTester.setDefault(null);
 	}
 
-	@Test
 	public void testIsStaleRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -69,7 +62,6 @@ public class ObservableListTest {
 		});
 	}
 
-	@Test
 	public void testSetStaleRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -79,7 +71,6 @@ public class ObservableListTest {
 		});
 	}
 
-	@Test
 	public void testMove_FiresListChanges() throws Exception {
 		list = new MutableObservableListStub();
 		final Object element = new Object();
@@ -109,7 +100,6 @@ public class ObservableListTest {
 		assertEquals(1, entry.getPosition());
 	}
 
-	@Test
 	public void testMove_MovesElement() throws Exception {
 		list = new MutableObservableListStub();
 		final Object element0 = new Object();
@@ -123,18 +113,11 @@ public class ObservableListTest {
 		assertEquals(element0, list.get(1));
 	}
 
-	@Test
-	public void testSuite() throws Exception {
-		JUnitCore.runClasses(Suite.class);
-	}
-
-	@RunWith(AllTests.class)
-	public static class Suite {
-		public static junit.framework.Test suite() {
-			TestSuite suite = new TestSuite(ObservableListTest.class.getName());
-			suite.addTest(ObservableListContractTest.suite(new Delegate()));
-			return suite;
-		}
+	public static Test suite() {
+		TestSuite suite = new TestSuite(ObservableListTest.class.getName());
+		suite.addTestSuite(ObservableListTest.class);
+		suite.addTest(ObservableListContractTest.suite(new Delegate()));
+		return suite;
 	}
 
 	/* package */ static class Delegate extends AbstractObservableCollectionContractDelegate {
