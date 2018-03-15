@@ -156,7 +156,7 @@ public class SnippetSideEffectConditionalBinding {
 			IObservableValue<Boolean> showDescription = WidgetProperties.selection().observe(showDescriptionButton);
 
 			// create a conditional ISideEffect
-			ISideEffect personNameSideEffect = ISideEffect.getFactory().create(() -> {
+			ISideEffect personNameSideEffect = ISideEffect.create(() -> {
 				String name = showDescription.getValue() ? person.getFirstName() + " " + person.getLastName()
 						: person.getFirstName();
 				personNameText.setText(name);
