@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *     Remy Chi Jian Suen - bug 144102
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.views.navigator;
@@ -880,7 +879,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (memento != null) {
                 String sortStr = memento.getString(TAG_SORTER);
                 if (sortStr != null) {
-					sortInt = Integer.parseInt(sortStr);
+					sortInt = new Integer(sortStr).intValue();
 				}
             } else {
                 sortInt = settings.getInt(STORE_SORT_TYPE);
@@ -905,7 +904,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (memento != null) {
                 String sortStr = memento.getString(TAG_SORTER);
                 if (sortStr != null) {
-					sortInt = Integer.parseInt(sortStr);
+					sortInt = new Integer(sortStr).intValue();
 				}
             } else {
                 sortInt = settings.getInt(STORE_SORT_TYPE);
