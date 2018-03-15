@@ -16,13 +16,15 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ColumnLayout;
 import org.eclipse.ui.internal.forms.widgets.ColumnLayoutUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class TestColumnWrapLayout {
@@ -32,6 +34,32 @@ public class TestColumnWrapLayout {
 	private final Point p50 = new Point(100, 50);
 	private final Point p100 = new Point(100, 100);
 	private final Point p200 = new Point(100, 200);
+
+	private Display display;
+	private Shell shell;
+	private Composite inner;
+	private ColumnLayout layout;
+
+	@Before
+	public void setUp() {
+		display = PlatformUI.getWorkbench().getDisplay();
+		shell = new Shell(display);
+		inner = new Composite(shell, SWT.NULL);
+		inner.setSize(100, 300);
+		layout = new ColumnLayout();
+		layout.leftMargin = 0;
+		layout.rightMargin = 0;
+		layout.topMargin = 0;
+		layout.bottomMargin = 0;
+		layout.horizontalSpacing = 0;
+		layout.verticalSpacing = 0;
+		inner.setLayout(layout);
+	}
+
+	@After
+	public void tearDown() {
+		shell.dispose();
+	}
 
 	@Test
 	public void testEqualSizeColumns() {
@@ -63,44 +91,34 @@ public class TestColumnWrapLayout {
 		assertEquals(260, ColumnLayoutUtils.computeColumnHeight(3, sizes, 100, 100));
 	}
 
-	private class SizedComposite extends Composite {
-
-		int height;
-
-		public SizedComposite(Composite parent, int style, int height) {
-			super(parent, style);
-			this.height = height;
-		}
-
-		@Override
-		public Point computeSize(int wHint, int hHint, boolean changed) {
-			return new Point( 20, height);
-		}
-	}
-
 	/**
 	 * Test that labels with the WRAP property set do indeed wrap.
 	 */
 	@Test
 	public void testColumnLayoutInShell() {
-		Display display = PlatformUI.getWorkbench().getDisplay();
-		Shell shell = new Shell(display);
-		shell.setSize(100, 300);
-		shell.setLayout(new GridLayout());
-		Composite inner = new Composite(shell, SWT.NULL);
-		ColumnLayout layout = new ColumnLayout();
 		layout.verticalSpacing = 5;
+		layout.horizontalSpacing = 5;
 		layout.minNumColumns = 2;
 		layout.maxNumColumns = 2;
 		layout.topMargin=2;
 		layout.bottomMargin=3;
-		inner.setLayout(layout);
-		new SizedComposite(inner, SWT.NULL, 30);
-		new SizedComposite(inner, SWT.NULL, 40);
-		new SizedComposite(inner, SWT.NULL, 20);
-		shell.layout(true);
-		assertEquals(70, inner.getSize().y);
-		shell.dispose();
+		layout.leftMargin = 5;
+		layout.rightMargin = 5;
+		ControlFactory.create(inner, 20, 20, 30);
+		ControlFactory.create(inner, 20, 20, 40);
+		ControlFactory.create(inner, 20, 20, 20);
+		Point size = inner.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		assertEquals(70, size.y);
+		inner.setSize(size);
+		inner.layout(true);
+		assertEquals(new Rectangle(5, 2, 20, 30), inner.getChildren()[0].getBounds());
+		assertEquals(new Rectangle(30, 2, 20, 40), inner.getChildren()[1].getBounds());
+	}
+
+	@Test
+	public void testEffectOfHorizontalSpacing() {
+		layout.horizontalSpacing = 10;
+		ControlFactory.create(inner, 20, 20, 30);
 	}
 
 }
