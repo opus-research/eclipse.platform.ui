@@ -708,9 +708,6 @@ public class ExpandableComposite extends Canvas {
 			if (toggle != null)
 				toggle.setBackground(bg);
 		}
-		if (client != null) {
-			client.setBackground(bg);
-		}
 	}
 
 	/**
