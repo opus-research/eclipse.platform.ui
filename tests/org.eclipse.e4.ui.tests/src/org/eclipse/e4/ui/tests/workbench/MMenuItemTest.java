@@ -67,7 +67,7 @@ public class MMenuItemTest {
 	private EModelService ems;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		ContextInjectionFactory.make(CommandServiceAddon.class, appContext);
 		ContextInjectionFactory.make(ContextServiceAddon.class, appContext);
@@ -77,7 +77,7 @@ public class MMenuItemTest {
 	}
 
 	@After
-	public void tearDown() {
+	public void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
@@ -329,7 +329,7 @@ public class MMenuItemTest {
 	}
 
 	@Test
-	public void testSubMenuCreation() {
+	public void testSubMenuCreation() throws Exception {
 		MWindow window = ems.createModelElement(MWindow.class);
 		MMenu mainMenu = ems.createModelElement(MMenu.class);
 		mainMenu.setElementId("org.eclipse.ui.main.menu");
@@ -376,7 +376,7 @@ public class MMenuItemTest {
 	}
 
 	@Test
-	public void testTbrItem() {
+	public void testTbrItem() throws Exception {
 		MWindow window = ems.createModelElement(MWindow.class);
 		MMenu mainMenu = ems.createModelElement(MMenu.class);
 		mainMenu.setElementId("org.eclipse.ui.main.menu");
@@ -424,7 +424,7 @@ public class MMenuItemTest {
 	}
 
 	@Test
-	public void testInvisibleItem() {
+	public void testInvisibleItem() throws Exception {
 		MWindow window = ems.createModelElement(MWindow.class);
 		MMenu mainMenu = ems.createModelElement(MMenu.class);
 		mainMenu.setElementId("org.eclipse.ui.main.menu");
@@ -474,7 +474,7 @@ public class MMenuItemTest {
 	}
 
 	@Test
-	public void testMenuContribution() {
+	public void testMenuContribution() throws Exception {
 		MWindow window = ems.createModelElement(MWindow.class);
 		MMenu mainMenu = ems.createModelElement(MMenu.class);
 		mainMenu.setElementId("org.eclipse.ui.main.menu");
@@ -519,7 +519,7 @@ public class MMenuItemTest {
 	}
 
 	@Test
-	public void testWithVisible() {
+	public void testWithVisible() throws Exception {
 		MWindow window = ems.createModelElement(MWindow.class);
 		MMenu mainMenu = ems.createModelElement(MMenu.class);
 		mainMenu.setElementId("org.eclipse.ui.main.menu");
@@ -604,7 +604,7 @@ public class MMenuItemTest {
 	}
 
 	@Test
-	public void testVisibilityOfMenuItemChangesBasedOnCoreExpression() {
+	public void testVisibilityOfMenuItemChangesBasedOnCoreExpression() throws Exception {
 		MWindow window = ems.createModelElement(MWindow.class);
 		MMenu mainMenu = ems.createModelElement(MMenu.class);
 		mainMenu.setElementId("org.eclipse.ui.main.menu");
