@@ -8,6 +8,7 @@
  * Contributors:
  *     Mickael Istria (Red Hat Inc.) - initial API and implementation
  *     Snjezana Peco (Red Hat Inc.)
+ *     Lars Vogel <Lars.Vogel@vogella.com>
  ******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
@@ -51,6 +52,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -207,12 +209,13 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 		createInputSelectionOptions(res);
 
-		createConfigurationOptions(res);
 
 		Composite proposalParent = new Composite(res, SWT.NONE);
 		proposalParent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
 		proposalParent.setLayout(new FillLayout());
 		createProposalsGroup(proposalParent);
+
+		createConfigurationOptions(res);
 
 		Group workingSetsGroup = new Group(res, SWT.NONE);
 		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1);
@@ -240,7 +243,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 	 */
 	private void createInputSelectionOptions(Composite res) {
 		Label rootDirectoryLabel = new Label(res, SWT.NONE);
-		rootDirectoryLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		rootDirectoryLabel.setText(DataTransferMessages.SmartImportWizardPage_selectRootDirectory);
 		rootDirectoryText = new Combo(res, SWT.BORDER);
 		String[] knownSources = getWizard().getDialogSettings().getArray(IMPORTED_SOURCES);
@@ -405,10 +407,9 @@ public class SmartImportRootWizardPage extends WizardPage {
 	private void createProposalsGroup(Composite parent) {
 		Composite res = new Composite(parent, SWT.NONE);
 		res.setLayout(new GridLayout(2, false));
-		selectionSummary = new Label(res, SWT.NONE);
-		selectionSummary.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 2, 1));
-		selectionSummary.setText(NLS.bind(DataTransferMessages.SmartImportProposals_selectionSummary, 0, 0));
-		FilteredTree filterTree = new FilteredTree(res, SWT.BORDER | SWT.CHECK, new PatternFilter(), true) {
+		PatternFilter patternFilter = new PatternFilter();
+		patternFilter.setIncludeLeadingWildcard(true);
+		FilteredTree filterTree = new FilteredTree(res, SWT.BORDER | SWT.CHECK, patternFilter, true) {
 			@Override
 			public CheckboxTreeViewer doCreateTreeViewer(Composite treeParent, int style) {
 				return new CheckboxTreeViewer(treeParent, style);
@@ -482,7 +483,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 		Composite selectionButtonsGroup = new Composite(res, SWT.NONE);
 		selectionButtonsGroup.setLayout(new GridLayout(1, false));
-		selectionButtonsGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+		selectionButtonsGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 		Button selectAllButton = new Button(selectionButtonsGroup, SWT.PUSH);
 		selectAllButton.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		selectAllButton.setText(DataTransferMessages.DataTransfer_selectAll);
@@ -503,6 +504,10 @@ public class SmartImportRootWizardPage extends WizardPage {
 				proposalsSelectionChanged();
 			}
 		});
+
+		selectionSummary = new Label(selectionButtonsGroup, SWT.NONE);
+		selectionSummary.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, true, 1, 1));
+		selectionSummary.setText(NLS.bind(DataTransferMessages.SmartImportProposals_selectionSummary, 0, 0));
 
 		tree.setInput(Collections.emptyMap());
 	}
@@ -613,10 +618,11 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 	private void refreshProposals() {
 		try {
-			getContainer().run(true, true, new IRunnableWithProgress() {
-				@Override
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-					if (sourceIsValid()) {
+			if (sourceIsValid()) {
+				Point initialSelection = rootDirectoryText.getSelection();
+				getContainer().run(true, true, new IRunnableWithProgress() {
+					@Override
+					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 						SmartImportRootWizardPage.this.potentialProjects = getWizard().getImportJob()
 								.getImportProposals(monitor);
 						if (!potentialProjects.containsKey(getWizard().getImportJob().getRoot())) {
@@ -631,13 +637,15 @@ public class SmartImportRootWizardPage extends WizardPage {
 									.remove(project.getLocation().toFile());
 							SmartImportRootWizardPage.this.alreadyExistingProjects.add(project.getLocation().toFile());
 						}
-					} else {
-						SmartImportRootWizardPage.this.potentialProjects = Collections.emptyMap();
-						SmartImportRootWizardPage.this.notAlreadyExistingProjects = Collections.emptySet();
-						SmartImportRootWizardPage.this.alreadyExistingProjects = Collections.emptySet();
 					}
-				}
-			});
+				});
+				// restore selection as getContainer().run(...) looses it
+				rootDirectoryText.setSelection(initialSelection);
+			} else {
+				SmartImportRootWizardPage.this.potentialProjects = Collections.emptyMap();
+				SmartImportRootWizardPage.this.notAlreadyExistingProjects = Collections.emptySet();
+				SmartImportRootWizardPage.this.alreadyExistingProjects = Collections.emptySet();
+			}
 			tree.setInput(potentialProjects);
 			tree.setCheckedElements(this.notAlreadyExistingProjects.toArray());
 		} catch (Exception ex) {
