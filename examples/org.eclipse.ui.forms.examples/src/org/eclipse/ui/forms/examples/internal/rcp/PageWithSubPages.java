@@ -10,15 +10,23 @@
  *******************************************************************************/
 package org.eclipse.ui.forms.examples.internal.rcp;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.*;
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.forms.*;
-import org.eclipse.ui.forms.editor.*;
-import org.eclipse.ui.forms.examples.internal.ExamplesPlugin;
-import org.eclipse.ui.forms.widgets.*;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.IFormColors;
+import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.editor.FormEditor;
+import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.examples.internal.ExamplesImages;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
 /**
  *
  */
@@ -42,8 +50,7 @@ public class PageWithSubPages extends FormPage {
 		ScrolledForm form = managedForm.getForm();
 		FormToolkit toolkit = managedForm.getToolkit();
 		form.setText("Form with subpages");
-		form.setBackgroundImage(ExamplesPlugin.getDefault().getImage(
-				ExamplesPlugin.IMG_FORM_BG));
+		form.setBackgroundImage(ExamplesImages.INSTANCE.getImage(ExamplesImages.IMG_FORM_BG));
 		GridLayout layout = new GridLayout();
 		layout.marginWidth = 10;
 		form.getBody().setLayout(layout);

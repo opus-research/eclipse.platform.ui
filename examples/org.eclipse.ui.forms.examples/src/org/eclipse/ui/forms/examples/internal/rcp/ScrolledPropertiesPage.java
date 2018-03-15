@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ui.forms.examples.internal.rcp;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.editor.*;
-import org.eclipse.ui.forms.examples.internal.ExamplesPlugin;
-import org.eclipse.ui.forms.widgets.*;
+import org.eclipse.ui.forms.editor.FormEditor;
+import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.examples.internal.ExamplesImages;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
 /**
  * @author dejan
  *
@@ -30,8 +31,7 @@ public class ScrolledPropertiesPage extends FormPage {
 		final ScrolledForm form = managedForm.getForm();
 		//FormToolkit toolkit = managedForm.getToolkit();
 		form.setText("Form with scrolled sections");
-		form.setBackgroundImage(ExamplesPlugin.getDefault().getImage(
-				ExamplesPlugin.IMG_FORM_BG));
+		form.setBackgroundImage(ExamplesImages.INSTANCE.getImage(ExamplesImages.IMG_FORM_BG));
 		block.createContent(managedForm);
 	}
 }

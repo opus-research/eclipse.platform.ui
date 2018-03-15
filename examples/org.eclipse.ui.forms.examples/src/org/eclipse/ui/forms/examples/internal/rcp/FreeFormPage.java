@@ -9,20 +9,39 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.forms.examples.internal.rcp;
-import java.io.*;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.*;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.forms.*;
-import org.eclipse.ui.forms.editor.*;
-import org.eclipse.ui.forms.events.*;
-import org.eclipse.ui.forms.examples.internal.ExamplesPlugin;
-import org.eclipse.ui.forms.widgets.*;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.HyperlinkSettings;
+import org.eclipse.ui.forms.IFormColors;
+import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.editor.FormEditor;
+import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.forms.examples.internal.ExamplesImages;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.forms.widgets.FormText;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Hyperlink;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.TableWrapData;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
+import org.eclipse.ui.forms.widgets.TreeNode;
 /**
  * @author dejan
  *
@@ -42,7 +61,7 @@ public class FreeFormPage extends FormPage {
 		FormToolkit toolkit = managedForm.getToolkit();
 		toolkit.getHyperlinkGroup().setHyperlinkUnderlineMode(HyperlinkSettings.UNDERLINE_HOVER);
 		form.setText("Free-form text with links");
-		form.setBackgroundImage(ExamplesPlugin.getDefault().getImage(ExamplesPlugin.IMG_FORM_BG));
+		form.setBackgroundImage(ExamplesImages.INSTANCE.getImage(ExamplesImages.IMG_FORM_BG));
 		TableWrapLayout layout = new TableWrapLayout();
 		layout.leftMargin = 10;
 		layout.rightMargin = 10;
@@ -143,7 +162,7 @@ public class FreeFormPage extends FormPage {
 			}
 		});
 		rtext.setHyperlinkSettings(toolkit.getHyperlinkGroup());
-		rtext.setImage("image1", ExamplesPlugin.getDefault().getImage(ExamplesPlugin.IMG_LARGE));
+		rtext.setImage("image1", ExamplesImages.INSTANCE.getImage(ExamplesImages.IMG_LARGE));
 		createCompositeControl(rtext, toolkit);
 		createControl(rtext, toolkit);
 		Menu menu = new Menu(rtext);

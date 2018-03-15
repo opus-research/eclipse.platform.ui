@@ -29,7 +29,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.MasterDetailsBlock;
 import org.eclipse.ui.forms.SectionPart;
 import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.examples.internal.ExamplesPlugin;
+import org.eclipse.ui.forms.examples.internal.ExamplesImages;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
@@ -130,9 +130,8 @@ public class ScrolledPropertiesBlock extends MasterDetailsBlock {
 		};
 		haction.setChecked(true);
 		haction.setToolTipText("Horizontal orientation");
-		haction.setImageDescriptor(ExamplesPlugin.getDefault()
-				.getImageRegistry()
-				.getDescriptor(ExamplesPlugin.IMG_HORIZONTAL));
+		haction.setImageDescriptor(
+				ExamplesImages.INSTANCE.getImageRegistry().getDescriptor(ExamplesImages.IMG_HORIZONTAL));
 		Action vaction = new Action("ver", Action.AS_RADIO_BUTTON) {
 			@Override
 			public void run() {
@@ -142,8 +141,8 @@ public class ScrolledPropertiesBlock extends MasterDetailsBlock {
 		};
 		vaction.setChecked(false);
 		vaction.setToolTipText("Vertical orientation");
-		vaction.setImageDescriptor(ExamplesPlugin.getDefault()
-				.getImageRegistry().getDescriptor(ExamplesPlugin.IMG_VERTICAL));
+		vaction.setImageDescriptor(
+				ExamplesImages.INSTANCE.getImageRegistry().getDescriptor(ExamplesImages.IMG_VERTICAL));
 		form.getToolBarManager().add(haction);
 		form.getToolBarManager().add(vaction);
 	}

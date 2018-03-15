@@ -23,6 +23,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.SharedHeaderFormEditor;
+import org.eclipse.ui.forms.examples.internal.ExamplesImages;
 import org.eclipse.ui.forms.examples.internal.ExamplesPlugin;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -89,9 +90,8 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 		};
 		haction.setChecked(true);
 		haction.setToolTipText("Horizontal orientation");
-		haction.setImageDescriptor(ExamplesPlugin.getDefault()
-				.getImageRegistry()
-				.getDescriptor(ExamplesPlugin.IMG_HORIZONTAL));
+		haction.setImageDescriptor(
+				ExamplesImages.INSTANCE.getImageRegistry().getDescriptor(ExamplesImages.IMG_HORIZONTAL));
 		Action vaction = new Action("ver", Action.AS_RADIO_BUTTON) {
 			@Override
 			public void run() {
@@ -99,8 +99,8 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 		};
 		vaction.setChecked(false);
 		vaction.setToolTipText("Vertical orientation");
-		vaction.setImageDescriptor(ExamplesPlugin.getDefault()
-				.getImageRegistry().getDescriptor(ExamplesPlugin.IMG_VERTICAL));
+		vaction.setImageDescriptor(
+				ExamplesImages.INSTANCE.getImageRegistry().getDescriptor(ExamplesImages.IMG_VERTICAL));
 		ControlContribution save = new ControlContribution("save") {
 			@Override
 			protected Control createControl(Composite parent) {

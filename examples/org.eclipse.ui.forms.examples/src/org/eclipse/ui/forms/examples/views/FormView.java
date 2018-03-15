@@ -24,7 +24,7 @@ import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.examples.internal.ExamplesPlugin;
+import org.eclipse.ui.forms.examples.internal.ExamplesImages;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -83,7 +83,7 @@ public class FormView extends ViewPart {
 		button.setLayoutData(td);
 
 		ih = toolkit.createImageHyperlink(form.getBody(), SWT.NULL);
-		ih.setImage(ExamplesPlugin.getDefault().getImageRegistry().get(ExamplesPlugin.IMG_SAMPLE));
+		ih.setImage(ExamplesImages.INSTANCE.getImageRegistry().get(ExamplesImages.IMG_SAMPLE));
 		ih.setText("Image Hyperlink with image and text");
 		td = new TableWrapData();
 		td.colspan = 2;
@@ -114,7 +114,7 @@ public class FormView extends ViewPart {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (clearHyperlinkImage.getSelection()) {
-					ih.setImage(ExamplesPlugin.getDefault().getImageRegistry().get(ExamplesPlugin.IMG_SAMPLE));
+					ih.setImage(ExamplesImages.INSTANCE.getImageRegistry().get(ExamplesImages.IMG_SAMPLE));
 				} else {
 					ih.setImage(null);
 				}
@@ -131,7 +131,7 @@ public class FormView extends ViewPart {
 
 		ExpandableComposite ec = toolkit.createExpandableComposite(form.getBody(), ExpandableComposite.TREE_NODE|ExpandableComposite.CLIENT_INDENT);
 		ImageHyperlink eci = toolkit.createImageHyperlink(ec, SWT.NULL);
-		eci.setImage(ExamplesPlugin.getDefault().getImageRegistry().get(ExamplesPlugin.IMG_SAMPLE));
+		eci.setImage(ExamplesImages.INSTANCE.getImageRegistry().get(ExamplesImages.IMG_SAMPLE));
 		ec.setTextClient(eci);
 		ec.setText("Expandable Composite title");
 		String ctext = "We will now create a somewhat long text so that "+
@@ -194,7 +194,7 @@ public class FormView extends ViewPart {
 		td = new TableWrapData(TableWrapData.FILL);
 		td.colspan = 2;
 		rtext.setLayoutData(td);
-		rtext.setImage("image", ExamplesPlugin.getDefault().getImageRegistry().get(ExamplesPlugin.IMG_SAMPLE));
+		rtext.setImage("image", ExamplesImages.INSTANCE.getImageRegistry().get(ExamplesImages.IMG_SAMPLE));
 		rtext.setColor("header", toolkit.getColors().getColor(IFormColors.TITLE));
 		rtext.setFont("header", JFaceResources.getHeaderFont());
 		rtext.setFont("code", JFaceResources.getTextFont());
