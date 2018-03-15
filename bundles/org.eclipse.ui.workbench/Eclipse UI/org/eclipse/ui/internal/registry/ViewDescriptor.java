@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Markus Alexander Kuppe, Versant Corporation - bug #215797
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -101,6 +100,7 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 
 	@Override
 	public float getFastViewWidthRatio() {
+		// TODO Auto-generated method stub
 		return 0;
 	}
 
