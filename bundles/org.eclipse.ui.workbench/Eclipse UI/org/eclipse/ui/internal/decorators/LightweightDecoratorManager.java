@@ -63,7 +63,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 		synchronized void setValues(Object object, DecorationBuilder builder,
 				LightweightDecoratorDefinition definition) {
-			this.data = new RunnableData(object, builder, definition);
+			data = new RunnableData(object, builder, definition);
 		}
 
 		/*
@@ -76,16 +76,12 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 			String message;
 			// Copy to local variables, see
 			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=300358
-			LightweightDecoratorDefinition decorator = data == null ? null : data.decorator;
+			LightweightDecoratorDefinition decorator = data.decorator;
 			if (decorator == null) {
 				message = WorkbenchMessages.DecoratorError;
 			} else {
-				String name = decorator.getName();
-				if (name == null) {
-					// decorator definition is not accessible anymore
-					name = decorator.getId();
-				}
-				message = NLS.bind(WorkbenchMessages.DecoratorWillBeDisabled, name);
+				message = NLS.bind(WorkbenchMessages.DecoratorWillBeDisabled,
+						decorator.getName());
 			}
 			WorkbenchPlugin.log(message, status);
 			if (decorator != null) {
@@ -102,7 +98,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 			// Copy to local variables, see
 			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=300358
 			RunnableData data = this.data;
-			if (data != null && data.isConsistent()) {
+			if (data.isConsistent()) {
 				data.decorator.decorate(data.element, data.builder);
 			}
 			clearReferences();
@@ -114,7 +110,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		 * @since 3.1
 		 */
 		void clearReferences() {
-			data = null;
+			data = new RunnableData(null, null, null);
 		}
 	}
 
