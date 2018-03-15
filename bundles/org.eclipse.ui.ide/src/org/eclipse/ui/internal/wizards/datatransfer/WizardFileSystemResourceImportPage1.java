@@ -426,7 +426,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
 			createLinksInWorkspaceButton = null;
 			createVirtualFoldersButton = null;
 			relativePathVariableGroup = null;
-			composite.requestLayout();
+			composite.layout();
 			shell.setSize(shellSize.x, shellSize.y - linkedResourceGroupHeight);
 			advancedButton.setText(IDEWorkbenchMessages.showAdvanced);
 		} else {
@@ -436,7 +436,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
 				linkedResourceGroupHeight= groupSize.y;
 			}
 			shell.setSize(shellSize.x, shellSize.y + linkedResourceGroupHeight);
-			composite.requestLayout();
+			composite.layout();
 			advancedButton.setText(IDEWorkbenchMessages.hideAdvanced);
 		}
 	}

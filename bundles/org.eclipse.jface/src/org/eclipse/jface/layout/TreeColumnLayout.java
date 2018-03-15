@@ -57,7 +57,7 @@ public class TreeColumnLayout extends AbstractColumnLayout {
 			tree.getDisplay().asyncExec(() -> {
 				if (!tree.isDisposed()) {
 					tree.update();
-					tree.getParent().requestLayout();
+					tree.getParent().layout();
 				}
 			});
 		}

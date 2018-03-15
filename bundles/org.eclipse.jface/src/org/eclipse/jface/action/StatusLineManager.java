@@ -297,7 +297,7 @@ public class StatusLineManager extends ContributionManager implements
 
                 setDirty(false);
 
-                statusLine.requestLayout();
+                statusLine.layout();
                 statusLine.setRedraw(true);
             }
         }

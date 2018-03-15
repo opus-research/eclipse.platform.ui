@@ -359,7 +359,7 @@ public class InternalDialog extends TrayDialog {
 		if (currentSize.x < desiredSize.x) {
 			getShell().setSize(desiredSize.x, currentSize.y);
 		} else {
-			getShell().requestLayout();
+			getShell().layout();
 		}
 	}
 
@@ -393,7 +393,7 @@ public class InternalDialog extends TrayDialog {
 				dialogState.put(IStatusDialogConstants.DETAILS_OPENED,
 						Boolean.TRUE);
 			}
-			dialogArea.requestLayout();
+			dialogArea.layout();
 		}
 	}
 
@@ -443,7 +443,7 @@ public class InternalDialog extends TrayDialog {
 			getShell().setSize(
 					new Point(windowSize.x, windowSize.y + (diffY)));
 		}
-		dialogArea.requestLayout();
+		dialogArea.layout();
 		return opened;
 	}
 
@@ -547,8 +547,8 @@ public class InternalDialog extends TrayDialog {
 			if (statusListViewer == null
 					|| statusListViewer.getControl().isDisposed()) {
 				fillListArea(listArea);
-				listArea.requestLayout();
-				listArea.getParent().requestLayout();
+				listArea.layout();
+				listArea.getParent().layout();
 				getShell().setSize(
 						getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
@@ -575,7 +575,7 @@ public class InternalDialog extends TrayDialog {
 				refreshSingleStatusArea();
 			}
 		}
-		titleArea.requestLayout();
+		titleArea.layout();
 	}
 
 	/**
@@ -597,7 +597,7 @@ public class InternalDialog extends TrayDialog {
 		// Add the buttons to the button bar.
 		createButtonsForButtonBar(composite);
 
-		composite.requestLayout();
+		composite.layout();
 		return composite;
 	}
 
@@ -729,7 +729,7 @@ public class InternalDialog extends TrayDialog {
 
 				((GridData) gotoButton.getLayoutData()).widthHint = gotoButton
 						.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
-				gotoButton.getParent().requestLayout();
+				gotoButton.getParent().layout();
 			} else
 				hideButton(gotoButton, true);
 		}
@@ -756,7 +756,7 @@ public class InternalDialog extends TrayDialog {
 				showErrorLogLink.dispose();
 			}
 		}
-		linkComposite.getParent().requestLayout();
+		linkComposite.getParent().layout();
 	}
 
 	private IViewDescriptor shouldDisplayLinkToErrorLog() {
@@ -809,7 +809,7 @@ public class InternalDialog extends TrayDialog {
 		if (description.equals(singleStatusLabel.getText()))
 			singleStatusLabel.setText(" "); //$NON-NLS-1$
 		singleStatusLabel.setText(description);
-		singleStatusDisplayArea.requestLayout();
+		singleStatusDisplayArea.layout();
 		getShell().setText(getString(IStatusDialogConstants.TITLE));
 	}
 

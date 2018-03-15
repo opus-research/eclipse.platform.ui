@@ -121,7 +121,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         if (viewer != null) {
             viewer.getControl().dispose();
             viewer = null;
-            composite.requestLayout();
+            composite.layout();
             shell.setSize(shellSize.x, shellSize.y - viewerHeight);
             detailsButton.setText(ProgressMessages.ProgressMonitorJobsDialog_DetailsTitle);
         } else {

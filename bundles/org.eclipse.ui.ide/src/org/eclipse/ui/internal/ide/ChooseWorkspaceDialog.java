@@ -263,7 +263,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		if (recentWorkspacesComposites.isEmpty()) {
 			recentWorkspacesForm.dispose();
 		}
-		getShell().requestLayout();
+		getShell().layout();
 		initializeBounds();
 		// Remove Workspace from combobox
 		text.remove(workspace);

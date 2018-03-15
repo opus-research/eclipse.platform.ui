@@ -480,7 +480,7 @@ public class TitleAreaDialog extends TrayDialog {
 		}
 
 		if (forceLayout) {
-			getShell().requestLayout();
+			getShell().layout();
 		} else {
 			// Do not layout before the dialog area has been created
 			// to avoid incomplete calculations.
