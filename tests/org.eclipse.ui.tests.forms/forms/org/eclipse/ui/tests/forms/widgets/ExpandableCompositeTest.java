@@ -544,6 +544,6 @@ public class ExpandableCompositeTest {
 		int textCenter = Geometry.centerPoint(children[1].getBounds()).y;
 		int twistieCenter = Geometry.centerPoint(children[0].getBounds()).y;
 
-		assertAround("Twisty position", textCenter, twistieCenter, 1);
+		assertEquals(textCenter, twistieCenter);
 	}
 }
