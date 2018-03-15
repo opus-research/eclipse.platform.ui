@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
- *     Mikael Barbero (Eclipse Foundation) - Bug 254570
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -50,30 +49,26 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 		List selection;
 		TreePath[] paths;
 		CustomHashtable element2TreePaths;
-		IElementComparer comparer;
 
 		private InitializeData(TreePath[] paths, IElementComparer comparer) {
 			this.paths= new TreePath[paths.length];
-			this.comparer = comparer;
 			System.arraycopy(paths, 0, this.paths, 0, paths.length);
 			element2TreePaths = new CustomHashtable(comparer);
 			int size = paths.length;
 			selection = new ArrayList(size);
 			for (int i = 0; i < size; i++) {
 				Object lastSegment= paths[i].getLastSegment();
-				if (lastSegment != null) {
-					Object mapped = element2TreePaths.get(lastSegment);
-					if (mapped == null) {
-						selection.add(lastSegment);
-						element2TreePaths.put(lastSegment, paths[i]);
-					} else if (mapped instanceof List) {
-						((List) mapped).add(paths[i]);
-					} else {
-						List newMapped = new ArrayList(2);
-						newMapped.add(mapped);
-						newMapped.add(paths[i]);
-						element2TreePaths.put(lastSegment, newMapped);
-					}
+				Object mapped= element2TreePaths.get(lastSegment);
+				if (mapped == null) {
+					selection.add(lastSegment);
+					element2TreePaths.put(lastSegment, paths[i]);
+				} else if (mapped instanceof List) {
+					((List)mapped).add(paths[i]);
+				} else {
+					List newMapped= new ArrayList(2);
+					newMapped.add(mapped);
+					newMapped.add(paths[i]);
+					element2TreePaths.put(lastSegment, newMapped);
 				}
 			}
 		}
@@ -87,7 +82,7 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 	 *            tree paths
 	 */
 	public TreeSelection(TreePath[] paths) {
-		this(new InitializeData(paths != null ? paths : EMPTY_TREE_PATHS, null));
+		this(new InitializeData(paths, null));
 	}
 
 	/**
@@ -100,7 +95,7 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 	 *            the comparer, or <code>null</code> if default equals is to be used
 	 */
 	public TreeSelection(TreePath[] paths, IElementComparer comparer) {
-		this(new InitializeData(paths != null ? paths : EMPTY_TREE_PATHS, comparer));
+		this(new InitializeData(paths, comparer));
 	}
 
 	/**
@@ -133,7 +128,7 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 	 * @param data the data
 	 */
 	private TreeSelection(InitializeData data) {
-		super(data.selection, data.comparer);
+		super(data.selection);
 		paths= data.paths;
 		element2TreePaths= data.element2TreePaths;
 	}
@@ -184,6 +179,17 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int code = getClass().hashCode();
+		if (paths != null) {
+			for (TreePath path : paths) {
+				code = code * 17 + path.hashCode(getElementComparer());
+			}
+		}
+		return code;
 	}
 
 	@Override
