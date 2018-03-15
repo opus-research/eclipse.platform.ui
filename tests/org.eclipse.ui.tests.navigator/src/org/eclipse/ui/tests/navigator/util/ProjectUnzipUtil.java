@@ -31,8 +31,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import org.eclipse.ui.tests.navigator.NavigatorTestsPlugin;
 
 public class ProjectUnzipUtil {
 
@@ -48,8 +47,7 @@ public class ProjectUnzipUtil {
 	}
 
 	public IPath getLocalPath(IPath zipFilePath) {
-		Bundle bundle = FrameworkUtil.getBundle(ProjectUnzipUtil.class);
-		URL url = FileLocator.find(bundle, zipFilePath, null);
+		URL url = FileLocator.find(NavigatorTestsPlugin.getDefault().getBundle(), zipFilePath, null);
 		try {
 			url = FileLocator.toFileURL(url);
 		} catch (IOException e) {
