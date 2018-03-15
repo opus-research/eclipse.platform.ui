@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -36,7 +37,6 @@ import org.eclipse.jface.commands.ActionHandler;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ILabelDecorator;
@@ -1021,7 +1021,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             // check if first element has new tag defined, indicates new version
             if (children.length > 0
                     && children[0].getString(TAG_IS_ENABLED) != null) {
-                ArrayList selectedFilters = new ArrayList();
+				ArrayList<String> selectedFilters = new ArrayList<>();
                 ArrayList unSelectedFilters = new ArrayList();
 				for (IMemento memento : children) {
 					if (memento.getString(TAG_IS_ENABLED).equals(String.valueOf(true))) {
@@ -1367,7 +1367,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 	 * @since 3.2
 	 */
 	private boolean internalSetWorkingSet(IWorkingSet workingSet) {
-		boolean refreshNeeded = !Util.equals(this.workingSet, workingSet);
+		boolean refreshNeeded = !Objects.equals(this.workingSet, workingSet);
 		this.workingSet = workingSet;
 		emptyWorkingSet = workingSet != null && workingSet.isAggregateWorkingSet()
 				&& workingSet.isEmpty();

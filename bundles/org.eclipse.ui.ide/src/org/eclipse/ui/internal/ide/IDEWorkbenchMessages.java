@@ -525,15 +525,15 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEWorkspacePreference_relatedLink;
 	public static String IDEWorkspacePreference_openReferencedProjects;
 	public static String IDEWorkspacePreference_closeUnrelatedProjectsToolTip;
-	public static String IDEWorkspacePreference_workspaceLocation;
 	public static String IDEWorkspacePreference_windowTitleGroupText;
 	public static String IDEWorkspacePreference_showLocationInWindowTitle;
 	public static String IDEWorkspacePreference_showLocationInWindowTitle_lockedByCommandLine;
 	public static String IDEWorkspacePreference_showLocationNameInWindowTitle;
 	public static String IDEWorkspacePreference_showPerspectiveNameInWindowTitle;
 	public static String IDEWorkspacePreference_showProductNameInWindowTitle;
-	public static String IDEWorkspacePreference_workspaceName;
 	public static String IDEWorkbenchPreference_workbenchSystemExplorer;
+	public static String IDEWorkspacePreference_UnknownNatureSeverity;
+	public static String IDEWorkspacePreference_UnknownNatureSeverity_Ignore;
 
 	// --- Linked Resources ---
 	public static String LinkedResourcesPreference_explanation;
@@ -992,6 +992,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEApplication_versionMessage_newerWorkspace;
 	public static String IDEApplication_versionMessage_olderWorkspace;
 	public static String IDEApplication_version_doNotWarnAgain;
+	public static String IDEApplication_version_continue;
 	public static String GlobalBuildAction_BuildRunningTitle;
 	public static String GlobalBuildAction_BuildRunningMessage;
 	public static String CleanDialog_buildCleanAuto;
