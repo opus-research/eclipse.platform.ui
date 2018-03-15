@@ -848,7 +848,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 					.setInput(NLS
 							.bind(
 									WorkbenchMessages.FilteredItemsSelectionDialog_nItemsSelected,
-									Integer.valueOf(selection.size())));
+									new Integer(selection.size())));
 			break;
 		}
 
@@ -1927,7 +1927,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 							WorkbenchMessages.FilteredItemsSelectionDialog_taskProgressMessage,
 							new Object[] {
 									message,
-									Integer.valueOf((int) ((worked * 100) / totalWork)) });
+									new Integer(
+											(int) ((worked * 100) / totalWork)) });
 
 		}
 
