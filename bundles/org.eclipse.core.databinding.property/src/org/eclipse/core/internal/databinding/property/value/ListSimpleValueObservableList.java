@@ -239,8 +239,8 @@ public class ListSimpleValueObservableList<S, M extends S, T> extends AbstractOb
 	public boolean contains(Object o) {
 		getterCalled();
 
-		for (M m : masterList) {
-			if (Util.equals(detailProperty.getValue(m), o))
+		for (Iterator<M> it = masterList.iterator(); it.hasNext();) {
+			if (Util.equals(detailProperty.getValue(it.next()), o))
 				return true;
 		}
 		return false;
@@ -445,7 +445,7 @@ public class ListSimpleValueObservableList<S, M extends S, T> extends AbstractOb
 
 		for (ListIterator<M> it = ListSimpleValueObservableList.this.masterList.listIterator(); it.hasNext();) {
 			if (masterElement == it.next())
-				indices.add(Integer.valueOf(it.previousIndex()));
+				indices.add(new Integer(it.previousIndex()));
 		}
 
 		int[] result = new int[indices.size()];

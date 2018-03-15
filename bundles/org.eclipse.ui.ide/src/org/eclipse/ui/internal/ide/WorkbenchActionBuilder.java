@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Andreas Buchen <andreas.buchen@sap.com> - Bug 206584
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440975, 431862
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 487570, 494289
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -77,7 +76,6 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
  * Adds actions to a workbench window.
  */
 public final class WorkbenchActionBuilder extends ActionBarAdvisor {
-
     private final IWorkbenchWindow window;
 
     // generic actions
@@ -134,6 +132,10 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
     private IWorkbenchAction prevPerspectiveAction;
 
     private IWorkbenchAction activateEditorAction;
+
+    private IWorkbenchAction maximizePartAction;
+
+    private IWorkbenchAction minimizePartAction;
 
     private IWorkbenchAction switchToEditorAction;
 
@@ -343,10 +345,11 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 			if (delta == null) {
 				return;
 			}
-			for (IResourceDelta projectDelta : delta.getAffectedChildren()) {
-				int kind = projectDelta.getKind();
+			IResourceDelta[] projectDeltas = delta.getAffectedChildren();
+			for (int i = 0; i < projectDeltas.length; i++) {
+				int kind = projectDeltas[i].getKind();
 				//affected by projects being opened/closed or description changes
-				boolean changed = (projectDelta.getFlags() & (IResourceDelta.DESCRIPTION | IResourceDelta.OPEN)) != 0;
+				boolean changed = (projectDeltas[i].getFlags() & (IResourceDelta.DESCRIPTION | IResourceDelta.OPEN)) != 0;
 				if (kind != IResourceDelta.CHANGED || changed) {
 					updateBuildActions(false);
 					return;
@@ -491,6 +494,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         menu.add(getPrintItem());
         menu.add(new GroupMarker(IWorkbenchActionConstants.PRINT_EXT));
         menu.add(new Separator());
+        menu.add(openWorkspaceAction);
         menu.add(new GroupMarker(IWorkbenchActionConstants.OPEN_EXT));
         menu.add(new Separator());
         menu.add(importResourcesAction);
@@ -504,8 +508,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         menu.add(ContributionItemFactory.REOPEN_EDITORS.create(getWindow()));
         menu.add(new GroupMarker(IWorkbenchActionConstants.MRU));
         menu.add(new Separator());
-
-		menu.add(openWorkspaceAction);
 
         // If we're on OS X we shouldn't show this command in the File menu. It
 		// should be invisible to the user. However, we should not remove it -
@@ -656,7 +658,24 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         openPreferencesItem.setVisible(!Util.isMac());
         menu.add(openPreferencesItem);
 
-        menu.add(ContributionItemFactory.OPEN_WINDOWS.create(getWindow()));
+		// Workaround for bug 461311. Radio buttons in the main menu can cause
+		// Eclipse to crash on window managers like unity that use menu proxies.
+		String menuProxy = System.getenv("UBUNTU_MENUPROXY"); //$NON-NLS-1$
+		String desktopSession = System.getenv("DESKTOP_SESSION"); //$NON-NLS-1$
+		String os = Platform.getOS();
+		String ws = Platform.getWS();
+		// Setting this property to false disables the workaround. Omitting the
+		// property or setting it to any other value
+		// enables the workaround
+		boolean workaroundEnabled = !"false".equals(System.getProperty("eclipse.workaround.bug461311")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		boolean radioButtonsMightCauseCrash = ((menuProxy == null) || !menuProxy.equals("0")) //$NON-NLS-1$
+				&& Platform.WS_GTK.equals(ws) && Platform.OS_LINUX.equals(os)
+				&& (desktopSession == null || desktopSession.equals("ubuntu")) //$NON-NLS-1$
+				&& workaroundEnabled;
+		if (!radioButtonsMightCauseCrash) {
+			menu.add(ContributionItemFactory.OPEN_WINDOWS.create(getWindow()));
+		}
         return menu;
     }
 
@@ -726,6 +745,9 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         subMenu.add(showPartPaneMenuAction);
         subMenu.add(showViewMenuAction);
         subMenu.add(quickAccessAction);
+        subMenu.add(new Separator());
+        subMenu.add(maximizePartAction);
+        subMenu.add(minimizePartAction);
         subMenu.add(new Separator());
         subMenu.add(activateEditorAction);
         subMenu.add(nextEditorAction);
@@ -869,6 +891,8 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         nextPerspectiveAction = null;
         prevPerspectiveAction = null;
         activateEditorAction = null;
+        maximizePartAction = null;
+        minimizePartAction = null;
         switchToEditorAction = null;
         quickAccessAction.dispose();
         quickAccessAction = null;
@@ -1075,6 +1099,12 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
                 .create(window);
         register(activateEditorAction);
 
+        maximizePartAction = ActionFactory.MAXIMIZE.create(window);
+        register(maximizePartAction);
+
+		minimizePartAction = ActionFactory.MINIMIZE.create(window);
+		register(minimizePartAction);
+
         switchToEditorAction = ActionFactory.SHOW_OPEN_EDITORS
                 .create(window);
         register(switchToEditorAction);
@@ -1267,8 +1297,8 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
      * @return <code>true</code> if a welcome page was found, <code>false</code> if not
      */
     private boolean hasWelcomePage(AboutInfo[] infos) {
-        for (AboutInfo info : infos) {
-            if (info.getWelcomePageURL() != null) {
+        for (int i = 0; i < infos.length; i++) {
+            if (infos[i].getWelcomePageURL() != null) {
             	return true;
             }
         }
@@ -1282,8 +1312,8 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
      * @return <code>true</code> if tips and tricks were found, <code>false</code> if not
      */
     private boolean hasTipsAndTricks(AboutInfo[] infos) {
-        for (AboutInfo info : infos) {
-            if (info.getTipsAndTricksHref() != null) {
+        for (int i = 0; i < infos.length; i++) {
+            if (infos[i].getTipsAndTricksHref() != null) {
             	return true;
             }
         }

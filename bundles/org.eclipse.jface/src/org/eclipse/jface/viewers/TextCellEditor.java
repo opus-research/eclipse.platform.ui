@@ -12,8 +12,6 @@
 
 package org.eclipse.jface.viewers;
 
-import static org.eclipse.swt.events.SelectionListener.widgetDefaultSelectedAdapter;
-
 import java.text.MessageFormat;	// Not using ICU to support standalone JFace scenario
 
 import org.eclipse.core.runtime.Assert;
@@ -26,6 +24,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -140,7 +139,12 @@ public class TextCellEditor extends CellEditor {
     @Override
 	protected Control createControl(Composite parent) {
         text = new Text(parent, getStyle());
-        text.addSelectionListener(widgetDefaultSelectedAdapter(e -> handleDefaultSelection(e)));
+        text.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+                handleDefaultSelection(e);
+            }
+        });
         text.addKeyListener(new KeyAdapter() {
             // hook key pressed - see PR 14201
             @Override
@@ -244,7 +248,8 @@ public class TextCellEditor extends CellEditor {
         boolean newValidState = isCorrect(typedValue);
         if (!newValidState) {
             // try to insert the current value into the error message.
-            setErrorMessage(MessageFormat.format(getErrorMessage(), value));
+            setErrorMessage(MessageFormat.format(getErrorMessage(),
+                    new Object[] { value }));
         }
         valueChanged(oldValidState, newValidState);
     }

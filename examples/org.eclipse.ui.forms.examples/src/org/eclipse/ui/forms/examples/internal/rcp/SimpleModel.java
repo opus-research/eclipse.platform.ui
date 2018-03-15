@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2004 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,10 +17,10 @@ import java.util.ArrayList;
  * Preferences - Java - Code Generation - Code and Comments
  */
 public class SimpleModel {
-	private ArrayList<IModelListener> modelListeners;
-	private ArrayList<NamedObject> objects;
+	private ArrayList modelListeners;
+	private ArrayList objects;
 	public SimpleModel() {
-		modelListeners = new ArrayList<>();
+		modelListeners = new ArrayList();
 		initialize();
 	}
 	public void addModelListener(IModelListener listener) {
@@ -32,7 +32,7 @@ public class SimpleModel {
 	}
 	public void fireModelChanged(Object[] objects, String type, String property) {
 		for (int i = 0; i < modelListeners.size(); i++) {
-			modelListeners.get(i).modelChanged(objects,
+			((IModelListener) modelListeners.get(i)).modelChanged(objects,
 					type, property);
 		}
 	}
@@ -40,7 +40,7 @@ public class SimpleModel {
 		return objects.toArray();
 	}
 	private void initialize() {
-		objects = new ArrayList<>();
+		objects = new ArrayList();
 		NamedObject[] objects = {
 				new TypeOne("TypeOne instance 1", 2, true, "Some text"),
 				new TypeOne("TypeOne instance 2", 1, false, "Different text"),
@@ -52,17 +52,17 @@ public class SimpleModel {
 		add(objects, false);
 	}
 	public void add(NamedObject[] objs, boolean notify) {
-		for (NamedObject obj : objs) {
-			objects.add(obj);
-			obj.setModel(this);
+		for (int i = 0; i < objs.length; i++) {
+			objects.add(objs[i]);
+			objs[i].setModel(this);
 		}
 		if (notify)
 			fireModelChanged(objs, IModelListener.ADDED, "");
 	}
 	public void remove(NamedObject[] objs, boolean notify) {
-		for (NamedObject obj : objs) {
-			objects.remove(obj);
-			obj.setModel(null);
+		for (int i = 0; i < objs.length; i++) {
+			objects.remove(objs[i]);
+			objs[i].setModel(null);
 		}
 		if (notify)
 			fireModelChanged(objs, IModelListener.REMOVED, "");

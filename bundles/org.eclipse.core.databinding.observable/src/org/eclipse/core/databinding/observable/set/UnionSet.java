@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.Diffs;
@@ -132,19 +133,23 @@ public final class UnionSet<E> extends ObservableSet<E> {
 		Set<E> addsToFire = new HashSet<>();
 		Set<E> removesToFire = new HashSet<>();
 
-		for (E added : adds) {
+		for (Iterator<? extends E> iter = adds.iterator(); iter.hasNext();) {
+			E added = iter.next();
+
 			Integer refCount = refCounts.get(added);
 			if (refCount == null) {
-				refCounts.put(added, Integer.valueOf(1));
+				refCounts.put(added, new Integer(1));
 				addsToFire.add(added);
 			} else {
 				int refs = refCount.intValue();
-				refCount = Integer.valueOf(refs + 1);
+				refCount = new Integer(refs + 1);
 				refCounts.put(added, refCount);
 			}
 		}
 
-		for (E removed : removes) {
+		for (Iterator<? extends E> iter = removes.iterator(); iter.hasNext();) {
+			E removed = iter.next();
+
 			Integer refCount = refCounts.get(removed);
 			if (refCount != null) {
 				int refs = refCount.intValue();
@@ -152,7 +157,7 @@ public final class UnionSet<E> extends ObservableSet<E> {
 					removesToFire.add(removed);
 					refCounts.remove(removed);
 				} else {
-					refCount = Integer.valueOf(refCount.intValue() - 1);
+					refCount = new Integer(refCount.intValue() - 1);
 					refCounts.put(removed, refCount);
 				}
 			}
@@ -196,14 +201,16 @@ public final class UnionSet<E> extends ObservableSet<E> {
 	private ArrayList<E> incrementRefCounts(Collection<? extends E> added) {
 		ArrayList<E> adds = new ArrayList<>();
 
-		for (E next : added) {
+		for (Iterator<? extends E> iter = added.iterator(); iter.hasNext();) {
+			E next = iter.next();
+
 			Integer refCount = refCounts.get(next);
 			if (refCount == null) {
 				adds.add(next);
-				refCount = Integer.valueOf(1);
+				refCount = new Integer(1);
 				refCounts.put(next, refCount);
 			} else {
-				refCount = Integer.valueOf(refCount.intValue() + 1);
+				refCount = new Integer(refCount.intValue() + 1);
 				refCounts.put(next, refCount);
 			}
 		}

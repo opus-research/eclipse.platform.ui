@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -145,7 +144,7 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
         GridData buttonData = new GridData(GridData.FILL_HORIZONTAL);
         button.setLayoutData(buttonData);
 
-        button.setData(id);
+        button.setData(new Integer(id));
         button.setText(label);
         button.setFont(parent.getFont());
 
@@ -279,9 +278,9 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
         List input = new ArrayList();
         IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
                 .getProjects();
-        for (IProject project : projects) {
-            if (project.isOpen()) {
-				input.add(project);
+        for (int i = 0; i < projects.length; i++) {
+            if (projects[i].isOpen()) {
+				input.add(projects[i]);
 			}
         }
 
@@ -369,7 +368,10 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
 
                 // filter out the desired resource types
                 List<IResource> results = new ArrayList<>();
-                for (IResource resource : members) {
+                for (int i = 0; i < members.length; i++) {
+                    // And the test bits with the resource types to see if they
+                    // are what we want
+                    IResource resource = members[i];
                     if (!showLinkedResources && resource.isLinked()) {
                         continue;
                     }
@@ -486,8 +488,8 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
 
         if (newSelectedTypes != null) { // ie.- did not press Cancel
             this.selectedTypes = new ArrayList(newSelectedTypes.length);
-            for (Object newSelectedType : newSelectedTypes) {
-                this.selectedTypes.add(newSelectedType);
+            for (int i = 0; i < newSelectedTypes.length; i++) {
+                this.selectedTypes.add(newSelectedTypes[i]);
             }
             setupSelectionsBasedOnSelectedTypes();
         }
@@ -645,7 +647,8 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
             return;
         }
 
-        for (IResource resource : resources) {
+        for (int i = 0; i < resources.length; i++) {
+            IResource resource = resources[i];
             if (resource.getType() == IResource.FILE) {
                 if (hasExportableExtension(resource.getName())) {
                     hasFiles = true;

@@ -404,7 +404,8 @@ public final class KeyBindingService implements INestableKeyBindingService {
 					parentId = current.getParentId();
 				}
 			} catch (NotDefinedException e) {
-				WorkbenchPlugin.log(e);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}

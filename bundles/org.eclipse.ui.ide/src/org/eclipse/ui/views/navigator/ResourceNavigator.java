@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *     Remy Chi Jian Suen - bug 144102
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.views.navigator;
@@ -880,7 +879,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (memento != null) {
                 String sortStr = memento.getString(TAG_SORTER);
                 if (sortStr != null) {
-					sortInt = Integer.parseInt(sortStr);
+					sortInt = new Integer(sortStr).intValue();
 				}
             } else {
                 sortInt = settings.getInt(STORE_SORT_TYPE);
@@ -905,7 +904,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (memento != null) {
                 String sortStr = memento.getString(TAG_SORTER);
                 if (sortStr != null) {
-					sortInt = Integer.parseInt(sortStr);
+					sortInt = new Integer(sortStr).intValue();
 				}
             } else {
                 sortInt = settings.getInt(STORE_SORT_TYPE);
@@ -1023,12 +1022,14 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
                     && children[0].getString(TAG_IS_ENABLED) != null) {
                 ArrayList selectedFilters = new ArrayList();
                 ArrayList unSelectedFilters = new ArrayList();
-				for (IMemento memento : children) {
-					if (memento.getString(TAG_IS_ENABLED).equals(String.valueOf(true))) {
-						selectedFilters.add(memento.getString(TAG_ELEMENT));
+                for (int i = 0; i < children.length; i++) {
+                    if (children[i].getString(TAG_IS_ENABLED).equals(
+                            String.valueOf(true))) {
+						selectedFilters.add(children[i].getString(TAG_ELEMENT));
 					} else {
 						//enabled == false
-						unSelectedFilters.add(memento.getString(TAG_ELEMENT));
+                        unSelectedFilters.add(children[i]
+                                .getString(TAG_ELEMENT));
 					}
                 }
 
@@ -1082,8 +1083,10 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             IMemento childMem = memento.getChild(TAG_EXPANDED);
             if (childMem != null) {
                 ArrayList elements = new ArrayList();
-				for (IMemento mem : childMem.getChildren(TAG_ELEMENT)) {
-					Object element = container.findMember(mem.getString(TAG_PATH));
+                IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
+                for (int i = 0; i < elementMem.length; i++) {
+                    Object element = container.findMember(elementMem[i]
+                            .getString(TAG_PATH));
                     if (element != null) {
                         elements.add(element);
                     }
@@ -1093,8 +1096,10 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             childMem = memento.getChild(TAG_SELECTION);
             if (childMem != null) {
                 ArrayList list = new ArrayList();
-				for (IMemento mem : childMem.getChildren(TAG_ELEMENT)) {
-					Object element = container.findMember(mem.getString(TAG_PATH));
+                IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
+                for (int i = 0; i < elementMem.length; i++) {
+                    Object element = container.findMember(elementMem[i]
+                            .getString(TAG_PATH));
                     if (element != null) {
                         list.add(element);
                     }
@@ -1158,12 +1163,12 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             Object expandedElements[] = viewer.getVisibleExpandedElements();
             if (expandedElements.length > 0) {
                 IMemento expandedMem = memento.createChild(TAG_EXPANDED);
-                for (Object expandedElement : expandedElements) {
-                    if (expandedElement instanceof IResource) {
+                for (int i = 0; i < expandedElements.length; i++) {
+                    if (expandedElements[i] instanceof IResource) {
                         IMemento elementMem = expandedMem
                                 .createChild(TAG_ELEMENT);
                         elementMem.putString(TAG_PATH,
-                                ((IResource) expandedElement).getFullPath()
+                                ((IResource) expandedElements[i]).getFullPath()
                                         .toString());
                     }
                 }
@@ -1173,10 +1178,13 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
                     .toArray();
             if (elements.length > 0) {
                 IMemento selectionMem = memento.createChild(TAG_SELECTION);
-                for (Object selectionElement : elements) {
-                    if (selectionElement instanceof IResource) {
-						IMemento elementMem = selectionMem.createChild(TAG_ELEMENT);
-						elementMem.putString(TAG_PATH, ((IResource) selectionElement).getFullPath().toString());
+                for (int i = 0; i < elements.length; i++) {
+                    if (elements[i] instanceof IResource) {
+                        IMemento elementMem = selectionMem
+                                .createChild(TAG_ELEMENT);
+                        elementMem.putString(TAG_PATH,
+                                ((IResource) elements[i]).getFullPath()
+                                        .toString());
                     }
                 }
             }

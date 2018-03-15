@@ -14,12 +14,17 @@ import com.ibm.icu.text.Collator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+
 import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -149,22 +154,30 @@ public class DecoratorsPreferencePage extends PreferencePage implements
         });
 
         checkboxViewer
-                .addSelectionChangedListener(event -> {
-				    if (event.getSelection() instanceof IStructuredSelection) {
-				        IStructuredSelection sel = (IStructuredSelection) event
-				                .getSelection();
-				        DecoratorDefinition definition = (DecoratorDefinition) sel
-				                .getFirstElement();
-				        if (definition == null) {
-							clearDescription();
-						} else {
-							showDescription(definition);
-						}
-				    }
-				});
+                .addSelectionChangedListener(new ISelectionChangedListener() {
+                    @Override
+					public void selectionChanged(SelectionChangedEvent event) {
+                        if (event.getSelection() instanceof IStructuredSelection) {
+                            IStructuredSelection sel = (IStructuredSelection) event
+                                    .getSelection();
+                            DecoratorDefinition definition = (DecoratorDefinition) sel
+                                    .getFirstElement();
+                            if (definition == null) {
+								clearDescription();
+							} else {
+								showDescription(definition);
+							}
+                        }
+                    }
+                });
 
-        checkboxViewer.addCheckStateListener(event -> checkboxViewer.setSelection(new StructuredSelection(event
-		        .getElement())));
+        checkboxViewer.addCheckStateListener(new ICheckStateListener() {
+            @Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+                checkboxViewer.setSelection(new StructuredSelection(event
+                        .getElement()));
+            }
+        });
     }
 
     /**
@@ -197,8 +210,8 @@ public class DecoratorsPreferencePage extends PreferencePage implements
     private void populateDecorators() {
         DecoratorDefinition[] definitions = getAllDefinitions();
         checkboxViewer.setInput(definitions);
-        for (DecoratorDefinition definition : definitions) {
-            checkboxViewer.setChecked(definition, definition
+        for (int i = 0; i < definitions.length; i++) {
+            checkboxViewer.setChecked(definitions[i], definitions[i]
                     .isEnabled());
         }
     }
@@ -234,9 +247,12 @@ public class DecoratorsPreferencePage extends PreferencePage implements
     @Override
 	protected void performDefaults() {
         super.performDefaults();
-		DecoratorManager manager = WorkbenchPlugin.getDefault().getDecoratorManager();
-		for (DecoratorDefinition definition : manager.getAllDecoratorDefinitions()) {
-            checkboxViewer.setChecked(definition, definition
+        DecoratorManager manager = WorkbenchPlugin.getDefault()
+				.getDecoratorManager();
+        DecoratorDefinition[] definitions = manager
+                .getAllDecoratorDefinitions();
+        for (int i = 0; i < definitions.length; i++) {
+            checkboxViewer.setChecked(definitions[i], definitions[i]
                     .getDefaultValue());
         }
     }
@@ -250,9 +266,11 @@ public class DecoratorsPreferencePage extends PreferencePage implements
             DecoratorManager manager = getDecoratorManager();
             //Clear the caches first to avoid unneccessary updates
             manager.clearCaches();
-			for (DecoratorDefinition definition : manager.getAllDecoratorDefinitions()) {
-                boolean checked = checkboxViewer.getChecked(definition);
-                definition.setEnabled(checked);
+            DecoratorDefinition[] definitions = manager
+                    .getAllDecoratorDefinitions();
+            for (int i = 0; i < definitions.length; i++) {
+                boolean checked = checkboxViewer.getChecked(definitions[i]);
+                definitions[i].setEnabled(checked);
 
             }
             //Have the manager clear again as there may have been

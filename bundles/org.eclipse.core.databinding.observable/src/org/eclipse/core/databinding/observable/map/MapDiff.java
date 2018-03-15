@@ -53,14 +53,16 @@ public abstract class MapDiff<K, V> implements IDiff {
 	 * @since 1.2
 	 */
 	public void applyTo(Map<K, V> map) {
-		for (K key : getAddedKeys()) {
+		for (Iterator<? extends K> it = getAddedKeys().iterator(); it.hasNext();) {
+			K key = it.next();
 			map.put(key, getNewValue(key));
 		}
-		for (K key : getChangedKeys()) {
+		for (Iterator<? extends K> it = getChangedKeys().iterator(); it.hasNext();) {
+			K key = it.next();
 			map.put(key, getNewValue(key));
 		}
-		for (K name : getRemovedKeys()) {
-			map.remove(name);
+		for (Iterator<? extends K> it = getRemovedKeys().iterator(); it.hasNext();) {
+			map.remove(it.next());
 		}
 	}
 

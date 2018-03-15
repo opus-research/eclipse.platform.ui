@@ -324,7 +324,9 @@ public abstract class ResourceManager {
         RuntimeException foundException = null;
 
         Runnable[] execs = disposeExecs.toArray(new Runnable[disposeExecs.size()]);
-        for (Runnable exec : execs) {
+        for (int i = 0; i < execs.length; i++) {
+            Runnable exec = execs[i];
+
             try {
                 exec.run();
             } catch (RuntimeException e) {

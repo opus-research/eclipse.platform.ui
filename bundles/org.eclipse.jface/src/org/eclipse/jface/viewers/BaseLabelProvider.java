@@ -64,8 +64,8 @@ public class BaseLabelProvider extends EventManager implements IBaseLabelProvide
 	 */
 	protected void fireLabelProviderChanged(final LabelProviderChangedEvent event) {
 		Object[] listeners = getListeners();
-		for (Object listener : listeners) {
-			final ILabelProviderListener l = (ILabelProviderListener) listener;
+		for (int i = 0; i < listeners.length; ++i) {
+			final ILabelProviderListener l = (ILabelProviderListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {

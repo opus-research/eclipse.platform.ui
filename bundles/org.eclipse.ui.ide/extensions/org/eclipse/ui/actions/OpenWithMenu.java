@@ -23,7 +23,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -244,7 +243,8 @@ public class OpenWithMenu extends ContributionItem {
         //if the same editor goes to two mappings.
 		List<IEditorDescriptor> alreadyMapped = new ArrayList<>();
 
-		for (IEditorDescriptor editor : editors) {
+        for (int i = 0; i < editors.length; i++) {
+			IEditorDescriptor editor= editors[i];
             if (!alreadyMapped.contains(editor)) {
                 createMenuItem(menu, editor, preferredEditor);
 				if (defaultEditor != null && editor.getId().equals(defaultEditor.getId())) {
@@ -343,20 +343,17 @@ public class OpenWithMenu extends ContributionItem {
 		menuItem.setSelection(markAsSelected);
         menuItem.setText(IDEWorkbenchMessages.DefaultEditorDescription_name);
 
-
         Listener listener = event -> {
 		    switch (event.type) {
 		    case SWT.Selection:
 		        if (menuItem.getSelection()) {
 		            IDE.setDefaultEditor(file, null);
 		            try {
-						openEditor(IDE.getEditorDescriptor(file, true, true), false);
+		                openEditor(IDE.getEditorDescriptor(file), false);
 		            } catch (PartInitException e) {
 		                DialogUtil.openError(page.getWorkbenchWindow()
 		                        .getShell(), IDEWorkbenchMessages.OpenWithMenu_dialogTitle,
 		                        e.getMessage(), e);
-					} catch (OperationCanceledException ex) {
-
 		            }
 		        }
 		        break;

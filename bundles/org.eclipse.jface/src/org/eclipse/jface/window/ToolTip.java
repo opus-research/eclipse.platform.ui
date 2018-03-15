@@ -379,8 +379,8 @@ public abstract class ToolTip {
 
 				// Search on which monitor the event occurred
 				Rectangle tmp;
-				for (Monitor element : ms) {
-					tmp = element.getBounds();
+				for (int i = 0; i < ms.length; i++) {
+					tmp = ms[i].getBounds();
 					if (tmp.contains(p)) {
 						bounds = tmp;
 						break;
@@ -481,8 +481,8 @@ public abstract class ToolTip {
 
 		if (c instanceof Composite) {
 			Control[] children = ((Composite) c).getChildren();
-			for (Control element : children) {
-				toolTipHookByTypeRecursively(element, add, type);
+			for (int i = 0; i < children.length; i++) {
+				toolTipHookByTypeRecursively(children[i], add, type);
 			}
 		}
 	}
@@ -493,8 +493,8 @@ public abstract class ToolTip {
 
 		if (c instanceof Composite) {
 			Control[] children = ((Composite) c).getChildren();
-			for (Control element : children) {
-				toolTipHookBothRecursively(element);
+			for (int i = 0; i < children.length; i++) {
+				toolTipHookBothRecursively(children[i]);
 			}
 		}
 	}
