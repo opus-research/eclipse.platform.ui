@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 486583
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
