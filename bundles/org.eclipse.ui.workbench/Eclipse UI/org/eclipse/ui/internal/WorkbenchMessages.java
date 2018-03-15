@@ -255,7 +255,6 @@ public class WorkbenchMessages extends NLS {
 	public static String ResetPerspective_text;
 	public static String ResetPerspective_toolTip;
 	public static String ResetPerspective_message;
-	public static String ResetPerspective_buttonLabel;
 	public static String ResetPerspective_title;
 	public static String RevertPerspective_note;
 

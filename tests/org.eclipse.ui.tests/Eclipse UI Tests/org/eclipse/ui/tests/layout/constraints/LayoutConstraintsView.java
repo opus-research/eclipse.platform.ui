@@ -149,7 +149,7 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
         quantizedHeight = getInt(quantizedHeightText);
         fixedArea = getInt(fixedAreaText);
 
-        StringBuilder result = new StringBuilder();
+        StringBuffer result = new StringBuffer();
         result.append("// Sample implementation: Make sure your ViewPart adapts to ISizeProvider.\n");
         result.append("// Then implement the following two methods.\n\n");
         sampleImplementation.setText(result.toString() +
@@ -194,7 +194,7 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
     }
 
     public String getSizeFlagsString() {
-        StringBuilder result = new StringBuilder();
+        StringBuffer result = new StringBuffer();
         result.append("/* (non-Javadoc)\n");
         result.append(" * @see org.eclipse.ui.ISizeProvider#getSizeFlags(boolean)\n");
         result.append(" */\n");
@@ -330,7 +330,7 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
     }
 
     private String computePreferredSizeString() {
-        StringBuilder result = new StringBuilder();
+        StringBuffer result = new StringBuffer();
         result.append("/* (non-Javadoc)\n");
         result.append(" * @see org.eclipse.ui.ISizeProvider#computePreferredSize(boolean, int, int, int)\n");
         result.append(" */\n");

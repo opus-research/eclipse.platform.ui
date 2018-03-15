@@ -180,7 +180,7 @@ public class PropertySheetAuto extends UITestCase {
 
         @Override
 		public String toString() {
-            StringBuilder s = new StringBuilder();
+            StringBuffer s = new StringBuffer();
             s.append("<");
             if (modelYear != 0) {
                 s.append(modelYear);
