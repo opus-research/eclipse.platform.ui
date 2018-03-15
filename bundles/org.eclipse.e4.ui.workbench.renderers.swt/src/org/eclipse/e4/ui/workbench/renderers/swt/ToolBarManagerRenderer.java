@@ -458,7 +458,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 */
 	private boolean processAddition(final MToolBar toolbarModel, final ToolBarManager manager,
 			MToolBarContribution contribution) {
-		final ToolBarContributionRecord record = new ToolBarContributionRecord(toolbarModel, contribution, this);
+		final ToolBarContributionRecord record = new ToolBarContributionRecord(application, toolbarModel, contribution,
+				this);
 		if (!record.mergeIntoModel()) {
 			return false;
 		}
