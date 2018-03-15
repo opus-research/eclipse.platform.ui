@@ -156,16 +156,13 @@ public class ToolBarContributionRecord {
 		}
 
 		for (MToolBarElement child : childrenToInspect) {
-			if (hasVisibleWhen(child)) {
+			if (child.getVisibleWhen() != null
+					|| child.getPersistedState().get(
+							MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null) {
 				return true;
 			}
 		}
 		return false;
-	}
-
-	private boolean hasVisibleWhen(MToolBarElement toolBarElement) {
-		return toolBarElement.getVisibleWhen() != null
-				|| toolBarElement.getPersistedState().get(MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null;
 	}
 
 	public boolean mergeIntoModel() {
@@ -189,7 +186,7 @@ public class ToolBarContributionRecord {
 		for (MToolBarElement copy : copyElements) {
 			// if a visibleWhen clause is defined, the item should not be
 			// visible until the clause has been evaluated and returned 'true'
-			copy.setVisible(!hasVisibleWhen(copy));
+			copy.setVisible(!anyVisibleWhen());
 			if (copy instanceof MToolBarSeparator) {
 				MToolBarSeparator shared = findExistingSeparator(copy
 						.getElementId());
