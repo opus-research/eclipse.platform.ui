@@ -577,6 +577,9 @@
       <keyword
             id="org.eclipse.ui.ide.unassociated"
             label="%PreferenceKeywords.unassociated"/>
+      <keyword
+            id="org.eclipse.ui.ide.save"
+            label="%PreferenceKeywords.Save"/>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -608,6 +611,15 @@
          <keywordReference id="org.eclipse.ui.ide.recentlyOpened"/>
          <keywordReference id="org.eclipse.ui.ide.restore"/>
          <keywordReference id="org.eclipse.ui.ide.state"/>
+      </page>
+      <page
+            name="%PreferencePages.AutoSave"
+            category="org.eclipse.ui.preferencePages.Editors"
+            class="org.eclipse.ui.internal.ide.dialogs.AutoSavePreferencePage"
+            id="org.eclipse.ui.preferencePages.AutoSave">
+         <keywordReference id="org.eclipse.ui.ide.editors"/>
+         <keywordReference id="org.eclipse.ui.ide.dirty"/>
+         <keywordReference id="org.eclipse.ui.ide.save"/>
       </page>
       <page
             name="%PreferencePages.Perspectives"
@@ -1197,6 +1209,20 @@
             contextId="org.eclipse.ui.contexts.dialogAndWindow"
             sequence="M2+M3+F3"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
+      <key
+            commandId="org.eclipse.ui.window.fullscreenmode"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="win32"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+F11">
+      </key>
+      <key
+            commandId="org.eclipse.ui.window.fullscreenmode"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="gtk"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+F11">
+      </key>
    </extension>
 
    <extension
@@ -2480,7 +2506,14 @@
             label="%askUserViaPopup">
       </strategy>
    </extension>
-
+   <extension
+         id="org.eclipse.ui.ide.autoSave"
+         point="org.eclipse.e4.workbench.model">
+      <fragment
+            apply="notexists"
+            uri="model/fragment.e4xmi">
+      </fragment>
+   </extension>
    <!-- Smart Import -->
    <extension
          point="org.eclipse.ui.menus">
@@ -2508,6 +2541,14 @@
 					</iterate>
 				</with>
 	       	  </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ui.appearance?after=org.eclipse.ui.ToggleCoolbarAction">
+         <command
+               commandId="org.eclipse.ui.window.fullscreenmode"
+               style="push">
          </command>
       </menuContribution>
    </extension>
