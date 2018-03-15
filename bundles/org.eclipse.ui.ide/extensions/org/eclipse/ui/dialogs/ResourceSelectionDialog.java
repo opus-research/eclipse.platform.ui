@@ -139,10 +139,10 @@ public class ResourceSelectionDialog extends SelectionDialog {
                 getResourceProvider(IResource.FOLDER | IResource.PROJECT
                         | IResource.ROOT), WorkbenchLabelProvider
                         .getDecoratingWorkbenchLabelProvider(),
-				new ResourceComparator(ResourceComparator.NAME),
+                        new ResourceComparator(ResourceComparator.NAME),
                 getResourceProvider(IResource.FILE), WorkbenchLabelProvider
-						.getDecoratingWorkbenchLabelProvider(),
-				new ResourceComparator(ResourceComparator.NAME), SWT.NONE,
+                        .getDecoratingWorkbenchLabelProvider(),
+                        new ResourceComparator(ResourceComparator.NAME),SWT.NONE,
                 // since this page has no other significantly-sized
                 // widgets we need to hardcode the combined widget's
                 // size, otherwise it will open too small

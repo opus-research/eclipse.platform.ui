@@ -147,25 +147,18 @@ public class MenuHelper {
 		return getIconURI(imageDescriptor, null);
 	}
 
-	private static URL getUrl(Class<?> idc, ImageDescriptor imageDescriptor) {
+	private static String getUrl(Class<? extends ImageDescriptor> idc, ImageDescriptor imageDescriptor) {
 		try {
 			if (urlField == null) {
 				urlField = idc.getDeclaredField("url"); //$NON-NLS-1$
 				urlField.setAccessible(true);
 			}
-			return (URL) urlField.get(imageDescriptor);
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Object value = urlField.get(imageDescriptor);
+			if (value != null) {
+				return value.toString();
+			}
+		} catch (SecurityException | NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
+			WorkbenchPlugin.log(e);
 		}
 		return null;
 	}
@@ -177,11 +170,7 @@ public class MenuHelper {
 				locationField.setAccessible(true);
 			}
 			return (Class<?>) locationField.get(imageDescriptor);
-		} catch (SecurityException e) {
-			WorkbenchPlugin.log(e);
-		} catch (NoSuchFieldException e) {
-			WorkbenchPlugin.log(e);
-		} catch (IllegalAccessException e) {
+		} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
 			WorkbenchPlugin.log(e);
 		}
 		return null;
@@ -194,11 +183,7 @@ public class MenuHelper {
 				nameField.setAccessible(true);
 			}
 			return (String) nameField.get(imageDescriptor);
-		} catch (SecurityException e) {
-			WorkbenchPlugin.log(e);
-		} catch (NoSuchFieldException e) {
-			WorkbenchPlugin.log(e);
-		} catch (IllegalAccessException e) {
+		} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
 			WorkbenchPlugin.log(e);
 		}
 		return null;
@@ -270,14 +255,9 @@ public class MenuHelper {
 					// visWhenMap.put(configElement, visWhen);
 				}
 			}
-		} catch (InvalidRegistryObjectException e) {
+		} catch (InvalidRegistryObjectException | CoreException e) {
 			// visWhenMap.put(configElement, null);
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CoreException e) {
-			// visWhenMap.put(configElement, null);
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			WorkbenchPlugin.log(e);
 		}
 		return null;
 	}
@@ -1121,8 +1101,8 @@ public class MenuHelper {
 		// Attempt to retrieve URIs from the descriptor and convert into a more
 		// durable form in case it's to be persisted
 		if (descriptor.getClass().toString().endsWith("URLImageDescriptor")) { //$NON-NLS-1$
-			URL url = getUrl(descriptor.getClass(), descriptor);
-			return rewriteDurableURL(url.toExternalForm());
+			String url = getUrl(descriptor.getClass(), descriptor);
+			return rewriteDurableURL(url);
 		} else if (descriptor.getClass().toString().endsWith("FileImageDescriptor")) { //$NON-NLS-1$
 			Class<?> sourceClass = getLocation(descriptor);
 			if (sourceClass == null) {
