@@ -12,6 +12,8 @@
 
 package org.eclipse.jface.dialogs;
 
+import java.util.Map;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -115,6 +117,55 @@ public class MessageDialogWithToggle extends MessageDialog {
         dialog.open();
         return dialog;
     }
+
+	/**
+	 * Convenience method to open a simple dialog as specified by the
+	 * <code>kind</code> flag, with a "don't show again' toggle.
+	 *
+	 * @param kind
+	 *            the kind of dialog to open, one of {@link #ERROR},
+	 *            {@link #INFORMATION}, {@link #QUESTION}, {@link #WARNING},
+	 *            {@link #CONFIRM}, or {#QUESTION_WITH_CANCEL}.
+	 * @param parent
+	 *            the parent shell of the dialog, or <code>null</code> if none
+	 * @param title
+	 *            the dialog's title, or <code>null</code> if none
+	 * @param message
+	 *            the message
+	 * @param toggleMessage
+	 *            the message for the toggle control, or <code>null</code> for
+	 *            the default message
+	 * @param toggleState
+	 *            the initial state for the toggle
+	 * @param store
+	 *            the IPreference store in which the user's preference should be
+	 *            persisted; <code>null</code> if you don't want it persisted
+	 *            automatically.
+	 * @param key
+	 *            the key to use when persisting the user's preference;
+	 *            <code>null</code> if you don't want it persisted.
+	 * @param style
+	 *            {@link SWT#NONE} for a default dialog, or {@link SWT#SHEET}
+	 *            for a dialog with sheet behavior
+	 * @param buttonLabelToIdMap
+	 *            map with button labels and ids
+	 * @return the dialog, after being closed by the user, which the client can
+	 *         only call <code>getReturnCode()</code> or
+	 *         <code>getToggleState()</code>
+	 * @since 3.5
+	 */
+	public static MessageDialogWithToggle open(int kind, Shell parent, String title, String message,
+			String toggleMessage, boolean toggleState, IPreferenceStore store, String key, int style,
+			Map<String, Integer> buttonLabelToIdMap) {
+		MessageDialogWithToggle dialog = new MessageDialogWithToggle(parent,
+				title, null, message, kind, buttonLabelToIdMap, 0, toggleMessage, false);
+		style &= SWT.SHEET;
+		dialog.setShellStyle(dialog.getShellStyle() | style);
+		dialog.prefStore = store;
+		dialog.prefKey = key;
+		dialog.open();
+		return dialog;
+	}
 
     /**
      * Convenience method to open a standard error dialog.
@@ -340,6 +391,11 @@ public class MessageDialogWithToggle extends MessageDialog {
      */
     private boolean toggleState;
 
+	/**
+	 * The mapping for custom buttons and ids
+	 */
+	private Map<String, Integer> dialogButtonIdMapping;
+
     /**
      * Creates a message dialog with a toggle. See the superclass constructor
      * for info on the other parameters.
@@ -386,6 +442,53 @@ public class MessageDialogWithToggle extends MessageDialog {
         this.toggleState = toggleState;
         setButtonLabels(dialogButtonLabels);
     }
+
+	/**
+	 * Creates a message dialog with a toggle. See the superclass constructor
+	 * for info on the other parameters.
+	 *
+	 * @param parentShell
+	 *            the parent shell
+	 * @param dialogTitle
+	 *            the dialog title, or <code>null</code> if none
+	 * @param image
+	 *            the dialog title image, or <code>null</code> if none
+	 * @param message
+	 *            the dialog message
+	 * @param dialogImageType
+	 *            one of the following values:
+	 *            <ul>
+	 *            <li><code>MessageDialog.NONE</code> for a dialog with no
+	 *            image</li>
+	 *            <li><code>MessageDialog.ERROR</code> for a dialog with an
+	 *            error image</li>
+	 *            <li><code>MessageDialog.INFORMATION</code> for a dialog with
+	 *            an information image</li>
+	 *            <li><code>MessageDialog.QUESTION </code> for a dialog with a
+	 *            question image</li>
+	 *            <li><code>MessageDialog.WARNING</code> for a dialog with a
+	 *            warning image</li>
+	 *            </ul>
+	 * @param buttonLabelToIdMap
+	 *            map with button labels and ids
+	 * @param defaultIndex
+	 *            the index in the button label array of the default button
+	 * @param toggleMessage
+	 *            the message for the toggle control, or <code>null</code> for
+	 *            the default message
+	 * @param toggleState
+	 *            the initial state for the toggle
+	 *
+	 */
+	public MessageDialogWithToggle(Shell parentShell, String dialogTitle, Image image, String message,
+			int dialogImageType, Map<String, Integer> buttonLabelToIdMap, int defaultIndex,
+			String toggleMessage, boolean toggleState) {
+		super(parentShell, dialogTitle, image, message, dialogImageType, defaultIndex,
+				buttonLabelToIdMap.keySet().toArray(new String[buttonLabelToIdMap.size()]));
+		this.toggleMessage = toggleMessage;
+		this.toggleState = toggleState;
+		this.dialogButtonIdMapping = buttonLabelToIdMap;
+	}
 
     /**
      * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
@@ -447,7 +550,7 @@ public class MessageDialogWithToggle extends MessageDialog {
 	protected Control createDialogArea(Composite parent) {
         Composite dialogAreaComposite = (Composite) super
                 .createDialogArea(parent);
-        setToggleButton(createToggleButton(dialogAreaComposite));
+		setToggleButton(createToggleButton(dialogAreaComposite));
         return dialogAreaComposite;
     }
 
@@ -620,6 +723,11 @@ public class MessageDialogWithToggle extends MessageDialog {
      * @return the id for the specified button label
      */
     private int mapButtonLabelToButtonID(String buttonLabel, int defaultId) {
+
+		if (dialogButtonIdMapping != null && dialogButtonIdMapping.containsKey(buttonLabel)) {
+			return dialogButtonIdMapping.get(buttonLabel);
+		}
+
     	// Not pretty but does the job...
     	if (IDialogConstants.OK_LABEL.equals(buttonLabel)) {
 			return IDialogConstants.OK_ID;
