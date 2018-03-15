@@ -31,9 +31,6 @@ public class QuickAccessDialogTest extends UITestCase {
 
 	private SearchField searchField;
 
-	// As defined in QuickAccessDialog and in SearchField
-	private static final int MAXIMUM_NUMBER_OF_ELEMENTS = 60;
-
 	/**
 	 * @param testName
 	 */
@@ -111,7 +108,7 @@ public class QuickAccessDialogTest extends UITestCase {
 		}, 200);
 		int oldCount = table.getItemCount();
 		assertTrue("Not enough quick access items for simple filter", oldCount > 3);
-		assertTrue("Too many quick access items for size of table", oldCount < MAXIMUM_NUMBER_OF_ELEMENTS);
+		assertTrue("Too many quick access items for size of table", oldCount < 30);
 		final String oldFirstItemText = table.getItem(0).getText(1);
 
 		text.setText("E");
@@ -125,7 +122,7 @@ public class QuickAccessDialogTest extends UITestCase {
 		assertNotSame("The quick access items should have changed", newFirstItemText, oldFirstItemText);
 		int newCount = table.getItemCount();
 		assertTrue("Not enough quick access items for simple filter", newCount > 3);
-		assertTrue("Too many quick access items for size of table", newCount < MAXIMUM_NUMBER_OF_ELEMENTS);
+		assertTrue("Too many quick access items for size of table", newCount < 30);
 
 	}
 
@@ -157,7 +154,7 @@ public class QuickAccessDialogTest extends UITestCase {
 		}, 200);
 		final int oldCount = table.getItemCount();
 		assertTrue("Not enough quick access items for simple filter", oldCount > 3);
-		assertTrue("Too many quick access items for size of table", oldCount < MAXIMUM_NUMBER_OF_ELEMENTS);
+		assertTrue("Too many quick access items for size of table", oldCount < 30);
 		final String oldFirstItemText = table.getItem(0).getText(1);
 
 		// Run the handler to turn on show all
