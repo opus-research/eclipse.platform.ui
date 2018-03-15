@@ -115,7 +115,7 @@ public class SelectPerspectiveDialog extends Dialog implements
     @Override
 	protected void createButtonsForButtonBar(Composite parent) {
         okButton = createButton(parent, IDialogConstants.OK_ID,
-				WorkbenchMessages.SelectPerspective_open_button_label, true);
+                IDialogConstants.OK_LABEL, true);
         createButton(parent, IDialogConstants.CANCEL_ID,
                 IDialogConstants.CANCEL_LABEL, false);
         updateButtons();
