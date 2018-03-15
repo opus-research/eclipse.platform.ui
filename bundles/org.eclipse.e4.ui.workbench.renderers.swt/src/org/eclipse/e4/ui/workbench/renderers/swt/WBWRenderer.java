@@ -572,11 +572,6 @@ public class WBWRenderer extends SWTPartRenderer {
 			shell.addControlListener(new ControlListener() {
 				@Override
 				public void controlResized(ControlEvent e) {
-					// Don't store the maximized size in the model
-					if (shell.getMaximized()) {
-						return;
-					}
-
 					try {
 						ignoreSizeChanges = true;
 						w.setWidth(shell.getSize().x);
