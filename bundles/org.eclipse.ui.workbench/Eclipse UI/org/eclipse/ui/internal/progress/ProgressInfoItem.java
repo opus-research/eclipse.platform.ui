@@ -86,8 +86,6 @@ public class ProgressInfoItem extends Composite {
 
 	static String DEFAULT_JOB_KEY = "org.eclipse.ui.internal.progress.PROGRESS_DEFAULT"; //$NON-NLS-1$
 
-	static String DARK_COLOR_KEY = "org.eclipse.ui.internal.progress.PROGRESS_DARK_COLOR"; //$NON-NLS-1$
-
 	JobTreeElement info;
 
 	Label progressLabel;
@@ -129,8 +127,6 @@ public class ProgressInfoItem extends Composite {
 
 	IndexListener indexListener;
 
-	private int currentIndex;
-
 	private boolean selected;
 
 	private MouseAdapter mouseListener;
@@ -142,8 +138,6 @@ public class ProgressInfoItem extends Composite {
 	private Link link;
 
 	private HandlerChangeTracker tracker;
-
-	private boolean isThemed;
 
 	static {
 		JFaceResources
@@ -180,19 +174,6 @@ public class ProgressInfoItem extends Composite {
 						DISABLED_CLEAR_FINISHED_JOB_KEY,
 						WorkbenchImages
 								.getWorkbenchImageDescriptor("dlcl16/progress_rem.png")); //$NON-NLS-1$
-
-		// Mac has different Gamma value
-		int shift = Util.isMac() ? -25 : -10;
-
-		Color lightColor = PlatformUI.getWorkbench().getDisplay()
-				.getSystemColor(SWT.COLOR_LIST_BACKGROUND);
-
-		// Determine a dark color by shifting the list color
-		RGB darkRGB = new RGB(Math.max(0, lightColor.getRed() + shift), Math
-				.max(0, lightColor.getGreen() + shift), Math.max(0, lightColor
-				.getBlue()
-				+ shift));
-		JFaceResources.getColorRegistry().put(DARK_COLOR_KEY, darkRGB);
 	}
 
 	/**
@@ -207,7 +188,6 @@ public class ProgressInfoItem extends Composite {
 			JobTreeElement progressInfo) {
 		super(parent, style);
 		info = progressInfo;
-		isThemed = PlatformUI.getWorkbench().getCustomThemeFlag();
 		setData(info);
 		setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 		createChildren();
@@ -577,7 +557,7 @@ public class ProgressInfoItem extends Composite {
 				}
 
 			}
-			setColor(currentIndex);
+			setColor();
 		}
 
 		// Remove completed tasks
@@ -910,13 +890,9 @@ public class ProgressInfoItem extends Composite {
 	}
 
 	/**
-	 * Set the color base on the index
-	 *
-	 * @param i
+	 * Set color if item is selected
 	 */
-	public void setColor(int i) {
-		currentIndex = i;
-
+	public void setColor() {
 		if (selected) {
 			setAllBackgrounds(getDisplay().getSystemColor(
 					SWT.COLOR_LIST_SELECTION));
@@ -924,20 +900,10 @@ public class ProgressInfoItem extends Composite {
 					SWT.COLOR_LIST_SELECTION_TEXT));
 			return;
 		}
-
-		if (!isThemed) {
-			if (i % 2 == 0) {
-				setAllBackgrounds(JFaceResources.getColorRegistry().get(DARK_COLOR_KEY));
-			} else {
-				setAllBackgrounds(getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			}
-			setAllForegrounds(getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND));
-		}
-
 	}
 
 	/**
-	 * Set the foreground of all widgets to the supplied color.
+	 * Set the foreground of all widgets to the supplied color. e
 	 *
 	 * @param color
 	 */
@@ -989,7 +955,7 @@ public class ProgressInfoItem extends Composite {
 			setButtonFocus();
 		}
 		selected = select;
-		setColor(currentIndex);
+		setColor();
 	}
 
 	/**
