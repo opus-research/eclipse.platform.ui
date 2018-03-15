@@ -82,6 +82,9 @@ public class MinMaxAddon {
 	@Inject
 	private IEclipseContext context;
 
+	@Inject
+	private EPartService partService;
+
 	// Allow 'local' changes to the tags
 	private boolean ignoreTagChanges = false;
 
@@ -630,8 +633,6 @@ public class MinMaxAddon {
 		adjustCTFButtons(element);
 		// Activate a part other than the trimStack so that if the tool item is pressed
 		// immediately it will still open the stack.
-		MWindow win = MinMaxAddonUtil.getWindowFor(element);
-		EPartService partService = win.getContext().get(EPartService.class);
 		partService.requestActivation();
 	}
 
@@ -898,7 +899,6 @@ public class MinMaxAddon {
 		MinMaxAddonUtil.unzoomStackOfMinMaxChildrenArea(this, element);
 
 		// There are more views available to be active...
-		EPartService partService = win.getContext().get(EPartService.class);
 		partService.requestActivation();
 	}
 
