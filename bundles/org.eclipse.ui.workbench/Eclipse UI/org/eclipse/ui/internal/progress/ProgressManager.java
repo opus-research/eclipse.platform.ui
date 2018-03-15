@@ -61,6 +61,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IPreferenceConstants;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -442,6 +443,9 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 			@Override
 			public void done(IJobChangeEvent event) {
+				if (!PlatformUI.isWorkbenchRunning()) {
+					return;
+				}
 				Iterator<IJobBusyListener> startListeners = busyListenersForJob(event.getJob()).iterator();
 				while (startListeners.hasNext()) {
 					IJobBusyListener next = startListeners.next();
@@ -590,9 +594,14 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	public IProgressMonitor getDefaultMonitor() {
 		// only need a default monitor for operations the UI thread
 		// and only if there is a display
-		Display display = Display.getDefault();
-		if (!display.isDisposed() && (display.getThread() == Thread.currentThread())) {
-			return new EventLoopProgressMonitor(new NullProgressMonitor());
+		Display display;
+		if (PlatformUI.isWorkbenchRunning()
+				&& !PlatformUI.getWorkbench().isStarting()) {
+			display = PlatformUI.getWorkbench().getDisplay();
+			if (!display.isDisposed()
+					&& (display.getThread() == Thread.currentThread())) {
+				return new EventLoopProgressMonitor(new NullProgressMonitor());
+			}
 		}
 		return super.getDefaultMonitor();
 	}
@@ -865,8 +874,12 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	private void busyCursorWhile(Runnable dialogWaitRunnable, ProgressMonitorJobsDialog dialog) {
 		// Create the job that will open the dialog after a delay.
 		scheduleProgressMonitorJob(dialog);
+		final Display display = PlatformUI.getWorkbench().getDisplay();
+		if (display == null) {
+			return;
+		}
 		// Show a busy cursor until the dialog opens.
-		BusyIndicator.showWhile(Display.getDefault(), dialogWaitRunnable);
+		BusyIndicator.showWhile(display, dialogWaitRunnable);
 	}
 
 	/**
@@ -1066,7 +1079,8 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 *            the state the windows will be set to
 	 */
 	private void setUserInterfaceActive(boolean active) {
-		Shell[] shells = Display.getDefault().getShells();
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		Shell[] shells = workbench.getDisplay().getShells();
 		if (active) {
 			for (int i = 0; i < shells.length; i++) {
 				if (!shells[i].isDisposed()) {
@@ -1103,9 +1117,6 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 * @return <code>true</code> if the dialog should not be shown
 	 */
 	private boolean shouldRunInBackground() {
-		if (!PlatformUI.isWorkbenchRunning()) {
-			return false;
-		}
 		return WorkbenchPlugin.getDefault().getPreferenceStore().getBoolean(
 				IPreferenceConstants.RUN_IN_BACKGROUND);
 	}
@@ -1157,9 +1168,8 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		 * @return the monitor on the event loop
 		 */
 		private IProgressMonitor getEventLoopMonitor() {
-			if (PlatformUI.isWorkbenchRunning() && PlatformUI.getWorkbench().isStarting()) {
+			if (PlatformUI.getWorkbench().isStarting())
 				return new NullProgressMonitor();
-			}
 
 			return new EventLoopProgressMonitor(new NullProgressMonitor()) {
 				@Override
