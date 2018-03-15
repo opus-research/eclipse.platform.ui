@@ -1276,7 +1276,7 @@ public class FormText extends Canvas {
 				int linkCount = model.getHyperlinkCount();
 				Object[] children = new Object[linkCount];
 				for (int i = 0; i < linkCount; i++) {
-					children[i] = Integer.valueOf(i);
+					children[i] = new Integer(i);
 				}
 				e.children = children;
 			}
