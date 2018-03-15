@@ -157,8 +157,8 @@ public final class ContextManager extends HandleObjectManager implements IContex
 		}
 
 		final Object[] listeners = getListeners();
-		for (Object listener2 : listeners) {
-			final IContextManagerListener listener = (IContextManagerListener) listener2;
+		for (int i = 0; i < listeners.length; i++) {
+			final IContextManagerListener listener = (IContextManagerListener) listeners[i];
 			listener.contextManagerChanged(event);
 		}
 	}

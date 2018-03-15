@@ -76,9 +76,9 @@ public class BindingStatus extends MultiStatus {
 		if (array == null)
 			return 0;
 		int result = 1;
-		for (Object element : array) {
+		for (int index = 0; index < array.length; index++) {
 			result = prime * result
-					+ (element == null ? 0 : element.hashCode());
+					+ (array[index] == null ? 0 : array[index].hashCode());
 		}
 		return result;
 	}

@@ -75,8 +75,8 @@ public abstract class AbstractHandler extends EventManager implements IHandler2 
 		}
 
 		final Object[] listeners = getListeners();
-		for (Object listener2 : listeners) {
-			final IHandlerListener listener = (IHandlerListener) listener2;
+		for (int i = 0; i < listeners.length; i++) {
+			final IHandlerListener listener = (IHandlerListener) listeners[i];
 			listener.handlerChanged(handlerEvent);
 		}
 	}
