@@ -59,9 +59,9 @@ public class PropertiesProvider extends QuickAccessProvider {
 							.getElements(PreferenceManager.PRE_ORDER);
 					IPreferenceNode[] properties = (IPreferenceNode[]) list
 							.toArray(new IPreferenceNode[list.size()]);
-					for (IPreferenceNode propertie : properties) {
+					for (int i = 0; i < properties.length; i++) {
 						PropertiesElement propertiesElement = new PropertiesElement(
-								element, propertie, this);
+								element, properties[i], this);
 						idToElement.put(propertiesElement.getId(),
 								propertiesElement);
 					}

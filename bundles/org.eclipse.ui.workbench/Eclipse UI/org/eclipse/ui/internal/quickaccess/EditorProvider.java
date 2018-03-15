@@ -44,8 +44,8 @@ public class EditorProvider extends QuickAccessProvider {
 				return new QuickAccessElement[0];
 			}
 			IEditorReference[] editors = activePage.getEditorReferences();
-			for (IEditorReference editor : editors) {
-				EditorElement editorElement = new EditorElement(editor,
+			for (int i = 0; i < editors.length; i++) {
+				EditorElement editorElement = new EditorElement(editors[i],
 						this);
 				idToElement.put(editorElement.getId(), editorElement);
 			}

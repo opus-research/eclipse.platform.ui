@@ -41,7 +41,8 @@ public class StatusUtil {
 
         if (aStatus.isMultiStatus()) {
             IStatus[] children = aStatus.getChildren();
-            for (IStatus currentChild : children) {
+            for (int i = 0; i < children.length; i++) {
+                IStatus currentChild = children[i];
                 if (currentChild.isMultiStatus()) {
                     Iterator childStatiiEnum = flatten(currentChild).iterator();
                     while (childStatiiEnum.hasNext()) {
