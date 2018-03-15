@@ -13,8 +13,9 @@ package org.eclipse.ui.tests.harness.util;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import junit.framework.Assert;
+
 import org.eclipse.swt.widgets.Display;
-import org.junit.Assert;
 
 /**
  * Implements the thread that will wait for the timeout and wake up the display

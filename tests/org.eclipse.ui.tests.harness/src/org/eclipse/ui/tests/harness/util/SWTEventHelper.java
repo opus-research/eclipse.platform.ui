@@ -11,6 +11,8 @@
 
 package org.eclipse.ui.tests.harness.util;
 
+import junit.framework.Assert;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DragDetectEvent;
@@ -21,7 +23,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
-import org.junit.Assert;
 
 /**
  * @since 3.1

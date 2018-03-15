@@ -12,9 +12,10 @@ package org.eclipse.ui.tests.harness.util;
 
 import java.util.Arrays;
 
+import junit.framework.Assert;
+
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.junit.Assert;
 
 /**
  * @since 3.1
