@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2017 Red Hat Inc., and others
+ * Copyright (c) 2014, 2016 Red Hat Inc., and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -121,7 +121,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 	private Label selectionSummary;
 	protected Map<File, List<ProjectConfigurator>> potentialProjects = Collections.emptyMap();
 	// Configuration part
-	private boolean closeProjectsAfterImport = false;
 	private boolean detectNestedProjects = true;
 	private boolean configureProjects = true;
 	// Working sets
@@ -410,7 +409,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		directoryButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.SHEET);
+				DirectoryDialog dialog = new DirectoryDialog(getShell());
 				dialog.setText(DataTransferMessages.SmartImportWizardPage_browseForFolder);
 				dialog.setMessage(DataTransferMessages.SmartImportWizardPage_selectFolderOrArchiveToImport);
 				if (rootDirectoryText.getText() != null) {
@@ -436,7 +435,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		browseArchiveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				FileDialog dialog = new FileDialog(getShell(), SWT.SHEET);
+				FileDialog dialog = new FileDialog(getShell());
 				dialog.setText(DataTransferMessages.SmartImportWizardPage_selectArchiveTitle);
 				dialog.setFilterExtensions(new String[] { "*.zip;*.tar;*.tar.gz" }); //$NON-NLS-1$
 				dialog.setFilterNames(new String[] { DataTransferMessages.SmartImportWizardPage_allSupportedArchives });
@@ -464,13 +463,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 	 * Creates the UI elements for the import options
 	 */
 	private void createConfigurationOptions(Composite parent) {
-		Button closeProjectsCheckbox = new Button(parent, SWT.CHECK);
-		closeProjectsCheckbox.setText(DataTransferMessages.SmartImportWizardPage_closeProjectsAfterImport);
-		closeProjectsCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
-		closeProjectsCheckbox.setSelection(closeProjectsAfterImport);
-		closeProjectsCheckbox.addSelectionListener(SelectionListener
-				.widgetSelectedAdapter(e -> closeProjectsAfterImport = closeProjectsCheckbox.getSelection()));
-
 		Link showDetectorsLink = new Link(parent, SWT.NONE);
 		showDetectorsLink.setText(DataTransferMessages.SmartImportWizardPage_showAvailableDetectors);
 		GridData layoutData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1);
@@ -809,10 +801,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 	 */
 	public boolean isConfigureProjects() {
 		return this.configureProjects;
-	}
-
-	boolean isCloseProjectsAfterImport() {
-		return closeProjectsAfterImport;
 	}
 
 	private void refreshProposals() {

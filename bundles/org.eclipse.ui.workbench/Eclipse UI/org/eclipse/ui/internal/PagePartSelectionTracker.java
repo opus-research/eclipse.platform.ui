@@ -126,7 +126,7 @@ public class PagePartSelectionTracker extends AbstractPartSelectionTracker
      *
      * @since 3.0
      */
-	static String getPartId(IWorkbenchPart part) {
+    private Object getPartId(IWorkbenchPart part) {
         String id = part.getSite().getId();
         if (part instanceof IViewPart) {
             String secondaryId = ((IViewPart) part).getViewSite()

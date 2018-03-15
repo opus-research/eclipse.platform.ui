@@ -185,11 +185,11 @@ public class NavigationHistoryAction extends PageEventAction {
 
     private NavigationHistoryEntry[] collapseEntries(
             NavigationHistoryEntry[] entries, int entriesCount[]) {
-		ArrayList<NavigationHistoryEntry> allEntries = new ArrayList<>(Arrays.asList(entries));
+        ArrayList allEntries = new ArrayList(Arrays.asList(entries));
         NavigationHistoryEntry previousEntry = null;
         int i = -1;
-        for (Iterator<NavigationHistoryEntry> iter = allEntries.iterator(); iter.hasNext();) {
-            NavigationHistoryEntry entry = iter.next();
+        for (Iterator iter = allEntries.iterator(); iter.hasNext();) {
+            NavigationHistoryEntry entry = (NavigationHistoryEntry) iter.next();
             if (previousEntry != null) {
                 String text = previousEntry.getHistoryText();
                 if (text != null) {
@@ -205,7 +205,7 @@ public class NavigationHistoryAction extends PageEventAction {
             i++;
         }
         entries = new NavigationHistoryEntry[allEntries.size()];
-        return allEntries.toArray(entries);
+        return (NavigationHistoryEntry[]) allEntries.toArray(entries);
     }
 
     @Override

@@ -633,7 +633,7 @@ public class WorkspaceOperationsTests extends UITestCase {
 			throws CoreException {
 
 		assertTrue(MessageFormat.format("{0} markers should have been created",
-				Integer.valueOf(expectedCount)),
+				new Integer(expectedCount)),
 				markers.length == expectedCount);
 
 		for (int i = 0; i < markers.length; i++) {
