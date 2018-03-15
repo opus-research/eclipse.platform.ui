@@ -174,10 +174,9 @@ public class SashRenderer extends SWTPartRenderer {
 	 * control
 	 */
 	private static void ensureLayoutWeight(MUIElement element) {
-		int weight = DEFAULT_WEIGHT;
-
 		String info = element.getContainerData();
-		if (info != null && info.length() > 0) {
+		int weight = DEFAULT_WEIGHT;
+		if (info == null || info.length() == 0) {
 			try {
 				int value = Integer.parseInt(info);
 				weight = value;
