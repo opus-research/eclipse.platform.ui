@@ -10,4 +10,5 @@ public class ExpandableCompositeElement extends CompositeElement {
 		super(composite, engine);
 	}
 
+
 }
