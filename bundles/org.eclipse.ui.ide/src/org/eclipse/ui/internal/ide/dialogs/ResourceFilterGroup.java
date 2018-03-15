@@ -2548,7 +2548,7 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 							IDEWorkbenchMessages.ResourceFilterPage_multiMatcher_FileLength, null));
 				}
 			}
-			shell.layout(true, true);
+			shell.requestLayout();
 		}
 	}
 
@@ -2838,7 +2838,7 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 		if (fContentAssistField != null)
 			fContentAssistField.setEnabled(isUsingRegularExpression);
 
-		shell.layout(true, true);
+		shell.requestLayout();
 		if (initializationComplete) {
 			Point size = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 			Point shellSize = shell.getSize();

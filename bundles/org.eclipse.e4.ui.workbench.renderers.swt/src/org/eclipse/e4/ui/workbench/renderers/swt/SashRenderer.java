@@ -78,7 +78,7 @@ public class SashRenderer extends SWTPartRenderer {
 				return;
 			}
 		}
-		s.layout(true, true);
+		s.requestLayout();
 	}
 
 	@Override

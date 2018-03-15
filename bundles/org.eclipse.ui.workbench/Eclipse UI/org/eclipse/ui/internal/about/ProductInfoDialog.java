@@ -64,7 +64,7 @@ public abstract class ProductInfoDialog extends InstallationDialog {
 		item.setData(ID, page.getId());
 		page.setPageContainer(this);
 		item.addDisposeListener(e -> page.dispose());
-		control.layout(true, true);
+		control.requestLayout();
 	}
 
 	@Override

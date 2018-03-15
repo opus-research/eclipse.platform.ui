@@ -264,7 +264,7 @@ public class InstallationDialog extends TrayDialog implements
 				createButtons(page);
 				item.setData(page);
 				item.addDisposeListener(e -> page.dispose());
-				pageComposite.layout(true, true);
+				pageComposite.requestLayout();
 
 			} catch (CoreException e1) {
 				Label label = new Label(pageComposite, SWT.NONE);
@@ -285,7 +285,7 @@ public class InstallationDialog extends TrayDialog implements
 		// cascade through all children because the buttons have changed and
 		// because tray dialog inserts an extra composite in the button bar
 		// hierarchy.
-		getButtonBar().getParent().layout(true, true);
+		getButtonBar().getParent().requestLayout();
 
 	}
 

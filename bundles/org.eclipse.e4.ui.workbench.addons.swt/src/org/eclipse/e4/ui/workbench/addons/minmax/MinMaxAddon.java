@@ -352,7 +352,7 @@ public class MinMaxAddon {
 			@Override
 			public void run() {
 				if (!winShell.isDisposed()) {
-					winShell.layout(true, true);
+					winShell.requestLayout();
 				}
 			}
 		});
