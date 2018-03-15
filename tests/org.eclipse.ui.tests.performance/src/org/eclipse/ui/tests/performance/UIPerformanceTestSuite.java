@@ -36,6 +36,5 @@ public class UIPerformanceTestSuite extends FilteredTestSuite {
         addTest(new EditorPerformanceSuite());
         addTest(new TestSuite(CommandsPerformanceTest.class));
 		addTest(new LabelProviderTestSuite());
-		addTest(new TestSuite(ProgressReportingTest.class));
     }
 }
