@@ -87,8 +87,9 @@ public final class ParameterType extends HandleObject implements Comparable {
 		if (superClass != null && isSubtype(superClass, type)) {
 			return true;
 		}
-		for (Class<?> classInterface : clazz.getInterfaces()) {
-			if (isSubtype(classInterface, type)) {
+		final Class<?>[] interfaces = clazz.getInterfaces();
+		for (int i = 0; i < interfaces.length; i++) {
+			if (isSubtype(interfaces[i], type)) {
 				return true;
 			}
 		}
@@ -202,9 +203,10 @@ public final class ParameterType extends HandleObject implements Comparable {
 			return;
 		}
 
-		for (Object listener : getListeners()) {
-			final IParameterTypeListener parameterTypeListener = (IParameterTypeListener) listener;
-			parameterTypeListener.parameterTypeChanged(event);
+		final Object[] listeners = getListeners();
+		for (int i = 0; i < listeners.length; i++) {
+			final IParameterTypeListener listener = (IParameterTypeListener) listeners[i];
+			listener.parameterTypeChanged(event);
 		}
 	}
 

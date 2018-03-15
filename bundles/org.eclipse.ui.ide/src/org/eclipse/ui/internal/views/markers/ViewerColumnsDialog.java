@@ -101,8 +101,8 @@ abstract class ViewerColumnsDialog<T> extends ViewerSettingsAndStatusDialog {
 		visibleLocalVar.clear();
 		nonVisibleLocalVar.clear();
 		T data = null;
-		for (T columnObj : columnObjs) {
-			data = columnObj;
+		for (int i = 0; i < columnObjs.length; i++) {
+			data = columnObjs[i];
 			if (columnInfo.isColumnVisible(data)) {
 				updater.setColumnVisible(data, true);
 				updater.setColumnIndex(data, visibleLocalVar.size());

@@ -37,11 +37,15 @@ public class TypeOneDetailsPage implements IDetailsPage {
 
 	public TypeOneDetailsPage() {
 	}
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.IDetailsPage#initialize(org.eclipse.ui.forms.IManagedForm)
+	 */
 	public void initialize(IManagedForm mform) {
 		this.mform = mform;
 	}
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.IDetailsPage#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createContents(Composite parent) {
 		TableWrapLayout layout = new TableWrapLayout();
 		layout.topMargin = 5;
@@ -67,7 +71,6 @@ public class TypeOneDetailsPage implements IDetailsPage {
 		//client.setBackground(client.getDisplay().getSystemColor(SWT.COLOR_CYAN));
 
 		SelectionListener choiceListener = new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Integer value = (Integer)e.widget.getData();
 				if (input!=null) {
@@ -88,7 +91,6 @@ public class TypeOneDetailsPage implements IDetailsPage {
 		createSpacer(toolkit, client, 2);
 		flag = toolkit.createButton(client, "Value of the flag property", SWT.CHECK);
 		flag.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (input!=null)
 					input.setFlag(flag.getSelection());
@@ -102,7 +104,6 @@ public class TypeOneDetailsPage implements IDetailsPage {
 		toolkit.createLabel(client, "Text property:");
 		text = toolkit.createText(client, "", SWT.SINGLE);
 		text.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				if (input!=null)
 					input.setText(text.getText());
@@ -136,7 +137,9 @@ public class TypeOneDetailsPage implements IDetailsPage {
 		flag.setSelection(input!=null && input.getFlag());
 		text.setText(input!=null && input.getText()!=null?input.getText():"");
 	}
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.IDetailsPage#inputChanged(org.eclipse.jface.viewers.IStructuredSelection)
+	 */
 	public void selectionChanged(IFormPart part, ISelection selection) {
 		IStructuredSelection ssel = (IStructuredSelection)selection;
 		if (ssel.size()==1) {
@@ -146,29 +149,37 @@ public class TypeOneDetailsPage implements IDetailsPage {
 			input = null;
 		update();
 	}
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.IDetailsPage#commit()
+	 */
 	public void commit(boolean onSave) {
 	}
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.IDetailsPage#setFocus()
+	 */
 	public void setFocus() {
 		choices[0].setFocus();
 	}
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.IDetailsPage#dispose()
+	 */
 	public void dispose() {
 	}
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.IDetailsPage#isDirty()
+	 */
 	public boolean isDirty() {
 		return false;
 	}
-	@Override
 	public boolean isStale() {
 		return false;
 	}
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.IDetailsPage#refresh()
+	 */
 	public void refresh() {
 		update();
 	}
-	@Override
 	public boolean setFormInput(Object input) {
 		return false;
 	}

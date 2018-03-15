@@ -96,8 +96,8 @@ public abstract class AbstractWorkingSetPulldownDelegate implements
 			public void menuShown(MenuEvent e) {
 				Menu m = (Menu) e.widget;
 				MenuItem[] items = m.getItems();
-				for (MenuItem item : items) {
-					item.dispose();
+				for (int i = 0; i < items.length; i++) {
+					items[i].dispose();
 				}
 				fillMenu(m);
 			}
@@ -124,8 +124,8 @@ public abstract class AbstractWorkingSetPulldownDelegate implements
 		WorkingSetRegistry registry = WorkbenchPlugin.getDefault()
 				.getWorkingSetRegistry();
 
-		for (IWorkingSet allSet : allSets) {
-			String setType = allSet.getId();
+		for (int i = 0; i < allSets.length; i++) {
+			String setType = allSets[i].getId();
 			if (WorkbenchActivityHelper.filterItem(registry
 					.getWorkingSetDescriptor(setType))) {
 				continue;
@@ -135,7 +135,7 @@ public abstract class AbstractWorkingSetPulldownDelegate implements
 				setsOfType = new ArrayList();
 				map.put(setType, setsOfType);
 			}
-			setsOfType.add(allSet);
+			setsOfType.add(allSets[i]);
 		}
 
 		IWorkingSet[][] typedSets = new IWorkingSet[map.keySet().size()][];

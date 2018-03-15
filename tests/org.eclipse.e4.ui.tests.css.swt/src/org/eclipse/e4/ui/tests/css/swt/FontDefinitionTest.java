@@ -38,7 +38,7 @@ public class FontDefinitionTest extends CSSSWTTestCase {
 	public void testFontDefinition() {
 		//given
 		engine = createEngine(
-				"FontDefinition#org-eclipse-jface-bannerfont {font-family: 'Times';font-size: 12;font-style: italic;font-weight: bold;}",
+				"FontDefinition#org-eclipse-jface-bannerfont {font-family: 'Times';font-size: 12;font-style: italic;}",
 				display);
 		FontDefinition definition = fontDefinition("org.eclipse.jface.bannerfont", "name", "categoryId","description");
 
@@ -52,7 +52,7 @@ public class FontDefinitionTest extends CSSSWTTestCase {
 		assertNotNull(definition.getValue());
 		assertEquals("Times", definition.getValue()[0].getName());
 		assertEquals(12, definition.getValue()[0].getHeight());
-		assertEquals(SWT.ITALIC | SWT.BOLD, definition.getValue()[0].getStyle());
+		assertEquals(SWT.ITALIC, definition.getValue()[0].getStyle());
 		assertEquals("categoryId", definition.getCategoryId());
 		assertEquals("name", definition.getName());
 		assertTrue(definition.getDescription().startsWith("description"));
@@ -63,7 +63,7 @@ public class FontDefinitionTest extends CSSSWTTestCase {
 	public void testFontDefinitionWhenNameCategoryIdAndDescriptionOverridden() {
 		// given
 		engine = createEngine(
-				"FontDefinition#org-eclipse-jface-bannerfont {font-family: 'Times';font-size: 12;font-style: italic; font-weight: bold;"
+				"FontDefinition#org-eclipse-jface-bannerfont {font-family: 'Times';font-size: 12;font-style: italic;"
 						+
 						" label:'nameOverridden'; category: '#categoryIdOverridden'; description: 'descriptionOverridden'}", display);
 		FontDefinition definition = fontDefinition("org.eclipse.jface.bannerfont", "name", "categoryId", "description");
@@ -78,7 +78,7 @@ public class FontDefinitionTest extends CSSSWTTestCase {
 		assertNotNull(definition.getValue());
 		assertEquals("Times", definition.getValue()[0].getName());
 		assertEquals(12, definition.getValue()[0].getHeight());
-		assertEquals(SWT.ITALIC | SWT.BOLD, definition.getValue()[0].getStyle());
+		assertEquals(SWT.ITALIC, definition.getValue()[0].getStyle());
 		assertEquals("categoryIdOverridden", definition.getCategoryId());
 		assertEquals("nameOverridden", definition.getName());
 		assertTrue(definition.getDescription().startsWith("descriptionOverridden"));
@@ -113,7 +113,7 @@ public class FontDefinitionTest extends CSSSWTTestCase {
 
 		Shell shell = new Shell(display, SWT.SHELL_TRIM);
 		Label label = new Label(shell, SWT.NONE);
-		Font font = new Font(display, "Arial", 9, SWT.BOLD);
+		Font font = new Font(display, "Arial", 9, SWT.NORMAL);
 		label.setFont(font);
 		label.setText("Some label text");
 
@@ -125,7 +125,7 @@ public class FontDefinitionTest extends CSSSWTTestCase {
 		//then
 		assertEquals("Times", label.getFont().getFontData()[0].getName());
 		assertEquals(12, label.getFont().getFontData()[0].getHeight());
-		assertEquals(SWT.ITALIC | SWT.BOLD, label.getFont().getFontData()[0].getStyle());
+		assertEquals(SWT.ITALIC, label.getFont().getFontData()[0].getStyle());
 
 		shell.dispose();
 		font.dispose();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2017 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Ralf M Petter<ralf.petter@gmail.com> - Bug 510241
  *******************************************************************************/
 
 package org.eclipse.ui.tests.forms.util;
 
-import static org.junit.Assert.assertEquals;
+import junit.framework.TestCase;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
@@ -20,10 +19,9 @@ import org.eclipse.ui.forms.FormColors;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.junit.Assert;
-import org.junit.Test;
 
 
-public class FormColorsTests {
+public class FormColorsTests extends TestCase {
 
 	// these keys should always return a Color until disposed
 	private static String[] KEYS_NON_NULL = {
@@ -48,7 +46,6 @@ public class FormColorsTests {
 	private static String TEST_KEY_1 = "testKey1";
 	private static String TEST_KEY_2 = "testKey2";
 
-	@Test
 	public void testStandalone() {
 		FormColors fColors = new FormColors(Display.getCurrent());
 		Color[] colors = new Color[KEYS_NON_NULL.length];
@@ -70,11 +67,11 @@ public class FormColorsTests {
 		Assert.assertEquals("FormColors did not return the same instance for getForeground()", fg, fColors.getForeground());
 		Assert.assertEquals("FormColors did not return the same instance for getBorderColor()", bc, fColors.getBorderColor());
 		boolean testBorderDispose = !bc.equals(fColors.getColor(IFormColors.BORDER));
-		// Create a Color which is not used inside eclipse to test if this color
-		// is disposed reliable when the FormColors object is disposed.
-		Color testColor = fColors.createColor("test", 1, 2, 3);
 		fColors.dispose();
-		Assert.assertTrue("FormColors did not dispose key: test", testColor.isDisposed());
+		for (int i = 0; i < KEYS_NON_NULL.length; i++)
+			Assert.assertTrue("FormColors did not dispose key: " + KEYS_NON_NULL[i], colors[i].isDisposed());
+		for (int i = 0; i < KEYS_NULL.length; i++)
+			Assert.assertTrue("FormColors did not dispose key: " + KEYS_NULL[i], nullColors[i] == null || nullColors[i].isDisposed());
 		Assert.assertTrue("FormColors did not dispose getInactiveBackground()", inactiveBg.isDisposed());
 		Assert.assertFalse("FormColors disposed getBackground()", bg.isDisposed());
 		Assert.assertFalse("FormColors disposed getForeground()", fg.isDisposed());
@@ -82,7 +79,6 @@ public class FormColorsTests {
 			Assert.assertFalse("FormColors disposed getBorderColor() when it shouldn't have", bc.isDisposed());
 	}
 
-	@Test
 	public void testMultiple() {
 		FormColors fColors = new FormColors(Display.getCurrent());
 		Color[] colors = new Color[KEYS_NON_NULL.length];
@@ -126,7 +122,6 @@ public class FormColorsTests {
 		fColors.dispose();
 	}
 
-	@Test
 	public void testShared() {
 		FormColors fColors = new FormColors(Display.getCurrent());
 		fColors.markShared();
@@ -171,7 +166,6 @@ public class FormColorsTests {
 		fColors.dispose();
 	}
 
-	@Test
 	public void testCustom() {
 		FormColors fColors = new FormColors(Display.getCurrent());
 		Color test1 = fColors.createColor(TEST_KEY_1, 255, 155, 55);

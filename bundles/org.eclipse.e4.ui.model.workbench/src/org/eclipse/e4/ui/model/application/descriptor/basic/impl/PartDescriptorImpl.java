@@ -26,7 +26,6 @@ import org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl;
 import org.eclipse.e4.ui.model.application.impl.StringToStringMapImpl;
 import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
-import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
@@ -70,7 +69,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.impl.PartDescriptorImpl#getLocalizedDescription <em>Localized Description</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.impl.PartDescriptorImpl#getVariables <em>Variables</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.impl.PartDescriptorImpl#getProperties <em>Properties</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.impl.PartDescriptorImpl#getTrimBars <em>Trim Bars</em>}</li>
  * </ul>
  *
  * @generated
@@ -345,16 +343,6 @@ public class PartDescriptorImpl extends ApplicationElementImpl implements MPartD
 	 * @ordered
 	 */
 	protected EMap<String, String> properties;
-
-	/**
-	 * The cached value of the '{@link #getTrimBars() <em>Trim Bars</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getTrimBars()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<MTrimBar> trimBars;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -678,18 +666,6 @@ public class PartDescriptorImpl extends ApplicationElementImpl implements MPartD
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List<MTrimBar> getTrimBars() {
-		if (trimBars == null) {
-			trimBars = new EObjectContainmentEList<MTrimBar>(MTrimBar.class, this, BasicPackageImpl.PART_DESCRIPTOR__TRIM_BARS);
-		}
-		return trimBars;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
 	 */
 	public void updateLocalization() {
 		if (eNotificationRequired()) {
@@ -734,8 +710,6 @@ public class PartDescriptorImpl extends ApplicationElementImpl implements MPartD
 				return basicSetToolbar(null, msgs);
 			case BasicPackageImpl.PART_DESCRIPTOR__PROPERTIES:
 				return ((InternalEList<?>)((EMap.InternalMapView<String, String>)getProperties()).eMap()).basicRemove(otherEnd, msgs);
-			case BasicPackageImpl.PART_DESCRIPTOR__TRIM_BARS:
-				return ((InternalEList<?>)getTrimBars()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -785,8 +759,6 @@ public class PartDescriptorImpl extends ApplicationElementImpl implements MPartD
 			case BasicPackageImpl.PART_DESCRIPTOR__PROPERTIES:
 				if (coreType) return ((EMap.InternalMapView<String, String>)getProperties()).eMap();
 				else return getProperties();
-			case BasicPackageImpl.PART_DESCRIPTOR__TRIM_BARS:
-				return getTrimBars();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -849,10 +821,6 @@ public class PartDescriptorImpl extends ApplicationElementImpl implements MPartD
 			case BasicPackageImpl.PART_DESCRIPTOR__PROPERTIES:
 				((EStructuralFeature.Setting)((EMap.InternalMapView<String, String>)getProperties()).eMap()).set(newValue);
 				return;
-			case BasicPackageImpl.PART_DESCRIPTOR__TRIM_BARS:
-				getTrimBars().clear();
-				getTrimBars().addAll((Collection<? extends MTrimBar>)newValue);
-				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -910,9 +878,6 @@ public class PartDescriptorImpl extends ApplicationElementImpl implements MPartD
 			case BasicPackageImpl.PART_DESCRIPTOR__PROPERTIES:
 				getProperties().clear();
 				return;
-			case BasicPackageImpl.PART_DESCRIPTOR__TRIM_BARS:
-				getTrimBars().clear();
-				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -961,8 +926,6 @@ public class PartDescriptorImpl extends ApplicationElementImpl implements MPartD
 				return variables != null && !variables.isEmpty();
 			case BasicPackageImpl.PART_DESCRIPTOR__PROPERTIES:
 				return properties != null && !properties.isEmpty();
-			case BasicPackageImpl.PART_DESCRIPTOR__TRIM_BARS:
-				return trimBars != null && !trimBars.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

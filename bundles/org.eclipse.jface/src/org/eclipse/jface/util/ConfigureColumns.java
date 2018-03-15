@@ -238,11 +238,11 @@ public class ConfigureColumns {
 					| SWT.H_SCROLL /*
 									 * | SWT.CHECK
 									 */);
-			for (ColumnObject columnObject : columnObjects) {
+			for (int i = 0; i < columnObjects.length; i++) {
 				TableItem tableItem = new TableItem(table, SWT.NONE);
-				tableItem.setText(columnObject.name);
-				tableItem.setImage(columnObject.image);
-				tableItem.setData(columnObject);
+				tableItem.setText(columnObjects[i].name);
+				tableItem.setImage(columnObjects[i].image);
+				tableItem.setData(columnObjects[i]);
 			}
 
 			GridDataFactory.defaultsFor(table).span(1, moveableColumnsFound ? 3 : 1)

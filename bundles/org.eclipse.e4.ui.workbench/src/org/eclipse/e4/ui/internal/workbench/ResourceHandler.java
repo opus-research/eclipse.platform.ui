@@ -172,7 +172,7 @@ public class ResourceHandler implements IModelResourceHandler {
 			if (!hasTopLevelWindows(resource)) {
 				if (logger != null) {
 					logger.error(new Exception(), // log a stack trace to help debug the corruption
-							"The persisted application model has no top-level window. Reinitializing with the default application model."); //$NON-NLS-1$
+							"The persisted workbench has no top-level windows, so reinitializing with defaults."); //$NON-NLS-1$
 				}
 				resource = null;
 			}
@@ -199,12 +199,15 @@ public class ResourceHandler implements IModelResourceHandler {
 		if (!hasTopLevelWindows(resource) && logger != null) {
 			logger.error(new Exception(), // log a stack trace to help debug the
 											// corruption
-					"Loading the application model results in no top-level window." //$NON-NLS-1$
-							+ "Continuing execution, but the missing window may cause other initialization failures."); //$NON-NLS-1$
+					"Initializing from the application definition instance yields no top-level windows! " //$NON-NLS-1$
+							+ "Continuing execution, but the missing windows may cause other initialization failures."); //$NON-NLS-1$
 		}
 
-		CommandLineOptionModelProcessor processor = ContextInjectionFactory.make(CommandLineOptionModelProcessor.class, context);
-		processor.process();
+		if (!clearPersistedState) {
+			CommandLineOptionModelProcessor processor = ContextInjectionFactory.make(
+					CommandLineOptionModelProcessor.class, context);
+			processor.process();
+		}
 
 		return resource;
 	}
