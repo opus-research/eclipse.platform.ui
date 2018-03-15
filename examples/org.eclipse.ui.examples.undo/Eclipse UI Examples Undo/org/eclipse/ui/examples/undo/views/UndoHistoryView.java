@@ -252,7 +252,7 @@ public class UndoHistoryView extends ViewPart implements
 	private IUndoContext selectContext() {
 		// This would be better implemented as a view filter, but for now, we
 		// will use a dialog that collects the available undo contexts.
-		List<IUndoContext> input = new ArrayList<>();
+		List<IUndoContext> input = new ArrayList<IUndoContext>();
 		IUndoableOperation[] operations = history
 				.getUndoHistory(IOperationHistory.GLOBAL_UNDO_CONTEXT);
 		for (IUndoableOperation operation : operations) {
