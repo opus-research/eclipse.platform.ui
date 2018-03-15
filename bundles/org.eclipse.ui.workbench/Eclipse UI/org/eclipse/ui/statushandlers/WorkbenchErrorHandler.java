@@ -39,7 +39,8 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 
 	@Override
 	public void handle(final StatusAdapter statusAdapter, int style) {
-		statusAdapter.setProperty(WorkbenchStatusDialogManager.HINT, Integer.valueOf(style));
+		statusAdapter.setProperty(WorkbenchStatusDialogManager.HINT,
+				Integer.valueOf(style));
 		if (((style & StatusManager.SHOW) == StatusManager.SHOW)
 				|| ((style & StatusManager.BLOCK) == StatusManager.BLOCK)) {
 
