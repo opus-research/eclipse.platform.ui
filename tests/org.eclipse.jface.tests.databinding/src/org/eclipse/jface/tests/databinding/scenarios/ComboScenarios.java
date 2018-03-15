@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.databinding.scenarios;
 
+import static org.junit.Assert.assertEquals;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -43,6 +45,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Combo;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ComboScenarios extends ScenariosTestCase {
 
@@ -66,8 +71,8 @@ public class ComboScenarios extends ScenariosTestCase {
 		}
 	};
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		super.setUp();
 		getComposite().setLayout(new FillLayout());
 
@@ -77,8 +82,8 @@ public class ComboScenarios extends ScenariosTestCase {
 		catalog = SampleData.CATALOG_2005; // Lodging source
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		combo.dispose();
 		combo = null;
 		cviewer = null;
@@ -148,6 +153,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	 * property change of content elements, etc.
 	 *
 	 */
+	@Test
 	public void test_ROCombo_Scenario03_vanilla() {
 		IObservableList lodgings = BeansObservables.observeList(Realm
 				.getDefault(), catalog, "lodgings");
@@ -191,6 +197,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	 *
 	 * This test does not deal with the combo's selection.
 	 */
+	@Test
 	public void test_ROCombo_Scenario03_collectionBindings() {
 		// column binding
 		// Bind the ComboViewer's content to the available lodging
@@ -259,6 +266,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	 * This scenario tests a simple SWT combo with a set item list where the
 	 * selection is bouded to a String property
 	 */
+	// @Test
 	// public void test_ROCombo_Scenario01() {
 	//
 	// // Read-Only Combo will not change its text property on a call to
@@ -299,6 +307,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	 *
 	 * The Combo's selection is bounded to the Country property of an Account.
 	 */
+	// @Test
 	// public void test_ROCombo_Scenario02_SWTCombo() {
 	//
 	// // Create a list of Strings for the countries
@@ -328,6 +337,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	 *
 	 * The Combo's selection is bounded to the Country property of an Account.
 	 */
+	// @Test
 	// public void test_ROCombo_Scenario02_ComboViewer() {
 	//
 	// // Account label provider will fill the combo with the country
@@ -364,6 +374,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	 * This test ensure that multiple combos can be bound to the same deomain
 	 * model
 	 */
+	@Test
 	public void test_ROCombo_multipleBindings() {
 		Adventure skiAdventure = SampleData.WINTER_HOLIDAY; // for selection
 
@@ -422,6 +433,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	 *
 	 * The Combo's selection is bounded to the Country property of an Account.
 	 */
+	@Test
 	public void test_ROCombo_SWTCCombo() {
 
 		// Create a list of Strings for the countries
@@ -458,6 +470,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	 *
 	 * The Combo's selection is bounded to the Country property of an Account.
 	 */
+	@Test
 	public void test_WCombo_SWTCCombo() {
 
 		// Create a list of Strings for the countries
@@ -503,6 +516,7 @@ public class ComboScenarios extends ScenariosTestCase {
 	 *
 	 * The Combo's selection is bounded to the Country property of an Account.
 	 */
+	@Test
 	public void test_ROCombo_SWTList() {
 
 		// Create a list of Strings for the countries

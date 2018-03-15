@@ -11,9 +11,6 @@
 
 package org.eclipse.core.tests.databinding.observable.value;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.DecoratingObservableValue;
@@ -21,13 +18,18 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.databinding.conformance.MutableObservableValueContractTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValueContractDelegate;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
+
+import junit.framework.TestSuite;
 
 /**
  * @since 3.2
  *
  */
+@RunWith(AllTests.class)
 public class DecoratingObservableValueTest {
-	public static Test suite() {
+	public static junit.framework.Test suite() {
 		TestSuite suite = new TestSuite(DecoratingObservableValueTest.class
 				.getName());
 		suite.addTest(MutableObservableValueContractTest.suite(new Delegate()));
