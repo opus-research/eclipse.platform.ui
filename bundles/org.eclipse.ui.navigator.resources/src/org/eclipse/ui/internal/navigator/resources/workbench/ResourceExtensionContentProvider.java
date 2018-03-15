@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  * IBM Corporation - initial API and implementation
+ * Mickael Istria (Red Hat Inc.) Bug 264404 - Problem decorators
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.resources.workbench;
 
@@ -170,6 +171,9 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		if ((changeFlags & IResourceDelta.REPLACED) != 0) {
 			runnables.add(getRefreshRunnable(resource));
 			return;
+		}
+		if ((changeFlags & IResourceDelta.MARKERS) != 0) {
+			runnables.add(getRefreshRunnable(resource.getProject()));
 		}
 
 
