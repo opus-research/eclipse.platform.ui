@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.window.Window;
@@ -176,19 +175,16 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 			createRecentWorkspacesComposite(composite);
 		}
 
-        // look for the eclipse.gcj property.
-        // If true, then we dont need any warning messages.
-        // someone is asserting that we're okay on GCJ
-        boolean gcj = Boolean.getBoolean("eclipse.gcj"); //$NON-NLS-1$
-		String vmName = System.getProperty("java.vm.name");//$NON-NLS-1$
-		if (!gcj && vmName != null && vmName.indexOf("libgcj") != -1) { //$NON-NLS-1$
-			composite.getDisplay().asyncExec(() -> setMessage(IDEWorkbenchMessages.UnsupportedVM_message,
-					IMessageProvider.WARNING));
-		}
-
         Dialog.applyDialogFont(composite);
         return composite;
     }
+
+	@Override
+	protected void createButtonsForButtonBar(Composite parent) {
+		// create OK and Cancel buttons by default
+		createButton(parent, IDialogConstants.OK_ID, IDEWorkbenchMessages.ChooseWorkspaceDialog_launchLabel, true);
+		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
+	}
 
 	/**
 	 * Returns the title that the dialog (or splash) should have.
@@ -534,10 +530,9 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
     }
 
     private void setInitialTextValues(Combo text) {
-        String[] recentWorkspaces = launchData.getRecentWorkspaces();
-        for (int i = 0; i < recentWorkspaces.length; ++i) {
-			if (recentWorkspaces[i] != null) {
-				text.add(recentWorkspaces[i]);
+		for (String recentWorkspace : launchData.getRecentWorkspaces()) {
+			if (recentWorkspace != null) {
+				text.add(recentWorkspace);
 			}
 		}
 

@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
@@ -16,7 +17,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -161,15 +161,12 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 						//i.e. multiple children
 						String commandGroupList = null;
 
-						for (Iterator<ActionSet> i = actionGroup.iterator(); i.hasNext();) {
-							ActionSet actionSet = i.next();
-
+						for (ActionSet actionSet : actionGroup) {
 							// For each action set, make a link for it, set
 							// the href to its id
 							String commandGroupLink = MessageFormat.format(
 									"<a href=\"{0}\">{1}</a>", //$NON-NLS-1$
-									new Object[] { actionSet.descriptor.getId(),
-											actionSet.descriptor.getLabel() });
+									actionSet.descriptor.getId(), actionSet.descriptor.getLabel());
 
 							if (commandGroupList == null) {
 								commandGroupList = commandGroupLink;
@@ -311,8 +308,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 			if (currentItems.size() > 0) {
 				// Create a list of the currently displayed items
 				text.append(WorkbenchMessages.HideItems_dynamicItemList);
-				for (Iterator<MenuItem> i = currentItems.iterator(); i.hasNext();) {
-					MenuItem menuItem = i.next();
+				for (MenuItem menuItem : currentItems) {
 					text.append(CustomizePerspectiveDialog.NEW_LINE).append("- ") //$NON-NLS-1$
 							.append(menuItem.getText());
 				}
@@ -406,8 +402,8 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 
 		List<Binding> foundBindings = new ArrayList<>(2);
 
-		for (Iterator<?> i = allBindings.iterator(); i.hasNext();) {
-			Binding binding = (Binding) i.next();
+		for (Object name : allBindings) {
+			Binding binding = (Binding) name;
 			if (binding.getParameterizedCommand() == null) {
 				continue;
 			}

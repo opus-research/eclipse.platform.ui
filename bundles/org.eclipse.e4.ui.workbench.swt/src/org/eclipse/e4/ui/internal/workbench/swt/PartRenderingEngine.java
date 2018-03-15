@@ -17,7 +17,6 @@ package org.eclipse.e4.ui.internal.workbench.swt;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,8 +31,11 @@ import javax.inject.Named;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -56,7 +58,6 @@ import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
-import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.MContribution;
@@ -98,6 +99,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
+import org.osgi.service.log.LogService;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
@@ -117,7 +119,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	IRendererFactory curFactory = null;
 
-	private Map<String, AbstractPartRenderer> customRendererMap = new HashMap<String, AbstractPartRenderer>();
+	private Map<String, AbstractPartRenderer> customRendererMap = new HashMap<>();
 
 	org.eclipse.swt.widgets.Listener keyListener;
 
@@ -143,7 +145,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 		boolean okToRender = parent instanceof MApplication || parent.getWidget() != null;
 
 		if (changedElement.isToBeRendered() && okToRender) {
-			Activator.trace(Policy.DEBUG_RENDERER, "visible -> true", null); //$NON-NLS-1$
+			if (Policy.DEBUG_RENDERER) {
+				WorkbenchSWTActivator.trace(Policy.DEBUG_RENDERER_FLAG, "visible -> true", null); //$NON-NLS-1$
+			}
 
 			// Note that the 'createGui' protocol calls 'childAdded'
 			Object w = createGui(changedElement);
@@ -151,7 +155,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 				fixZOrder(changedElement);
 			}
 		} else {
-			Activator.trace(Policy.DEBUG_RENDERER, "visible -> false", null); //$NON-NLS-1$
+			if (Policy.DEBUG_RENDERER) {
+				WorkbenchSWTActivator.trace(Policy.DEBUG_RENDERER_FLAG, "visible -> false", null); //$NON-NLS-1$
+			}
 
 			// Ensure that the element about to be removed is not the
 			// selected element
@@ -279,7 +285,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 		}
 
 		if (UIEvents.isADD(event)) {
-			Activator.trace(Policy.DEBUG_RENDERER, "Child Added", null); //$NON-NLS-1$
+			if (Policy.DEBUG_RENDERER) {
+				WorkbenchSWTActivator.trace(Policy.DEBUG_RENDERER_FLAG, "Child Added", null); //$NON-NLS-1$
+			}
 			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.NEW_VALUE)) {
 				MUIElement added = (MUIElement) o;
 
@@ -318,7 +326,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 			}
 		} else if (UIEvents.isREMOVE(event)) {
-			Activator.trace(Policy.DEBUG_RENDERER, "Child Removed", null); //$NON-NLS-1$
+			if (Policy.DEBUG_RENDERER) {
+				WorkbenchSWTActivator.trace(Policy.DEBUG_RENDERER_FLAG, "Child Removed", null); //$NON-NLS-1$
+			}
 			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.OLD_VALUE)) {
 				MUIElement removed = (MUIElement) o;
 				// Removing invisible elements is a NO-OP as far as the
@@ -482,8 +492,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 		curFactory = factory;
 		context.set(IRendererFactory.class, curFactory);
 
-		IEclipsePreferences node = InstanceScope.INSTANCE.getNode("org.eclipse.e4.ui.workbench.renderers.swt");
-		enableThemePreference = node.getBoolean(ENABLED_THEME_KEY, true);
+		IScopeContext[] contexts = new IScopeContext[] { DefaultScope.INSTANCE, InstanceScope.INSTANCE};
+		enableThemePreference = Platform.getPreferencesService().getBoolean("org.eclipse.e4.ui.workbench.renderers.swt",
+				ENABLED_THEME_KEY, true, contexts);
 
 		cssThemeChangedHandler = new StylingPreferencesHandler(context.get(Display.class));
 	}
@@ -491,9 +502,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 	private static void populateModelInterfaces(MContext contextModel,
 			IEclipseContext context, Class<?>[] interfaces) {
 		for (Class<?> intf : interfaces) {
-			Activator.trace(Policy.DEBUG_CONTEXTS,
-					"Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
-							+ contextModel.getClass().getName(), null);
+			if (Policy.DEBUG_CONTEXTS) {
+				WorkbenchSWTActivator.trace(Policy.DEBUG_CONTEXTS_FLAG,
+						"Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
+								+ contextModel.getClass().getName(), null);
+			}
 			context.set(intf.getName(), contextModel);
 
 			populateModelInterfaces(contextModel, context, intf.getInterfaces());
@@ -867,7 +880,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				MUIElement selectedElement = container.getSelectedElement();
 				List<MUIElement> children = container.getChildren();
 				// Bug 458460: Operate on a copy in case child nulls out parent
-				for (MUIElement child : new ArrayList<MUIElement>(children)) {
+				for (MUIElement child : new ArrayList<>(children)) {
 					// remove stuff in the "back" first
 					if (child != selectedElement) {
 						removeGui(child);
@@ -1114,6 +1127,18 @@ public class PartRenderingEngine implements IPresentationEngine {
 						}
 					};
 				}
+				final IEventLoopAdvisor finalAdvisor = advisor;
+				display.setErrorHandler(e -> {
+					// If e is one of the exception types that are generally
+					// recoverable, hand it to the event loop advisor
+					if (e instanceof LinkageError || e instanceof AssertionError) {
+						handle(e, finalAdvisor);
+					} else {
+						// Otherwise, rethrow it
+						throw e;
+					}
+				});
+				display.setRuntimeExceptionHandler(e -> handle(e, finalAdvisor));
 				// Spin the event loop until someone disposes the display
 				while (((testShell != null && !testShell.isDisposed()) || (theApp != null && someAreVisible(theApp
 						.getChildren()))) && !display.isDisposed()) {
@@ -1337,26 +1362,13 @@ public class PartRenderingEngine implements IPresentationEngine {
 			});
 
 			URL url;
-			InputStream stream = null;
 			try {
 				url = FileLocator.resolve(new URL(cssURI));
-				stream = url.openStream();
-				cssEngine.parseStyleSheet(stream);
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} finally {
-				if (stream != null) {
-					try {
-						stream.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+				try (InputStream stream = url.openStream()) {
+					cssEngine.parseStyleSheet(stream);
 				}
+			} catch (IOException e) {
+				Activator.log(LogService.LOG_ERROR, e.getMessage(), e);
 			}
 
 			Shell[] shells = display.getShells();
@@ -1366,8 +1378,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 					s.reskin(SWT.ALL);
 					cssEngine.applyStyles(s, true);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Activator.log(LogService.LOG_ERROR, e.getMessage(), e);
 				} finally {
 					s.setRedraw(true);
 				}
@@ -1410,12 +1421,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		}
 
 		protected Listener createOnDisplayDisposedListener() {
-			return new Listener() {
-					@Override
-					public void handleEvent(org.eclipse.swt.widgets.Event event) {
-						resetOverriddenPreferences();
-					}
-			};
+			return event -> resetOverriddenPreferences();
 		}
 
 		@Override
@@ -1447,7 +1453,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		protected Set<IEclipsePreferences> getPreferences() {
 			if (prefs == null) {
-				prefs = new HashSet<IEclipsePreferences>();
+				prefs = new HashSet<>();
 				BundleContext context = WorkbenchSWTActivator.getDefault().getContext();
 				for (Bundle bundle : context.getBundles()) {
 					if (bundle.getSymbolicName() != null) {

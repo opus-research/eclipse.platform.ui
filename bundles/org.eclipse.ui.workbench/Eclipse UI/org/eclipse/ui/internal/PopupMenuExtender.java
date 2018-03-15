@@ -431,12 +431,9 @@ public class PopupMenuExtender implements IMenuListener2,
     			// has been fired.
     			// This is less threatening if the popup: menu
     			// contributions aren't tied to the evaluation service
-				workbench.getDisplay().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						final Workbench realWorkbench = (Workbench) workbench;
-						runCleanUp(realWorkbench);
-					}
+				workbench.getDisplay().asyncExec(() -> {
+					final Workbench realWorkbench = (Workbench) workbench;
+					runCleanUp(realWorkbench);
 				});
 			}
     	}
@@ -453,11 +450,11 @@ public class PopupMenuExtender implements IMenuListener2,
 
 	private void gatherContributions(final IMenuManager mgr) {
 		final IContributionItem[] items = mgr.getItems();
-		for (int i = 0; i < items.length; i++) {
-			if (items[i] instanceof PluginActionContributionItem) {
-				actionContributionCache.add((PluginActionContributionItem) items[i]);
-			} else if (items[i] instanceof IMenuManager) {
-				gatherContributions(((IMenuManager) items[i]));
+		for (IContributionItem item : items) {
+			if (item instanceof PluginActionContributionItem) {
+				actionContributionCache.add((PluginActionContributionItem) item);
+			} else if (item instanceof IMenuManager) {
+				gatherContributions(((IMenuManager) item));
 			}
 		}
 	}
@@ -467,8 +464,8 @@ public class PopupMenuExtender implements IMenuListener2,
 			PluginActionContributionItem[] items = actionContributionCache
 					.toArray(new PluginActionContributionItem[actionContributionCache.size()]);
 			actionContributionCache.clear();
-			for (int i = 0; i < items.length; i++) {
-				items[i].dispose();
+			for (PluginActionContributionItem item : items) {
+				item.dispose();
 			}
 		}
 
@@ -595,8 +592,7 @@ public class PopupMenuExtender implements IMenuListener2,
 		}
 		//check the delta to see if there are any viewer contribution changes.  if so, null our builder to cause reparsing on the next menu show
 		IExtensionDelta [] deltas = event.getExtensionDeltas();
-		for (int i = 0; i < deltas.length; i++) {
-			IExtensionDelta delta = deltas[i];
+		for (IExtensionDelta delta : deltas) {
 			IExtensionPoint extensionPoint = delta.getExtensionPoint();
 			if (extensionPoint.getContributor().getName().equals(WorkbenchPlugin.PI_WORKBENCH)
 					&& extensionPoint.getSimpleIdentifier().equals(
@@ -604,8 +600,7 @@ public class PopupMenuExtender implements IMenuListener2,
 
 				boolean clearPopups = false;
 				IConfigurationElement [] elements = delta.getExtension().getConfigurationElements();
-				for (int j = 0; j < elements.length; j++) {
-					IConfigurationElement element = elements[j];
+				for (IConfigurationElement element : elements) {
 					if (element.getName().equals(IWorkbenchRegistryConstants.TAG_VIEWER_CONTRIBUTION)) {
 						clearPopups = true;
 						break;
@@ -613,12 +608,7 @@ public class PopupMenuExtender implements IMenuListener2,
 				}
 
 				if (clearPopups) {
-					display.syncExec(new Runnable() {
-						@Override
-						public void run() {
-							clearStaticActions();
-						}
-					});
+					display.syncExec(() -> clearStaticActions());
 				}
 			}
 		}
