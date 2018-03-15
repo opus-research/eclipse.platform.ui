@@ -71,14 +71,25 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 	 */
 	public int rightMargin = 5;
 
+	private LayoutCache cache = new LayoutCache();
+
 	/**
 	 * Creates a new instance of the column layout.
 	 */
 	public ColumnLayout() {
 	}
 
+	private void updateCache(Composite composite, boolean flushCache) {
+		Control[] children = composite.getChildren();
+		if (flushCache) {
+			cache.flush();
+		}
+		cache.setControls(children);
+	}
+
 	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
+		updateCache(composite, flushCache);
 		if (wHint == 0)
 			return computeSize(composite, wHint, hHint, minNumColumns);
 		else if (wHint == SWT.DEFAULT)
@@ -103,7 +114,11 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 		}
 
 		for (int i = 0; i < children.length; i++) {
-			sizes[i] = computeControlSize(children[i], cwHint);
+			if (wHint == SWT.DEFAULT) {
+				sizes[i] = computeMinimumSize(i);
+			} else {
+				sizes[i] = computeControlSize(i, cwHint);
+			}
 			cwidth = Math.max(cwidth, sizes[i].x);
 			cheight += sizes[i].y;
 		}
@@ -150,11 +165,18 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 		return size;
 	}
 
-	private Point computeControlSize(Control c, int wHint) {
+	private Point computeMinimumSize(int i) {
+		SizeCache sc = cache.getCache(i);
+		int minWidth = sc.computeMaximumWidth();
+		return sc.computeSize(minWidth, SWT.DEFAULT);
+	}
+
+	private Point computeControlSize(int controlIndex, int wHint) {
+		Control c = cache.getCache(controlIndex).getControl();
 		ColumnLayoutData cd = (ColumnLayoutData) c.getLayoutData();
 		int widthHint = cd != null ? cd.widthHint : wHint;
 		int heightHint = cd != null ? cd.heightHint : SWT.DEFAULT;
-		return c.computeSize(widthHint, heightHint);
+		return cache.computeSize(controlIndex, widthHint, heightHint);
 	}
 
 	private int findShortestColumn(int[] heights) {
@@ -171,13 +193,14 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 
 	@Override
 	protected void layout(Composite parent, boolean flushCache) {
+		updateCache(parent, flushCache);
 		Control[] children = parent.getChildren();
 		Rectangle carea = parent.getClientArea();
 		int cwidth = 0;
 		int cheight = 0;
 		Point[] sizes = new Point[children.length];
 		for (int i = 0; i < children.length; i++) {
-			sizes[i] = computeControlSize(children[i], SWT.DEFAULT);
+			sizes[i] = computeControlSize(i, SWT.DEFAULT);
 			cwidth = Math.max(cwidth, sizes[i].x);
 			cheight += sizes[i].y;
 		}
@@ -252,6 +275,6 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 
 	@Override
 	public int computeMinimumWidth(Composite parent, boolean changed) {
-		return computeSize(parent, 0, SWT.DEFAULT, changed).x;
+		return computeSize(parent, SWT.DEFAULT, SWT.DEFAULT, changed).x;
 	}
 }
