@@ -23,12 +23,16 @@ import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.internal.expressions.ReferenceExpression;
 import org.eclipse.e4.core.commands.ExpressionContext;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Evaluate;
+import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MExpression;
+import org.eclipse.e4.ui.model.application.ui.MImperativeExpression;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
@@ -47,6 +51,9 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 public final class ContributionsAnalyzer {
+
+	private static final Object missingEvaluate = new Object();
+
 	public static void trace(String msg, Throwable error) {
 		Activator.trace("/trace/menus", msg, error); //$NON-NLS-1$
 	}
@@ -220,32 +227,44 @@ public final class ContributionsAnalyzer {
 		if (menuContribution.getVisibleWhen() == null) {
 			return true;
 		}
-		return isVisible((MCoreExpression) menuContribution.getVisibleWhen(), eContext);
+		return isVisible(menuContribution.getVisibleWhen(), eContext);
 	}
 
 	public static boolean isVisible(MToolBarContribution contribution, ExpressionContext eContext) {
 		if (contribution.getVisibleWhen() == null) {
 			return true;
 		}
-		return isVisible((MCoreExpression) contribution.getVisibleWhen(), eContext);
+		return isVisible(contribution.getVisibleWhen(), eContext);
 	}
 
 	public static boolean isVisible(MTrimContribution contribution, ExpressionContext eContext) {
 		if (contribution.getVisibleWhen() == null) {
 			return true;
 		}
-		return isVisible((MCoreExpression) contribution.getVisibleWhen(), eContext);
+		return isVisible(contribution.getVisibleWhen(), eContext);
 	}
 
-	public static boolean isVisible(MCoreExpression exp, final ExpressionContext eContext) {
-		final Expression ref;
-		if (exp.getCoreExpression() instanceof Expression) {
-			ref = (Expression) exp.getCoreExpression();
-		} else {
-			ref = new ReferenceExpression(exp.getCoreExpressionId());
-			exp.setCoreExpression(ref);
+	public static boolean isVisible(MExpression exp, final ExpressionContext eContext) {
+		if (exp instanceof MCoreExpression) {
+			MCoreExpression coreExpression = (MCoreExpression) exp;
+			return isCoreExpressionVisible(coreExpression, eContext);
+		} else if (exp instanceof MImperativeExpression) {
+			return isImperativeExpressionVisible(exp, eContext);
 		}
-		// Creates dependency on a predefined value that can be "poked" by the evaluation
+
+		return true;
+	}
+
+	private static boolean isCoreExpressionVisible(MCoreExpression coreExpression, final ExpressionContext eContext) {
+		final Expression ref;
+		if (coreExpression.getCoreExpression() instanceof Expression) {
+			ref = (Expression) coreExpression.getCoreExpression();
+		} else {
+			ref = new ReferenceExpression(coreExpression.getCoreExpressionId());
+			coreExpression.setCoreExpression(ref);
+		}
+		// Creates dependency on a predefined value that can be "poked" by
+		// the evaluation
 		// service
 		ExpressionInfo info = ref.computeExpressionInfo();
 		String[] names = info.getAccessedPropertyNames();
@@ -259,6 +278,25 @@ public final class ContributionsAnalyzer {
 			trace("isVisible exception", e); //$NON-NLS-1$
 		}
 		return ret;
+	}
+
+	private static boolean isImperativeExpressionVisible(MExpression exp, final ExpressionContext eContext) {
+		MImperativeExpression imperativeExpression = (MImperativeExpression) exp;
+		Object imperativeExpressionObject = imperativeExpression.getObject();
+		if (imperativeExpressionObject == null) {
+			IContributionFactory contributionFactory = eContext.eclipseContext.get(IContributionFactory.class);
+			Object newImperativeExpression = contributionFactory.create(imperativeExpression.getContributionURI(),
+					eContext.eclipseContext);
+			imperativeExpression.setObject(newImperativeExpression);
+			imperativeExpressionObject = newImperativeExpression;
+		}
+		Object result = ContextInjectionFactory.invoke(imperativeExpressionObject, Evaluate.class, eContext.eclipseContext, null,
+				missingEvaluate);
+		if (result == missingEvaluate) {
+			throw new IllegalStateException(
+					"There is no method annotated with @Evaluate in the imperative expression class"); //$NON-NLS-1$
+		}
+		return (boolean) result;
 	}
 
 	public static void addMenuContributions(final MMenu menuModel,
