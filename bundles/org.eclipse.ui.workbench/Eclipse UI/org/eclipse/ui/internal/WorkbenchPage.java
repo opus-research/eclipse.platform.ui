@@ -4529,8 +4529,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	@Override
 	public IViewPart[] getViewStack(IViewPart part) {
-		String compoundId = PagePartSelectionTracker.getPartId(part);
-		MPart mpart = partService.findPart(compoundId);
+		MPart mpart = partService.findPart(part.getSite().getId());
 		if (mpart != null) {
 			MElementContainer<?> parent = mpart.getParent();
 			if (parent == null) {
