@@ -698,14 +698,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String LinkedResourceEditor_removeMessage;
 	public static String LinkedResourceEditor_removingMessage;
 
-	// --- Auto-save ---
-	public static String AutoSavePreferencPage_autoSaveButton;
-	public static String AutoSavePreferencPage_intervalMessage;
-	public static String AutoSavePreferencPage_errorMessage;
-	public static String AutoSavePreferencPage_resetMessage;
-	public static String AutoSavePreferencPage_noteLabel;
-	public static String AutoSavePreferencPage_noteMessage;
-
 	// ==============================================================================
 	// Editors
 	// ==============================================================================
@@ -1031,7 +1023,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String editorAssociationOverride_error_invalidElementName_message;
 	public static String editorAssociationOverride_error_invalidExtension_message;
 
-	public static String ExtendedFileEditorsPreferencePage_strategyForUnassociatedFiles;
+	public static String ExtendedFileEditorsPreferencePage_strategyForUnknownFiles;
 	public static String ExtendedFileEditorsPreferencePage_labelNotResolved;
 
 	static {

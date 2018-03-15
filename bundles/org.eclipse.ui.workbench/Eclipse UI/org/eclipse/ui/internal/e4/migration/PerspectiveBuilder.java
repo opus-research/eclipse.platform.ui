@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -145,13 +144,12 @@ public class PerspectiveBuilder {
 
 	private void processStandaloneViews() {
 		Map<String, ViewLayoutReader> viewLayouts = perspReader.getViewLayouts();
-		for (Entry<String, ViewLayoutReader> entry : viewLayouts.entrySet()) {
-			String viewId = entry.getKey();
+		for (String viewId : viewLayouts.keySet()) {
 			MPlaceholder placeholder = viewPlaceholders.get(viewId);
 			if (placeholder == null) {
 				continue;
 			}
-			if (entry.getValue().isStandalone()) {
+			if (viewLayouts.get(viewId).isStandalone()) {
 				MElementContainer<MUIElement> parent = placeholder.getParent();
 				placeholder.setContainerData(parent.getContainerData());
 				parent.getChildren().remove(placeholder);
