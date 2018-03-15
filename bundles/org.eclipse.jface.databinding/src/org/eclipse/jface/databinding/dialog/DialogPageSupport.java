@@ -82,8 +82,7 @@ public class DialogPageSupport {
 		public void handleListChange(ListChangeEvent event) {
 			ListDiff diff = event.diff;
 			ListDiffEntry[] differences = diff.getDifferences();
-			for (int i = 0; i < differences.length; i++) {
-				ListDiffEntry listDiffEntry = differences[i];
+			for (ListDiffEntry listDiffEntry : differences) {
 				ValidationStatusProvider validationStatusProvider = (ValidationStatusProvider) listDiffEntry
 						.getElement();
 				IObservableList targets = validationStatusProvider.getTargets();
@@ -110,8 +109,7 @@ public class DialogPageSupport {
 		public void handleListChange(ListChangeEvent event) {
 			ListDiff diff = event.diff;
 			ListDiffEntry[] differences = diff.getDifferences();
-			for (int i = 0; i < differences.length; i++) {
-				ListDiffEntry listDiffEntry = differences[i];
+			for (ListDiffEntry listDiffEntry : differences) {
 				IObservable target = (IObservable) listDiffEntry.getElement();
 				if (listDiffEntry.isAddition()) {
 					target.addChangeListener(uiChangeListener);
