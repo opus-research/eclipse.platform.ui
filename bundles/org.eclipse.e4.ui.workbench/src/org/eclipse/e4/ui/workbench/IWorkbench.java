@@ -101,33 +101,6 @@ public interface IWorkbench {
 	public final static String APPLICATION_CONTEXT_KEY = "applicationContext"; //$NON-NLS-1$
 
 	/**
-	 * This named context parameter is used to specify whether a {@link MPart}
-	 * or a {@link MPlaceholder} are shown on top, which means the contents of
-	 * it can be seen by the user in the UI.
-	 * <p>
-	 * This means clients can obtain the state of being on top by asking the
-	 * part's context for the {@link IWorkbench#ON_TOP} key.
-	 * </p>
-	 * <p>
-	 * Note that also objects created with a parts' context can obtain this
-	 * {@link IWorkbench#ON_TOP} key, e.g., MToolControls.
-	 * </p>
-	 *
-	 * <pre>
-	 * &#64;Inject
-	 * &#64;Optional
-	 * private void onTop(&#64;Named(IWorkbench.ON_TOP) Boolean onTop) {
-	 * 	if (onTop) {
-	 * 		// ... do something when part is on top
-	 * 	}
-	 * }
-	 * </pre>
-	 *
-	 * @since 1.4
-	 */
-	public static final String ON_TOP = "elementOnTop"; //$NON-NLS-1$
-
-	/**
 	 * Close the workbench instance
 	 *
 	 * @return <code>true</code> if the shutdown succeeds
