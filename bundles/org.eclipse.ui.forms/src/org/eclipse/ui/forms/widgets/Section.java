@@ -204,8 +204,10 @@ public class Section extends ExpandableComposite {
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 		if (descriptionControl != null
-				&& (getExpansionStyle() & DESCRIPTION) != 0)
+				&& (getExpansionStyle() & DESCRIPTION) != 0) {
 			descriptionControl.setBackground(bg);
+		}
+		super.requestLayout();
 	}
 
 	/**
@@ -220,6 +222,7 @@ public class Section extends ExpandableComposite {
 		if (descriptionControl != null
 				&& (getExpansionStyle() & DESCRIPTION) != 0)
 			descriptionControl.setForeground(fg);
+		super.requestLayout();
 	}
 
 	/**
@@ -327,10 +330,14 @@ public class Section extends ExpandableComposite {
 	}
 
 	private void putTitleBarColor(String key, Color color) {
-		if (color == null)
-			return;
-		if (titleColors == null)
+		if (titleColors == null) {
 			titleColors = new Hashtable<>();
+		}
+		if (color == null) {
+			titleColors.remove(key);
+			return;
+		}
+
 		titleColors.put(key, color);
 	}
 
