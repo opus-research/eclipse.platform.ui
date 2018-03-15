@@ -384,7 +384,8 @@ public class TabbedPropertyList
 
 			/* Draw dynamic images, if any */
 			boolean hasDynamicImage = false;
-			for (Image dynamicImage : dynamicImages) {
+			for (int i = 0; i < dynamicImages.length; i++) {
+				Image dynamicImage = dynamicImages[i];
 				if (dynamicImage != null && !dynamicImage.isDisposed()) {
 					hasDynamicImage = true;
 					break;
@@ -394,7 +395,8 @@ public class TabbedPropertyList
 				int drawPosition = textIndent
 						+ e.gc.textExtent(tab.getText()).x + 4;
 				boolean addSpace = false;
-				for (Image dynamicImage : dynamicImages) {
+				for (int i = 0; i < dynamicImages.length; i++) {
+					Image dynamicImage = dynamicImages[i];
 					if (dynamicImage != null && !dynamicImage.isDisposed()) {
 						if (addSpace) {
 							drawPosition = drawPosition + 3;
@@ -727,8 +729,8 @@ public class TabbedPropertyList
 	 */
 	public void removeAll() {
 		if (elements != null) {
-			for (ListElement element : elements) {
-				element.dispose();
+			for (int i = 0; i < elements.length; i++) {
+				elements[i].dispose();
 			}
 		}
 		elements = ELEMENTS_EMPTY;
@@ -945,6 +947,8 @@ public class TabbedPropertyList
 		widgetNormalShadow = Display.getCurrent().getSystemColor(
 				SWT.COLOR_WIDGET_NORMAL_SHADOW);
 
+		RGB infoBackground = Display.getCurrent().getSystemColor(
+				SWT.COLOR_INFO_BACKGROUND).getRGB();
 		RGB white = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE)
 				.getRGB();
 		RGB black = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK)
@@ -952,16 +956,16 @@ public class TabbedPropertyList
 
 		/*
 		 * gradient in the default tab: start colour WIDGET_NORMAL_SHADOW 100% +
-		 * white 20% + WIDGET_BACKGROUND 60% end colour WIDGET_NORMAL_SHADOW
-		 * 100% + WIDGET_BACKGROUND 40%
+		 * white 20% + INFO_BACKGROUND 60% end colour WIDGET_NORMAL_SHADOW 100% +
+		 * INFO_BACKGROUND 40%
 		 */
 		defaultGradientStart = factory.getColors().createColor(
 				"TabbedPropertyList.defaultTabGradientStart", //$NON-NLS-1$
-				FormColors.blend(widgetBackground.getRGB(), FormColors.blend(white,
+				FormColors.blend(infoBackground, FormColors.blend(white,
 						widgetNormalShadow.getRGB(), 20), 60));
 		defaultGradientEnd = factory.getColors().createColor(
 				"TabbedPropertyList.defaultTabGradientEnd", //$NON-NLS-1$
-				FormColors.blend(widgetBackground.getRGB(), widgetNormalShadow.getRGB(),
+				FormColors.blend(infoBackground, widgetNormalShadow.getRGB(),
 						40));
 
 		navigationElementShadowStroke = factory.getColors().createColor(

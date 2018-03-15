@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,6 @@ import org.eclipse.ui.tests.encoding.EncodingTestSuite;
 import org.eclipse.ui.tests.fieldassist.FieldAssistTestSuite;
 import org.eclipse.ui.tests.filteredtree.FilteredTreeTests;
 import org.eclipse.ui.tests.keys.KeysTestSuite;
-import org.eclipse.ui.tests.menus.MenusTestSuite;
 import org.eclipse.ui.tests.multipageeditor.MultiPageEditorTestSuite;
 import org.eclipse.ui.tests.navigator.NavigatorTestSuite;
 import org.eclipse.ui.tests.operations.OperationsTestSuite;
@@ -63,8 +62,7 @@ import org.junit.runners.Suite;
 	ContextsTestSuite.class,
 	ConcurrencyTestSuite.class,
 	FilteredTreeTests.class,
-	StatusHandlingTestSuite.class,
-	MenusTestSuite.class
+	StatusHandlingTestSuite.class
 })
 public class UiTestSuite {
 
@@ -76,6 +74,7 @@ public class UiTestSuite {
 	// CommandsTestSuite.class,
 	// DragTestSuite.class,
 	// IntroTestSuite.class,
+	// MenusTestSuite.class,
 	// PresentationsTestSuite.class,
 	// LeakTests.class,
 	// MultiEditorTestSuite.class,

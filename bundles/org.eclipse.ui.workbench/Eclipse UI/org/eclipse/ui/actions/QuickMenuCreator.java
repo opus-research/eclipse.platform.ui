@@ -23,6 +23,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
@@ -61,13 +63,19 @@ public abstract class QuickMenuCreator {
 			return;
 		}
 		quickMenu.setLocation(location);
-		quickMenu.addListener(SWT.Hide, event -> {
-			if (!display.isDisposed()) {
-				display.asyncExec(() -> {
-					if (!quickMenu.isDisposed()) {
-						quickMenu.dispose();
-					}
-				});
+		quickMenu.addListener(SWT.Hide, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				if (!display.isDisposed()) {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							if (!quickMenu.isDisposed()) {
+								quickMenu.dispose();
+							}
+						}
+					});
+				}
 			}
 		});
 		quickMenu.setVisible(true);
@@ -236,7 +244,8 @@ public abstract class QuickMenuCreator {
 	private Point[] getIncludedPositions(Rectangle[] rectangles,
 			Rectangle widgetBounds) {
 		List result = new ArrayList();
-		for (Rectangle rectangle : rectangles) {
+		for (int i = 0; i < rectangles.length; i++) {
+			Rectangle rectangle = rectangles[i];
 			Rectangle intersect = widgetBounds.intersection(rectangle);
 			if (intersect != null && intersect.height == rectangle.height) {
 				result.add(new Point(intersect.x, intersect.y
@@ -249,7 +258,8 @@ public abstract class QuickMenuCreator {
 	private Point findBestLocation(Point[] points, Point relativeCursor) {
 		Point result = null;
 		double bestDist = Double.MAX_VALUE;
-		for (Point point : points) {
+		for (int i = 0; i < points.length; i++) {
+			Point point = points[i];
 			int a = 0;
 			int b = 0;
 			if (point.x > relativeCursor.x) {

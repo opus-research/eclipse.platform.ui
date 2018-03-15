@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 Freescale Semiconductor and others.
+ * Copyright (c) 2008, 2015 Freescale Semiconductor and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,11 +8,11 @@
  * Contributors:
  *     Serge Beauchamp (Freescale Semiconductor) - [252996] initial API and implementation
  *     IBM Corporation - ongoing implementation
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.misc;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,7 +32,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.StringMatcher;
 
 /**
@@ -125,7 +124,7 @@ public class FileInfoAttributesMatcher extends AbstractFileInfoMatcher {
 	 */
 	public static class Argument {
 		public String key = KEY_NAME;
-		public String pattern = ""; //$NON-NLS-1$
+		public String pattern = new String();
 		public String operator = OPERATOR_EQUALS;
 		public boolean caseSensitive = false;
 		public boolean regularExpression = false;
@@ -235,11 +234,20 @@ public class FileInfoAttributesMatcher extends AbstractFileInfoMatcher {
 			Method toMillis = fileTime.getMethod("toMillis"); //$NON-NLS-1$
 			Object result = toMillis.invoke(time);
 
-			if (result instanceof Long) {
+			if (result instanceof Long)
 				return ((Long) result).longValue();
-			}
-		} catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
-			IDEWorkbenchPlugin.log(e.getMessage(), e);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
 		}
 		return 0;
 	}
@@ -267,7 +275,7 @@ public class FileInfoAttributesMatcher extends AbstractFileInfoMatcher {
 
 		public boolean match(IContainer parent, IFileInfo fileInfo) {
 			if (type.equals(String.class)) {
-				String value = ""; //$NON-NLS-1$
+				String value = new String();
 				if (argument.key.equals(KEY_NAME))
 					value = fileInfo.getName();
 				if (argument.key.equals(KEY_PROPJECT_RELATIVE_PATH))

@@ -63,8 +63,9 @@ public class WizardProvider extends QuickAccessProvider {
 
 	private void collectWizards(IWizardCategory category, List<IWizardDescriptor> result) {
 		result.addAll(Arrays.asList(category.getWizards()));
-		for (IWizardCategory childCategory : category.getCategories()) {
-			collectWizards(childCategory, result);
+		IWizardCategory[] childCategories = category.getCategories();
+		for (int i = 0; i < childCategories.length; i++) {
+			collectWizards(childCategories[i], result);
 		}
 	}
 

@@ -47,9 +47,8 @@ public class TrimDropAgent extends DropAgent {
 	@Override
 	public boolean canDrop(MUIElement dragElement, DnDInfo info) {
 		// We only except elements that can go in the trim
-		if (!(dragElement instanceof MTrimElement)) {
+		if (!(dragElement instanceof MTrimElement))
 			return false;
-		}
 
 		// are we over a 'side' ?
 		side = getDropSide(info);
@@ -62,18 +61,14 @@ public class TrimDropAgent extends DropAgent {
 		if (ds.getLayout() instanceof TrimmedPartLayout) {
 			TrimmedPartLayout tpl = (TrimmedPartLayout) ds.getLayout();
 
-			if (tpl.getTrimRect(SWT.TOP).contains(info.cursorPos)) {
+			if (tpl.getTrimRect(SWT.TOP).contains(info.cursorPos))
 				return SideValue.TOP;
-			}
-			if (tpl.getTrimRect(SWT.BOTTOM).contains(info.cursorPos)) {
+			if (tpl.getTrimRect(SWT.BOTTOM).contains(info.cursorPos))
 				return SideValue.BOTTOM;
-			}
-			if (tpl.getTrimRect(SWT.LEFT).contains(info.cursorPos)) {
+			if (tpl.getTrimRect(SWT.LEFT).contains(info.cursorPos))
 				return SideValue.LEFT;
-			}
-			if (tpl.getTrimRect(SWT.RIGHT).contains(info.cursorPos)) {
+			if (tpl.getTrimRect(SWT.RIGHT).contains(info.cursorPos))
 				return SideValue.RIGHT;
-			}
 		}
 
 		return null;
@@ -84,21 +79,18 @@ public class TrimDropAgent extends DropAgent {
 
 		// If we're over the trim bar itself drop at the end
 		// May need to take margins into account
-		if (info.curCtrl == trimComp) {
+		if (info.curCtrl == trimComp)
 			return null;
-		}
 
 		TrimBarLayout tbl = (TrimBarLayout) trimComp.getLayout();
 		Point trimPos = trimComp.getDisplay().map(null, trimComp, info.cursorPos);
 		Control trimCtrl = tbl.ctrlFromPoint(trimComp, trimPos);
 
-		if (trimCtrl == null) {
+		if (trimCtrl == null)
 			return null;
-		}
 
-		if (trimCtrl == dragElement.getWidget()) {
+		if (trimCtrl == dragElement.getWidget())
 			return dragElement;
-		}
 
 		// Are we closer to the 'end' of the trim control ?
 		// If so insert before the next control (if any)
@@ -106,9 +98,8 @@ public class TrimDropAgent extends DropAgent {
 		if (isAfter(trimCtrl, info)) {
 			MElementContainer<MUIElement> trimParent = trimElement.getParent();
 			int trimIndex = trimParent.getChildren().indexOf(trimElement);
-			if (trimIndex == trimParent.getChildren().size() - 1) {
+			if (trimIndex == trimParent.getChildren().size() - 1)
 				return null;
-			}
 
 			return trimParent.getChildren().get(trimIndex + 1);
 		}
@@ -153,9 +144,8 @@ public class TrimDropAgent extends DropAgent {
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
 		SideValue curSide = getDropSide(info);
-		if (side != curSide) {
+		if (side != curSide)
 			return false;
-		}
 
 		MUIElement insertBefore = getInsertionElement(dragElement, info);
 

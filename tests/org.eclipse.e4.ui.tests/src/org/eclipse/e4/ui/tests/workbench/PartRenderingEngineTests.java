@@ -14,16 +14,13 @@ package org.eclipse.e4.ui.tests.workbench;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine;
@@ -46,8 +43,6 @@ import org.eclipse.e4.ui.workbench.addons.cleanupaddon.CleanupAddon;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Control;
@@ -94,21 +89,6 @@ public class PartRenderingEngineTests {
 		appContext = E4Application.createDefaultContext();
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
-
-		final Display d = Display.getDefault();
-		appContext.set(Realm.class, DisplayRealm.getRealm(d));
-		appContext.set(UISynchronize.class, new UISynchronize() {
-			@Override
-			public void syncExec(Runnable runnable) {
-				d.syncExec(runnable);
-			}
-
-			@Override
-			public void asyncExec(Runnable runnable) {
-				d.asyncExec(runnable);
-			}
-		});
-
 		LogReaderService logReaderService = appContext
 				.get(LogReaderService.class);
 		logReaderService.addLogListener(listener);
@@ -739,33 +719,17 @@ public class PartRenderingEngineTests {
 		// the selected element doesn't change its value
 		container.setSelectedElement(partA);
 		partB.setToBeRendered(false);
-		assertEquals(
+		assertTrue(
 				"Changing the TBR of a non-selected element should not change the value of the container's seletedElement",
-				partA, container.getSelectedElement());
+				container.getSelectedElement() == partA);
 
-
-		// Ensure that changing the TBR state of the selected element to false
-		// results in selecting moving to a TBR=true element
+		// Ensure that changing the TBR state of the selected element results in
+		// it going null
 		container.setSelectedElement(partA);
 		partA.setToBeRendered(false);
-		assertNotEquals("Changing the TBR of the selected element should have moved selection to a TBR item", partA,
-				container.getSelectedElement());
-
-		if ("gtk".equals(SWT.getPlatform())) {
-			assertTrue(
-					"Changing the TBR of the selected element should have moved selection to a TBR item",
-					container.getSelectedElement().isToBeRendered());
-
-			// Ensure that when all elements are TBR=false, selection is null
-			partC.setToBeRendered(false);
-			// Then there should be TBR item
-			assertNull("Changing the TBR of all elements to false should have set the field to null",
-					container.getSelectedElement());
-		} else {
-			assertTrue(
-					"Changing the TBR of the selected element should have set the field to null",
-					container.getSelectedElement() == null);
-		}
+		assertTrue(
+				"Changing the TBR of the selected element should have set the field to null",
+				container.getSelectedElement() == null);
 	}
 
 	@Test

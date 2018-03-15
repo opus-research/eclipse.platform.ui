@@ -15,20 +15,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.TrayDialog;
-import org.eclipse.jface.viewers.AbstractTreeViewer;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.window.Window;
+import com.ibm.icu.text.Collator;
+
 import org.eclipse.osgi.util.NLS;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -45,12 +35,26 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import org.eclipse.core.resources.IMarker;
+
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.TrayDialog;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.window.Window;
+
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.IWorkingSetSelectionDialog;
 import org.eclipse.ui.internal.views.tasklist.TaskListMessages;
-
-import com.ibm.icu.text.Collator;
 
 class FiltersDialog extends TrayDialog {
     /**
@@ -144,8 +148,8 @@ class FiltersDialog extends TrayDialog {
         void updateEnabledState() {
             boolean enabled = enableButton.isEnabled()
                     && enableButton.getSelection();
-            for (Button valueButton : valueButtons) {
-                valueButton.setEnabled(enabled);
+            for (int i = 0; i < valueButtons.length; ++i) {
+                valueButtons[i].setEnabled(enabled);
             }
         }
 
@@ -373,8 +377,9 @@ class FiltersDialog extends TrayDialog {
     public void checkStateChanged(CheckStateChangedEvent event) {
         MarkerType type = (MarkerType) event.getElement();
         typesViewer.setSubtreeChecked(type, event.getChecked());
-		for (MarkerType markerSupertype : type.getAllSupertypes()) {
-			typesViewer.setChecked(markerSupertype, false);
+        MarkerType[] allSupertypes = type.getAllSupertypes();
+        for (int i = 0; i < allSupertypes.length; ++i) {
+            typesViewer.setChecked(allSupertypes[i], false);
         }
         updateEnabledState();
     }
@@ -415,7 +420,7 @@ class FiltersDialog extends TrayDialog {
 
         Button reset = new Button(composite, SWT.PUSH);
         reset.setText(TaskListMessages.TaskList_resetText);
-		reset.setData(Integer.valueOf(RESET_ID));
+        reset.setData(new Integer(RESET_ID));
 
         reset.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -638,7 +643,9 @@ class FiltersDialog extends TrayDialog {
     MarkerType[] getMarkerTypes() {
         if (markerTypes == null) {
             ArrayList typesList = new ArrayList();
-			for (MarkerType type : markerTypesModel.getTypes()) {
+            MarkerType[] types = markerTypesModel.getTypes();
+            for (int i = 0; i < types.length; ++i) {
+                MarkerType type = types[i];
                 if (type.getLabel().length() > 0) {
                     if (type.isSubtypeOf(markerTypesModel
                             .getType(IMarker.PROBLEM))
@@ -669,9 +676,10 @@ class FiltersDialog extends TrayDialog {
      * @return the ids of the selected marker types
      */
     String[] getSelectedTypes() {
+        Object[] checked = typesViewer.getCheckedElements();
         ArrayList list = new ArrayList();
-		for (Object checkedElement : typesViewer.getCheckedElements()) {
-			MarkerType type = (MarkerType) checkedElement;
+        for (int i = 0; i < checked.length; ++i) {
+            MarkerType type = (MarkerType) checked[i];
             // Skip it if any supertypes have already been included.
             // Relies on getCheckedElements() using a pre-order traversal
             // so parents are earlier in the list.
@@ -809,8 +817,9 @@ class FiltersDialog extends TrayDialog {
         if (superType == null) {
             return false;
         }
-		for (Object checkedElement : typesViewer.getCheckedElements()) {
-			if (((MarkerType) checkedElement).isSubtypeOf(superType)) {
+        Object[] checked = typesViewer.getCheckedElements();
+        for (int i = 0; i < checked.length; ++i) {
+            if (((MarkerType) checked[i]).isSubtypeOf(superType)) {
                 return true;
             }
         }
@@ -833,8 +842,8 @@ class FiltersDialog extends TrayDialog {
      */
     void setSelectedTypes(String[] typeIds) {
         typesViewer.setCheckedElements(new MarkerType[0]);
-        for (String typeId : typeIds) {
-            MarkerType type = markerTypesModel.getType(typeId);
+        for (int i = 0; i < typeIds.length; ++i) {
+            MarkerType type = markerTypesModel.getType(typeIds[i]);
             if (type != null) {
                 typesViewer.setSubtreeChecked(type, true);
             }

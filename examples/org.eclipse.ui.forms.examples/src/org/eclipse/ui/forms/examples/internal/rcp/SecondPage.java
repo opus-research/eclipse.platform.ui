@@ -37,7 +37,6 @@ public class SecondPage extends FormPage {
 		super(editor, "second", "Section Page");
 	}
 
-	@Override
 	protected void createFormContent(IManagedForm managedForm) {
 		ScrolledForm form = managedForm.getForm();
 		FormToolkit toolkit = managedForm.getToolkit();
@@ -108,7 +107,6 @@ public class SecondPage extends FormPage {
 		section.setClient(client);
 		section.setExpanded(true);
 		section.addExpansionListener(new ExpansionAdapter() {
-			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				form.reflow(false);
 			}

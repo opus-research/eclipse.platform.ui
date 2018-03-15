@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -90,10 +91,12 @@ public class IWorkbenchPageTest extends UITestCase {
 	String getMessage() {
 		return logStatus==null?"No message":logStatus.getMessage();
 	}
-
-	ILogListener openAndHideListener = (status, plugin) -> {
-		logStatus = status;
-		logCount++;
+	ILogListener openAndHideListener = new ILogListener() {
+		@Override
+		public void logging(IStatus status, String plugin) {
+			logStatus = status;
+			logCount++;
+		}
 	};
 
 
@@ -205,7 +208,7 @@ public class IWorkbenchPageTest extends UITestCase {
 
 			assertNotNull(sets);
 			assertEquals(2, sets.length);
-			Set<IWorkingSet> realSet = new HashSet<>(Arrays.asList(sets));
+			Set<IWorkingSet> realSet = new HashSet<IWorkingSet>(Arrays.asList(sets));
 			assertTrue(realSet.contains(set1));
 			assertTrue(realSet.contains(set2));
 
@@ -247,10 +250,14 @@ public class IWorkbenchPageTest extends UITestCase {
 		IWorkingSet set1 = null;
 		final IWorkingSet[][] sets = new IWorkingSet[1][];
 		sets[0] = new IWorkingSet[0];
-		IPropertyChangeListener listener = event -> {
-			IWorkingSet[] oldSets = (IWorkingSet[]) event.getOldValue();
-			assertTrue(Arrays.equals(sets[0], oldSets));
-			sets[0] = (IWorkingSet[]) event.getNewValue();
+		IPropertyChangeListener listener = new IPropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				IWorkingSet[] oldSets = (IWorkingSet[]) event.getOldValue();
+				assertTrue(Arrays.equals(sets[0], oldSets));
+				sets[0] = (IWorkingSet[]) event.getNewValue();
+			}
 		};
 		try {
 			set1 = manager.createWorkingSet("w1", new IAdaptable[0]);
@@ -879,16 +886,9 @@ public class IWorkbenchPageTest extends UITestCase {
 	 * @param hasEditors whether there should be editors open or not
 	 */
 	private void testBringToTop_MinimizedViewBug292966(boolean hasEditors) throws Throwable {
-		IPerspectiveRegistry reg = fWorkbench.getPerspectiveRegistry();
-		IPerspectiveDescriptor resourcePersp = reg.findPerspectiveWithId(IDE.RESOURCE_PERSPECTIVE_ID);
-		fActivePage.setPerspective(resourcePersp);
-		processEvents();
-
 		// first show the view we're going to test
 		IViewPart propertiesView = fActivePage.showView(IPageLayout.ID_PROP_SHEET);
 		assertNotNull(propertiesView);
-
-		processEvents();
 
 		proj = FileUtil.createProject("testOpenEditor");
 		// open an editor
@@ -900,20 +900,17 @@ public class IWorkbenchPageTest extends UITestCase {
 		if (!hasEditors) {
 			// close editors if we don't want them opened for this test
 			fActivePage.closeAllEditors(false);
-			processEvents();
 			assertEquals("All the editors should have been closed", 0, fActivePage.getEditorReferences().length); //$NON-NLS-1$
 		}
 
 		// minimize the view we're testing
 		fActivePage.setPartState(fActivePage.getReference(propertiesView), IWorkbenchPage.STATE_MINIMIZED);
 		assertFalse("A minimized view should not be visible", fActivePage.isPartVisible(propertiesView)); //$NON-NLS-1$
-		processEvents();
 
 		// open another view so that it now becomes the active part container
 		IViewPart projectExplorer = fActivePage.showView(IPageLayout.ID_PROJECT_EXPLORER);
 		// get the list of views that shares the stack with this other view
 		IViewPart[] viewStack = fActivePage.getViewStack(projectExplorer);
-		processEvents();
 		// make sure that we didn't inadvertently bring back the test view by mistake
 		for (IViewPart element : viewStack) {
 			assertFalse("The properties view should not be on the same stack as the project explorer", //$NON-NLS-1$
@@ -927,11 +924,11 @@ public class IWorkbenchPageTest extends UITestCase {
 				fActivePage.isPartVisible(propertiesView));
 	}
 
-	public void testBringToTop_MinimizedViewWithEditorsBug292966() throws Throwable {
+	public void XXXtestBringToTop_MinimizedViewWithEditorsBug292966() throws Throwable {
 		testBringToTop_MinimizedViewBug292966(false);
 	}
 
-	public void testBringToTop_MinimizedViewWithoutEditorsBug292966() throws Throwable {
+	public void XXXtestBringToTop_MinimizedViewWithoutEditorsBug292966() throws Throwable {
 		testBringToTop_MinimizedViewBug292966(true);
 	}
 
@@ -970,7 +967,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	/**
 	 * Tests showing multi-instance views (docked normally).
 	 */
-	public void testShowViewMult() throws Throwable {
+	public void XXXtestShowViewMult() throws Throwable {
 		/*
 		 * javadoc: Shows the view identified by the given view id and secondary
 		 * id in this page and gives it focus. This allows multiple instances of
@@ -1021,20 +1018,19 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertEquals(callTrace.contains("setFocus"), false);
 		assertEquals(callTrace2.contains("setFocus"), false);
 
-		// TODO expectations below do not work, exception is not thrown
 		/*
 		 * javadoc: If a secondary id is given, the view must allow multiple
 		 * instances by having specified allowMultiple="true" in its extension.
 		 */
-//		boolean exceptionThrown = false;
-//		try {
-//			fActivePage.showView(MockViewPart.ID, "2",
-//					IWorkbenchPage.VIEW_ACTIVATE);
-//		} catch (PartInitException e) {
-//			assertEquals(e.getMessage().indexOf("mult") != -1, true);
-//			exceptionThrown = true;
-//		}
-//		assertEquals(exceptionThrown, true);
+		boolean exceptionThrown = false;
+		try {
+			fActivePage.showView(MockViewPart.ID, "2",
+					IWorkbenchPage.VIEW_ACTIVATE);
+		} catch (PartInitException e) {
+			assertEquals(e.getMessage().indexOf("mult") != -1, true);
+			exceptionThrown = true;
+		}
+		assertEquals(exceptionThrown, true);
 	}
 
 	public void testFindView() throws Throwable {
@@ -1192,7 +1188,7 @@ public class IWorkbenchPageTest extends UITestCase {
 
 	private void showViewViaCommand(String viewId) throws Throwable {
 		waitForJobs(500, 3000);
-		Map<String, String> parameters = new HashMap<>();
+		Map<String, String> parameters = new HashMap<String, String>();
 		parameters.put(IWorkbenchCommandConstants.VIEWS_SHOW_VIEW_PARM_ID, viewId);
 
 		Command command = createCommand(IWorkbenchCommandConstants.VIEWS_SHOW_VIEW);
@@ -1424,7 +1420,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		}
 	}
 
-	public void testClose() throws Throwable {
+	public void XXXtestClose() throws Throwable {
 		IWorkbenchPage page = openTestPage(fWin);
 
 		proj = FileUtil.createProject("testOpenEditor");
@@ -1743,7 +1739,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		}
 	}
 
-	public void testSaveAllEditors() throws Throwable {
+	public void XXXtestSaveAllEditors() throws Throwable {
 		int total = 3;
 
 		final IFile[] files = new IFile[total];
@@ -1905,7 +1901,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		return false;
 	}
 
-	public void testStackOrder() throws PartInitException {
+	public void XXXtestStackOrder() throws PartInitException {
 		IViewPart part1 = fActivePage.showView(MockViewPart.ID);
 		IViewPart part2 = fActivePage.showView(MockViewPart.ID2);
 		IViewPart part3 = fActivePage.showView(MockViewPart.ID3);
@@ -2208,7 +2204,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	 *
 	 * @since 3.1
 	 */
-	public void testGetOpenPerspectives() {
+	public void XXXtestGetOpenPerspectives() {
 		IPerspectiveDescriptor[] openPersps = fActivePage.getOpenPerspectives();
 		assertEquals(1, openPersps.length);
 		assertEquals(EmptyPerspective.PERSP_ID, openPersps[0].getId());
@@ -2244,7 +2240,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	 *
 	 * @since 3.1
 	 */
-	public void testGetSortedPerspectives() {
+	public void XXXtestGetSortedPerspectives() {
 		IPerspectiveDescriptor[] openPersps = fActivePage
 				.getSortedPerspectives();
 		assertEquals(1, openPersps.length);
@@ -2281,7 +2277,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	 *
 	 * @since 3.1
 	 */
-	public void testClosePerspective() {
+	public void XXXtestClosePerspective() {
 		// TODO: Need to test variants with saveEditors==true
 
 		IPerspectiveRegistry reg = fWorkbench.getPerspectiveRegistry();
@@ -2390,7 +2386,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	 *
 	 * @since 3.1
 	 */
-	public void testCloseAllPerspectives() {
+	public void XXXtestCloseAllPerspectives() {
 		// TODO: Need to test variants with saveEditors==true
 
 		IPerspectiveRegistry reg = fWorkbench.getPerspectiveRegistry();
@@ -3158,31 +3154,21 @@ public class IWorkbenchPageTest extends UITestCase {
 	 * prevention of regressing on bug 209333.
 	 */
 	public void testSetPartState() throws Exception {
-		processEvents();
 		// show a view
 		IViewPart view = fActivePage.showView(MockViewPart.ID);
-		processEvents();
 
 		// now minimize it
 		IViewReference reference = (IViewReference) fActivePage
 				.getReference(view);
 		fActivePage.setPartState(reference, IWorkbenchPage.STATE_MINIMIZED);
-		processEvents();
 
 		// since it's minimized
 		assertTrue("This view should be minimized", APITestUtils.isViewMinimized(reference));
-		// for whatever reason this view is still active, and active views
-		// aren't recognized
-		// as hidden even if they *are* physically invisible.
-		assertTrue("Minimized but active view should be visible", fActivePage.isPartVisible(view));
 
 		// try to restore it
 		fActivePage.setPartState(reference, IWorkbenchPage.STATE_RESTORED);
-		processEvents();
-
 		// since it's maximized
 		assertFalse("This view should not be restored", APITestUtils.isViewMinimized(reference));
-		assertTrue("Restored view should be visible", fActivePage.isPartVisible(view));
 	}
 
 	/**

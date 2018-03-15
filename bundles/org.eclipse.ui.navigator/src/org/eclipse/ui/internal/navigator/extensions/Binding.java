@@ -50,7 +50,8 @@ class Binding {
 			return knownIds.get(anExtensionId).booleanValue();
 		}
 
-		for (Pattern pattern : excludePatterns) {
+		for (Iterator<Pattern> itr = excludePatterns.iterator(); itr.hasNext();) {
+			Pattern pattern = itr.next();
 			if (pattern.matcher(anExtensionId).matches()) {
 				knownIds.put(anExtensionId, Boolean.FALSE);
 				if (Policy.DEBUG_RESOLUTION) {
@@ -61,7 +62,8 @@ class Binding {
 			}
 		}
 
-		for (Pattern pattern : includePatterns) {
+		for (Iterator<Pattern> itr = includePatterns.iterator(); itr.hasNext();) {
+			Pattern pattern = itr.next();
 			if (pattern.matcher(anExtensionId).matches()) {
 				// keep track of the result for next time
 				knownIds.put(anExtensionId, Boolean.TRUE);
@@ -116,15 +118,15 @@ class Binding {
 		boolean isRoot = false;
 		String patternString = null;
 		Pattern compiledPattern = null;
-		for (IConfigurationElement contentExtensionPattern : contentExtensionPatterns) {
+		for (int i = 0; i < contentExtensionPatterns.length; i++) {
 			if (toRespectRoots) {
-				isRootString = contentExtensionPattern
+				isRootString = contentExtensionPatterns[i]
 						.getAttribute(NavigatorViewerDescriptor.ATT_IS_ROOT);
 				isRoot = (isRootString != null) ? Boolean.valueOf(
 						isRootString.trim()).booleanValue() : false;
 			}
 
-			patternString = contentExtensionPattern
+			patternString = contentExtensionPatterns[i]
 					.getAttribute(NavigatorViewerDescriptor.ATT_PATTERN);
 			if (patternString == null) {
 				NavigatorPlugin
@@ -161,9 +163,9 @@ class Binding {
 				.getChildren(TAG_EXTENSION);
 		String patternString = null;
 		Pattern compiledPattern = null;
-		for (IConfigurationElement contentExtensionPattern : contentExtensionPatterns) {
+		for (int i = 0; i < contentExtensionPatterns.length; i++) {
 
-			patternString = contentExtensionPattern
+			patternString = contentExtensionPatterns[i]
 					.getAttribute(NavigatorViewerDescriptor.ATT_PATTERN);
 			if (patternString == null) {
 				NavigatorPlugin

@@ -122,9 +122,19 @@ public final class ContextService implements IContextService {
 						return updating;
 					}
 					if (result != EvaluationResult.FALSE) {
-						runExternalCode(() -> contextService.activateContext(contextId));
+						runExternalCode(new Runnable() {
+							@Override
+							public void run() {
+								contextService.activateContext(contextId);
+							}
+						});
 					} else if (cached != null) {
-						runExternalCode(() -> contextService.deactivateContext(contextId));
+						runExternalCode(new Runnable() {
+							@Override
+							public void run() {
+								contextService.deactivateContext(contextId);
+							}
+						});
 					}
 					cached = result;
 				}
@@ -194,15 +204,11 @@ public final class ContextService implements IContextService {
 
 	@Override
 	public final void deactivateContexts(final Collection activations) {
-		try {
-			deferUpdates(true);
-			final Iterator<?> activationItr = activations.iterator();
-			while (activationItr.hasNext()) {
-				final IContextActivation activation = (IContextActivation) activationItr.next();
-				deactivateContext(activation);
-			}
-		} finally {
-			deferUpdates(false);
+		final Iterator activationItr = activations.iterator();
+		while (activationItr.hasNext()) {
+			final IContextActivation activation = (IContextActivation) activationItr
+					.next();
+			deactivateContext(activation);
 		}
 	}
 

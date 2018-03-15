@@ -43,11 +43,15 @@ public class UIExtensionTracker extends ExtensionTracker {
 		if (display.isDisposed())
 			return;
 
-		display.asyncExec(() -> {
-            try {
-                handler.removeExtension(removedExtension, objects);
-            } catch (Exception e) {
-                WorkbenchPlugin.log(getClass(), "doRemove", e); //$NON-NLS-1$
+		display.syncExec(new Runnable() {
+
+            @Override
+			public void run() {
+                try {
+                    handler.removeExtension(removedExtension, objects);
+                } catch (Exception e) {
+                    WorkbenchPlugin.log(getClass(), "doRemove", e); //$NON-NLS-1$
+                }
             }
         });
     }
@@ -57,11 +61,14 @@ public class UIExtensionTracker extends ExtensionTracker {
 		if (display.isDisposed())
 			return;
 
-		display.asyncExec(() -> {
-			try {
-				handler.addExtension(UIExtensionTracker.this, addedExtension);
-			} catch (Exception e) {
-				WorkbenchPlugin.log(getClass(), "doAdd", e); //$NON-NLS-1$
+        display.syncExec(new Runnable() {
+            @Override
+			public void run() {
+                try {
+                    handler.addExtension(UIExtensionTracker.this, addedExtension);
+                } catch (Exception e) {
+                    WorkbenchPlugin.log(getClass(), "doAdd", e); //$NON-NLS-1$
+                }
             }
         });
     }

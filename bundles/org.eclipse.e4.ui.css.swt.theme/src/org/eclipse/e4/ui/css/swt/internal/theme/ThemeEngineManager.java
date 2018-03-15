@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 Tom Schindl and others.
+ * Copyright (c) 2010, 2015 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,6 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.internal.theme;
 
-import org.eclipse.core.runtime.ILog;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.core.engine.CSSErrorHandler;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
@@ -21,13 +17,9 @@ import org.eclipse.e4.ui.css.swt.engine.CSSSWTEngineImpl;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.css.swt.theme.IThemeManager;
 import org.eclipse.swt.widgets.Display;
-import org.osgi.service.component.annotations.Component;
 
-@Component
 public class ThemeEngineManager implements IThemeManager {
 	private static final String KEY = "org.eclipse.e4.ui.css.swt.theme";
-
-	private static ILog LOG = Platform.getLog(Platform.getBundle(KEY));
 
 	@Override
 	public IThemeEngine getEngineForDisplay(Display display) {
@@ -50,14 +42,11 @@ public class ThemeEngineManager implements IThemeManager {
 		cssEngine.setErrorHandler(new CSSErrorHandler() {
 			@Override
 			public void error(Exception e) {
-				logError(e.getMessage(), e);
+				// TODO Use the logger
+				e.printStackTrace();
 			}
 		});
 		WidgetElement.setEngine(display, cssEngine);
 		return cssEngine;
-	}
-
-	static void logError(String message, Throwable e) {
-		LOG.log(new Status(IStatus.ERROR, KEY, message, e));
 	}
 }

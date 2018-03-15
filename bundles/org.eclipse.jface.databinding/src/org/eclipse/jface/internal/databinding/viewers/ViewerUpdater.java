@@ -53,7 +53,8 @@ public abstract class ViewerUpdater implements IViewerUpdater {
 	@Override
 	public void move(Object element, int oldPosition, int newPosition) {
 		if (isElementOrderPreserved()) {
-			IStructuredSelection selection = viewer.getStructuredSelection();
+			IStructuredSelection selection = (IStructuredSelection) viewer
+					.getSelection();
 
 			remove(element, oldPosition);
 			insert(element, newPosition);

@@ -183,8 +183,8 @@ public abstract class IDERegistryReader {
             extensions = orderExtensions(extensions);
             extensionPoints.put(pointId, extensions);
         }
-        for (IExtension extension : extensions) {
-			readExtension(extension);
+        for (int i = 0; i < extensions.length; i++) {
+			readExtension(extensions[i]);
 		}
     }
 }
