@@ -281,8 +281,8 @@ public abstract class WizardPropertyPage extends PropertyPage {
 	 */
 	private void rebuildWizardPage() {
 		Control[] children= fWizardPageContainer.getChildren();
-		for (Control element2 : children) {
-			element2.dispose();
+		for (Control controlElement : children) {
+			controlElement.dispose();
 		}
 
 		createWizardPageContent(fWizardPageContainer);

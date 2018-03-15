@@ -64,8 +64,8 @@ public abstract class WizardParameterValues implements IParameterValues {
 
 		final IWizardDescriptor[] wizardDescriptors = wizardCategory
 				.getWizards();
-		for (final IWizardDescriptor wizardDescriptor : wizardDescriptors) {
-			
+		for (int i = 0; i < wizardDescriptors.length; i++) {
+			final IWizardDescriptor wizardDescriptor = wizardDescriptors[i];
 
 			// Note: using description instead of label for the name
 			// to reduce possibilities of key collision in the map
@@ -83,7 +83,8 @@ public abstract class WizardParameterValues implements IParameterValues {
 
 		final IWizardCategory[] childCategories = wizardCategory
 				.getCategories();
-		for (final IWizardCategory childCategory : childCategories) {
+		for (int i = 0; i < childCategories.length; i++) {
+			final IWizardCategory childCategory = childCategories[i];
 			addParameterValues(values, childCategory);
 		}
 	}

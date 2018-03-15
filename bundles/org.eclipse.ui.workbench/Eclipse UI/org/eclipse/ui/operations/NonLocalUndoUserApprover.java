@@ -164,8 +164,8 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 			// empty
 			// array of affected objects is considered a local change.
 			local = true;
-			for (Object modifiedElement2 : modifiedElements) {
-				Object modifiedElement = modifiedElement2;
+			for (int i = 0; i < modifiedElements.length; i++) {
+				Object modifiedElement = modifiedElements[i];
 				if (!elementsContains(modifiedElement)) {
 					// the modified element is not known by the editor
 					local = false;
@@ -257,8 +257,8 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 			// may provide on the preferred class if they are not instances of
 			// the preferred class. This is done only once.
 			elementsAndAdapters = new ArrayList(elements.length);
-			for (Object element2 : elements) {
-				Object element = element2;
+			for (int i = 0; i < elements.length; i++) {
+				Object element = elements[i];
 				elementsAndAdapters.add(element);
 				if (affectedObjectsClass != null
 						&& !affectedObjectsClass.isInstance(element)) {

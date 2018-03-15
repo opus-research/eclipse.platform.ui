@@ -1493,8 +1493,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		}
 		// @issue should not pass in null
 		IWizardCategory[] children = element.getCategories();
-		for (IWizardCategory element2 : children) {
-			initializeNewWizardsMenu(menu, category, element2, activeIds);
+		for (IWizardCategory child : children) {
+			initializeNewWizardsMenu(menu, category, child, activeIds);
 		}
 	}
 
