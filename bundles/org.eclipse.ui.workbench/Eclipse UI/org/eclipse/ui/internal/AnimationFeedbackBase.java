@@ -11,6 +11,8 @@
 package org.eclipse.ui.internal;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -35,9 +37,12 @@ public abstract class AnimationFeedbackBase {
 	public AnimationFeedbackBase(Shell parentShell) {
 		baseShell = parentShell;
 
-		baseShell.addDisposeListener(e -> {
-			if (engine != null)
-				engine.cancelAnimation();
+		baseShell.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				if (engine != null)
+					engine.cancelAnimation();
+			}
 		});
 	}
 
@@ -91,9 +96,12 @@ public abstract class AnimationFeedbackBase {
 		if (animationShell == null) {
 			animationShell = new Shell(getBaseShell(), SWT.NO_TRIM | SWT.ON_TOP);
 
-			animationShell.addDisposeListener(e -> {
-				if (engine != null)
-					engine.cancelAnimation();
+			animationShell.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent e) {
+					if (engine != null)
+						engine.cancelAnimation();
+				}
 			});
 		}
 
