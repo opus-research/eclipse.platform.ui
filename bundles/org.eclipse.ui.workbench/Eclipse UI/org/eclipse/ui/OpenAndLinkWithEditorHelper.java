@@ -7,12 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 485201
  *******************************************************************************/
 package org.eclipse.ui;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -41,22 +39,13 @@ public abstract class OpenAndLinkWithEditorHelper {
 
 
 	private final class InternalListener implements IOpenListener, ISelectionChangedListener, IDoubleClickListener {
-		/*
-		 * @see org.eclipse.jface.viewers.IOpenListener#open(org.eclipse.jface.viewers.OpenEvent)
-		 */
+
 		@Override
 		public final void open(OpenEvent event) {
 			lastOpenSelection = event.getSelection();
-			try {
-				OpenAndLinkWithEditorHelper.this.open(lastOpenSelection, OpenStrategy.activateOnOpen());
-			} catch (OperationCanceledException e) {
-				// ignore: user cancel, see bug 485201.
-			}
+			OpenAndLinkWithEditorHelper.this.open(lastOpenSelection, OpenStrategy.activateOnOpen());
 		}
 
-		/*
-		 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-		 */
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			final ISelection selection = event.getSelection();
@@ -65,9 +54,6 @@ public abstract class OpenAndLinkWithEditorHelper {
 			lastOpenSelection = null;
 		}
 
-		/*
-		 * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
-		 */
 		@Override
 		public void doubleClick(DoubleClickEvent event) {
 			if (!OpenStrategy.activateOnOpen())
