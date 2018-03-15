@@ -87,7 +87,7 @@ public class EditorRegistryReader extends RegistryReader {
 		}
 
 		if (descriptor != null && contentType != null) {
-			editorRegistry.addContentTypeBindingFromPlugin(contentType, descriptor, false);
+			editorRegistry.addContentTypeBinding(contentType, descriptor, false);
 		}
 		return true;
 	}
