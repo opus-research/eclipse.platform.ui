@@ -100,7 +100,8 @@ public class BeanProperties {
 	 * @return a value property for the given property name of the given bean
 	 *         class.
 	 */
-	public static IBeanValueProperty value(Class beanClass, String propertyName, Class valueType) {
+	public static IBeanValueProperty value(Class beanClass,
+			String propertyName, Class valueType) {
 		String[] propertyNames = split(propertyName);
 		if (propertyNames.length > 1)
 			valueType = null;
@@ -345,7 +346,8 @@ public class BeanProperties {
 	 * @return a map property for the given property name of an arbitrary bean
 	 *         class.
 	 */
-	public static IBeanMapProperty map(String propertyName, Class keyType, Class valueType) {
+	public static IBeanMapProperty map(String propertyName, Class keyType,
+			Class valueType) {
 		return map(null, propertyName, keyType, valueType);
 	}
 
@@ -379,7 +381,8 @@ public class BeanProperties {
 	 * @return a map property for the given property name of the given bean
 	 *         class.
 	 */
-	public static IBeanMapProperty map(Class beanClass, String propertyName, Class keyType, Class valueType) {
+	public static IBeanMapProperty map(Class beanClass, String propertyName,
+			Class keyType, Class valueType) {
 		PropertyDescriptor propertyDescriptor;
 		IMapProperty property;
 		if (beanClass == null) {
