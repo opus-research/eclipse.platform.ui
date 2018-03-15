@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -633,7 +633,8 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 			windowContext.set(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, this);
 			windowContext.set(ISources.ACTIVE_WORKBENCH_WINDOW_SHELL_NAME, getShell());
-			EContextService cs = windowContext.get(EContextService.class);
+			EContextService cs = (EContextService) windowContext.get(EContextService.class
+					.getName());
 			cs.activateContext(IContextService.CONTEXT_ID_WINDOW);
 			cs.getActiveContextIds();
 
@@ -2749,7 +2750,7 @@ STATUS_LINE_ID, model);
 
 	@Override
 	public IExtensionTracker getExtensionTracker() {
-		return model.getContext().get(IExtensionTracker.class);
+		return (IExtensionTracker) model.getContext().get(IExtensionTracker.class.getName());
 	}
 
 	/**

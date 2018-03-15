@@ -80,9 +80,6 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 		project = existingProject;
 	}
 
-	/**
-	 * @since 3.14
-	 */
 	@Override
 	protected Button createButton(Composite parent, int id, String label, boolean defaultButton) {
 		if (id == IDialogConstants.OK_ID) {

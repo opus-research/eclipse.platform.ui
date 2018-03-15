@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2017 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,8 +34,6 @@ import org.eclipse.swt.widgets.Listener;
  *
  */
 public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
-	private boolean removeNonFocusedSelectionInformation;
-
 	/**
 	 * Create a new instance which can be passed to a
 	 * {@link TreeViewerFocusCellManager}
@@ -44,24 +42,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	 *            the viewer
 	 */
 	public FocusCellOwnerDrawHighlighter(ColumnViewer viewer) {
-		this(viewer, true);
-	}
-
-	/**
-	 * Create a new instance which can be passed to a
-	 * {@link TreeViewerFocusCellManager}
-	 *
-	 * @param viewer
-	 *            the viewer
-	 * @param removeNonFocusedSelectionInformation
-	 *            <code>true</code> if only the currently focused cell should be
-	 *            indicated as selected. <code>false</code> to indicate both the
-	 *            full selection and the currently focused cell.
-	 * @since 3.14
-	 */
-	public FocusCellOwnerDrawHighlighter(ColumnViewer viewer, boolean removeNonFocusedSelectionInformation) {
 		super(viewer);
-		this.removeNonFocusedSelectionInformation = removeNonFocusedSelectionInformation;
 		hookListener(viewer);
 	}
 
@@ -104,8 +85,10 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 
 	private void removeSelectionInformation(Event event, ViewerCell cell) {
 		GC gc = event.gc;
-		gc.setBackground(cell.getViewerRow().getBackground(cell.getColumnIndex()));
-		gc.setForeground(cell.getViewerRow().getForeground(cell.getColumnIndex()));
+		gc.setBackground(cell.getViewerRow().getBackground(
+				cell.getColumnIndex()));
+		gc.setForeground(cell.getViewerRow().getForeground(
+				cell.getColumnIndex()));
 		gc.fillRectangle(cell.getBounds());
 		event.detail &= ~SWT.SELECTED;
 	}
@@ -124,9 +107,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 				ViewerCell cell = row.getCell(event.index);
 
 				if (focusCell == null || !cell.equals(focusCell)) {
-					if (removeNonFocusedSelectionInformation) {
-						removeSelectionInformation(event, cell);
-					}
+					removeSelectionInformation(event, cell);
 				} else {
 					markFocusedCell(event, cell);
 				}
@@ -144,8 +125,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	 * @return the color or <code>null</code> to use the default
 	 */
 	protected Color getSelectedCellBackgroundColor(ViewerCell cell) {
-		return removeNonFocusedSelectionInformation ? null
-				: cell.getItem().getDisplay().getSystemColor(SWT.COLOR_LIST_SELECTION);
+		return null;
 	}
 
 	/**
