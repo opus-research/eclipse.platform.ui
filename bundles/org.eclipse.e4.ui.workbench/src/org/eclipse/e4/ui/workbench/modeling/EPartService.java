@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411, 486876
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 395825, 433188
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.modeling;
 
 import java.util.Collection;
-import java.util.Optional;
 import org.eclipse.core.runtime.AssertionFailedException;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
@@ -358,12 +357,10 @@ public interface EPartService {
 	 *            the perspective to switch to, must not be <code>null</code>
 	 *            and it must identify a perspective that's being managed by
 	 *            this service
-	 * @return an java.util.Optional<MPerspective> containing the perspective,
-	 *         which was switched to.
 	 *
 	 * @since 1.4
 	 */
-	public Optional<MPerspective> switchPerspective(String perspectiveId);
+	public void switchPerspective(String perspectiveId);
 
 	/**
 	 * Indicates whether a part with a certain elementId is currently rendered in a certain
