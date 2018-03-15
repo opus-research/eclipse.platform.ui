@@ -157,7 +157,7 @@ public class ProgressMonitorPart extends Composite implements
         fTaskName = name;
         fSubTaskName = ""; //$NON-NLS-1$
         updateLabel();
-        if ((totalWork == IProgressMonitor.UNKNOWN || totalWork == 0) && !fProgressIndicator.isDisposed()) {
+        if (totalWork == IProgressMonitor.UNKNOWN || totalWork == 0) {
             fProgressIndicator.beginAnimatedTask();
         } else {
             fProgressIndicator.beginTask(totalWork);
@@ -279,9 +279,7 @@ public class ProgressMonitorPart extends Composite implements
 
     @Override
 	public void internalWorked(double work) {
-		if (!fProgressIndicator.isDisposed()) {
-			fProgressIndicator.worked(work);
-		}
+        fProgressIndicator.worked(work);
     }
 
     @Override
@@ -335,9 +333,6 @@ public class ProgressMonitorPart extends Composite implements
      * Updates the label with the current task and subtask names.
      */
     protected void updateLabel() {
-		if (fLabel.isDisposed() || fLabel.isAutoDirection()) {
-			return;
-		}
         if (blockedStatus == null) {
             String text = taskLabel();
             fLabel.setText(text);
