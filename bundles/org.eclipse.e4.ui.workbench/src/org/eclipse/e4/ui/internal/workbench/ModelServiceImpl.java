@@ -1035,6 +1035,9 @@ public class ModelServiceImpl implements EModelService {
 
 		// If the id contains a ':' use the part before it as the descriptor id
 		int colonIndex = id == null ? -1 : id.indexOf(':');
+		if (id == null) {
+			return null;
+		}
 		String descId = colonIndex == -1 ? id : id.substring(0, colonIndex);
 
 		for (MPartDescriptor descriptor : application.getDescriptors()) {
