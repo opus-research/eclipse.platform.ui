@@ -27,8 +27,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -75,7 +73,6 @@ import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.dialogs.WorkingSetConfigurationBlock;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
-import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
 /**
@@ -633,7 +630,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 				Point initialSelection = rootDirectoryText.getSelection();
 				getContainer().run(true, true, new IRunnableWithProgress() {
 					@Override
-					public void run(IProgressMonitor monitor) {
+					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 						SmartImportRootWizardPage.this.potentialProjects = getWizard().getImportJob()
 								.getImportProposals(monitor);
 						if (!potentialProjects.containsKey(getWizard().getImportJob().getRoot())) {
@@ -659,12 +656,10 @@ public class SmartImportRootWizardPage extends WizardPage {
 			}
 			tree.setInput(potentialProjects);
 			tree.setCheckedElements(this.notAlreadyExistingProjects.toArray());
-		} catch (InvocationTargetException ite) {
+		} catch (Exception ex) {
+			MessageDialog.openError(getShell(), ex.getMessage(), ex.getMessage());
+			IDEWorkbenchPlugin.log(ex.getMessage(), ex);
 			this.selection = null;
-			IStatus status = new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, DataTransferMessages.SmartImportWizardPage_scanProjectsFailed,
-					ite.getCause());
-			StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.SHOW);
-		} catch (InterruptedException operationCanceled) {
 		}
 		proposalsSelectionChanged();
 		SmartImportRootWizardPage.this.validatePage();
