@@ -15,6 +15,7 @@
  *     Sopot Cela <scela@redhat.com> - Bug 472761
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 473184
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 506306
+ *     Axel Richard <axel.richard@oebo.fr> - Bug 354538
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -41,6 +42,7 @@ import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSRenderingUtils;
+import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
@@ -355,7 +357,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	@PreDestroy
 	void preDestroy() {
-		if (isDebugEnabled()) {
+		if (Policy.DEBUG_RENDERER) {
 			logger.debug("\nTBMR:dispose: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
 		}
@@ -579,8 +581,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		List<MUIElement> parts = container.getChildren();
 		if (parts != null) {
 			MUIElement[] plist = parts.toArray(new MUIElement[parts.size()]);
-			for (int i = 0; i < plist.length; i++) {
-				MUIElement childME = plist[i];
+			for (MUIElement childME : plist) {
 				modelProcessSwitch(parentManager, (MToolBarElement) childME);
 			}
 		}
@@ -818,7 +819,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public void linkModelToManager(MToolBar model, ToolBarManager manager) {
 		modelToManager.put(model, manager);
 		managerToModel.put(manager, model);
-		if (isDebugEnabled()) {
+		if (Policy.DEBUG_RENDERER) {
 			logger.debug("\nTBMR:linkModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
 		}
@@ -829,9 +830,16 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 * @param manager
 	 */
 	public void clearModelToManager(MToolBar model, ToolBarManager manager) {
+		for (MToolBarElement element : model.getChildren()) {
+			if (element instanceof MToolBar) {
+				clearModelToManager((MToolBar) element, getManager((MToolBar) element));
+			}
+			IContributionItem ici = getContribution(element);
+			clearModelToContribution(element, ici);
+		}
 		modelToManager.remove(model);
 		managerToModel.remove(manager);
-		if (isDebugEnabled()) {
+		if (Policy.DEBUG_RENDERER) {
 			logger.debug("\nTBMR:clearModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
 		}
@@ -860,7 +868,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public void linkModelToContribution(MToolBarElement model, IContributionItem item) {
 		modelToContribution.put(model, item);
 		contributionToModel.put(item, model);
-		if (isDebugEnabled()) {
+		if (Policy.DEBUG_RENDERER) {
 			logger.debug(
 					"\nTBMR:linkModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
 					modelToContribution.size(), contributionToModel.size());
@@ -872,9 +880,15 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 * @param item
 	 */
 	public void clearModelToContribution(MToolBarElement model, IContributionItem item) {
+		if (model instanceof MToolBar) {
+			for (MToolBarElement element : ((MToolBar) model).getChildren()) {
+				IContributionItem ici = getContribution(element);
+				clearModelToContribution(element, ici);
+			}
+		}
 		modelToContribution.remove(model);
 		contributionToModel.remove(item);
-		if (isDebugEnabled()) {
+		if (Policy.DEBUG_RENDERER) {
 			logger.debug(
 					"\nTBMR:clearModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
 					modelToContribution.size(), contributionToModel.size());

@@ -117,10 +117,8 @@ public class CleanDialog extends MessageDialog {
      * @param selection the currently selected projects (may be empty)
      */
     public CleanDialog(IWorkbenchWindow window, IProject[] selection) {
-        super(
-                window.getShell(),
-                IDEWorkbenchMessages.CleanDialog_title, null, getQuestion(), NONE, 0,
-                	IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL);
+		super(window.getShell(), IDEWorkbenchMessages.CleanDialog_title, null, getQuestion(), NONE, 0,
+				IDEWorkbenchMessages.CleanDialog_clean_button_label, IDialogConstants.CANCEL_LABEL);
         this.window = window;
         this.selection = selection;
         if (this.selection == null) {
@@ -315,8 +313,8 @@ public class CleanDialog extends MessageDialog {
         } else {
 			SubMonitor subMonitor = SubMonitor.convert(monitor, IDEWorkbenchMessages.CleanDialog_cleanSelectedTaskName,
 					selection.length);
-			for (int i = 0; i < selection.length; i++) {
-				((IProject) selection[i]).build(IncrementalProjectBuilder.CLEAN_BUILD, subMonitor.split(1));
+			for (Object currentSelection : selection) {
+				((IProject) currentSelection).build(IncrementalProjectBuilder.CLEAN_BUILD, subMonitor.split(1));
             }
         }
     }
