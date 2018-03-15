@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Marc-Andre Laperle (Ericsson) - Bug 413278
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 497618, 368977
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 497618
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -22,13 +22,13 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * Shows a list of open editor and parts in the current or last active workbook.
+ * Shows a list of open editors in the current or last active workbook.
  *
  * @since 3.4
  *
@@ -39,13 +39,12 @@ public class WorkbookEditorsHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		MUIElement uiElement = null;
 
-		IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
-		System.out.printf("%n activePart: %s%n uiElement: %s", activePart, uiElement); //$NON-NLS-1$
-		if (activePart != null) {
+		IEditorPart activeEditor = HandlerUtil.getActiveEditor(event);
+		if (activeEditor != null) {
 			IWorkbenchWindow workbenchWindow = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 			WorkbenchPage page = (WorkbenchPage) workbenchWindow.getActivePage();
 			if (page != null) {
-				IWorkbenchPartReference reference = page.getReference(activePart);
+				IWorkbenchPartReference reference = page.getReference(activeEditor);
 				if (reference != null) {
 					uiElement = page.getActiveElement(reference);
 				}
@@ -57,7 +56,6 @@ public class WorkbookEditorsHandler extends AbstractHandler {
 		}
 
 		MPartStack activeStack = getActiveStack(uiElement);
-		System.out.printf("%n activeStack: %s%n", activePart, uiElement, activeStack); //$NON-NLS-1$
 		if (activeStack != null) {
 			if (activeStack.getRenderer() instanceof StackRenderer
 					&& activeStack.getWidget() instanceof CTabFolder) {
