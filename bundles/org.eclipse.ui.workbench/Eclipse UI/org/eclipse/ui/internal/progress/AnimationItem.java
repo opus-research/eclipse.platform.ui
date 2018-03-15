@@ -19,13 +19,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.internal.WorkbenchWindow;
 
 /**
  * The AnimationItem is the class that manages the animation for the progress.
  */
 public abstract class AnimationItem {
-	IWorkbenchWindow window;
+    WorkbenchWindow window;
 
     interface IAnimationContainer {
         /**
@@ -58,7 +58,7 @@ public abstract class AnimationItem {
      * @param workbenchWindow
      *            the window being created
      */
-	public AnimationItem(IWorkbenchWindow workbenchWindow) {
+    public AnimationItem(WorkbenchWindow workbenchWindow) {
         this.window = workbenchWindow;
     }
 
@@ -158,7 +158,7 @@ public abstract class AnimationItem {
 	/**
 	 * @return Returns the window.
 	 */
-	public IWorkbenchWindow getWindow() {
+	public WorkbenchWindow getWindow() {
 		return window;
 	}
 }
