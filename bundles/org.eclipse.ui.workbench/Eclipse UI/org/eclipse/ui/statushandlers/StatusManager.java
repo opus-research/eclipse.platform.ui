@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,6 @@ import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.internal.statushandlers.StatusHandlerDescriptor;
 import org.eclipse.ui.internal.statushandlers.StatusHandlerRegistry;
 import org.eclipse.ui.progress.IProgressConstants;
-import org.osgi.framework.BundleContext;
 
 /**
  * <p>
@@ -115,7 +114,7 @@ public class StatusManager {
 
 	private List loggedStatuses = new ArrayList();
 
-	private ListenerList<INotificationListener> listeners = new ListenerList<>();
+	private ListenerList listeners = new ListenerList();
 
 	/**
 	 * Returns StatusManager singleton instance.
@@ -141,12 +140,6 @@ public class StatusManager {
 	private AbstractStatusHandler getStatusHandler(){
 		if (statusHandler != null) {
 			return statusHandler;
-		}
-		BundleContext bundleContext = WorkbenchPlugin.getDefault().getBundle().getBundleContext();
-		if (bundleContext == null) {
-			// bundle is not in the STARTING, ACTIVE, or STOPPING state: we
-			// should not do anything, most likely we are going to shut down
-			return null;
 		}
 
 		StatusHandlerDescriptor defaultHandlerDescriptor = StatusHandlerRegistry.getDefault()
@@ -208,25 +201,18 @@ public class StatusManager {
 			}
 
 			// delegates the problem to workbench handler
-			AbstractStatusHandler handler = getStatusHandler();
-			if (handler != null) {
-				handler.handle(statusAdapter, style);
-			} else if (style != StatusManager.NONE) {
-				logError(statusAdapter.getStatus());
-			}
+			getStatusHandler().handle(statusAdapter, style);
 
 			// if attached status handler is not able to notify StatusManager
 			// about particular event, use the default policy and fake the
 			// notification
-			if (handler == null || !handler.supportsNotification(
+			if (!getStatusHandler().supportsNotification(
 					INotificationTypes.HANDLED)) {
 				generateFakeNotification(statusAdapter, style);
 			}
 		} catch (Throwable ex) {
 			// The used status handler failed
-			if (statusAdapter != null) {
-				logError(statusAdapter.getStatus());
-			}
+			logError(statusAdapter.getStatus());
 			logError("Error occurred during status handling", ex); //$NON-NLS-1$
 		}
 	}
@@ -349,15 +335,18 @@ public class StatusManager {
 	 * @since 3.5
 	 */
 	public void fireNotification(int type, StatusAdapter[] adapters){
-		AbstractStatusHandler handler = getStatusHandler();
-		if (handler != null && handler.supportsNotification(type)) {
+		if(getStatusHandler().supportsNotification(type)){
 			doFireNotification(type, adapters);
 		}
 	}
 
 	private void doFireNotification(int type, StatusAdapter[] adapters) {
-		for (INotificationListener listener : listeners) {
-			listener.statusManagerNotified(type, adapters);
+		Object[] oListeners = listeners.getListeners();
+		for (int i = 0; i < oListeners.length; i++) {
+			if (oListeners[i] instanceof INotificationListener) {
+				((INotificationListener) oListeners[i])
+						.statusManagerNotified(type, adapters);
+			}
 		}
 	}
 

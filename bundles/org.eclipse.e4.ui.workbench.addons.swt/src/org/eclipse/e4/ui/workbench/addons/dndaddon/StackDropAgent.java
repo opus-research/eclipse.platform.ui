@@ -14,8 +14,6 @@ package org.eclipse.e4.ui.workbench.addons.dndaddon;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
@@ -105,9 +103,13 @@ public class StackDropAgent extends DropAgent {
 	 * @return
 	 */
 	private static List<CTabItem> getVisibleItems(CTabFolder dropCTF) {
-		return Stream.of(dropCTF.getItems())
-			.filter(i -> i.isShowing())
-			.collect(Collectors.toList());
+		List<CTabItem> visibleItems = new ArrayList<>();
+		for (CTabItem item : dropCTF.getItems()) {
+			if (item.isShowing()) {
+				visibleItems.add(item);
+			}
+		}
+		return visibleItems;
 	}
 
 	/**
