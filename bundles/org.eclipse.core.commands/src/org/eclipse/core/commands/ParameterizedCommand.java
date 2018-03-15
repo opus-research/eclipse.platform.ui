@@ -709,8 +709,7 @@ public final class ParameterizedCommand implements Comparable {
 
 	@Override
 	public final String toString() {
-		final StringBuilder buffer = new StringBuilder();
-		buffer.append("ParameterizedCommand("); //$NON-NLS-1$
+		final StringBuilder buffer = new StringBuilder("ParameterizedCommand("); //$NON-NLS-1$
 		buffer.append(command);
 		buffer.append(',');
 		buffer.append(Arrays.toString(parameterizations));
