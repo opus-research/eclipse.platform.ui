@@ -22,19 +22,15 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.e4.ui.workbench.swt.internal.copy.SearchPattern;
-import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -137,28 +133,14 @@ public class WorkbookEditorsHandler extends FilteredTableBaseHandler {
 					StyleRange style = new StyleRange();
 					style.start = 0;
 					style.length = cell.getText().length();
-					// if active use the bold font
-					style.font = getFont(isActiveEditor(model));
-					// if hidden use a light gray background
-					if (isHiddenEditor(model)) {
-						cell.setBackground(getBackgroundColorForHiddenTabs());
-					}
+					// if hidden use the bold font, if active italic
+					style.font = getFont(isHiddenEditor(model), isActiveEditor(model));
 					cell.setStyleRanges(new StyleRange[] { style });
 				}
 			}
 
-			@Override
-			public String getToolTipText(Object element) {
-				if (element instanceof WorkbenchPartReference) {
-					WorkbenchPartReference ref = (WorkbenchPartReference) element;
-					return ref.getTitleToolTip();
-				}
-				return super.getToolTipText(element);
-			}
-
 		});
 
-		ColumnViewerToolTipSupport.enableFor(tableViewerColumn.getViewer());
 	}
 
 	/** True if the given model represents the active editor */
@@ -179,21 +161,15 @@ public class WorkbookEditorsHandler extends FilteredTableBaseHandler {
 		return (item != null && !item.isShowing());
 	}
 
-	private Font getFont(boolean bold) {
+	private Font getFont(boolean hidden, boolean active) {
 		ITheme theme = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme();
-		if (bold) {
+		if (active) {
+			return theme.getFontRegistry().getItalic(IWorkbenchThemeConstants.TAB_TEXT_FONT);
+		}
+		if (hidden) {
 			return theme.getFontRegistry().getBold(IWorkbenchThemeConstants.TAB_TEXT_FONT);
 		}
 		return theme.getFontRegistry().get(IWorkbenchThemeConstants.TAB_TEXT_FONT);
-	}
-
-	private Color getBackgroundColorForHiddenTabs() {
-		ITheme theme = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme();
-		Color color = theme.getColorRegistry().get(IWorkbenchThemeConstants.INACTIVE_TAB_BG_END);
-		if (color != null) {
-			return color;
-		}
-		return Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
 	}
 
 	@Override
