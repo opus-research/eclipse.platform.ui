@@ -690,7 +690,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 					if (returnCode[0] == PlatformUI.RETURN_OK) {
 						// run the e4 event loop and instantiate ... well, stuff
 						e4Workbench.createAndRunUI(e4Workbench.getApplication());
-						IMenuService wms = e4Workbench.getContext().get(IMenuService.class);
+						WorkbenchMenuService wms = (WorkbenchMenuService) e4Workbench.getContext()
+								.get(IMenuService.class);
 						wms.dispose();
 					}
 					if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
  *     								 removes a menu from multiple perspectives
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184, 472654, 486632
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184, 472654
  *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *******************************************************************************/
@@ -303,7 +303,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 *
 	 * @since 3.3
 	 */
-	private ListenerList<IPropertyChangeListener> genericPropertyListeners = new ListenerList<>();
+	private ListenerList<IPropertyChangeListener> genericPropertyListeners = new ListenerList<IPropertyChangeListener>();
 
 	private IAdaptable input;
 
@@ -2423,7 +2423,7 @@ STATUS_LINE_ID, model);
 
 	private ListenerList<IActionSetsListener> actionSetListeners = null;
 
-	private ListenerList<IBackgroundSaveListener> backgroundSaveListeners = new ListenerList<>(ListenerList.IDENTITY);
+	private ListenerList<IBackgroundSaveListener> backgroundSaveListeners = new ListenerList<IBackgroundSaveListener>(ListenerList.IDENTITY);
 
 	private SelectionService selectionService;
 
@@ -2451,7 +2451,7 @@ STATUS_LINE_ID, model);
 
 	final void addActionSetsListener(final IActionSetsListener listener) {
 		if (actionSetListeners == null) {
-			actionSetListeners = new ListenerList<>();
+			actionSetListeners = new ListenerList<IActionSetsListener>();
 		}
 
 		actionSetListeners.add(listener);
