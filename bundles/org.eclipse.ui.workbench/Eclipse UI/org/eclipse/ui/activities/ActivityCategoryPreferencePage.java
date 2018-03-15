@@ -266,8 +266,6 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
 			enabler = new ActivityEnabler(workingCopy, strings);
 			Control enablerControl = enabler.createControl(composite);
 			enablerControl.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-			Dialog.applyDialogFont(composite);
 			return composite;
 		}
 

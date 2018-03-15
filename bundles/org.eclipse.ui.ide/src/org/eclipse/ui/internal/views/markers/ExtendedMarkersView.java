@@ -160,6 +160,9 @@ public class ExtendedMarkersView extends ViewPart {
 	private ISelectionListener pageSelectionListener;
 	private IPartListener2 partListener;
 	private Clipboard clipboard;
+
+	// private IPropertyChangeListener preferenceListener;
+
 	private IMemento memento;
 	private String[] defaultGeneratorIds = new String[0];
 
@@ -181,6 +184,27 @@ public class ExtendedMarkersView extends ViewPart {
 		defaultGeneratorIds = new String[] { contentGeneratorId };
 	}
 
+	/**
+	 * Create a preference listener for any preference updates.
+	 */
+	// TODO: this is not needed as the preference dialog will refresh anyway
+//	private void initializePreferenceListener() {
+//		preferenceListener = new IPropertyChangeListener() {
+//			public void propertyChange(PropertyChangeEvent event) {
+//				String propertyName = event.getProperty();
+//				if (propertyName
+//						.equals(IDEInternalPreferences.USE_MARKER_LIMITS)
+//						|| propertyName
+//								.equals(IDEInternalPreferences.MARKER_LIMITS_VALUE)) {
+//					viewer.refresh();
+//					updateTitle();
+//				}
+//			}
+//		};
+//		IDEWorkbenchPlugin.getDefault().getPreferenceStore()
+//				.addPropertyChangeListener(preferenceListener);
+//	}
+
 
 	/**
 	 * Add all concrete {@link MarkerSupportItem} elements associated with the
@@ -197,8 +221,8 @@ public class ExtendedMarkersView extends ViewPart {
 		}
 
 		MarkerSupportItem[] children = markerItem.getChildren();
-		for (MarkerSupportItem element : children) {
-			addAllConcreteItems(element, allMarkers);
+		for (int i = 0; i < children.length; i++) {
+			addAllConcreteItems(children[i], allMarkers);
 		}
 
 	}
@@ -224,8 +248,8 @@ public class ExtendedMarkersView extends ViewPart {
 		if (markerItem.getMarker() != null)
 			allMarkers.add(markerItem.getMarker());
 		MarkerSupportItem[] children = markerItem.getChildren();
-		for (MarkerSupportItem element : children) {
-			addMarkers(element, allMarkers);
+		for (int i = 0; i < children.length; i++) {
+			addMarkers(children[i], allMarkers);
 
 		}
 
@@ -349,9 +373,9 @@ public class ExtendedMarkersView extends ViewPart {
 
 		if (considerUIWidths) {
 			TreeColumn[] columns= tree.getColumns();
-			for (TreeColumn column : columns) {
-				if (markerField.equals(column.getData(MARKER_FIELD))) {
-					return column.getWidth();
+			for (int i= 0; i < columns.length; i++) {
+				if (markerField.equals(columns[i].getData(MARKER_FIELD))) {
+					return columns[i].getWidth();
 				}
 			}
 		}
@@ -581,6 +605,11 @@ public class ExtendedMarkersView extends ViewPart {
 		if (clipboard != null)
 			clipboard.dispose();
 
+		/*
+		 * IDEWorkbenchPlugin.getDefault().getPreferenceStore()
+		 * .removePropertyChangeListener(preferenceListener);
+		 */
+
 		getSite().getPage().removePostSelectionListener(pageSelectionListener);
 		getSite().getPage().removePartListener(partListener);
 
@@ -598,8 +627,8 @@ public class ExtendedMarkersView extends ViewPart {
 	MarkerSupportItem[] getAllConcreteItems() {
 		MarkerSupportItem[] elements =getActiveViewerInputClone().getElements();
 		Collection<MarkerSupportItem> allMarkers = new ArrayList<>();
-		for (MarkerSupportItem element : elements) {
-			addAllConcreteItems(element, allMarkers);
+		for (int i = 0; i < elements.length; i++) {
+			addAllConcreteItems(elements[i], allMarkers);
 		}
 		MarkerSupportItem[] markers = new MarkerSupportItem[allMarkers.size()];
 		allMarkers.toArray(markers);
@@ -623,8 +652,8 @@ public class ExtendedMarkersView extends ViewPart {
 	IMarker[] getAllMarkers() {
 		MarkerSupportItem[] elements =getActiveViewerInputClone().getElements();
 		Collection<IMarker> allMarkers = new ArrayList<>();
-		for (MarkerSupportItem element : elements) {
-			addMarkers(element, allMarkers);
+		for (int i = 0; i < elements.length; i++) {
+			addMarkers(elements[i], allMarkers);
 
 		}
 		IMarker[] markers = new IMarker[allMarkers.size()];
@@ -655,10 +684,10 @@ public class ExtendedMarkersView extends ViewPart {
 					IMemento[] mementoCategories = expanded.getChildren(TAG_CATEGORY);
 					MarkerCategory[] markerCategories =getActiveViewerInputClone().getCategories();
 					if (markerCategories != null) {
-						for (MarkerCategory markerCategorie : markerCategories) {
-							for (IMemento mementoCategorie : mementoCategories) {
-								if (markerCategorie.getName().equals(mementoCategorie.getID())) {
-									categoriesToExpand.add(markerCategorie.getName());
+						for (int i = 0; i < markerCategories.length; i++) {
+							for (int j = 0; j < mementoCategories.length; j++) {
+								if (markerCategories[i].getName().equals(mementoCategories[j].getID())) {
+									categoriesToExpand.add(markerCategories[i].getName());
 								}
 							}
 						}
@@ -844,8 +873,8 @@ public class ExtendedMarkersView extends ViewPart {
 					lastCategory = (MarkerCategory) next;
 					final MarkerEntry[] children = (MarkerEntry[]) lastCategory.getChildren();
 
-					for (MarkerEntry element : children) {
-						result.add(element.getMarker());
+					for(int j = 0; j < children.length; j++) {
+						result.add(children[j].getMarker());
 					}
 				}
 			}
@@ -881,9 +910,9 @@ public class ExtendedMarkersView extends ViewPart {
 		// Categories might be null if building is still happening
 		if (categories != null && builder.isShowingHierarchy()) {
 
-			for (MarkerSupportItem categorie : categories) {
+			for (int i = 0; i < categories.length; i++) {
 
-				int childCount = categorie.getChildrenCount();
+				int childCount = categories[i].getChildrenCount();
 				if (markerLimitsEnabled) {
 					childCount = Math.min(childCount, markerLimit);
 				}
@@ -1112,9 +1141,9 @@ public class ExtendedMarkersView extends ViewPart {
 	 */
 	void openSelectedMarkers() {
 		IMarker[] markers = getOpenableMarkers();
-		for (IMarker marker : markers) {
+		for (int i = 0; i < markers.length; i++) {
 			IWorkbenchPage page = getSite().getPage();
-			openMarkerInEditor(marker, page);
+			openMarkerInEditor(markers[i], page);
 		}
 	}
 
@@ -1234,8 +1263,9 @@ public class ExtendedMarkersView extends ViewPart {
 	 */
 	void setPrimarySortField(MarkerField field) {
 		TreeColumn[] columns = viewer.getTree().getColumns();
-		for (TreeColumn treeColumn : columns) {
-			if (treeColumn.getData(MARKER_FIELD).equals(field)) {
+		for (int i = 0; i < columns.length; i++) {
+			TreeColumn treeColumn = columns[i];
+			if (columns[i].getData(MARKER_FIELD).equals(field)) {
 				setPrimarySortField(field, treeColumn);
 				return;
 			}
@@ -1653,7 +1683,8 @@ public class ExtendedMarkersView extends ViewPart {
 			// try to adapt them in resources and add it to the
 			// selectedElements
 			List<Object> selectedElements = new ArrayList<>();
-			for (Object object : objectsToAdapt) {
+			for (Iterator<Object> iterator = objectsToAdapt.iterator(); iterator.hasNext();) {
+				Object object = iterator.next();
 				Object resElement = MarkerResourceUtil.adapt2ResourceElement(object);
 				if (resElement != null) {
 					selectedElements.add(resElement);

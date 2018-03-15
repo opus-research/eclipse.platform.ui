@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -129,15 +129,15 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     /**
      * API listener list
      */
-	private ListenerList<IPropertyListener> propChangeListeners = new ListenerList<>();
+    private ListenerList propChangeListeners = new ListenerList();
 
     /**
      * Internal listener list. Listens to the INTERNAL_PROPERTY_* property change events that are not yet API.
      * TODO: Make these properties API in 3.2
      */
-	private ListenerList<IPropertyListener> internalPropChangeListeners = new ListenerList<>();
+    private ListenerList internalPropChangeListeners = new ListenerList();
 
-	private ListenerList<IPropertyChangeListener> partChangeListeners = new ListenerList<>();
+    private ListenerList partChangeListeners = new ListenerList();
 
     protected Map propertyCache = new HashMap();
 
@@ -256,8 +256,9 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     }
 
     protected void fireInternalPropertyChange(int id) {
-		for (IPropertyListener listener : internalPropChangeListeners) {
-			listener.propertyChanged(this, id);
+        Object listeners[] = internalPropChangeListeners.getListeners();
+        for (int i = 0; i < listeners.length; i++) {
+            ((IPropertyListener) listeners[i]).propertyChanged(this, id);
         }
     }
 
@@ -361,8 +362,9 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 
     private void immediateFirePropertyChange(int id) {
         UIListenerLogging.logPartReferencePropertyChange(this, id);
-		for (IPropertyListener listener : propChangeListeners) {
-			listener.propertyChanged(legacyPart, id);
+        Object listeners[] = propChangeListeners.getListeners();
+        for (int i = 0; i < listeners.length; i++) {
+			((IPropertyListener) listeners[i]).propertyChanged(legacyPart, id);
         }
 
         fireInternalPropertyChange(id);
@@ -502,8 +504,9 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     }
 
     protected void firePartPropertyChange(PropertyChangeEvent event) {
-		for (IPropertyChangeListener l : partChangeListeners) {
-			l.propertyChange(event);
+		Object[] l = partChangeListeners.getListeners();
+		for (int i = 0; i < l.length; i++) {
+			((IPropertyChangeListener) l[i]).propertyChange(event);
 		}
 	}
 
