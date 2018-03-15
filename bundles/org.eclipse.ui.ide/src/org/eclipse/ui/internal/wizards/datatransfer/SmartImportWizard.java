@@ -293,7 +293,6 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 			// always update working set on request as the job isn't updated on
 			// WS change automatically
 			this.easymportJob.setWorkingSets(projectRootPage.getSelectedWorkingSets());
-			this.easymportJob.setOpenProjects(projectRootPage.isOpenProjects());
 		}
 		return this.easymportJob;
 	}
