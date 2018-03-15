@@ -1621,7 +1621,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			resetFilters();
 		} else {
 			this.filters = new ArrayList<>(Arrays.asList(filters));
-			refresh(false);
+			refresh();
 		}
 	}
 
@@ -1632,7 +1632,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	public void resetFilters() {
 		if (filters != null) {
 			filters = null;
-			refresh(false);
+			refresh();
 		}
 	}
 
