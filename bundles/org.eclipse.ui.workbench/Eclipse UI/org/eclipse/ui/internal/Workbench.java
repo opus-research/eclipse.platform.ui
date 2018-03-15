@@ -16,6 +16,7 @@
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *     Mickael Istria (Red Hat Inc.) - Bug 469918
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 487297
+ *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 471310
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -461,9 +462,9 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/**
 	 * Listener list for registered IWorkbenchListeners .
 	 */
-	private ListenerList workbenchListeners = new ListenerList(ListenerList.IDENTITY);
+	private ListenerList<IWorkbenchListener> workbenchListeners = new ListenerList<>(ListenerList.IDENTITY);
 
-	private ServiceRegistration workbenchService;
+	private ServiceRegistration<?> workbenchService;
 
 	private MApplication application;
 
@@ -724,16 +725,16 @@ public final class Workbench extends EventManager implements IWorkbench,
 		}
 	}
 
-	private static ServiceTracker instanceAppContext;
+	private static ServiceTracker<?, IApplicationContext> instanceAppContext;
 
 	static IApplicationContext getApplicationContext() {
 		if (instanceAppContext == null) {
-			instanceAppContext = new ServiceTracker(
+			instanceAppContext = new ServiceTracker<>(
 					WorkbenchPlugin.getDefault().getBundleContext(), IApplicationContext.class
 							.getName(), null);
 			instanceAppContext.open();
 		}
-		return (IApplicationContext) instanceAppContext.getService();
+		return instanceAppContext.getService();
 	}
 
 	static Object getApplication(String[] args) {
@@ -844,10 +845,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 						splashShell.setBackgroundImage(background);
 				}
 
-				Dictionary properties = new Hashtable();
+				Dictionary<String, Object> properties = new Hashtable<>();
 				properties.put(Constants.SERVICE_RANKING, new Integer(Integer.MAX_VALUE));
 				BundleContext context = WorkbenchPlugin.getDefault().getBundleContext();
-				final ServiceRegistration registration[] = new ServiceRegistration[1];
+				final ServiceRegistration<?> registration[] = new ServiceRegistration[1];
 				StartupMonitor startupMonitor = new StartupMonitor() {
 
 					@Override
@@ -2820,7 +2821,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 		Job job = new Job("Workbench early startup") { //$NON-NLS-1$
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				HashSet disabledPlugins = new HashSet(Arrays
+				HashSet<String> disabledPlugins = new HashSet<>(Arrays
 						.asList(getDisabledEarlyActivatedPlugins()));
 				monitor.beginTask(WorkbenchMessages.Workbench_startingPlugins, extensions.length);
 				for (IExtension extension : extensions) {
@@ -3543,7 +3544,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 	}
 
 	@Override
-	public final boolean hasService(final Class key) {
+	public final boolean hasService(final Class<?> key) {
 		return serviceLocator.hasService(key);
 	}
 
@@ -3581,10 +3582,10 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * @param localSelection
 	 * @param localEditorInput
 	 */
-	public final void addShowingMenus(final Set menuIds, final ISelection localSelection,
+	public final void addShowingMenus(final Set<String> menuIds, final ISelection localSelection,
 			final ISelection localEditorInput) {
 		menuSourceProvider.addShowingMenus(menuIds, localSelection, localEditorInput);
-		Map currentState = menuSourceProvider.getCurrentState();
+		Map<?, ?> currentState = menuSourceProvider.getCurrentState();
 		for (String key : menuSourceProvider.getProvidedSourceNames()) {
 			e4Context.set(key, currentState.get(key));
 		}
@@ -3601,7 +3602,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * @param localSelection
 	 * @param localEditorInput
 	 */
-	public final void removeShowingMenus(final Set menuIds, final ISelection localSelection,
+	public final void removeShowingMenus(final Set<String> menuIds, final ISelection localSelection,
 			final ISelection localEditorInput) {
 		menuSourceProvider.removeShowingMenus(menuIds, localSelection, localEditorInput);
 		for (String key : menuSourceProvider.getProvidedSourceNames()) {
