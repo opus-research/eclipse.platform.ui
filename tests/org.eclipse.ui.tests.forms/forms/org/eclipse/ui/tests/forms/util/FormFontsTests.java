@@ -22,7 +22,7 @@ import org.eclipse.ui.internal.forms.widgets.FormFonts;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class FormFontsTest {
+public class FormFontsTests {
 	@Test
 	public void testSingleton() {
 		Display display = Display.getCurrent();
