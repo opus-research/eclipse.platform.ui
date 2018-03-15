@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -604,9 +604,8 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 *
 	 * @return WorkbenchSiteProgressService
 	 */
-	WorkbenchSiteProgressService getSiteProgressService() {
-		return (WorkbenchSiteProgressService) e4Context.get(IWorkbenchSiteProgressService.class
-				.getName());
+	IWorkbenchSiteProgressService getSiteProgressService() {
+		return e4Context.get(IWorkbenchSiteProgressService.class);
 	}
 
 	@Override
@@ -627,7 +626,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 */
 	@Override
 	public String toString() {
-		final StringBuffer buffer = new StringBuffer();
+		final StringBuilder buffer = new StringBuilder();
 		buffer.append("PartSite(id="); //$NON-NLS-1$
 		buffer.append(getId());
 		buffer.append(",pluginId="); //$NON-NLS-1$
