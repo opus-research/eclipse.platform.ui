@@ -153,7 +153,6 @@ public class DataTransferMessages extends NLS {
 
 	// Smart import
 	public static String SmartImportWizardPage_selectFolderOrArchiveToImport;
-	public static String SmartImportWizardPage_browseForFolder;
 	public static String SmartImportProposals_alreadyImportedAsProject_title;
 	public static String SmartImportProposals_anotherProjectWithSameNameExists_description;
 
@@ -176,14 +175,12 @@ public class DataTransferMessages extends NLS {
 	public static String SmartImportWizardPage_overwriteArchiveDirectory_message;
 	public static String SmartImportWizardPage_incompleteExpand_title;
 	public static String SmartImportWizardPage_incompleteExpand_message;
-	public static String SmartImportWizardPage_scanProjectsFailed;
 
 	public static String SmartImportJob_discardRootProject_title;
 	public static String SmartImportJob_discardRootProject_description;
 	public static String SmartImportProposals_selectionSummary;
 	public static String SmartImportProposals_folder;
 	public static String SmartImportProposals_importAs;
-	public static String SmartImportProposals_hideExistingProjects;
 
 	public static String SmartImportReport_importedProjects;
 	public static String SmartImportReport_importedProjectsWithCount;

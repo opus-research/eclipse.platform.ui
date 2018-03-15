@@ -9,7 +9,6 @@
  *     Serge Beauchamp (Freescale Semiconductor) - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *     Mickael Istria (Red Hat Inc.) - Bug 486901
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  ******************************************************************************/
 
 package org.eclipse.ui.internal.ide.dialogs;
@@ -642,9 +641,12 @@ return true;
 				message.append("\n"); //$NON-NLS-1$
 		}
 		final String resultMessage = message.toString();
-		MessageDialog dialog = new MessageDialog(fConvertAbsoluteButton.getShell(), title, null,
-				IDEWorkbenchMessages.LinkedResourceEditor_convertionResults, MessageDialog.INFORMATION, 0,
-				IDEWorkbenchMessages.linkedResourceEditor_OK) {
+		MessageDialog dialog = new MessageDialog(fConvertAbsoluteButton
+				.getShell(), title, null,
+				IDEWorkbenchMessages.LinkedResourceEditor_convertionResults,
+				MessageDialog.INFORMATION,
+				new String[] { IDEWorkbenchMessages.linkedResourceEditor_OK },
+				0) {
 
 			@Override
 			protected boolean isResizable() {
