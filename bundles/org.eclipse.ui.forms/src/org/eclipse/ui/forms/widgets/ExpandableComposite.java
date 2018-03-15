@@ -1112,7 +1112,11 @@ public class ExpandableComposite extends Canvas {
 			gc.drawFocus(0, 0, size.x, size.y);
 	}
 
-	void reflow() {
+	/**
+	 * Reflows this expandable composite and all the parents up the hierarchy
+	 * until a SharedScrolledComposite is reached.
+	 */
+	protected void reflow() {
 		Composite c = this;
 		while (c != null) {
 			c.setRedraw(false);

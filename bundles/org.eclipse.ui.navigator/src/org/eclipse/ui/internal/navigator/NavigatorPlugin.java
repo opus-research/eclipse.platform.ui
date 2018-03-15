@@ -84,8 +84,8 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 
 			Object[] mesgs = messages.getListeners();
 			ILog pluginLog = getDefault().getLog();
-			for (Object mesg : mesgs) {
-				pluginLog.log((IStatus)mesg);
+			for (int i = 0; i < mesgs.length; i++) {
+				pluginLog.log((IStatus)mesgs[i]);
 			}
 			return Status.OK_STATUS;
 
