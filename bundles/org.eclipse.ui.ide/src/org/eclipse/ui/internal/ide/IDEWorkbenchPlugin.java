@@ -87,8 +87,6 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 
 	private static final int PROBLEMS_VIEW_CREATION_DELAY= 6000;
 
-	private final static int PROBLEMS_VIEW_CREATION_MAXATTEMPTS = 10;
-
     /**
      * Project image registry; lazily initialized.
      */
@@ -105,12 +103,6 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 	private UnassociatedEditorStrategyRegistry unassociatedEditorStrategyRegistry = null;
 
 	private ResourceManager resourceManager;
-
-	/**
-	 * Keep the number of times the job that tries to create the problems view has
-	 * been executed.
-	 */
-	private int createProblemsViewAttempts = 1;
 
 	/**
 	 * Create an instance of the receiver.
@@ -392,7 +384,6 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 		if (display != null) {
 			display.timerExec(PROBLEMS_VIEW_CREATION_DELAY, r);
 		} else {
-			setCreateProblemsViewAttempts(1);
 			Job job = new Job("Initializing Problems view") { //$NON-NLS-1$
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
@@ -400,17 +391,13 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 					if (workbench == null) {
 						// Workbench not created yet, so avoid using display to
 						// avoid crash like in bug 513901
-						int attempts = getCreateProblemsViewAttempts();
-						if (attempts <= PROBLEMS_VIEW_CREATION_MAXATTEMPTS) {
-							schedule(PROBLEMS_VIEW_CREATION_DELAY * attempts);
-							setCreateProblemsViewAttempts(++attempts);
-						}
+						schedule(PROBLEMS_VIEW_CREATION_DELAY);
 						return Status.OK_STATUS;
 					}
-					if (workbench.isClosing()) {
+					if (workbench != null && workbench.isClosing()) {
 						return Status.CANCEL_STATUS;
 					}
-					workbench.getDisplay().asyncExec(r);
+					PlatformUI.getWorkbench().getDisplay().asyncExec(r);
 					return Status.OK_STATUS;
 				}
 			};
@@ -419,26 +406,4 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 			job.schedule(PROBLEMS_VIEW_CREATION_DELAY);
 		}
 	}
-
-	/**
-	 * Get the number of times the job that tries to create the problems view has
-	 * been executed.
-	 *
-	 * @return an integer with the number of attemps.
-	 */
-	public int getCreateProblemsViewAttempts() {
-		return createProblemsViewAttempts;
-	}
-
-	/**
-	 * Set the number of times the job that tries to create the problems view has
-	 * been executed.
-	 *
-	 * @param attemps
-	 *            an integer with the number of attempts.
-	 */
-	public void setCreateProblemsViewAttempts(int attempts) {
-		createProblemsViewAttempts = attempts;
-	}
-
 }
