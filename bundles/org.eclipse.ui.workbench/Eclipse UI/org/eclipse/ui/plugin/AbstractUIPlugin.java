@@ -35,6 +35,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -136,6 +138,11 @@ public abstract class AbstractUIPlugin extends Plugin {
      */
     private ScopedPreferenceStore preferenceStore;
 
+    /**
+     * The registry for all graphic images; <code>null</code> if not yet
+     * initialized.
+     */
+    private ImageRegistry imageRegistry = null;
 
     /**
      * The bundle listener used for kicking off refreshPluginActions().
@@ -143,9 +150,6 @@ public abstract class AbstractUIPlugin extends Plugin {
      * @since 3.0.1
      */
     private BundleListener bundleListener;
-
-	private UiPluginImageManager imageManager;
-	private boolean imageMangerInitialized = false;
 
     /**
 	 * The {@link #AbstractUIPlugin(IPluginDescriptor)} constructor was called
@@ -187,10 +191,19 @@ public abstract class AbstractUIPlugin extends Plugin {
      * @see #getImageRegistry
      */
     protected ImageRegistry createImageRegistry() {
-		if (imageManager == null) {
-			imageManager = new UiPluginImageManager();
+
+    	//If we are in the UI Thread use that
+    	if(Display.getCurrent() != null) {
+			return new ImageRegistry(Display.getCurrent());
 		}
-		return imageManager.getImageRegistry();
+
+    	if(PlatformUI.isWorkbenchRunning()) {
+			return new ImageRegistry(PlatformUI.getWorkbench().getDisplay());
+		}
+
+    	//Invalid thread access if it is not the UI Thread
+    	//and the workbench is not created.
+    	throw new SWTError(SWT.ERROR_THREAD_INVALID_ACCESS);
     }
 
     /**
@@ -233,15 +246,11 @@ public abstract class AbstractUIPlugin extends Plugin {
      * @return the image registry
      */
     public ImageRegistry getImageRegistry() {
-		if (imageManager == null) {
-			imageManager = new UiPluginImageManager();
-		}
-		ImageRegistry imageRegistry = imageManager.getImageRegistry();
-		if (imageMangerInitialized == false) {
-			initializeImageRegistry(imageRegistry);
-			imageMangerInitialized = true;
-		}
-		return imageRegistry;
+        if (imageRegistry == null) {
+            imageRegistry = createImageRegistry();
+            initializeImageRegistry(imageRegistry);
+        }
+        return imageRegistry;
     }
 
     /**
@@ -613,10 +622,9 @@ public abstract class AbstractUIPlugin extends Plugin {
             saveDialogSettings();
             savePreferenceStore();
             preferenceStore = null;
-			if (imageManager != null) {
-				imageManager.dispose();
-				imageManager = null;
-			}
+            if (imageRegistry != null)
+            	imageRegistry.dispose();
+            imageRegistry = null;
         } finally {
             super.stop(context);
         }

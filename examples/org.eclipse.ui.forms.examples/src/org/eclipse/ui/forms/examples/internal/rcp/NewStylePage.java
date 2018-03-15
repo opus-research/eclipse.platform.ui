@@ -46,7 +46,7 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
-import org.eclipse.ui.forms.examples.internal.ExamplesImages;
+import org.eclipse.ui.forms.examples.internal.ExamplesPlugin;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
@@ -499,8 +499,9 @@ public class NewStylePage extends FormPage {
 			};
 			haction.setChecked(true);
 			haction.setToolTipText("Horizontal orientation");
-			haction.setImageDescriptor(
-					ExamplesImages.INSTANCE.getImageRegistry().getDescriptor(ExamplesImages.IMG_HORIZONTAL));
+			haction.setImageDescriptor(ExamplesPlugin.getDefault()
+					.getImageRegistry().getDescriptor(
+							ExamplesPlugin.IMG_HORIZONTAL));
 			Action vaction = new Action("ver", Action.AS_RADIO_BUTTON) {
 				@Override
 				public void run() {
@@ -508,8 +509,9 @@ public class NewStylePage extends FormPage {
 			};
 			vaction.setChecked(false);
 			vaction.setToolTipText("Vertical orientation");
-			vaction.setImageDescriptor(
-					ExamplesImages.INSTANCE.getImageRegistry().getDescriptor(ExamplesImages.IMG_VERTICAL));
+			vaction.setImageDescriptor(ExamplesPlugin.getDefault()
+					.getImageRegistry().getDescriptor(
+							ExamplesPlugin.IMG_VERTICAL));
 			ControlContribution save = new ControlContribution("save") {
 				@Override
 				protected Control createControl(Composite parent) {
@@ -538,9 +540,9 @@ public class NewStylePage extends FormPage {
 			haction.setChecked(true);
 			haction.setText("Horizontal");
 			haction.setToolTipText("Horizontal orientation");
-			haction.setImageDescriptor(
-					ExamplesImages.INSTANCE.getImageRegistry().getDescriptor(
-							ExamplesImages.IMG_HORIZONTAL));
+			haction.setImageDescriptor(ExamplesPlugin.getDefault()
+					.getImageRegistry().getDescriptor(
+							ExamplesPlugin.IMG_HORIZONTAL));
 			Action vaction = new Action("ver", Action.AS_RADIO_BUTTON) {
 				@Override
 				public void run() {
@@ -549,8 +551,9 @@ public class NewStylePage extends FormPage {
 			vaction.setChecked(false);
 			vaction.setText("Vertical");
 			vaction.setToolTipText("Vertical orientation");
-			vaction.setImageDescriptor(
-					ExamplesImages.INSTANCE.getImageRegistry().getDescriptor(ExamplesImages.IMG_VERTICAL));
+			vaction.setImageDescriptor(ExamplesPlugin.getDefault()
+					.getImageRegistry().getDescriptor(
+							ExamplesPlugin.IMG_VERTICAL));
 			form.getForm().getMenuManager().add(haction);
 			form.getForm().getMenuManager().add(vaction);
 		} else {

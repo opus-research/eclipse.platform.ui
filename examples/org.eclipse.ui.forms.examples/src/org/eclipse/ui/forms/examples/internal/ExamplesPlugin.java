@@ -9,12 +9,17 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.forms.examples.internal;
+import java.net.URL;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.FormColors;
@@ -29,7 +34,21 @@ public class ExamplesPlugin extends AbstractUIPlugin {
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
 	private FormColors formColors;
-
+	public static final String IMG_FORM_BG = "formBg";
+	public static final String IMG_LARGE = "large";
+	public static final String IMG_HORIZONTAL = "horizontal";
+	public static final String IMG_VERTICAL = "vertical";
+	public static final String IMG_SAMPLE = "sample";
+	public static final String IMG_WIZBAN = "wizban";
+	public static final String IMG_LINKTO_HELP = "linkto_help";
+	public static final String IMG_HELP_TOPIC = "help_topic";
+	public static final String IMG_CLOSE = "close";
+	public static final String IMG_HELP_CONTAINER = "container_obj";
+	public static final String IMG_HELP_TOC_OPEN = "toc_open";
+	public static final String IMG_HELP_TOC_CLOSED = "toc_closed";
+	public static final String IMG_HELP_SEARCH = "e_search_menu";
+	public static final String IMG_CLEAR = "clear";
+	public static final String IMG_NW = "nw";
 
 	/**
 	 * The constructor.
@@ -41,6 +60,38 @@ public class ExamplesPlugin extends AbstractUIPlugin {
 					.getBundle("org.eclipse.ui.forms.examples.internal.ExamplesPluginResources");
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
+		}
+	}
+
+	@Override
+	protected void initializeImageRegistry(ImageRegistry registry) {
+		registerImage(registry, IMG_FORM_BG, "form_banner.gif");
+		registerImage(registry, IMG_LARGE, "large_image.gif");
+		registerImage(registry, IMG_HORIZONTAL, "th_horizontal.gif");
+		registerImage(registry, IMG_VERTICAL, "th_vertical.gif");
+		registerImage(registry, IMG_SAMPLE, "sample.png");
+		registerImage(registry, IMG_WIZBAN, "newprj_wiz.png");
+		registerImage(registry, IMG_LINKTO_HELP, "linkto_help.gif");
+		registerImage(registry, IMG_HELP_TOPIC, "topic.gif");
+		registerImage(registry, IMG_HELP_CONTAINER, "container_obj.gif");
+		registerImage(registry, IMG_HELP_TOC_CLOSED, "toc_closed.gif");
+		registerImage(registry, IMG_HELP_TOC_OPEN, "toc_open.gif");
+		registerImage(registry, IMG_CLOSE, "close_view.gif");
+		registerImage(registry, IMG_HELP_SEARCH, "e_search_menu.gif");
+		registerImage(registry, IMG_CLEAR, "clear.gif");
+		registerImage(registry, IMG_NW, "nw.gif");
+	}
+
+	private void registerImage(ImageRegistry registry, String key,
+			String fileName) {
+		try {
+			IPath path = new Path("icons/" + fileName);
+			URL url = FileLocator.find(getBundle(), path, null);
+			if (url!=null) {
+				ImageDescriptor desc = ImageDescriptor.createFromURL(url);
+				registry.put(key, desc);
+			}
+		} catch (Exception e) {
 		}
 	}
 
@@ -88,7 +139,6 @@ public class ExamplesPlugin extends AbstractUIPlugin {
 				formColors.dispose();
 				formColors = null;
 			}
-			ExamplesImages.INSTANCE.dispose();
 		} finally {
 			super.stop(context);
 		}
