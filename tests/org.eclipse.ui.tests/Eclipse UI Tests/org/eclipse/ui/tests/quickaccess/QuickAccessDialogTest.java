@@ -67,7 +67,7 @@ public class QuickAccessDialogTest extends UITestCase {
 	 * Tests that the shell opens when the command is activated
 	 * @throws Exception
 	 */
-	public void disabledTestOpenByCommand() throws Exception {
+	public void testOpenByCommand() throws Exception {
 		IHandlerService handlerService = getWorkbench().getActiveWorkbenchWindow()
 				.getService(IHandlerService.class);
 		Shell shell = searchField.getQuickAccessShell();
@@ -91,7 +91,7 @@ public class QuickAccessDialogTest extends UITestCase {
 	/**
 	 * Test that changing the filter text works correctly
 	 */
-	public void disabledTestTextFilter() {
+	public void testTextFilter(){
 		final Table table = searchField.getQuickAccessTable();
 		Text text = searchField.getQuickAccessSearchText();
 		assertTrue("Quick access table should say to start typing", table.getItemCount() == 1);
@@ -147,7 +147,7 @@ public class QuickAccessDialogTest extends UITestCase {
 	 * Tests that activating the handler again toggles the show all setting and that the setting changes the results
 	 * Also tests that closing and reopening the shell resets show all
 	 */
-	public void disabledTestShowAll() throws Exception {
+	public void testShowAll() throws Exception {
 		// Open the shell
 		IHandlerService handlerService = getWorkbench().getActiveWorkbenchWindow()
 				.getService(IHandlerService.class);
