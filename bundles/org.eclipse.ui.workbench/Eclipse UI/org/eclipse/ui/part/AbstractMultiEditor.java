@@ -19,6 +19,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
@@ -170,7 +171,12 @@ public abstract class AbstractMultiEditor extends EditorPart {
         activeEditorIndex = 0;
 
 		for (int i = 0; i < children.length; i++) {
-			children[i].addPropertyListener( (source, propId) -> handlePropertyChange(propId));
+			children[i].addPropertyListener( new IPropertyListener() {
+				@Override
+				public void propertyChanged(Object source, int propId) {
+					handlePropertyChange(propId);
+				}
+			});
 		}
 
         innerEditorsCreated();

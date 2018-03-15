@@ -25,7 +25,12 @@ public class HelpSearchHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) {
 
-		BusyIndicator.showWhile(null, () -> PlatformUI.getWorkbench().getHelpSystem().displaySearch());
+		BusyIndicator.showWhile(null, new Runnable() {
+			@Override
+			public void run() {
+				PlatformUI.getWorkbench().getHelpSystem().displaySearch();
+			}
+		});
 		return null;
 	}
 
