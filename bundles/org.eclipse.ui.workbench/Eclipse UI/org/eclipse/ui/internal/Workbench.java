@@ -221,6 +221,7 @@ import org.eclipse.ui.internal.model.ContributionService;
 import org.eclipse.ui.internal.progress.ProgressManager;
 import org.eclipse.ui.internal.progress.ProgressManagerUtil;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
+import org.eclipse.ui.internal.registry.ImportExportPespectiveHandler;
 import org.eclipse.ui.internal.registry.UIExtensionTracker;
 import org.eclipse.ui.internal.registry.ViewDescriptor;
 import org.eclipse.ui.internal.services.EvaluationService;
@@ -629,10 +630,14 @@ public final class Workbench extends EventManager implements IWorkbench,
 					IEclipseContext context = e4Workbench.getContext();
 
 					WorkbenchMigrationProcessor migrationProcessor = null;
-					try {
-						migrationProcessor = ContextInjectionFactory.make(WorkbenchMigrationProcessor.class, context);
-					} catch (@SuppressWarnings("restriction") InjectionException e) {
-						WorkbenchPlugin.log(e);
+					// migration is enabled by default
+					if (ImportExportPespectiveHandler.isImpExpEnabled()) {
+						try {
+							migrationProcessor = ContextInjectionFactory.make(WorkbenchMigrationProcessor.class,
+									context);
+						} catch (@SuppressWarnings("restriction") InjectionException e) {
+							WorkbenchPlugin.log(e);
+						}
 					}
 
 					if (migrationProcessor != null && isFirstE4WorkbenchRun(appModel)
@@ -839,7 +844,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 				}
 
 				Dictionary properties = new Hashtable();
-				properties.put(Constants.SERVICE_RANKING, Integer.valueOf(Integer.MAX_VALUE));
+				properties.put(Constants.SERVICE_RANKING, new Integer(Integer.MAX_VALUE));
 				BundleContext context = WorkbenchPlugin.getDefault().getBundleContext();
 				final ServiceRegistration registration[] = new ServiceRegistration[1];
 				StartupMonitor startupMonitor = new StartupMonitor() {

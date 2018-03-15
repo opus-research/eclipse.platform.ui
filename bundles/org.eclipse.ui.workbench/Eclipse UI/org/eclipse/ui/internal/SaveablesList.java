@@ -133,9 +133,9 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		Integer refCount = referenceMap.get(key);
 		if (refCount == null) {
 			result = true;
-			refCount = Integer.valueOf(0);
+			refCount = new Integer(0);
 		}
-		referenceMap.put(key, Integer.valueOf(refCount.intValue() + 1));
+		referenceMap.put(key, new Integer(refCount.intValue() + 1));
 		return result;
 	}
 
@@ -155,7 +155,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 			referenceMap.remove(key);
 			result = true;
 		} else {
-			referenceMap.put(key, Integer.valueOf(refCount.intValue() - 1));
+			referenceMap.put(key, new Integer(refCount.intValue() - 1));
 		}
 		return result;
 	}
@@ -455,9 +455,8 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 * @param modelsDecrementing
 	 */
 	private void fillModelsClosing(Set<Saveable> modelsClosing, Map<Saveable, Integer> modelsDecrementing) {
-		for (Entry<Saveable, Integer> entry : modelsDecrementing.entrySet()) {
-			Saveable model = entry.getKey();
-			if (entry.getValue().equals(modelRefCounts.get(model))) {
+		for (Saveable model : modelsDecrementing.keySet()) {
+			if (modelsDecrementing.get(model).equals(modelRefCounts.get(model))) {
 				modelsClosing.add(model);
 			}
 		}
