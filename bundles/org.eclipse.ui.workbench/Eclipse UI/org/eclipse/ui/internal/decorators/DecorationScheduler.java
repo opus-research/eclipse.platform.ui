@@ -295,25 +295,19 @@ public class DecorationScheduler {
 				}
 
 				SubMonitor subMonitor = SubMonitor.convert(monitor,
-						WorkbenchMessages.DecorationScheduler_CalculatingTask, 100);
+						WorkbenchMessages.DecorationScheduler_CalculatingTask, awaitingDecoration.size());
 				// will block if there are no resources to be decorated
 				DecorationReference reference;
-				subMonitor.split(5);
-				int workCount = 5;
+
 				while ((reference = nextElement()) != null) {
 
-					// Count up to 90 to give the appearance of updating
-					if (workCount < 95) {
-						subMonitor.split(1);
-						workCount++;
-					}
+					subMonitor.split(1);
 
 					monitor.subTask(reference.getSubTask());
 					Object element = reference.getElement();
 					boolean force = reference.shouldForceUpdate();
 					IDecorationContext[] contexts = reference.getContexts();
-					for (int i = 0; i < contexts.length; i++) {
-						IDecorationContext context = contexts[i];
+					for (IDecorationContext context : contexts) {
 						ensureResultCached(element, force, context);
 					}
 					// Only notify listeners when we have exhausted the
