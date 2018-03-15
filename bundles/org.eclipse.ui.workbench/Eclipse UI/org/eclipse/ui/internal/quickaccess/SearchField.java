@@ -297,7 +297,7 @@ public class SearchField {
 	}
 
 	private Text createText(Composite parent) {
-		Text text = new Text(parent, SWT.NONE);
+		Text text = new Text(parent, SWT.SEARCH);
 		text.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription);
 		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
 
