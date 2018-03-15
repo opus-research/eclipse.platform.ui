@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IBundleGroup;
 import org.eclipse.core.runtime.IBundleGroupProvider;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TrayDialog;
@@ -79,7 +80,9 @@ public class AboutDialog extends TrayDialog {
 
     private final static int DETAILS_ID = IDialogConstants.CLIENT_ID + 1;
 
-	private final static int EXPORT_ID = DETAILS_ID + 1;
+	private final static int EXPORT_ID = IDialogConstants.CLIENT_ID + 2;
+
+	private final static int IMPORT_ID = IDialogConstants.CLIENT_ID + 3;
 
     private String productName;
 
@@ -147,6 +150,15 @@ public class AboutDialog extends TrayDialog {
 				}
 			});
 			break;
+
+		case IMPORT_ID:
+			BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
+				@Override
+				public void run() {
+					openInstallationImportWizard();
+				}
+			});
+			break;
         default:
             super.buttonPressed(buttonId);
             break;
@@ -185,6 +197,7 @@ public class AboutDialog extends TrayDialog {
 
         createButton(parent, DETAILS_ID, WorkbenchMessages.AboutDialog_DetailsButton, false);
 		createButton(parent, EXPORT_ID, WorkbenchMessages.AboutDialog_ExportButton, false);
+		createButton(parent, IMPORT_ID, WorkbenchMessages.AboutDialog_ImportButton, false);
 
         Label l = new Label(parent, SWT.NONE);
         l.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -505,6 +518,29 @@ public class AboutDialog extends TrayDialog {
 		}
 
 	}
+
+	private void openInstallationImportWizard() {
+		final String installationImportWizard = "org.eclipse.equinox.p2.replication.import"; //$NON-NLS-1$
+		IWizardDescriptor wizardDescriptor = PlatformUI.getWorkbench().getImportWizardRegistry()
+				.findWizard(installationImportWizard);
+
+		// should not happen, but who knows what p2 is doing in the future...
+		if (wizardDescriptor == null) {
+			return;
+		}
+		try {
+			IWorkbenchWizard wizard = wizardDescriptor.createWizard();
+			WizardDialog dlg = new WizardDialog(getShell(), wizard);
+			dlg.setTitle(wizard.getWindowTitle());
+			dlg.setHelpAvailable(false);
+			dlg.open();
+		} catch (CoreException e) {
+			Logger logger = PlatformUI.getWorkbench().getService(Logger.class);
+			logger.error(e);
+		}
+
+	}
+
 	@Override
 	protected boolean isResizable() {
 		return true;
