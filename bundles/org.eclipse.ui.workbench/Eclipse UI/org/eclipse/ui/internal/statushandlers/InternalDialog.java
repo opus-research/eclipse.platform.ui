@@ -930,9 +930,11 @@ public class InternalDialog extends TrayDialog {
 		Link link = new Link(linkComposite, SWT.NONE);
 		link.addSelectionListener(widgetSelectedAdapter(e -> {
 			try {
-				Workbench.getInstance().getActiveWorkbenchWindow().getActivePage().showView(LOG_VIEW_ID);
+				Workbench.getInstance().getActiveWorkbenchWindow()
+						.getActivePage().showView(LOG_VIEW_ID);
 			} catch (CoreException ce) {
-				StatusManager.getManager().handle(ce, WorkbenchPlugin.PI_WORKBENCH);
+				StatusManager.getManager().handle(ce,
+						WorkbenchPlugin.PI_WORKBENCH);
 			}
 		}));
 		link.setText(WorkbenchMessages.ErrorLogUtil_ShowErrorLogHyperlink);

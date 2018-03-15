@@ -48,12 +48,10 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 
 public final class ContributionsAnalyzer {
 	public static void trace(String msg, Throwable error) {
-		if (DEBUG) {
-			Activator.trace(Policy.DEBUG_MENUS_FLAG, msg, error);
-		}
+		Activator.trace("/trace/menus", msg, error); //$NON-NLS-1$
 	}
 
-	private static boolean DEBUG = Policy.DEBUG_MENUS;
+	private static boolean DEBUG = true;
 
 	private static void trace(String msg, Object menu, Object menuModel) {
 		trace(msg + ": " + menu + ": " + menuModel, null); //$NON-NLS-1$ //$NON-NLS-2$
@@ -258,9 +256,7 @@ public final class ContributionsAnalyzer {
 		try {
 			ret = ref.evaluate(eContext) != EvaluationResult.FALSE;
 		} catch (Exception e) {
-			if (DEBUG) {
-				trace("isVisible exception", e); //$NON-NLS-1$
-			}
+			trace("isVisible exception", e); //$NON-NLS-1$
 		}
 		return ret;
 	}
@@ -544,9 +540,6 @@ public final class ContributionsAnalyzer {
 	}
 
 	public static void printContributions(ArrayList<MMenuContribution> contributions) {
-		if (!DEBUG) {
-			return;
-		}
 		for (MMenuContribution c : contributions) {
 			trace("\n" + c, null); //$NON-NLS-1$
 			for (MMenuElement element : c.getChildren()) {
@@ -572,9 +565,7 @@ public final class ContributionsAnalyzer {
 	public static void mergeToolBarContributions(ArrayList<MToolBarContribution> contributions,
 			ArrayList<MToolBarContribution> result) {
 		HashMap<ToolBarKey, ArrayList<MToolBarContribution>> buckets = new HashMap<>();
-		if (DEBUG) {
-			trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
-		}
+		trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
 		// first pass, sort by parentId?position,scheme,visibleWhen
 		for (MToolBarContribution contribution : contributions) {
 			ToolBarKey key = getKey(contribution);
@@ -612,18 +603,14 @@ public final class ContributionsAnalyzer {
 				result.add(toContribute);
 			}
 		}
-		if (DEBUG) {
-			trace("mergeContributions: final size: " + result.size(), null); //$NON-NLS-1$
-		}
+		trace("mergeContributions: final size: " + result.size(), null); //$NON-NLS-1$
 	}
 
 	public static void mergeContributions(ArrayList<MMenuContribution> contributions,
 			ArrayList<MMenuContribution> result) {
 		HashMap<MenuKey, ArrayList<MMenuContribution>> buckets = new HashMap<>();
-		if (DEBUG) {
-			trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
-			printContributions(contributions);
-		}
+		trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
+		printContributions(contributions);
 		// first pass, sort by parentId?position,scheme,visibleWhen
 		for (MMenuContribution contribution : contributions) {
 			MenuKey key = getKey(contribution);
@@ -724,9 +711,7 @@ public final class ContributionsAnalyzer {
 	public static void mergeTrimContributions(ArrayList<MTrimContribution> contributions,
 			ArrayList<MTrimContribution> result) {
 		HashMap<TrimKey, ArrayList<MTrimContribution>> buckets = new HashMap<>();
-		if (DEBUG) {
-			trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
-		}
+		trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
 		// first pass, sort by parentId?position,scheme,visibleWhen
 		for (MTrimContribution contribution : contributions) {
 			TrimKey key = getKey(contribution);
@@ -764,18 +749,14 @@ public final class ContributionsAnalyzer {
 				result.add(toContribute);
 			}
 		}
-		if (DEBUG) {
-			trace("mergeContributions: final size: " + result.size(), null); //$NON-NLS-1$
-		}
+		trace("mergeContributions: final size: " + result.size(), null); //$NON-NLS-1$
 	}
 
 	public static void populateModelInterfaces(Object modelObject, IEclipseContext context,
 			Class<?>[] interfaces) {
 		for (Class<?> intf : interfaces) {
-			if (Policy.DEBUG_CONTEXTS) {
-				Activator.trace(Policy.DEBUG_CONTEXTS_FLAG, "Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
-						+ modelObject.getClass().getName(), null);
-			}
+			Activator.trace(Policy.DEBUG_CONTEXTS, "Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
+					+ modelObject.getClass().getName(), null);
 			context.set(intf.getName(), modelObject);
 
 			populateModelInterfaces(modelObject, context, intf.getInterfaces());

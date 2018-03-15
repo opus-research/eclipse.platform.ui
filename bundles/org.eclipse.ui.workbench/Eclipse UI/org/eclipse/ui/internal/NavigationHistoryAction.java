@@ -117,8 +117,10 @@ public class NavigationHistoryAction extends PageEventAction {
 							Integer.valueOf(entriesCount[i]));
     			}
     			item.setText(text);
-				item.addSelectionListener(widgetSelectedAdapter(
-						e -> history.shiftCurrentEntry((NavigationHistoryEntry) e.widget.getData(), forward)));
+    			item.addSelectionListener(widgetSelectedAdapter(e -> history
+				.shiftCurrentEntry(
+						(NavigationHistoryEntry) e.widget
+						.getData(), forward)));
     		}
     	}
     	recreateMenu = false;

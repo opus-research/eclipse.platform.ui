@@ -73,7 +73,8 @@ public class PerspectiveBarNewContributionItem extends ContributionItem {
 			    if (event.widget instanceof ToolItem) {
 			        ToolItem toolItem = (ToolItem) event.widget;
 			        Rectangle rectangle = toolItem.getBounds();
-					point = new Point(rectangle.x, rectangle.y + rectangle.height);
+			        point = new Point(rectangle.x, rectangle.y
+			                + rectangle.height);
 			    }
 			    Menu menu = menuManager.createContextMenu(parent);
 			    point = parent.toDisplay(point);

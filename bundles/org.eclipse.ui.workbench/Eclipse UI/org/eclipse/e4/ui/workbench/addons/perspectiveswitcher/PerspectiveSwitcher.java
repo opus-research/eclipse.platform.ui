@@ -47,7 +47,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
@@ -715,17 +714,19 @@ public class PerspectiveSwitcher {
 	private void addShowTextItem(final Menu menu) {
 		final MenuItem showtextMenuItem = new MenuItem(menu, SWT.CHECK);
 		showtextMenuItem.setText(WorkbenchMessages.PerspectiveBar_showText);
-		IPreferenceStore apiPreferenceStore = PrefUtil.getAPIPreferenceStore();
-		String showTextOnPerspectiveBarPreference = IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR;
 		showtextMenuItem.addSelectionListener(widgetSelectedAdapter(e -> {
 			boolean preference = showtextMenuItem.getSelection();
-			if (preference != apiPreferenceStore.getDefaultBoolean(showTextOnPerspectiveBarPreference)) {
-				PrefUtil.getInternalPreferenceStore().setValue(IPreferenceConstants.OVERRIDE_PRESENTATION, true);
+			if (preference != PrefUtil.getAPIPreferenceStore().getDefaultBoolean(
+					IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR)) {
+				PrefUtil.getInternalPreferenceStore().setValue(
+						IPreferenceConstants.OVERRIDE_PRESENTATION, true);
 			}
-			apiPreferenceStore.setValue(showTextOnPerspectiveBarPreference, preference);
+			PrefUtil.getAPIPreferenceStore().setValue(
+					IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR, preference);
 			changeShowText(preference);
 		}));
-		showtextMenuItem.setSelection(apiPreferenceStore.getBoolean(showTextOnPerspectiveBarPreference));
+		showtextMenuItem.setSelection(PrefUtil.getAPIPreferenceStore().getBoolean(
+				IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR));
 	}
 
 	private void setPropertyChangeListener() {
