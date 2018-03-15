@@ -223,7 +223,7 @@ public class MMenuItemTest {
 		MenuManager fileManager = renderer.getManager(fileMenu);
 		assertNotNull("No file menu?", fileManager);
 
-
+		
 		assertEquals(4, fileManager.getSize());
 
 		assertEquals("mmc.item1", fileManager.getItems()[3].getId());
@@ -402,12 +402,13 @@ public class MMenuItemTest {
 	}
 
 	@Test
-	public void validateThatCheckedHandledMenuItemIsCreated() {
-		MWindow window = modelService.createModelElement(MWindow.class);
-		MMenu menu = modelService.createModelElement(MMenu.class);
-		MHandledMenuItem menuItem = modelService.createModelElement(MHandledMenuItem.class);
+	public void testMHandledMenuItem_Check_Bug316752() {
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
+		MHandledMenuItem menuItem = MenuFactoryImpl.eINSTANCE
+				.createHandledMenuItem();
+		MCommand command = CommandsFactoryImpl.eINSTANCE.createCommand();
 
-		MCommand command = modelService.createModelElement(MCommand.class);
 		command.setElementId("commandId");
 
 		menuItem.setCommand(command);
@@ -417,7 +418,8 @@ public class MMenuItemTest {
 		menu.getChildren().add(menuItem);
 		window.setMainMenu(menu);
 
-		MApplication application = modelService.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
@@ -425,7 +427,8 @@ public class MMenuItemTest {
 		wb = new E4Workbench(window, appContext);
 		wb.createAndRunUI(window);
 
-		MenuManager barManager = (MenuManager) ((Menu) menu.getWidget()).getData();
+		MenuManager barManager = (MenuManager) ((Menu) menu.getWidget())
+				.getData();
 		barManager.updateAll(true);
 
 		Object widget1 = menuItem.getWidget();
@@ -437,11 +440,11 @@ public class MMenuItemTest {
 	}
 
 	@Test
-	public void validateThatMenuWithRadioButtonAreUpdatedByUserSelection() {
-		MWindow window = modelService.createModelElement(MWindow.class);
-		MMenu menu = modelService.createModelElement(MMenu.class);
-		MMenuItem menuItem1 = modelService.createModelElement(MDirectMenuItem.class);
-		MMenuItem menuItem2 = modelService.createModelElement(MDirectMenuItem.class);
+	public void testMMenuItem_RadioItems() {
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
+		MMenuItem menuItem1 = MenuFactoryImpl.eINSTANCE.createDirectMenuItem();
+		MMenuItem menuItem2 = MenuFactoryImpl.eINSTANCE.createDirectMenuItem();
 
 		menuItem1.setType(ItemType.RADIO);
 		menuItem2.setType(ItemType.RADIO);
@@ -450,7 +453,8 @@ public class MMenuItemTest {
 		menu.getChildren().add(menuItem2);
 		window.setMainMenu(menu);
 
-		MApplication application = modelService.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
