@@ -10,8 +10,10 @@
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
-import org.eclipse.jface.resource.JFaceResources;
+import java.util.function.Predicate;
+
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -97,6 +99,11 @@ public class StringFieldEditor extends FieldEditor {
      */
     private int validateStrategy = VALIDATE_ON_KEY_STROKE;
 
+	/**
+	 * An optional validation step.
+	 */
+	private Predicate<String> validator;
+
     /**
      * Creates a new string field editor
      */
@@ -165,36 +172,37 @@ public class StringFieldEditor extends FieldEditor {
         gd.grabExcessHorizontalSpace = gd.horizontalSpan == 1;
     }
 
-    /**
-     * Checks whether the text input field contains a valid value or not.
-     *
-     * @return <code>true</code> if the field value is valid,
-     *   and <code>false</code> if invalid
-     */
-    protected boolean checkState() {
-        boolean result = false;
-        if (emptyStringAllowed) {
+	/**
+	 * Checks whether the text input field contains a valid value or not.
+	 *
+	 * @return <code>true</code> if the field value is valid, and
+	 *         <code>false</code> if invalid
+	 */
+	protected boolean checkState() {
+		boolean result = false;
+		if (emptyStringAllowed) {
 			result = true;
 		}
 
-        if (textField == null) {
+		if (textField == null) {
 			result = false;
 		} else {
 			String txt = textField.getText();
 			result = (txt.trim().length() > 0) || emptyStringAllowed;
 		}
 
-        // call hook for subclasses
-        result = result && doCheckState();
+		// call hook for subclasses and the validator
+		result = result && doCheckState();
+		result = result && (validator == null || validator.test(getStringValue()));
 
-        if (result) {
+		if (result) {
 			clearErrorMessage();
 		} else {
 			showErrorMessage(errorMessage);
 		}
 
-        return result;
-    }
+		return result;
+	}
 
     /**
      * Hook for subclasses to do specific state checks.
@@ -509,4 +517,26 @@ public class StringFieldEditor extends FieldEditor {
         super.setEnabled(enabled, parent);
         getTextControl(parent).setEnabled(enabled);
     }
+
+	/**
+	 * Return the validator or {@code null} if none configured.
+	 *
+	 * @return the validator
+	 * @since 3.13
+	 */
+	public Predicate<String> getValidator() {
+		return validator;
+	}
+
+	/**
+	 * Set the optional validator. Changing the validator does not re-validate
+	 * the field.
+	 *
+	 * @param validator
+	 *            the validator or {@code null} to remove the current validator
+	 * @since 3.13
+	 */
+	public void setValidator(Predicate<String> validator) {
+		this.validator = validator;
+	}
 }
