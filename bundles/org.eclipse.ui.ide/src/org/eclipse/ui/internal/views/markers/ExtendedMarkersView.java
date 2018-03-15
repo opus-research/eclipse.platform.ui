@@ -1099,7 +1099,7 @@ public class ExtendedMarkersView extends ViewPart {
 	/**
 	 * Open the filters dialog for the receiver.
 	 */
-	protected void openFiltersDialog() {
+	void openFiltersDialog() {
 		FiltersConfigurationDialog dialog = new FiltersConfigurationDialog(
 				getSite().getWorkbenchWindow().getShell(), generator);
 		if (dialog.open() == Window.OK) {
