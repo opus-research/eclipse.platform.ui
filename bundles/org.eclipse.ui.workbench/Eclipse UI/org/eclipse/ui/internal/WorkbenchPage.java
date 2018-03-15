@@ -4512,7 +4512,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	@Override
 	public IViewPart[] getViewStack(IViewPart part) {
-		MPart mpart = partService.findPart(part.getSite().getId());
+		String compoundId = part.getViewSite().getId();
+		String secondaryId = part.getViewSite().getSecondaryId();
+		if (secondaryId != null && secondaryId.length() > 0)
+			compoundId += ":" + secondaryId; //$NON-NLS-1$
+		MPart mpart = partService.findPart(compoundId);
 		if (mpart != null) {
 			MElementContainer<?> parent = mpart.getParent();
 			if (parent == null) {
