@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136, 472654
  *     Robert Roth <robert.roth.off@gmail.com> - Bugs 274005, 456291
  *     Mickael Istria (Red Hat Inc.) - Theme and fontregistry rather than pref
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -510,19 +511,22 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
             if (element instanceof IHierarchalThemeElementDefinition) {
                 IHierarchalThemeElementDefinition themeElement = (IHierarchalThemeElementDefinition) element;
 				if (themeElement.getDefaultsTo() != null) {
-                    String myCategory = ((ICategorizedThemeElementDefinition) themeElement).getCategoryId();
-                    ICategorizedThemeElementDefinition def;
-                    if (element instanceof ColorDefinition)
+					String myCategory = ((ICategorizedThemeElementDefinition) themeElement).getCategoryId();
+					ICategorizedThemeElementDefinition def;
+					if (element instanceof ColorDefinition) {
 						def = themeRegistry.findColor(themeElement.getDefaultsTo());
-					else
+					} else {
 						def = themeRegistry.findFont(themeElement.getDefaultsTo());
-
-                    if (!ColorsAndFontsPreferencePage.equals(def.getCategoryId(), myCategory)) {
-                    	if (isDefault(themeElement))
-							return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_default"), themeElement.getName(), def.getName() ); //$NON-NLS-1$
-               			return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_override"), themeElement.getName(), def.getName() ); //$NON-NLS-1$
-                    }
-                }
+					}
+					if (def != null && !ColorsAndFontsPreferencePage.equals(def.getCategoryId(), myCategory)) {
+						if (isDefault(themeElement)) {
+							return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_default"), //$NON-NLS-1$
+									themeElement.getName(), def.getName());
+						}
+						return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_override"), //$NON-NLS-1$
+								themeElement.getName(), def.getName());
+					}
+				}
             }
             return ((IThemeElementDefinition) element).getName();
         }
@@ -1323,7 +1327,7 @@ getPreferenceStore(),
     @Override
 	public void init(IWorkbench aWorkbench) {
         this.workbench = (Workbench) aWorkbench;
-		themeEngine = (IThemeEngine) workbench.getService(IThemeEngine.class);
+		themeEngine = workbench.getService(IThemeEngine.class);
         setPreferenceStore(PrefUtil.getInternalPreferenceStore());
 
         final IThemeManager themeManager = aWorkbench.getThemeManager();
@@ -1342,7 +1346,7 @@ getPreferenceStore(),
 
         updateThemeInfo(themeManager);
 
-        eventBroker = (IEventBroker) workbench.getService(IEventBroker.class);
+		eventBroker = workbench.getService(IEventBroker.class);
 		eventBroker.subscribe(WorkbenchThemeManager.Events.THEME_REGISTRY_RESTYLED,
 				themeRegistryRestyledHandler);
     }
@@ -2121,10 +2125,8 @@ getPreferenceStore(),
 		String messageTop = RESOURCE_BUNDLE.getString("fontColorSample"); //$NON-NLS-1$
 		String fontColorString = RESOURCE_BUNDLE.getString("fontColorString"); //$NON-NLS-1$
 		RGB rgb = currentColor.getRGB();
-		String messageBottom = MessageFormat
-				.format(fontColorString,
-						new Object[] { Integer.valueOf(rgb.red), Integer.valueOf(rgb.green),
-								Integer.valueOf(rgb.blue) });
+		String messageBottom = MessageFormat.format(fontColorString, Integer.valueOf(rgb.red),
+				Integer.valueOf(rgb.green), Integer.valueOf(rgb.blue));
 
 		// calculate position of the vertical line
 		int separator = (clientArea.width - 2) / 3;
@@ -2218,9 +2220,12 @@ getPreferenceStore(),
 
 	private boolean isAvailableInCurrentTheme(ThemeElementDefinition definition) {
 		if (definition instanceof ColorDefinition) {
-			RGB value = ((ColorDefinition) definition).getValue();
-			return value != null && value != EMPTY_COLOR_VALUE
-					&& colorRegistry.get(definition.getId()) != null;
+			ColorDefinition colorDef = (ColorDefinition) definition;
+			RGB value = colorDef.getValue();
+			if ((value == null || value == EMPTY_COLOR_VALUE) && colorDef.getDefaultsTo() == null) {
+				return false;
+			}
+			return colorRegistry.get(definition.getId()) != null;
 		}
 		return true;
 	}
@@ -2231,7 +2236,7 @@ getPreferenceStore(),
 			return description;
 		}
 		return MessageFormat.format(RESOURCE_BUNDLE.getString("definitionNotAvailInTheme"), //$NON-NLS-1$
-				new Object[] { description }).trim();
+				description).trim();
 	}
 
 	private void updateDefinitionState(ThemeElementDefinition definition, boolean reset) {
