@@ -16,7 +16,6 @@
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *     Mickael Istria (Red Hat Inc.) - Bug 469918
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 487297
- *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 471310
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -153,8 +152,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TaskBar;
-import org.eclipse.swt.widgets.TaskItem;
 import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -306,131 +303,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private static final String PROP_EXIT_CODE = "eclipse.exitcode"; //$NON-NLS-1$
 	private static final String CMD_DATA = "-data"; //$NON-NLS-1$
 	private static final String CMD_VMARGS = "-vmargs"; //$NON-NLS-1$
-
-	private final class TaskBarDelegatingProgressMonitor implements IProgressMonitor {
-
-		private final Shell shell;
-		private IProgressMonitor progessMonitor;
-		private TaskItem systemTaskItem;
-		private int totalWork;
-		private int totalWorked;
-
-		public TaskBarDelegatingProgressMonitor(IProgressMonitor progressMonitor, Shell shell) {
-			Assert.isNotNull(progressMonitor);
-			this.shell = shell;
-			this.progessMonitor = progressMonitor;
-		}
-
-		@Override
-		public void beginTask(String name, int totalWork) {
-			progessMonitor.beginTask(name, totalWork);
-			if (this.totalWork == 0) {
-				this.totalWork = totalWork;
-			}
-		}
-
-		@Override
-		public void worked(int work) {
-			progessMonitor.worked(work);
-			totalWorked += work;
-			if (Display.getCurrent() != null) {
-				handleTaskBarProgressUpdated();
-			} else if (getDisplay() != null && !getDisplay().isDisposed()) {
-				getDisplay().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						handleTaskBarProgressUpdated();
-					}
-				});
-			}
-		}
-
-		@Override
-		public void done() {
-			progessMonitor.done();
-
-			if (Display.getCurrent() != null) {
-				handleTaskBarProgressDone();
-			} else if (getDisplay() != null && !getDisplay().isDisposed()) {
-				getDisplay().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						handleTaskBarProgressDone();
-					}
-				});
-			}
-		}
-
-		private TaskItem getTaskItem(Shell shell) {
-			if (Display.getCurrent() == null) {
-				return null;
-			}
-			if (systemTaskItem == null) {
-				if (getDisplay() != null && shell != null && !shell.isDisposed()) {
-					TaskBar systemTaskBar = getDisplay().getSystemTaskBar();
-					if (systemTaskBar != null) {
-						systemTaskItem = systemTaskBar.getItem(shell);
-						if (systemTaskItem == null) {
-							// fall back to the application TaskItem if there
-							// isn't one for the shell
-							systemTaskItem = systemTaskBar.getItem(null);
-						}
-					}
-				}
-			}
-			return systemTaskItem;
-		}
-
-		private void handleTaskBarProgressUpdated() {
-			if (systemTaskItem == null) {
-				systemTaskItem = getTaskItem(shell);
-			}
-			if (systemTaskItem != null && !systemTaskItem.isDisposed()) {
-				if (systemTaskItem.getProgressState() != SWT.NORMAL) {
-					systemTaskItem.setProgressState(SWT.NORMAL);
-				}
-				float percentComplete = ((float) totalWorked / (float) totalWork) * 100f;
-				systemTaskItem.setProgress(Math.round(percentComplete));
-			}
-		}
-
-		private void handleTaskBarProgressDone() {
-			if (systemTaskItem == null) {
-				systemTaskItem = getTaskItem(shell);
-			}
-			if (systemTaskItem != null && !systemTaskItem.isDisposed()) {
-				if (systemTaskItem.getProgressState() != SWT.DEFAULT) {
-					systemTaskItem.setProgressState(SWT.DEFAULT);
-				}
-			}
-		}
-
-		@Override
-		public void internalWorked(double work) {
-			progessMonitor.internalWorked(work);
-		}
-
-		@Override
-		public boolean isCanceled() {
-			return progessMonitor.isCanceled();
-		}
-
-		@Override
-		public void setCanceled(boolean value) {
-			progessMonitor.setCanceled(value);
-		}
-
-		@Override
-		public void setTaskName(String name) {
-			progessMonitor.setTaskName(name);
-		}
-
-		@Override
-		public void subTask(String name) {
-			progessMonitor.subTask(name);
-		}
-
-	}
 
 	private final class StartupProgressBundleListener implements SynchronousBundleListener {
 
@@ -818,8 +690,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 					if (returnCode[0] == PlatformUI.RETURN_OK) {
 						// run the e4 event loop and instantiate ... well, stuff
 						e4Workbench.createAndRunUI(e4Workbench.getApplication());
-						WorkbenchMenuService wms = (WorkbenchMenuService) e4Workbench.getContext()
-								.get(IMenuService.class);
+						IMenuService wms = e4Workbench.getContext().get(IMenuService.class);
 						wms.dispose();
 					}
 					if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {
@@ -2747,11 +2618,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 			// fall back to starting without showing progress.
 			runnable.run();
 		} else {
-			Shell shell = null;
-			if (handler != null) {
-				shell = handler.getSplash();
-			}
-			progressMonitor = new TaskBarDelegatingProgressMonitor(progressMonitor, shell);
 			progressMonitor.beginTask("", expectedProgressCount); //$NON-NLS-1$
 			SynchronousBundleListener bundleListener = new StartupProgressBundleListener(
 					progressMonitor, (int) (expectedProgressCount * cutoff));
