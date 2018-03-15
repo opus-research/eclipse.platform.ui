@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -95,7 +95,12 @@ public class BrowserText {
         link.addSelectionListener(new SelectionAdapter() {
             @Override
 			public void widgetSelected(SelectionEvent e) {
-				BusyIndicator.showWhile(link.getDisplay(), () -> doOpenExternal());
+                BusyIndicator.showWhile(link.getDisplay(), new Runnable() {
+                    @Override
+					public void run() {
+                        doOpenExternal();
+                    }
+                });
             }
         });
         link.setBackground(bg);
@@ -127,10 +132,10 @@ public class BrowserText {
 
     private void loadExceptionText() {
         StringWriter swriter = new StringWriter();
-		try (PrintWriter writer = new PrintWriter(swriter)) {
-			writer.println(ex.getMessage());
-			ex.printStackTrace(writer);
-		}
+        PrintWriter writer = new PrintWriter(swriter);
+        writer.println(ex.getMessage());
+        ex.printStackTrace(writer);
+        writer.close();
         exception.setText(swriter.toString());
     }
 
