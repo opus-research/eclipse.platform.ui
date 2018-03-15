@@ -27,7 +27,8 @@ public class CSSStyleRuleImpl extends CSSRuleImpl implements CSSStyleRule, Exten
 	private SelectorList selectors;
 	private CSSStyleDeclaration styleDeclaration;
 
-	public CSSStyleRuleImpl(CSSStyleSheet parentStyleSheet, CSSRule parentRule, SelectorList selectors) {
+	public CSSStyleRuleImpl(CSSStyleSheet parentStyleSheet, CSSRule parentRule,
+			SelectorList selectors) {
 		super(parentStyleSheet, parentRule);
 		this.selectors = selectors;
 	}
@@ -72,6 +73,7 @@ public class CSSStyleRuleImpl extends CSSRuleImpl implements CSSStyleRule, Exten
 
 	@Override
 	public void setSelectorText(String selectorText) throws DOMException {
+		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
@@ -87,15 +89,11 @@ public class CSSStyleRuleImpl extends CSSRuleImpl implements CSSStyleRule, Exten
 
 	@Override
 	public CSSPropertyList getCSSPropertyList() {
+		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
 	public void setStyle(CSSStyleDeclaration styleDeclaration) {
 		this.styleDeclaration = styleDeclaration;
-	}
-
-	@Override
-	public String toString() {
-		return getSelectorText();
 	}
 }
