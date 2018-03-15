@@ -77,7 +77,7 @@ public class SetBindingTest extends AbstractDefaultRealmTestCase {
 
 		model.add("first");
 		new SetBinding(target, model, new UpdateSetStrategy(), new UpdateSetStrategy());
-		model.remove("first");
+		model.remove(0);
 	}
 
 	/**

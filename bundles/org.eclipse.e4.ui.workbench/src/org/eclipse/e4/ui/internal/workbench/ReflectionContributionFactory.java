@@ -135,8 +135,12 @@ public class ReflectionContributionFactory implements IContributionFactory {
 			try {
 				languages.put(languageElement.getAttribute("name"), //$NON-NLS-1$
 						languageElement.createExecutableExtension("contributionFactory")); //$NON-NLS-1$
-			} catch (InvalidRegistryObjectException | CoreException e) {
-				Activator.log(LogService.LOG_ERROR, e.getMessage(), e);
+			} catch (InvalidRegistryObjectException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
