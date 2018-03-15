@@ -193,8 +193,8 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 	        INavigatorFilterService filterService = commonViewer
 					.getNavigatorContentService().getFilterService();
 			ViewerFilter[] visibleFilters = filterService.getVisibleFilters(true);
-			for (int i = 0; i < visibleFilters.length; i++) {
-				commonViewer.addFilter(visibleFilters[i]);
+			for (ViewerFilter visibleFilter : visibleFilters) {
+				commonViewer.addFilter(visibleFilter);
 			}
 
 			commonViewer.setSorter(new CommonViewerSorter());
@@ -226,6 +226,9 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 
 		commonActionGroup = createCommonActionGroup();
 		commonActionGroup.fillActionBars(getViewSite().getActionBars());
+		if (memento != null && commonActionGroup instanceof IMementoAware) {
+			((IMementoAware) commonActionGroup).restoreState(memento);
+		}
 
 		ISaveablesLifecycleListener saveablesLifecycleListener = new ISaveablesLifecycleListener() {
 			ISaveablesLifecycleListener siteSaveablesLifecycleListener = getSite()
@@ -335,7 +338,6 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 					.intValue() == 1
 					: false));
 		}
-
 	}
 
 	/**
@@ -353,6 +355,9 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 		super.saveState(aMemento);
 		commonManager.saveState(aMemento);
 		commonViewer.getNavigatorContentService().saveState(aMemento);
+		if (commonActionGroup instanceof IMementoAware) {
+			((IMementoAware) commonActionGroup).saveState(aMemento);
+		}
 	}
 
 	/**
@@ -646,8 +651,8 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 	@Override
 	public boolean isDirty() {
 		Saveable[] saveables = getSaveables();
-		for (int i = 0; i < saveables.length; i++) {
-			if(saveables[i].isDirty()) {
+		for (Saveable saveable : saveables) {
+			if(saveable.isDirty()) {
 				return true;
 			}
 		}

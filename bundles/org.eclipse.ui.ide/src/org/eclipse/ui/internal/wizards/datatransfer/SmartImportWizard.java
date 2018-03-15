@@ -27,12 +27,12 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IImportWizard;
@@ -209,14 +209,30 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 		if (o instanceof File) {
 			return (File)o;
 		} else if (o instanceof IResource) {
-			return ((IResource)o).getLocation().toFile();
+			IPath location = ((IResource)o).getLocation();
+			return location == null ? null : location.toFile();
 		} else if (o instanceof IAdaptable) {
 			IResource resource = ((IAdaptable)o).getAdapter(IResource.class);
 			if (resource != null) {
-				return resource.getLocation().toFile();
+				IPath location = resource.getLocation();
+				return location == null ? null : location.toFile();
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Tries to infer a file path string from given object, using various
+	 * strategies
+	 *
+	 * @param o
+	 *            an object
+	 * @return a {@link File#getAbsolutePath} associated to this object, or
+	 *         empty string.
+	 */
+	public static String toAbsolutePath(Object o) {
+		File file = toFile(o);
+		return file == null ? "" : file.getAbsolutePath(); //$NON-NLS-1$
 	}
 
 	@Override
@@ -273,6 +289,11 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 			this.easymportJob = new SmartImportJob(this.directoryToImport, projectRootPage.getSelectedWorkingSets(),
 					projectRootPage.isConfigureProjects(), projectRootPage.isDetectNestedProject());
 		}
+		if (this.easymportJob != null) {
+			// always update working set on request as the job isn't updated on
+			// WS change automatically
+			this.easymportJob.setWorkingSets(projectRootPage.getSelectedWorkingSets());
+		}
 		return this.easymportJob;
 	}
 
@@ -310,14 +331,6 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 				|| (isValidArchive(pageRoot) && getExpandDirectory(pageRoot).getAbsoluteFile().equals(jobRoot));
 		return sameSource && job.isDetectNestedProjects() == page.isDetectNestedProject()
 				&& job.isConfigureProjects() == page.isConfigureProjects();
-	}
-
-	@Override
-	public IWizardPage getNextPage(IWizardPage page) {
-		if (page == this.projectRootPage && !this.projectRootPage.isDetectNestedProject()) {
-			return null;
-		}
-		return super.getNextPage(page);
 	}
 
 }

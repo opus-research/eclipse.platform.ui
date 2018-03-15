@@ -87,9 +87,8 @@ public final class ParameterType extends HandleObject implements Comparable {
 		if (superClass != null && isSubtype(superClass, type)) {
 			return true;
 		}
-		final Class<?>[] interfaces = clazz.getInterfaces();
-		for (int i = 0; i < interfaces.length; i++) {
-			if (isSubtype(interfaces[i], type)) {
+		for (Class<?> classInterface : clazz.getInterfaces()) {
+			if (isSubtype(classInterface, type)) {
 				return true;
 			}
 		}
@@ -203,10 +202,9 @@ public final class ParameterType extends HandleObject implements Comparable {
 			return;
 		}
 
-		final Object[] listeners = getListeners();
-		for (int i = 0; i < listeners.length; i++) {
-			final IParameterTypeListener listener = (IParameterTypeListener) listeners[i];
-			listener.parameterTypeChanged(event);
+		for (Object listener : getListeners()) {
+			final IParameterTypeListener parameterTypeListener = (IParameterTypeListener) listener;
+			parameterTypeListener.parameterTypeChanged(event);
 		}
 	}
 
@@ -271,8 +269,7 @@ public final class ParameterType extends HandleObject implements Comparable {
 	@Override
 	public final String toString() {
 		if (string == null) {
-			final StringBuffer stringBuffer = new StringBuffer();
-			stringBuffer.append("ParameterType("); //$NON-NLS-1$
+			final StringBuilder stringBuffer = new StringBuilder("ParameterType("); //$NON-NLS-1$
 			stringBuffer.append(id);
 			stringBuffer.append(',');
 			stringBuffer.append(defined);
