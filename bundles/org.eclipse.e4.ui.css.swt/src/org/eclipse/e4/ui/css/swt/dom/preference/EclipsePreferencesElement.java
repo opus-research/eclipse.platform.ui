@@ -80,8 +80,4 @@ public class EclipsePreferencesElement extends ElementAdapter {
 		return "";
 	}
 
-	@Override
-	public boolean isPseudoInstanceOf(String s) {
-		return true;
-	}
 }
