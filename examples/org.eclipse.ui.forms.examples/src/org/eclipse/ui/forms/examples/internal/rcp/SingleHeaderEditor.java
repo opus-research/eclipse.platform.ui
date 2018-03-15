@@ -43,14 +43,12 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 	 *
 	 * @see org.eclipse.ui.forms.editor.FormEditor#createToolkit(org.eclipse.swt.widgets.Display)
 	 */
-	@Override
 	protected FormToolkit createToolkit(Display display) {
 		// Create a toolkit that shares colors between editors.
 		return new FormToolkit(ExamplesPlugin.getDefault().getFormColors(
 				display));
 	}
 
-	@Override
 	protected void createHeaderContents(IManagedForm headerForm) {
 		final ScrolledForm sform = headerForm.getForm();
 		//sform.setText("Shared header for all the pages");
@@ -59,7 +57,6 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 		sform.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(
 				ISharedImages.IMG_OBJ_FILE));
 		headerForm.getForm().getDisplay().timerExec(5000, new Runnable() {
-			@Override
 			public void run() {
 				sform.setText("<Another text>");
 			}
@@ -72,7 +69,6 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 	 *
 	 * @see org.eclipse.ui.forms.editor.FormEditor#addPages()
 	 */
-	@Override
 	protected void addPages() {
 		try {
 			addPage(new HeadlessPage(this, 1));
@@ -88,7 +84,6 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 	 *
 	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public void doSave(IProgressMonitor monitor) {
 	}
 
@@ -97,7 +92,6 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 	 *
 	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
 	 */
-	@Override
 	public void doSaveAs() {
 	}
 
@@ -106,14 +100,12 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 	 *
 	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
 	 */
-	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
 	private void addToolBar(Form form) {
 		Action haction = new Action("hor", Action.AS_RADIO_BUTTON) {
-			@Override
 			public void run() {
 			}
 		};
@@ -123,7 +115,6 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 				.getImageRegistry()
 				.getDescriptor(ExamplesPlugin.IMG_HORIZONTAL));
 		Action vaction = new Action("ver", Action.AS_RADIO_BUTTON) {
-			@Override
 			public void run() {
 			}
 		};
@@ -132,7 +123,6 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 		vaction.setImageDescriptor(ExamplesPlugin.getDefault()
 				.getImageRegistry().getDescriptor(ExamplesPlugin.IMG_VERTICAL));
 		ControlContribution save = new ControlContribution("save") {
-			@Override
 			protected Control createControl(Composite parent) {
 				Button saveButton = new Button(parent, SWT.PUSH);
 				saveButton.setText("Save");
