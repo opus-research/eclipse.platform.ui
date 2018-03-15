@@ -222,7 +222,8 @@ public class TaskBarProgressManager {
 				jobs.clear();
 				jobInfoMap.clear();
 				setAnimated(false);
-				for (JobInfo currentInfo : manager.getJobInfos(showsDebug())) {
+				JobInfo[] currentInfos = manager.getJobInfos(showsDebug());
+				for (JobInfo currentInfo : currentInfos) {
 					addJob(currentInfo);
 				}
 			}

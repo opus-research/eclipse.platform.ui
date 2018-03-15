@@ -456,8 +456,8 @@ public final class SelectionEnabler {
 			}
 			// test all the interfaces it implements
 			Class[] interfaces = clazz.getInterfaces();
-			for (Class currentInterface : interfaces) {
-				if (currentInterface.getName().equals(className)) {
+			for (Class interface1 : interfaces) {
+				if (interface1.getName().equals(className)) {
 					match = true;
 					break;
 				}

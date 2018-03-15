@@ -391,8 +391,8 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
 
         TableItem allItems[] = editorsTable.getItems();
         boolean hasClean = false;
-        for (TableItem tableItem : allItems) {
-            Adapter editor = (Adapter) tableItem.getData();
+        for (TableItem allItem : allItems) {
+            Adapter editor = (Adapter) allItem.getData();
             if (!editor.isDirty()) {
                 hasClean = true;
                 break;
@@ -518,7 +518,8 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
      */
     private void updateEditors(IWorkbenchPage[] pages) {
         for (IWorkbenchPage page : pages) {
-			for (IEditorReference editor : page.getEditorReferences()) {
+            IEditorReference editors[] = page.getEditorReferences();
+            for (IEditorReference editor : editors) {
                 elements.add(new Adapter(editor));
             }
         }
@@ -539,8 +540,10 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
         editorsTable.removeAll();
         elements = new ArrayList();
         if (showAllPersp) {
-			for (IWorkbenchWindow workbenchWindow : window.getWorkbench().getWorkbenchWindows()) {
-				updateEditors(workbenchWindow.getPages());
+            IWorkbenchWindow windows[] = window.getWorkbench()
+                    .getWorkbenchWindows();
+            for (IWorkbenchWindow window2 : windows) {
+				updateEditors(window2.getPages());
 			}
         } else {
             IWorkbenchPage page = window.getActivePage();

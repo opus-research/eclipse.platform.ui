@@ -430,29 +430,34 @@ public final class LegacyActionPersistence extends RegistryPersistence {
 		final IConfigurationElement[][] indexedConfigurationElements = new IConfigurationElement[5][];
 
 		// Sort the actionSets extension point.
-		for (final IConfigurationElement configElement : registry.getConfigurationElementsFor(EXTENSION_ACTION_SETS)) {
-			final String name = configElement.getName();
+		final IConfigurationElement[] actionSetsExtensionPoint = registry
+				.getConfigurationElementsFor(EXTENSION_ACTION_SETS);
+		for (final IConfigurationElement element : actionSetsExtensionPoint) {
+			final String name = element.getName();
 			if (TAG_ACTION_SET.equals(name)) {
-				addElementToIndexedArray(configElement, indexedConfigurationElements,
+				addElementToIndexedArray(element, indexedConfigurationElements,
 						INDEX_ACTION_SETS, actionSetCount++);
 			}
 		}
 
 		// Sort the editorActions extension point.
-		for (final IConfigurationElement configElement : registry
-				.getConfigurationElementsFor(EXTENSION_EDITOR_ACTIONS)) {
-			final String name = configElement.getName();
+		final IConfigurationElement[] editorActionsExtensionPoint = registry
+				.getConfigurationElementsFor(EXTENSION_EDITOR_ACTIONS);
+		for (final IConfigurationElement element : editorActionsExtensionPoint) {
+			final String name = element.getName();
 			if (TAG_EDITOR_CONTRIBUTION.equals(name)) {
-				addElementToIndexedArray(configElement, indexedConfigurationElements,
+				addElementToIndexedArray(element, indexedConfigurationElements,
 						INDEX_EDITOR_CONTRIBUTIONS, editorContributionCount++);
 			}
 		}
 
 		// Sort the viewActions extension point.
-		for (final IConfigurationElement configElement : registry.getConfigurationElementsFor(EXTENSION_VIEW_ACTIONS)) {
-			final String name = configElement.getName();
+		final IConfigurationElement[] viewActionsExtensionPoint = registry
+				.getConfigurationElementsFor(EXTENSION_VIEW_ACTIONS);
+		for (final IConfigurationElement element : viewActionsExtensionPoint) {
+			final String name = element.getName();
 			if (TAG_VIEW_CONTRIBUTION.equals(name)) {
-				addElementToIndexedArray(configElement, indexedConfigurationElements,
+				addElementToIndexedArray(element, indexedConfigurationElements,
 						INDEX_VIEW_CONTRIBUTIONS, viewContributionCount++);
 			}
 		}
@@ -496,23 +501,26 @@ public final class LegacyActionPersistence extends RegistryPersistence {
 	private final void readActions(final String primaryId,
 			final IConfigurationElement[] elements, final List warningsToLog,
 			final Expression visibleWhenExpression, final String viewId) {
-		for (final IConfigurationElement configElement : elements) {
+		for (final IConfigurationElement element : elements) {
 			/*
 			 * We might need the identifier to generate the command, so we'll
 			 * read it out now.
 			 */
-			final String id = readRequired(configElement, ATT_ID, warningsToLog, "Actions require an id"); //$NON-NLS-1$
+			final String id = readRequired(element, ATT_ID, warningsToLog,
+					"Actions require an id"); //$NON-NLS-1$
 			if (id == null) {
 				continue;
 			}
 
 			// Try to break out the command part of the action.
-			final ParameterizedCommand command = convertActionToCommand(configElement, primaryId, id, warningsToLog);
+			final ParameterizedCommand command = convertActionToCommand(
+					element, primaryId, id, warningsToLog);
 			if (command == null) {
 				continue;
 			}
 
-			convertActionToHandler(configElement, id, command, visibleWhenExpression, viewId, warningsToLog);
+			convertActionToHandler(element, id, command, visibleWhenExpression,
+					viewId, warningsToLog);
 			// TODO Read the overrideActionId attribute
 		}
 	}

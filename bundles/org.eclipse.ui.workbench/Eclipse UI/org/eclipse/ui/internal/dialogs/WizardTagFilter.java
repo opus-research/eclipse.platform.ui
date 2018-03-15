@@ -38,7 +38,8 @@ public class WizardTagFilter extends ViewerFilter {
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		if (element instanceof IWizardDescriptor) {
 			IWizardDescriptor desc = (IWizardDescriptor)element;
-			for (String tag : desc.getTags()) {
+			String [] tags = desc.getTags();
+			for (String tag : tags) {
 				for (String myTag : myTags) {
 					if (tag.equals(myTag)) {
 						return true;

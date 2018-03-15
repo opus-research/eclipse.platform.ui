@@ -129,9 +129,9 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	 *
 	 */
 	private void processDynamicElements(MMenu menuModel, MenuManager menuManager) {
-		MMenuElement[] menuElements = menuModel.getChildren().toArray(
+		MMenuElement[] ml = menuModel.getChildren().toArray(
 				new MMenuElement[menuModel.getChildren().size()]);
-		for (MMenuElement currentMenuElement : menuElements) {
+		for (MMenuElement currentMenuElement : ml) {
 
 			if (currentMenuElement instanceof MDynamicMenuContribution) {
 				MDynamicMenuContribution dmc = (MDynamicMenuContribution) currentMenuElement;

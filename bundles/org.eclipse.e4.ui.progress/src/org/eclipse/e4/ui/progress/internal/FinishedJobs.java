@@ -281,14 +281,15 @@ public class FinishedJobs extends EventManager {
 				}
 
 				if (toBeRemoved != null) {
-					for (JobTreeElement jobTreeElement : toBeRemoved) {
-						remove(jobTreeElement);
+					for (JobTreeElement element2 : toBeRemoved) {
+						remove(element2);
 					}
 				}
 
 				if (fire) {
-					for (Object listener : getListeners()) {
-						KeptJobsListener jv = (KeptJobsListener) listener;
+					Object l[] = getListeners();
+					for (Object element2 : l) {
+						KeptJobsListener jv = (KeptJobsListener) element2;
 						jv.finished(info);
 					}
 				}
@@ -328,17 +329,17 @@ public class FinishedJobs extends EventManager {
 
 				// delete all elements that have jte as their direct or indirect
 				// parent
-				JobTreeElement jobTreeElements[] = keptjobinfos
+				JobTreeElement jtes[] = keptjobinfos
 								.toArray(new JobTreeElement[keptjobinfos.size()]);
-				for (JobTreeElement jobTreeElement : jobTreeElements) {
-					JobTreeElement parent = (JobTreeElement) jobTreeElement
+				for (JobTreeElement jte2 : jtes) {
+					JobTreeElement parent = (JobTreeElement) jte2
 							.getParent();
 					if (parent != null) {
 						if (parent == jte || parent.getParent() == jte) {
-							if (keptjobinfos.remove(jobTreeElement)) {
-								disposeAction(jobTreeElement);
+							if (keptjobinfos.remove(jte2)) {
+								disposeAction(jte2);
 							}
-							finishedTime.remove(jobTreeElement);
+							finishedTime.remove(jte2);
 						}
 					}
 				}

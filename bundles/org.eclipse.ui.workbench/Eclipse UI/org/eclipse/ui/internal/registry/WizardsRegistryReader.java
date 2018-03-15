@@ -77,8 +77,8 @@ public class WizardsRegistryReader extends RegistryReader {
             path = ""; //$NON-NLS-1$
             String[] categoryPath = category.getParentPath();
             if (categoryPath != null) {
-                for (String parentPath : categoryPath) {
-                    path += parentPath + '/';
+                for (String element : categoryPath) {
+                    path += element + '/';
                 }
             }
             path += cat.getId();
@@ -230,8 +230,8 @@ public class WizardsRegistryReader extends RegistryReader {
         Collections.sort(Arrays.asList(flatArray), comparer);
 
         // Add each category.
-        for (CategoryNode categoryNode : flatArray) {
-            Category cat = categoryNode.getCategory();
+        for (CategoryNode element : flatArray) {
+            Category cat = element.getCategory();
             finishCategory(cat);
         }
 
@@ -248,9 +248,9 @@ public class WizardsRegistryReader extends RegistryReader {
 
         // Traverse down into parent category.
         if (categoryPath != null) {
-            for (String parentPath : categoryPath) {
+            for (String element : categoryPath) {
                 WizardCollectionElement tempElement = getChildWithID(parent,
-                        parentPath);
+                        element);
                 if (tempElement == null) {
                     // The parent category is invalid.  By returning here the
                     // category will be dropped and any wizard within the category
@@ -370,8 +370,9 @@ public class WizardsRegistryReader extends RegistryReader {
      */
     protected WizardCollectionElement getChildWithID(
             WizardCollectionElement parent, String id) {
-		for (Object child : parent.getChildren(null)) {
-			WizardCollectionElement currentChild = (WizardCollectionElement) child;
+        Object[] children = parent.getChildren(null);
+        for (Object element : children) {
+            WizardCollectionElement currentChild = (WizardCollectionElement) element;
             if (currentChild.getId().equals(id)) {
 				return currentChild;
 			}
@@ -539,7 +540,8 @@ public class WizardsRegistryReader extends RegistryReader {
      * @return WorkbenchWizardElement matching the given id, if found; null otherwise
      */
     public WorkbenchWizardElement findWizard(String id) {
-		for (Object wizard : getWizardCollectionElements()) {
+        Object[] wizards = getWizardCollectionElements();
+        for (Object wizard : wizards) {
             WizardCollectionElement collection = (WizardCollectionElement) wizard;
             WorkbenchWizardElement element = collection.findWizard(id, true);
             if (element != null && !WorkbenchActivityHelper.restrictUseOf(element)) {

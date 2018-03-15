@@ -448,7 +448,8 @@ public class DecoratorManager implements ILabelProviderListener,
 		Object adapted = getResourceAdapter(element);
 		String result = scheduler.decorateWithText(text, element, adapted,
 				context);
-		for (FullDecoratorDefinition decorator : getDecoratorsFor(element)) {
+		FullDecoratorDefinition[] decorators = getDecoratorsFor(element);
+		for (FullDecoratorDefinition decorator : decorators) {
 			if (decorator.isEnabledFor(element)) {
 				String newResult = safeDecorateText(element, result,
 						decorator);
@@ -459,7 +460,8 @@ public class DecoratorManager implements ILabelProviderListener,
 		}
 
 		if (adapted != null) {
-			for (FullDecoratorDefinition decorator : getDecoratorsFor(adapted)) {
+			decorators = getDecoratorsFor(adapted);
+			for (FullDecoratorDefinition decorator : decorators) {
 				if (decorator.isAdaptable()
 						&& decorator.isEnabledFor(adapted)) {
 					String newResult = safeDecorateText(adapted, result,
@@ -514,8 +516,9 @@ public class DecoratorManager implements ILabelProviderListener,
 		Object adapted = getResourceAdapter(element);
 		Image result = scheduler.decorateWithOverlays(image, element, adapted,
 				context, localResourceManager);
+		FullDecoratorDefinition[] decorators = getDecoratorsFor(element);
 
-		for (FullDecoratorDefinition decorator : getDecoratorsFor(element)) {
+		for (FullDecoratorDefinition decorator : decorators) {
 			if (decorator.isEnabledFor(element)) {
 				Image newResult = safeDecorateImage(element, result,
 						decorator);
@@ -528,7 +531,8 @@ public class DecoratorManager implements ILabelProviderListener,
 		// Get any adaptations to IResource
 
 		if (adapted != null) {
-			for (FullDecoratorDefinition decorator : getDecoratorsFor(adapted)) {
+			decorators = getDecoratorsFor(adapted);
+			for (FullDecoratorDefinition decorator : decorators) {
 				if (decorator.isAdaptable()
 						&& decorator.isEnabledFor(adapted)) {
 					Image newResult = safeDecorateImage(adapted, result,
@@ -658,14 +662,14 @@ public class DecoratorManager implements ILabelProviderListener,
 	 */
 	private FullDecoratorDefinition[] enabledFullDefinitions() {
 
-		FullDecoratorDefinition[] fullDefinitions = getFullDefinitions();
+		FullDecoratorDefinition[] full = getFullDefinitions();
 		// As this are a deprecated data type optimize for
 		// the undefined case.
-		if (fullDefinitions.length == 0) {
-			return fullDefinitions;
+		if (full.length == 0) {
+			return full;
 		}
 		ArrayList result = new ArrayList();
-		for (FullDecoratorDefinition element : fullDefinitions) {
+		for (FullDecoratorDefinition element : full) {
 			if (element.isEnabled()) {
 				result.add(element);
 			}
@@ -800,7 +804,8 @@ public class DecoratorManager implements ILabelProviderListener,
 			}
 		}
 
-		for (FullDecoratorDefinition element : getFullDefinitions()) {
+		FullDecoratorDefinition[] full = getFullDefinitions();
+		for (FullDecoratorDefinition element : full) {
 			String id = element.getId();
 			if (enabledIds.contains(id)) {
 				element.setEnabled(true);
@@ -1103,7 +1108,9 @@ public class DecoratorManager implements ILabelProviderListener,
 	@Override
 	public void addExtension(IExtensionTracker tracker,
 			IExtension addedExtension) {
-		for (IConfigurationElement addedElement : addedExtension.getConfigurationElements()) {
+		IConfigurationElement addedElements[] = addedExtension
+				.getConfigurationElements();
+		for (IConfigurationElement addedElement : addedElements) {
 			DecoratorRegistryReader reader = new DecoratorRegistryReader();
 			reader.readElement(addedElement);
 			for (Iterator j = reader.getValues().iterator(); j.hasNext();) {
