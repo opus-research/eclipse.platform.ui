@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Tasktop Technologies and others.
+ * Copyright (c) 2015 Tasktop Technologies and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,15 +7,8 @@
  *
  * Contributors:
  *     Tasktop Technologies - initial API and implementation
- *     Ralf M Petter<ralf.petter@gmail.com> - Bug 510241
  *******************************************************************************/
 package org.eclipse.ui.tests.forms.util;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
 
@@ -30,19 +23,18 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.internal.forms.widgets.FormImages;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-public class ImageHyperlinkTest {
+import junit.framework.TestCase;
+
+public class ImageHyperlinkTest extends TestCase {
 
 	private Display display;
 	private Shell shell;
 	private GC gc;
 	private TestImageHyperlink imageHyperlink;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		display = PlatformUI.getWorkbench().getDisplay();
 		shell = new Shell(display);
 		shell.setSize(400, 300);
@@ -53,19 +45,17 @@ public class ImageHyperlinkTest {
 		gc = new GC(display);
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		shell.dispose();
 		gc.dispose();
 	}
 
-	@Test
 	public void testNoImageOnCreation() throws Exception {
 		assertNull(imageHyperlink.getImage());
 		assertNull(getDisabledImage(imageHyperlink));
 	}
 
-	@Test
 	public void testSetImageDoesNotCreateDisabledImage() throws Exception {
 		Image image = createGradient();
 
@@ -75,7 +65,6 @@ public class ImageHyperlinkTest {
 		assertNull(getDisabledImage(imageHyperlink));
 	}
 
-	@Test
 	public void testCreateDisabledImageOnPaint() throws Exception {
 		Image image = createGradient();
 		imageHyperlink.setImage(image);
@@ -86,7 +75,6 @@ public class ImageHyperlinkTest {
 		assertNull(getDisabledImage(imageHyperlink));
 	}
 
-	@Test
 	public void testCreateDisabledImageOnPaintWhenDisabled() throws Exception {
 		Image image = createGradient();
 		imageHyperlink.setImage(image);
@@ -98,7 +86,6 @@ public class ImageHyperlinkTest {
 		assertNotNull(getDisabledImage(imageHyperlink));
 	}
 
-	@Test
 	public void testSetImageDisposesPreviousDisabledImage() throws Exception {
 		Image prevImage = createGradient();
 		imageHyperlink.setImage(prevImage);
@@ -113,7 +100,6 @@ public class ImageHyperlinkTest {
 		assertTrue(prevDisabledImage.isDisposed());
 	}
 
-	@Test
 	public void testPaintHyperlinkDoesNotLeakDisabledImage() throws Exception {
 		Image prevImage = createGradient();
 		imageHyperlink.setImage(prevImage);
@@ -125,7 +111,6 @@ public class ImageHyperlinkTest {
 
 		assertSame(prevDisabledImage, getDisabledImage(imageHyperlink));
 	}
-	@Test
 	public void testSetImageNullClearsDisabledImage() throws Exception {
 		Image image = createGradient();
 		imageHyperlink.setImage(image);
