@@ -30,12 +30,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
 import org.eclipse.core.runtime.IStatus;
@@ -146,10 +140,6 @@ public class ProgressManager extends ProgressProvider implements
 	 * are handled.
 	 */
 	private final INotificationListener notificationListener;
-
-	private ConcurrentMap<JobInfo, ScheduledFuture<?>> scheduledUpdates = new ConcurrentHashMap<>();
-
-	private ScheduledExecutorService ex = Executors.newScheduledThreadPool(1);
 
 	private static final String IMAGE_KEY = "org.eclipse.ui.progress.images"; //$NON-NLS-1$
 
@@ -652,21 +642,18 @@ public class ProgressManager extends ProgressProvider implements
 	 * @param info
 	 */
 	public void refreshJobInfo(JobInfo info) {
-		scheduledUpdates.computeIfAbsent(info, jobInfo -> ex.schedule(() -> {
-			scheduledUpdates.remove(jobInfo);
-			GroupInfo group = jobInfo.getGroupInfo();
-			if (group != null) {
-				refreshGroup(group);
-			}
+		GroupInfo group = info.getGroupInfo();
+		if (group != null) {
+			refreshGroup(group);
+		}
 
-			Object[] listenersArray = listeners.getListeners();
-			for (int i = 0; i < listenersArray.length; i++) {
-				IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
-				if (!isCurrentDisplaying(jobInfo.getJob(), listener.showsDebug())) {
-					listener.refreshJobInfo(jobInfo);
-				}
+		Object[] listenersArray = listeners.getListeners();
+		for (int i = 0; i < listenersArray.length; i++) {
+			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
+			if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
+				listener.refreshJobInfo(info);
 			}
-		}, 100, TimeUnit.MILLISECONDS));
+		}
 	}
 
 	/**
