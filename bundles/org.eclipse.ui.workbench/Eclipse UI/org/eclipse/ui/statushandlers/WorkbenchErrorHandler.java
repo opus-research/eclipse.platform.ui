@@ -11,6 +11,12 @@
 
 package org.eclipse.ui.statushandlers;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -26,6 +32,32 @@ import org.eclipse.ui.statushandlers.StatusManager.INotificationTypes;
  * @since 3.3
  */
 public class WorkbenchErrorHandler extends AbstractStatusHandler {
+
+	private ExecutorService uiCheckService = Executors.newFixedThreadPool(1);
+
+	/**
+	 * This method checks if is is safe to access UI thread from non-UI code.
+	 * The implementation assumes that it is not safe to use UI thread if
+	 * execution of a no-op task on UI thread takes longer than 5 seconds.
+	 *
+	 * @return true if the error handler can run synchronous operations on UI
+	 *         thread if {@link #handle(StatusAdapter, int)} is called from
+	 *         non-UI code
+	 */
+	private boolean isSafeToAccessUiThread() {
+		Future<?> future = uiCheckService.submit(() -> {
+			Display.getDefault().syncExec(() -> {
+				/* if this task returns, UI thread is not blocked */
+			});
+		});
+		try {
+			// Consider UI thread as blocked if the task needs longer
+			future.get(5, TimeUnit.SECONDS);
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			return false;
+		}
+		return true;
+	}
 
 	@Override
 	public boolean supportsNotification(int type) {
@@ -49,13 +81,13 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 				showStatusAdapter(statusAdapter, block);
 			} else {
 				if (block) {
-					Display.getDefault().syncExec(new Runnable() {
-						@Override
-						public void run() {
-							showStatusAdapter(statusAdapter, true);
-						}
-					});
-
+					if (isSafeToAccessUiThread()) {
+						Display.getDefault().syncExec(() -> showStatusAdapter(statusAdapter, true));
+					} else {
+						// UI thread is blocked: we should not deadlock
+						// so post the async task on UI thread
+						Display.getDefault().asyncExec(() -> showStatusAdapter(statusAdapter, true));
+					}
 				} else {
 					Display.getDefault().asyncExec(new Runnable() {
 						@Override
