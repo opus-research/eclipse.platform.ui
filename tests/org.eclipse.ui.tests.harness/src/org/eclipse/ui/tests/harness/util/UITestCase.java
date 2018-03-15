@@ -94,7 +94,7 @@ public abstract class UITestCase extends TestCase {
     public UITestCase(String testName) {
         super(testName);
         //		ErrorDialog.NO_UI = true;
-        testWindows = new ArrayList<IWorkbenchWindow>(3);
+        testWindows = new ArrayList<>(3);
     }
 
 	/**
@@ -307,6 +307,7 @@ public abstract class UITestCase extends TestCase {
 		processEvents();
 		shell.setMinimized(false);
 		processEvents();
+		waitForJobs(200, 3000);
 		shell.forceActive();
 		processEvents();
 		shell.forceFocus();
@@ -419,7 +420,7 @@ public abstract class UITestCase extends TestCase {
 	 * Close all test windows.
 	 */
     public void closeAllTestWindows() {
-		List<IWorkbenchWindow> testWindowsCopy = new ArrayList<IWorkbenchWindow>(testWindows);
+		List<IWorkbenchWindow> testWindowsCopy = new ArrayList<>(testWindows);
 		for (IWorkbenchWindow testWindow : testWindowsCopy) {
 			testWindow.close();
         }
