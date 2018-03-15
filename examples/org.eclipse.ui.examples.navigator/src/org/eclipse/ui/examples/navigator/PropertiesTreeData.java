@@ -69,8 +69,8 @@ public class PropertiesTreeData {
 	} 
 
 	public String toString() {
-		StringBuilder toString = 
-				new StringBuilder(getName()).append(":").append(getValue()); //$NON-NLS-1$
+		StringBuffer toString = 
+				new StringBuffer(getName()).append(":").append(getValue()); //$NON-NLS-1$
 		return toString.toString();
 	}
 

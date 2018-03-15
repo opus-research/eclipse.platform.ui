@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -99,7 +99,7 @@ public class PropertySheetAuto extends UITestCase {
          * property descriptors.
          */
         private void createDescriptors() {
-			ArrayList<IPropertyDescriptor> list = new ArrayList<>(5);
+            ArrayList list = new ArrayList(5);
             if (modelYear != 0) {
 				list.add(new TextPropertyDescriptor(MODEL_YEAR, "model year"));
 			}
@@ -115,7 +115,8 @@ public class PropertySheetAuto extends UITestCase {
             if (engineSize != 0.0) {
 				list.add(new TextPropertyDescriptor(ENGINE_SIZE, "engine"));
 			}
-			descriptors = list.toArray(new IPropertyDescriptor[list.size()]);
+            descriptors = (IPropertyDescriptor[]) list
+                    .toArray(new IPropertyDescriptor[list.size()]);
         }
 
         @Override
@@ -179,7 +180,7 @@ public class PropertySheetAuto extends UITestCase {
 
         @Override
 		public String toString() {
-            StringBuilder s = new StringBuilder();
+            StringBuffer s = new StringBuffer();
             s.append("<");
             if (modelYear != 0) {
                 s.append(modelYear);
@@ -304,7 +305,7 @@ public class PropertySheetAuto extends UITestCase {
         for (int i = 0; i < NUMBER_OF_SELECTIONS; i++) {
             // create the selection
             int numberToSelect = random.nextInt(NUMBER_OF_CARS - 2);
-			ArrayList<Car> selection = new ArrayList<>(numberToSelect);
+            ArrayList selection = new ArrayList(numberToSelect);
             while (selection.size() < numberToSelect) {
                 int j = random.nextInt(NUMBER_OF_CARS);
                 if (!selection.contains(cars[j])) {
@@ -340,7 +341,7 @@ public class PropertySheetAuto extends UITestCase {
         for (int i = 0; i < NUMBER_OF_SELECTIONS; i++) {
             // create the selection
             int numberToSelect = random.nextInt(NUMBER_OF_CARS - 2);
-			ArrayList<Car> selection = new ArrayList<>(numberToSelect);
+            ArrayList selection = new ArrayList(numberToSelect);
             while (selection.size() < numberToSelect) {
                 int j = random.nextInt(NUMBER_OF_CARS);
                 if (!selection.contains(cars[j])) {
@@ -384,7 +385,7 @@ public class PropertySheetAuto extends UITestCase {
 
 			// create the selection
 			int numberToSelect = random.nextInt(NUMBER_OF_CARS - 2);
-			ArrayList<Car> selection = new ArrayList<>(numberToSelect);
+			ArrayList selection = new ArrayList(numberToSelect);
 			while (selection.size() < numberToSelect) {
 				int j = random.nextInt(NUMBER_OF_CARS);
 				if (!selection.contains(cars[j])) {
@@ -439,7 +440,7 @@ public class PropertySheetAuto extends UITestCase {
 
             // create the selection
             int numberToSelect = random.nextInt(NUMBER_OF_CARS - 2);
-			ArrayList<Car> selection = new ArrayList<>(numberToSelect);
+            ArrayList selection = new ArrayList(numberToSelect);
             while (selection.size() < numberToSelect) {
                 int j = random.nextInt(NUMBER_OF_CARS);
                 if (!selection.contains(cars[j])) {
@@ -503,7 +504,7 @@ public class PropertySheetAuto extends UITestCase {
 
 		// create the selection
 		int numberToSelect = random.nextInt(NUMBER_OF_CARS - 2);
-		ArrayList<Car> selection = new ArrayList<>(numberToSelect);
+		ArrayList selection = new ArrayList(numberToSelect);
 		while (selection.size() < numberToSelect) {
 			int j = random.nextInt(NUMBER_OF_CARS);
 			if (!selection.contains(cars[j])) {
@@ -545,6 +546,7 @@ public class PropertySheetAuto extends UITestCase {
 
 	private void processUiEvents() {
 		while (Display.getCurrent().readAndDispatch()) {
+			;
 		}
 	}
 

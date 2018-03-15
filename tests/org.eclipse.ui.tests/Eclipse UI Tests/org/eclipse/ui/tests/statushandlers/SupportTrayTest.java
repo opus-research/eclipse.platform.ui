@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,8 @@ package org.eclipse.ui.tests.statushandlers;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -29,8 +31,6 @@ import org.eclipse.ui.internal.statushandlers.IStatusDialogConstants;
 import org.eclipse.ui.internal.statushandlers.StackTraceSupportArea;
 import org.eclipse.ui.internal.statushandlers.SupportTray;
 import org.eclipse.ui.statushandlers.StatusAdapter;
-
-import junit.framework.TestCase;
 
 public class SupportTrayTest extends TestCase {
 
@@ -56,7 +56,7 @@ public class SupportTrayTest extends TestCase {
 	}
 
 	public void testDefaultSupportProviderEnablement(){
-		Map<Object, Object> dialogState = new HashMap<>();
+		Map dialogState = new HashMap();
 		Status status = new Status(IStatus.ERROR, "org.eclipse.ui.test",
 				"Message.", new NullPointerException());
 		StatusAdapter sa = new StatusAdapter(status);
@@ -71,7 +71,7 @@ public class SupportTrayTest extends TestCase {
 	}
 
 	public void testJFacePolicySupportProvider(){
-		Map<Object, Object> dialogState = new HashMap<>();
+		Map dialogState = new HashMap();
 		StatusAdapter sa = new StatusAdapter(Status.OK_STATUS);
 		dialogState.put(IStatusDialogConstants.CURRENT_STATUS_ADAPTER, sa);
 		SupportTray st = new SupportTray(dialogState, new NullListener());
@@ -108,7 +108,7 @@ public class SupportTrayTest extends TestCase {
 	}
 
 	public void testJFacePolicyOverDefaultPreference() {
-		Map<Object, Object> dialogState = new HashMap<>();
+		Map dialogState = new HashMap();
 		StatusAdapter sa = new StatusAdapter(Status.OK_STATUS);
 		dialogState.put(IStatusDialogConstants.CURRENT_STATUS_ADAPTER, sa);
 		SupportTray st = new SupportTray(dialogState, new NullListener());
@@ -130,7 +130,7 @@ public class SupportTrayTest extends TestCase {
 		try {
 			td[0] = new TrayDialog(new Shell()) {
 			};
-			Map<Object, Object> dialogState = new HashMap<>();
+			Map dialogState = new HashMap();
 			dialogState.put(IStatusDialogConstants.CURRENT_STATUS_ADAPTER, new StatusAdapter(Status.OK_STATUS));
 			SupportTray st = new SupportTray(dialogState, new Listener() {
 				@Override
