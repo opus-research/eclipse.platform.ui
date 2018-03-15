@@ -213,7 +213,13 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 */
 	protected IValidator createValidator(Object fromType, Object toType) {
 		if (fromType == null || toType == null) {
-			return value -> Status.OK_STATUS;
+			return new IValidator() {
+
+				@Override
+				public IStatus validate(Object value) {
+					return Status.OK_STATUS;
+				}
+			};
 		}
 
 		return findValidator(fromType, toType);
@@ -540,9 +546,19 @@ public class UpdateValueStrategy extends UpdateStrategy {
 			if (result != null)
 				return result;
 			if (fromClass != null && toClass != null && fromClass == toClass) {
-				return value -> Status.OK_STATUS;
+				return new IValidator() {
+					@Override
+					public IStatus validate(Object value) {
+						return Status.OK_STATUS;
+					}
+				};
 			}
-			return value -> Status.OK_STATUS;
+			return new IValidator() {
+				@Override
+				public IStatus validate(Object value) {
+					return Status.OK_STATUS;
+				}
+			};
 		}
 	}
 

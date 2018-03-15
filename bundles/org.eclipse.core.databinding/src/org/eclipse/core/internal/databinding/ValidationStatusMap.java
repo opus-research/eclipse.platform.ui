@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.databinding.Binding;
+import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.Realm;
@@ -42,7 +43,12 @@ public class ValidationStatusMap extends ObservableMap {
 
 	private List dependencies = new ArrayList();
 
-	private IChangeListener markDirtyChangeListener = event -> markDirty();
+	private IChangeListener markDirtyChangeListener = new IChangeListener() {
+		@Override
+		public void handleChange(ChangeEvent event) {
+			markDirty();
+		}
+	};
 
 	/**
 	 * @param realm
