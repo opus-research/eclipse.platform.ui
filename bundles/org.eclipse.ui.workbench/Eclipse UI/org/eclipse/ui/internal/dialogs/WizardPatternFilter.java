@@ -29,7 +29,6 @@ public class WizardPatternFilter extends PatternFilter {
 	 */
 	public WizardPatternFilter() {
 		super();
-		setIncludeLeadingWildcard(true);
 	}
 
 	@Override
@@ -47,10 +46,6 @@ public class WizardPatternFilter extends PatternFilter {
 			WorkbenchWizardElement desc = (WorkbenchWizardElement) element;
 			String text = desc.getLabel();
 			if (wordMatches(text)) {
-				return true;
-			}
-			String wizDesc = desc.getDescription();
-			if (wordMatches(wizDesc)) {
 				return true;
 			}
 
