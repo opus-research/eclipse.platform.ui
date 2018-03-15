@@ -534,6 +534,8 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEWorkspacePreference_showProductNameInWindowTitle;
 	public static String IDEWorkspacePreference_workspaceName;
 	public static String IDEWorkbenchPreference_workbenchSystemExplorer;
+	public static String IDEWorkspacePreference_UnknownNatureSeverity;
+	public static String IDEWorkspacePreference_UnknownNatureSeverity_Ignore;
 
 	// --- Linked Resources ---
 	public static String LinkedResourcesPreference_explanation;
