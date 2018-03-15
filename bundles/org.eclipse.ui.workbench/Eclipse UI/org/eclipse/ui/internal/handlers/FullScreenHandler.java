@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.contexts.IContextService;
@@ -109,8 +110,27 @@ public class FullScreenHandler extends AbstractHandler {
 			GC gc = new GC(getShell().getDisplay());
 			int textExtendX = gc.textExtent(message).x;
 			gc.dispose();
+			Point dialogLocation = new Point(bounds.x + bounds.width / 2 - textExtendX / 2,
+					bounds.y + bounds.height / 5);
+			System.out.println("-------- SHOWING FULLSCREEN DIALOG ---------"); //$NON-NLS-1$
+			Monitor[] monitors = getShell().getDisplay().getMonitors();
+			for (int i = 0; i < monitors.length; i++) {
+				Rectangle monitorBounds = monitors[i].getBounds();
+				System.out.printf("Monitor %d bounds: %s\n", i, monitorBounds); //$NON-NLS-1$
+				if (monitorBounds.intersects(getShell().getBounds())) {
+					System.out.println("  the window's bounds are on this monitor"); //$NON-NLS-1$
+				}
+				if (monitors[i].equals(getShell().getMonitor())) {
+					System.out.println("  this is the window's monitor"); //$NON-NLS-1$
+				}
+				if (monitorBounds.contains(dialogLocation)) {
+					System.out.println("  the fullscreen dialog should appear on this monitor"); //$NON-NLS-1$
+				}
+			}
 
-			return new Point(bounds.x + bounds.width / 2 - textExtendX / 2, bounds.y + bounds.height / 5);
+			System.out.println("width of dialog message: " + textExtendX); //$NON-NLS-1$
+			System.out.println("dialog location: " + dialogLocation); //$NON-NLS-1$
+			return dialogLocation;
 		}
 
 		@Override
