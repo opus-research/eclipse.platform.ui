@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -36,7 +37,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -116,26 +116,39 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 		final FormToolkit toolkit = new FormToolkit(workArea.getDisplay());
 		workArea.addDisposeListener(e -> toolkit.dispose());
 		final ScrolledForm form = toolkit.createScrolledForm(workArea);
-		form.getBody().setBackground(workArea.getBackground());
+		form.setBackground(workArea.getBackground());
 		form.getBody().setLayout(new GridLayout());
-		form.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		final ExpandableComposite expandable =
-				toolkit.createExpandableComposite(form.getBody(), ExpandableComposite.TWISTIE);
-
-		expandable.setText(IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_SettingsGroupName);
+		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		form.setLayoutData(layoutData);
+		final ExpandableComposite expandable = toolkit
+				.createExpandableComposite(form.getBody(),
+						ExpandableComposite.TWISTIE);
+		expandable
+				.setText(IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_SettingsGroupName);
 		expandable.setBackground(workArea.getBackground());
 		expandable.setLayout(new GridLayout());
-		expandable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		expandable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		expandable.addExpansionListener(new IExpansionListener() {
+
+			boolean notExpanded = true;
 
 			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				form.reflow(true);
-				Point size = getInitialSize();
-				Shell shell = getShell();
-				shell.setBounds(getConstrainedShellBounds(
-						new Rectangle(shell.getLocation().x, shell.getLocation().y, size.x, size.y)));
+				if (e.getState() && notExpanded) {
+					getShell().setRedraw(false);
+					Rectangle shellBounds = getShell().getBounds();
+					int entriesToShow = Math.min(4, SettingsTransfer
+							.getSettingsTransfers().length);
+
+					shellBounds.height += convertHeightInCharsToPixels(entriesToShow)
+							+ IDialogConstants.VERTICAL_SPACING;
+					getShell().setBounds(shellBounds);
+					getShell().setRedraw(true);
+					notExpanded = false;
+				}
+
 			}
 
 			@Override
@@ -163,6 +176,8 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 	 * @return boolean <code>true</code> if any were selected
 	 */
 	private boolean createButtons(FormToolkit toolkit, Composite sectionClient) {
+
+
 		String[] enabledSettings = getEnabledSettings(IDEWorkbenchPlugin
 				.getDefault().getDialogSettings()
 				.getSection(WORKBENCH_SETTINGS));
