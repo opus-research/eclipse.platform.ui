@@ -252,7 +252,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 			if (part == null || part == this || !page.isPartVisible(part)) {
 				continue;
 			}
-			if (!isImportant(part) || part.getSite().getSelectionProvider() == null) {
+			if (!isImportant(part)) {
 				continue;
 			}
 			ISelection selection = part.getSite().getSelectionProvider().getSelection();
