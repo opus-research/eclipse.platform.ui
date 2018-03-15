@@ -2203,13 +2203,8 @@ STATUS_LINE_ID, model);
 
 				// re-enable the main menu if necessary
 				if (enableMainMenu) {
-					MMenu mainMenu = model.getMainMenu();
-					if (mainMenu != null) {
-						// window is not being closed
-						Menu menuWidget = (Menu) mainMenu.getWidget();
-						if (menuWidget != null && !menuWidget.isDisposed() && !menuWidget.isEnabled())
-							menuWidget.setEnabled(true);
-					}
+					Menu mainMenu = (Menu) model.getMainMenu().getWidget();
+					mainMenu.setEnabled(true);
 				}
 
 				if (keyFilterEnabled)
