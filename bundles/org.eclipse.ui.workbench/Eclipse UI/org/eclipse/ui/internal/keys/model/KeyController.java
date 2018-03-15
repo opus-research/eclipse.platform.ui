@@ -124,7 +124,7 @@ public class KeyController {
 		bindingModel = new BindingModel(this);
 		bindingModel.init(serviceLocator, fBindingManager, contextModel);
 		conflictModel = new ConflictModel(this);
-		conflictModel.init(fBindingManager, bindingModel, contextModel);
+		conflictModel.init(fBindingManager, bindingModel);
 		addSetContextListener();
 		addSetBindingListener();
 		addSetConflictListener();
