@@ -132,8 +132,16 @@ public class ChooseWorkspaceData {
      */
     public String getInitialDefault() {
         if (initialDefault == null) {
-			setInitialDefault(System.getProperty("user.dir") //$NON-NLS-1$
-                    + File.separator + "workspace"); //$NON-NLS-1$
+			StringBuilder defaultBuilder = new StringBuilder();
+			defaultBuilder.append(System.getProperty("user.dir")); //$NON-NLS-1$
+			defaultBuilder.append(File.separator);
+			String launcherName = System.getProperty("eclipse.launcher.name"); //$NON-NLS-1$
+			if (launcherName != null) {
+				defaultBuilder.append(launcherName);
+				defaultBuilder.append('-');
+			}
+			defaultBuilder.append("workspace"); //$NON-NLS-1$
+			setInitialDefault(defaultBuilder.toString());
 		}
         return initialDefault;
     }
