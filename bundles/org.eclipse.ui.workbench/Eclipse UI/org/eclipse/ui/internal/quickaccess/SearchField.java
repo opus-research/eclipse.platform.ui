@@ -39,6 +39,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.util.Geometry;
+import org.eclipse.jface.util.Util;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -297,7 +298,13 @@ public class SearchField {
 	}
 
 	private Text createText(Composite parent) {
-		Text text = new Text(parent, SWT.SEARCH);
+		Text text = null;
+		if (Util.isWin32() || Util.isGtk()) {
+			text = new Text(parent, SWT.NONE);
+		} else {
+			text = new Text(parent, SWT.SEARCH);
+		}
+
 		text.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription);
 		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
 
