@@ -129,8 +129,8 @@ public class EditorHistory {
      */
     public IStatus restoreState(IMemento memento) {
         IMemento[] mementos = memento.getChildren(IWorkbenchConstants.TAG_FILE);
-        for (int i = 0; i < mementos.length; i++) {
-            EditorHistoryItem item = new EditorHistoryItem(mementos[i]);
+        for (IMemento memento2 : mementos) {
+            EditorHistoryItem item = new EditorHistoryItem(memento2);
             if (!"".equals(item.getName()) || !"".equals(item.getToolTipText())) { //$NON-NLS-1$ //$NON-NLS-2$
                 add(item, fifoList.size());
             }

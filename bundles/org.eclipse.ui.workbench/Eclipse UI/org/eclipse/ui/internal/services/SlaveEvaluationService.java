@@ -126,16 +126,16 @@ public class SlaveEvaluationService implements IEvaluationService {
 	public void dispose() {
 		if (!evaluationReferences.isEmpty()) {
 			Object[] array = evaluationReferences.toArray();
-			for (int i = 0; i < array.length; i++) {
+			for (Object element : array) {
 				parentService
-						.removeEvaluationListener((IEvaluationReference) array[i]);
+						.removeEvaluationListener((IEvaluationReference) element);
 			}
 		}
 		if (!serviceListeners.isEmpty()) {
 			Object[] array = serviceListeners.toArray();
-			for (int i = 0; i < array.length; i++) {
+			for (Object element : array) {
 				parentService
-						.removeServiceListener((IPropertyChangeListener) array[i]);
+						.removeServiceListener((IPropertyChangeListener) element);
 			}
 			serviceListeners.clear();
 		}
@@ -143,8 +143,8 @@ public class SlaveEvaluationService implements IEvaluationService {
 		// with this service.
 		if (!sourceProviders.isEmpty()) {
 			Object[] array = sourceProviders.toArray();
-			for (int i = 0; i < array.length; i++) {
-				parentService.removeSourceProvider((ISourceProvider) array[i]);
+			for (Object element : array) {
+				parentService.removeSourceProvider((ISourceProvider) element);
 			}
 			sourceProviders.clear();
 		}

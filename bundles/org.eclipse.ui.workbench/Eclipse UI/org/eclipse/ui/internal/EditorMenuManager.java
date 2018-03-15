@@ -39,8 +39,7 @@ public class EditorMenuManager extends SubMenuManager {
         public void updateEnabledAllowed() {
             // update the items in the map
             IContributionItem[] items = EditorMenuManager.super.getItems();
-            for (int i = 0; i < items.length; i++) {
-                IContributionItem item = items[i];
+            for (IContributionItem item : items) {
                 item.update(IContributionManagerOverrides.P_ENABLED);
             }
             // update the wrapped menus
@@ -202,8 +201,8 @@ public class EditorMenuManager extends SubMenuManager {
 
     protected void getAllContributedActions(HashSet set) {
         IContributionItem[] items = super.getItems();
-        for (int i = 0; i < items.length; i++) {
-			getAllContributedActions(set, items[i]);
+        for (IContributionItem item : items) {
+			getAllContributedActions(set, item);
 		}
         if (wrappers == null) {
 			return;
@@ -217,8 +216,8 @@ public class EditorMenuManager extends SubMenuManager {
     protected void getAllContributedActions(HashSet set, IContributionItem item) {
         if (item instanceof MenuManager) {
             IContributionItem subItems[] = ((MenuManager) item).getItems();
-            for (int j = 0; j < subItems.length; j++) {
-				getAllContributedActions(set, subItems[j]);
+            for (IContributionItem subItem : subItems) {
+				getAllContributedActions(set, subItem);
 			}
         } else if (item instanceof ActionContributionItem) {
             set.add(((ActionContributionItem) item).getAction());
