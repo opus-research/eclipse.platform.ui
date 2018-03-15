@@ -32,6 +32,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -62,7 +63,8 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
  * The set of registered editors is tracked by the EditorRegistery
  * available from the workbench plugin.
  */
-public class FileEditorsPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public class FileEditorsPreferencePage extends PreferencePage implements
+        IWorkbenchPreferencePage, Listener {
 
     private static final String DATA_EDITOR = "editor"; //$NON-NLS-1$
 
@@ -186,12 +188,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements IWorkbe
 
         resourceTypeTable = new Table(pageComponent, SWT.MULTI | SWT.BORDER
                 | SWT.FULL_SELECTION);
-        Listener resourceTypeTableListener = event -> {
-            fillEditorTable();
-            updateEnabledState();
-        };
-        resourceTypeTable.addListener(SWT.Selection, resourceTypeTableListener);
-        resourceTypeTable.addListener(SWT.DefaultSelection, resourceTypeTableListener);
+        resourceTypeTable.addListener(SWT.Selection, this);
+        resourceTypeTable.addListener(SWT.DefaultSelection, this);
         data = new GridData(GridData.FILL_HORIZONTAL);
 
         int availableRows = DialogUtil.availableRows(pageComponent);
@@ -212,18 +210,12 @@ public class FileEditorsPreferencePage extends PreferencePage implements IWorkbe
 
         addResourceTypeButton = new Button(groupComponent, SWT.PUSH);
         addResourceTypeButton.setText(WorkbenchMessages.FileEditorPreference_add);
-        addResourceTypeButton.addListener(SWT.Selection, event -> {
-            promptForResourceType();
-            updateEnabledState();
-        });
+        addResourceTypeButton.addListener(SWT.Selection, this);
         setButtonLayoutData(addResourceTypeButton);
 
         removeResourceTypeButton = new Button(groupComponent, SWT.PUSH);
         removeResourceTypeButton.setText(WorkbenchMessages.FileEditorPreference_remove);
-        removeResourceTypeButton.addListener(SWT.Selection, event -> {
-            removeSelectedResourceType();
-            updateEnabledState();
-        });
+        removeResourceTypeButton.addListener(SWT.Selection, this);
         setButtonLayoutData(removeResourceTypeButton);
 
         //Spacer
@@ -242,9 +234,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements IWorkbe
         editorLabel.setLayoutData(data);
 
         editorTable = new Table(pageComponent, SWT.MULTI | SWT.BORDER);
-        Listener editorTableListener = event -> updateEnabledState();
-        editorTable.addListener(SWT.Selection, editorTableListener);
-        editorTable.addListener(SWT.DefaultSelection, editorTableListener);
+        editorTable.addListener(SWT.Selection, this);
+        editorTable.addListener(SWT.DefaultSelection, this);
         data = new GridData(GridData.FILL_BOTH);
         data.heightHint = editorTable.getItemHeight() * 7;
         editorTable.setLayoutData(data);
@@ -261,27 +252,18 @@ public class FileEditorsPreferencePage extends PreferencePage implements IWorkbe
 
         addEditorButton = new Button(groupComponent, SWT.PUSH);
         addEditorButton.setText(WorkbenchMessages.FileEditorPreference_addEditor);
-        addEditorButton.addListener(SWT.Selection, event -> {
-            promptForEditor();
-            updateEnabledState();
-        });
+        addEditorButton.addListener(SWT.Selection, this);
         addEditorButton.setLayoutData(data);
         setButtonLayoutData(addEditorButton);
 
         removeEditorButton = new Button(groupComponent, SWT.PUSH);
         removeEditorButton.setText(WorkbenchMessages.FileEditorPreference_removeEditor);
-        removeEditorButton.addListener(SWT.Selection, event -> {
-            removeSelectedEditor();
-            updateEnabledState();
-        });
+        removeEditorButton.addListener(SWT.Selection, this);
         setButtonLayoutData(removeEditorButton);
 
         defaultEditorButton = new Button(groupComponent, SWT.PUSH);
         defaultEditorButton.setText(WorkbenchMessages.FileEditorPreference_default);
-        defaultEditorButton.addListener(SWT.Selection, event -> {
-            setSelectedEditorAsDefault();
-            updateEnabledState();
-        });
+        defaultEditorButton.addListener(SWT.Selection, this);
         setButtonLayoutData(defaultEditorButton);
 
         fillResourceTypeTable();
@@ -451,6 +433,26 @@ public class FileEditorsPreferencePage extends PreferencePage implements IWorkbe
                     .toArray(new IEditorDescriptor[editorList.size()]);
         }
         return null;
+    }
+
+    @Override
+	public void handleEvent(Event event) {
+        if (event.widget == addResourceTypeButton) {
+            promptForResourceType();
+        } else if (event.widget == removeResourceTypeButton) {
+            removeSelectedResourceType();
+        } else if (event.widget == addEditorButton) {
+            promptForEditor();
+        } else if (event.widget == removeEditorButton) {
+            removeSelectedEditor();
+        } else if (event.widget == defaultEditorButton) {
+            setSelectedEditorAsDefault();
+        } else if (event.widget == resourceTypeTable) {
+            fillEditorTable();
+        }
+
+        updateEnabledState();
+
     }
 
     /**
