@@ -127,7 +127,7 @@ public class CSSAttributeConditionImpl extends AbstractAttributeCondition {
 		}
 		String val = getValue();
 		if (val == null) {
-			return true;
+			return false;
 		}
 		return e.getAttribute(getLocalName()).equals(val);
 	}
