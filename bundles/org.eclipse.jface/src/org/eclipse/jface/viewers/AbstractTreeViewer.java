@@ -83,7 +83,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * List of registered tree listeners (element type:
 	 * <code>TreeListener</code>).
 	 */
-	private ListenerList<ITreeViewerListener> treeListeners = new ListenerList<>();
+	private ListenerList treeListeners = new ListenerList();
 
 	/**
 	 * The level to which the tree is automatically expanded each time the
@@ -1081,10 +1081,12 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * @see ITreeViewerListener#treeCollapsed
 	 */
 	protected void fireTreeCollapsed(final TreeExpansionEvent event) {
+		Object[] listeners = treeListeners.getListeners();
 		boolean oldBusy = isBusy();
 		setBusy(true);
 		try {
-			for (ITreeViewerListener l : treeListeners) {
+			for (int i = 0; i < listeners.length; ++i) {
+				final ITreeViewerListener l = (ITreeViewerListener) listeners[i];
 				SafeRunnable.run(new SafeRunnable() {
 					@Override
 					public void run() {
@@ -1106,10 +1108,12 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * @see ITreeViewerListener#treeExpanded
 	 */
 	protected void fireTreeExpanded(final TreeExpansionEvent event) {
+		Object[] listeners = treeListeners.getListeners();
 		boolean oldBusy = isBusy();
 		setBusy(true);
 		try {
-			for (ITreeViewerListener l : treeListeners) {
+			for (int i = 0; i < listeners.length; ++i) {
+				final ITreeViewerListener l = (ITreeViewerListener) listeners[i];
 				SafeRunnable.run(new SafeRunnable() {
 					@Override
 					public void run() {
