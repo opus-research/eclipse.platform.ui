@@ -76,9 +76,12 @@ public class ShowInMenu extends ContributionItem implements
 
 	private boolean dirty = true;
 
-	private IMenuListener menuListener = manager -> {
-		manager.markDirty();
-		dirty = true;
+	private IMenuListener menuListener = new IMenuListener() {
+		@Override
+		public void menuAboutToShow(IMenuManager manager) {
+			manager.markDirty();
+			dirty = true;
+		}
 	};
 
 	private IServiceLocator locator;
