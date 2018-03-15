@@ -1393,20 +1393,12 @@
          <markerTypeReference
                id="org.eclipse.core.resources.problemmarker">
          </markerTypeReference>
-         <markerFieldConfiguration
+          <markerFieldConfiguration
                enabled="false"
-               id="org.eclipse.ui.ide.errorsFilter"
-               name="%MarkerFilterGrouping.AllErrors"
-               scope="ON_ANY"
-               values="org.eclipse.ui.internal.views.markers.AllErrorsParameters">
-         </markerFieldConfiguration>
-
-         <markerFieldConfiguration
-               enabled="false"
-               id="org.eclipse.ui.ide.selectedWarningsGrouping"
-               name="%MarkerFilterGrouping.SelectedWarnings"
-               scope="ON_SELECTED_AND_CHILDREN"
-               values="org.eclipse.ui.internal.views.markers.SelectedWarningsParameters">
+               id="org.eclipse.ui.ide.projectErrorsWarningsGrouping"
+               name="%MarkerFilterGrouping.ProjectErrorsWarnings"
+               scope="ON_ANY_IN_SAME_CONTAINER"
+               values="org.eclipse.ui.internal.views.markers.ErrorsWarningsParameters">
          </markerFieldConfiguration>
 
          <markerFieldConfiguration
@@ -1416,12 +1408,20 @@
                scope="ON_SELECTED_AND_CHILDREN"
                values="org.eclipse.ui.internal.views.markers.ErrorsWarningsParameters">
          </markerFieldConfiguration>
-          <markerFieldConfiguration
+
+         <markerFieldConfiguration
                enabled="false"
-               id="org.eclipse.ui.ide.projectErrorsWarningsGrouping"
-               name="%MarkerFilterGrouping.ProjectErrorsWarnings"
-               scope="ON_ANY_IN_SAME_CONTAINER"
-               values="org.eclipse.ui.internal.views.markers.ErrorsWarningsParameters">
+               id="org.eclipse.ui.ide.selectedWarningsGrouping"
+               name="%MarkerFilterGrouping.SelectedWarnings"
+               scope="ON_SELECTED_AND_CHILDREN"
+               values="org.eclipse.ui.internal.views.markers.SelectedWarningsParameters">
+         </markerFieldConfiguration>
+         <markerFieldConfiguration
+               enabled="false"
+               id="org.eclipse.ui.ide.errorsFilter"
+               name="%MarkerFilterGrouping.AllErrors"
+               scope="ON_ANY"
+               values="org.eclipse.ui.internal.views.markers.AllErrorsParameters">
          </markerFieldConfiguration>
 
          <markerFieldReference
@@ -1717,6 +1717,22 @@
                   commandId="org.eclipse.ui.ToggleCoolbarAction"
                   style="push"
                   tooltip="%menu.toggleCoolbar.tooltip">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.window.fullscreenmode"
+                  style="push">
+            </command>
+            <separator
+                  name="org.eclipse.ui.window.appearance.separator1"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.ui.window.maximizePart"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.window.minimizePart"
+                  style="push">
             </command>
          </menu>
       </menuContribution>
@@ -2511,27 +2527,6 @@
 					</iterate>
 				</with>
 	       	  </visibleWhen>
-         </command>
-      </menuContribution>
-      <menuContribution
-            allPopups="false"
-            locationURI="menu:org.eclipse.ui.appearance?after=org.eclipse.ui.ToggleCoolbarAction">
-         <command
-               commandId="org.eclipse.ui.window.fullscreenmode"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <!--
-                 bug 492811: remove test in 4.7 once
-                 org.eclipse.ui.cocoa.fullscreenWindow is removed
-                -->
-               <not>
-                  <systemTest
-                        property="osgi.ws"
-                        value="cocoa">
-                  </systemTest>
-               </not>
-            </visibleWhen>
          </command>
       </menuContribution>
    </extension>
