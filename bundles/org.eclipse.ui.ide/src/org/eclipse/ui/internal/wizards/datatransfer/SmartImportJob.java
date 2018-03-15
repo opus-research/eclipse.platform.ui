@@ -34,6 +34,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -71,6 +72,7 @@ public class SmartImportJob extends Job {
 	private boolean discardRootProject;
 	private boolean deepChildrenDetection;
 	private boolean configureProjects;
+	private boolean openProjects;
 	private boolean reconfigureEclipseProjects;
 	private IWorkingSet[] workingSets;
 
@@ -270,6 +272,15 @@ public class SmartImportJob extends Job {
 						}
 					}
 				}
+			}
+			if (!openProjects) {
+				this.report.keySet().forEach(project -> {
+					try {
+						project.close(monitor);
+					} catch (CoreException e) {
+						listener.errorHappened(project.getLocation(), e);
+					}
+				});
 			}
 
 			if (isAutoBuilding) {
@@ -718,6 +729,14 @@ public class SmartImportJob extends Job {
 	 */
 	public void setDetectNestedProjects(boolean detectNestedProjects) {
 		this.deepChildrenDetection = detectNestedProjects;
+	}
+
+	/**
+	 * @param openProjects
+	 *            if true, imported projects are opened in the workspace
+	 */
+	void setOpenProjects(boolean openProjects) {
+		this.openProjects = openProjects;
 	}
 
 	/**
