@@ -46,6 +46,7 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
+import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
@@ -346,7 +347,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			rendererFilter = null;
 		}
 		context.remove(MenuManagerRenderer.class);
-		if (isDebugEnabled()) {
+		if (Policy.DEBUG_RENDERER) {
 			logger.debug("\nMMR:dispose: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
 		}
@@ -642,8 +643,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		List<MUIElement> parts = container.getChildren();
 		if (parts != null) {
 			MUIElement[] plist = parts.toArray(new MUIElement[parts.size()]);
-			for (int i = 0; i < plist.length; i++) {
-				MUIElement childME = plist[i];
+			for (MUIElement childME : plist) {
 				modelProcessSwitch(parentManager, (MMenuElement) childME);
 			}
 		}
@@ -685,8 +685,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		List<MMenuElement> parts = menuModel.getChildren();
 		if (parts != null) {
 			MMenuElement[] plist = parts.toArray(new MMenuElement[parts.size()]);
-			for (int i = 0; i < plist.length; i++) {
-				MMenuElement childME = plist[i];
+			for (MMenuElement childME : plist) {
 				modelProcessSwitch(menuManager, childME);
 			}
 		}
@@ -879,7 +878,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	public void linkModelToManager(MMenu model, MenuManager manager) {
 		modelToManager.put(model, manager);
 		managerToModel.put(manager, model);
-		if (isDebugEnabled()) {
+		if (Policy.DEBUG_RENDERER) {
 			logger.debug("\nMMR:linkModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
 		}
@@ -895,7 +894,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 		modelToManager.remove(model);
 		managerToModel.remove(manager);
-		if (isDebugEnabled()) {
+		if (Policy.DEBUG_RENDERER) {
 			logger.debug("\nMMR:clearModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
 		}
@@ -912,7 +911,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	public void linkModelToContribution(MMenuElement model, IContributionItem item) {
 		modelToContribution.put(model, item);
 		contributionToModel.put(item, model);
-		if (isDebugEnabled()) {
+		if (Policy.DEBUG_RENDERER) {
 			logger.debug(
 					"\nMMR:linkModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
 					modelToContribution.size(), contributionToModel.size());
@@ -928,7 +927,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 		modelToContribution.remove(model);
 		contributionToModel.remove(item);
-		if (isDebugEnabled()) {
+		if (Policy.DEBUG_RENDERER) {
 			logger.debug(
 					"\nMMR:clearModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
 					modelToContribution.size(), contributionToModel.size());
