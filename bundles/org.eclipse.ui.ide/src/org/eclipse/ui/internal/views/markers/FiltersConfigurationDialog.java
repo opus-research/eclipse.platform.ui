@@ -144,7 +144,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		composite.setBackground(container.getBackground());
 
-		createSelectAllButton(composite);
+		createAndOrButtons(composite);
 
 		configComposite = new Group(composite, SWT.NONE);
 		configComposite.setText(MarkerMessages.MarkerConfigurationsLabel);
@@ -518,7 +518,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		};
 	}
 
-	private void createSelectAllButton(Composite parent) {
+	private void createAndOrButtons(Composite parent) {
 		allButton = new Button(parent, SWT.CHECK);
 		allButton.setText(MarkerMessages.ALL_Title);
 		allButton.addSelectionListener(new SelectionAdapter() {
