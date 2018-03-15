@@ -219,5 +219,4 @@ public class WorkbenchPreferenceDialog extends FilteredPreferenceDialog {
 	public void setInitialPage(String pageId) {
 		initialPageId = pageId;
 	}
-
 }
