@@ -165,8 +165,8 @@ public abstract class PerspectiveMenu extends ContributionItem {
             item.setText(NO_TARGETS_MSG);
             item.setEnabled(false);
         } else {
-            for (IContributionItem item : items) {
-                item.fill(menu, index++);
+            for (int i = 0; i < items.length; i++) {
+                items[i].fill(menu, index++);
             }
         }
         dirty = false;
@@ -264,8 +264,8 @@ public abstract class PerspectiveMenu extends ContributionItem {
 
         String[] ids = page.getPerspectiveShortcuts();
 
-        for (String id2 : ids) {
-            IPerspectiveDescriptor desc = reg.findPerspectiveWithId(id2);
+        for (int i = 0; i < ids.length; i++) {
+            IPerspectiveDescriptor desc = reg.findPerspectiveWithId(ids[i]);
             if (desc != null && !list.contains(desc)) {
                 if (WorkbenchActivityHelper.filterItem(desc)) {
 					continue;
