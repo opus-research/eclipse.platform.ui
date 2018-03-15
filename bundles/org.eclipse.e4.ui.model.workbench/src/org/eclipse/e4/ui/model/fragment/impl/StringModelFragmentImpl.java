@@ -9,12 +9,10 @@
  *      Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *      IBM Corporation - initial API and implementation
  *      Steven Spungin <steven@spungin.tv> - Bug 437958
- *      Olivier Prouvost <olivier.prouvost@opcoach.com> Bug 509448
  */
 package org.eclipse.e4.ui.model.fragment.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -23,8 +21,6 @@ import org.eclipse.e4.emf.xpath.XPathContext;
 import org.eclipse.e4.emf.xpath.XPathContextFactory;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
-import org.eclipse.e4.ui.model.application.impl.ApplicationElementImpl;
-import org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl;
 import org.eclipse.e4.ui.model.fragment.MStringModelFragment;
 import org.eclipse.e4.ui.model.internal.ModelUtils;
 import org.eclipse.emf.common.notify.Notification;
@@ -35,27 +31,25 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
- * <!-- begin-user-doc --> An implementation of the model object '<em><b>String
- * Model Fragment</b></em>'. <!-- end-user-doc -->
+ * <!-- begin-user-doc -->
+ * An implementation of the model object '<em><b>String Model Fragment</b></em>'.
+ * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * </p>
  * <ul>
- * <li>{@link org.eclipse.e4.ui.model.fragment.impl.StringModelFragmentImpl#getFeaturename
- * <em>Featurename</em>}</li>
- * <li>{@link org.eclipse.e4.ui.model.fragment.impl.StringModelFragmentImpl#getParentElementId
- * <em>Parent Element Id</em>}</li>
- * <li>{@link org.eclipse.e4.ui.model.fragment.impl.StringModelFragmentImpl#getPositionInList
- * <em>Position In List</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.fragment.impl.StringModelFragmentImpl#getFeaturename <em>Featurename</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.fragment.impl.StringModelFragmentImpl#getParentElementId <em>Parent Element Id</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.fragment.impl.StringModelFragmentImpl#getPositionInList <em>Position In List</em>}</li>
  * </ul>
  *
  * @generated
  */
 public class StringModelFragmentImpl extends ModelFragmentImpl implements MStringModelFragment {
 	/**
-	 * The default value of the '{@link #getFeaturename() <em>Featurename</em>}'
-	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The default value of the '{@link #getFeaturename() <em>Featurename</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getFeaturename()
 	 * @generated
 	 * @ordered
@@ -65,9 +59,9 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	final Pattern patternCSV = Pattern.compile("[,\\s]*,[,\\s]*");
 
 	/**
-	 * The cached value of the '{@link #getFeaturename() <em>Featurename</em>}'
-	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getFeaturename() <em>Featurename</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getFeaturename()
 	 * @generated
 	 * @ordered
@@ -75,9 +69,9 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	protected String featurename = FEATURENAME_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getParentElementId() <em>Parent Element
-	 * Id</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The default value of the '{@link #getParentElementId() <em>Parent Element Id</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getParentElementId()
 	 * @generated
 	 * @ordered
@@ -85,9 +79,9 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	protected static final String PARENT_ELEMENT_ID_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getParentElementId() <em>Parent Element
-	 * Id</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getParentElementId() <em>Parent Element Id</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getParentElementId()
 	 * @generated
 	 * @ordered
@@ -95,9 +89,9 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	protected String parentElementId = PARENT_ELEMENT_ID_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getPositionInList() <em>Position In
-	 * List</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The default value of the '{@link #getPositionInList() <em>Position In List</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getPositionInList()
 	 * @generated
 	 * @ordered
@@ -105,9 +99,9 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	protected static final String POSITION_IN_LIST_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getPositionInList() <em>Position In
-	 * List</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getPositionInList() <em>Position In List</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @see #getPositionInList()
 	 * @generated
 	 * @ordered
@@ -115,8 +109,8 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	protected String positionInList = POSITION_IN_LIST_EDEFAULT;
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected StringModelFragmentImpl() {
@@ -124,8 +118,8 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -134,8 +128,8 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String getFeaturename() {
@@ -143,21 +137,20 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setFeaturename(String newFeaturename) {
 		String oldFeaturename = featurename;
 		featurename = newFeaturename;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME, oldFeaturename, featurename));
+			eNotify(new ENotificationImpl(this, Notification.SET, FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME, oldFeaturename, featurename));
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String getParentElementId() {
@@ -165,21 +158,20 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setParentElementId(String newParentElementId) {
 		String oldParentElementId = parentElementId;
 		parentElementId = newParentElementId;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID, oldParentElementId, parentElementId));
+			eNotify(new ENotificationImpl(this, Notification.SET, FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID, oldParentElementId, parentElementId));
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String getPositionInList() {
@@ -187,107 +179,103 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setPositionInList(String newPositionInList) {
 		String oldPositionInList = positionInList;
 		positionInList = newPositionInList;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST, oldPositionInList, positionInList));
+			eNotify(new ENotificationImpl(this, Notification.SET, FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST, oldPositionInList, positionInList));
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
-			return getFeaturename();
-		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
-			return getParentElementId();
-		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
-			return getPositionInList();
+			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
+				return getFeaturename();
+			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
+				return getParentElementId();
+			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
+				return getPositionInList();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
-			setFeaturename((String) newValue);
-			return;
-		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
-			setParentElementId((String) newValue);
-			return;
-		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
-			setPositionInList((String) newValue);
-			return;
+			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
+				setFeaturename((String)newValue);
+				return;
+			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
+				setParentElementId((String)newValue);
+				return;
+			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
+				setPositionInList((String)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
-			setFeaturename(FEATURENAME_EDEFAULT);
-			return;
-		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
-			setParentElementId(PARENT_ELEMENT_ID_EDEFAULT);
-			return;
-		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
-			setPositionInList(POSITION_IN_LIST_EDEFAULT);
-			return;
+			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
+				setFeaturename(FEATURENAME_EDEFAULT);
+				return;
+			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
+				setParentElementId(PARENT_ELEMENT_ID_EDEFAULT);
+				return;
+			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
+				setPositionInList(POSITION_IN_LIST_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
-			return FEATURENAME_EDEFAULT == null ? featurename != null : !FEATURENAME_EDEFAULT.equals(featurename);
-		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
-			return PARENT_ELEMENT_ID_EDEFAULT == null ? parentElementId != null
-			: !PARENT_ELEMENT_ID_EDEFAULT.equals(parentElementId);
-		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
-			return POSITION_IN_LIST_EDEFAULT == null ? positionInList != null
-			: !POSITION_IN_LIST_EDEFAULT.equals(positionInList);
+			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
+				return FEATURENAME_EDEFAULT == null ? featurename != null : !FEATURENAME_EDEFAULT.equals(featurename);
+			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
+				return PARENT_ELEMENT_ID_EDEFAULT == null ? parentElementId != null : !PARENT_ELEMENT_ID_EDEFAULT.equals(parentElementId);
+			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
+				return POSITION_IN_LIST_EDEFAULT == null ? positionInList != null : !POSITION_IN_LIST_EDEFAULT.equals(positionInList);
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy())
-			return super.toString();
+		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (featurename: "); //$NON-NLS-1$
@@ -371,75 +359,5 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 		}
 	}
 
-	/**
-	 * This method returns the target class of the element pointed by the
-	 * 'extended element ID' value In case of several matches it returns a list
-	 * of possible classes (but this case means that the ID is used for
-	 * different objects in different models present in the workspace). If the
-	 * parent element ID value is xpath:/ or
-	 * 'org.eclipse.e4.legacy.ide.application', it returns MApplication EClass
-	 * 
-	 * @param application
-	 *            : the application to be parsed
-	 * @return the list of EClass
-	 */
-	public List<EClass> getTargetClass(MApplication application) {
-		List<EClass> ret = Collections.emptyList();
 
-		String idsOrXPath = getParentElementId();
-		if ("xpath:/".equals(idsOrXPath) || "org.eclipse.e4.legacy.ide.application".equals(idsOrXPath)) {
-			ret = new ArrayList<EClass>();
-			ret.add(ApplicationPackageImpl.eINSTANCE.getApplication());
-		} else {
-			// Deal with non default MApplication IDs.
-			if (idsOrXPath.startsWith("xpath:")) {
-				String xPath = idsOrXPath.substring(6);
-				ret = getTargetClassFromXPath(application, xPath);
-			} else {
-
-				MApplicationElement o = ModelUtils.findElementById(application, idsOrXPath);
-				if (o != null) {
-					ret = new ArrayList<EClass>();
-					ret.add(((EObject) o).eClass());
-				}
-			}
-		}
-
-		return ret;
-
-	}
-
-	/**
-	 * Returns the EClass of the Application element(s) referenced by the xpath
-	 * value (without prefix)
-	 * 
-	 * @param application
-	 *            : the application to be parsed
-	 * @param xpath
-	 *            : the xpath value without the 'xpath:' prefix
-	 * @return the list of EClass(es) matching this xpath
-	 */
-	private List<EClass> getTargetClassFromXPath(MApplication application, String xpath) {
-		List<EClass> ret = new ArrayList<EClass>();
-
-		XPathContextFactory<EObject> f = EcoreXPathContextFactory.newInstance();
-		XPathContext xpathContext = f.newContext((EObject) application);
-		Iterator<Object> i = xpathContext.iterate(xpath);
-
-		try {
-			while (i.hasNext()) {
-				Object obj = i.next();
-				if (obj instanceof MApplicationElement) {
-					ApplicationElementImpl ae = (ApplicationElementImpl) obj;
-					ret.add(ae.eClass());
-				}
-			}
-		} catch (Exception ex) {
-			// custom xpath functions will throw exceptions
-			ex.printStackTrace();
-		}
-
-		return ret;
-	}
-
-} // StringModelFragmentImpl
+} //StringModelFragmentImpl
