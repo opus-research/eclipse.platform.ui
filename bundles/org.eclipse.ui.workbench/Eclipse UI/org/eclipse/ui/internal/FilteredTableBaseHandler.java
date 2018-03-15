@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -69,7 +69,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.keys.IBindingService;
-import org.eclipse.ui.model.PerspectiveLabelProvider;
 
 /**
  * Base class to open a dialog to filter and select elements of a {@link Table}.
@@ -746,16 +745,6 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 	protected void setMatcherString(String pattern) {
 	}
 
-	private PerspectiveLabelProvider labelProvider = null;
-
-	private PerspectiveLabelProvider getPerspectiveLabelProvider() {
-		if(labelProvider==null){
-			labelProvider = new PerspectiveLabelProvider(false);
-		}
-		return labelProvider;
-	}
-
-
 	/** Default ColumnLabelProvider. The table has only one column */
 	protected ColumnLabelProvider getColumnLabelProvider() {
 		return new ColumnLabelProvider() {
@@ -767,9 +756,6 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 						return "*" + ref.getTitle(); //$NON-NLS-1$
 					}
 					return ref.getTitle();
-				} else if (element instanceof IPerspectiveDescriptor) {
-					IPerspectiveDescriptor desc = (IPerspectiveDescriptor) element;
-					return getPerspectiveLabelProvider().getText(desc);
 				}
 				return super.getText(element);
 			}
@@ -778,9 +764,6 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 			public Image getImage(Object element) {
 				if (element instanceof WorkbenchPartReference) {
 					return ((WorkbenchPartReference) element).getTitleImage();
-				} else if (element instanceof IPerspectiveDescriptor) {
-					IPerspectiveDescriptor desc = (IPerspectiveDescriptor) element;
-					return getPerspectiveLabelProvider().getImage(desc);
 				}
 				return super.getImage(element);
 			}
@@ -789,8 +772,6 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 			public String getToolTipText(Object element) {
 				if (element instanceof WorkbenchPartReference) {
 					return ((WorkbenchPartReference) element).getTitleToolTip();
-				} else if (element instanceof IPerspectiveDescriptor) {
-					// no need of tooltip
 				}
 				return super.getToolTipText(element);
 			};
