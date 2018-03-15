@@ -4743,16 +4743,21 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	@Override
 	public void showEditor(IEditorReference ref) {
-		// FIXME compat showEditor
-		E4Util.unsupported("showEditor"); //$NON-NLS-1$
-
+		IWorkbenchPart wPart = ref.getPart(false);
+		MPart part = ((EditorReference)ref).getModel();
+		part.setVisible(true);
+								
+		//Workaround to get content visible. Otherwise the content sometimes is not rendered.
+		MElementContainer<MUIElement> partStack = part.getParent();
+		partStack.setSelectedElement(null);
+		partStack.setSelectedElement(part);
+		wPart.setFocus();
 	}
 
 	@Override
 	public void hideEditor(IEditorReference ref) {
-		// FIXME compat hideEditor
-		E4Util.unsupported("hideEditor"); //$NON-NLS-1$
-
+		MPart part = ((EditorReference)ref).getModel();
+		part.setVisible(false);
 	}
 
 	private String getEditorImageURI(EditorReference reference) {
