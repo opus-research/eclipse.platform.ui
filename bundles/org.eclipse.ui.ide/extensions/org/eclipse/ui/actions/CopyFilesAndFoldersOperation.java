@@ -455,10 +455,12 @@ public class CopyFilesAndFoldersOperation {
 					if (homogenousResources(resource, existing)) {
 						copyExisting(resource, existing, iterationMonitor.split(100));
 					} else {
-						// Copying a linked resource over unlinked or vice
-						// versa.
-						// Can't use setContents here. Fixes bug 28772.
-						delete(existing, iterationMonitor.split(10));
+						if (existing != null) {
+							// Copying a linked resource over unlinked or vice
+							// versa.
+							// Can't use setContents here. Fixes bug 28772.
+							delete(existing, iterationMonitor.split(10));
+						}
 						iterationMonitor.setWorkRemaining(100);
 
 						if ((createLinks || createVirtualFoldersAndLinks) && (resource.isLinked() == false)
