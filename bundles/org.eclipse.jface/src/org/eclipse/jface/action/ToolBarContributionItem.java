@@ -13,8 +13,8 @@ package org.eclipse.jface.action;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.internal.provisional.action.IToolBarContributionItem;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -342,11 +342,11 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         Rectangle toolBarBounds = toolBar.getBounds();
         ToolItem[] items = toolBar.getItems();
         ArrayList<ToolItem> hidden = new ArrayList<>();
-        for (ToolItem toolItem : items) {
-            Rectangle itemBounds = toolItem.getBounds();
+        for (ToolItem item2 : items) {
+            Rectangle itemBounds = item2.getBounds();
             if (!((itemBounds.x + itemBounds.width <= toolBarBounds.width) && (itemBounds.y
                     + itemBounds.height <= toolBarBounds.height))) {
-                hidden.add(toolItem);
+                hidden.add(item2);
             }
         }
 
@@ -439,9 +439,10 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         boolean visibleItem = false;
         if (toolBarManager != null) {
             IContributionItem[] contributionItems = toolBarManager.getItems();
-            for (IContributionItem item : contributionItems) {
-                IContributionItem contributionItem = item;
-				if ((!contributionItem.isGroupMarker()) && (!contributionItem.isSeparator())) {
+            for (IContributionItem contributionItem2 : contributionItems) {
+                IContributionItem contributionItem = contributionItem2;
+                if ((!contributionItem.isGroupMarker())
+                        && (!contributionItem.isSeparator())) {
                     visibleItem = true;
                     break;
                 }

@@ -969,11 +969,12 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 				comparator.sort(null, nodes);
 			}
 			ViewerFilter[] filters = getTreeViewer().getFilters();
-			for (IPreferenceNode preferenceNode : nodes) {
-				IPreferenceNode selectedNode = preferenceNode;
+			for (IPreferenceNode node2 : nodes) {
+				IPreferenceNode selectedNode = node2;
 				// See if it passes all filters
 				for (int j = 0; j < filters.length; j++) {
-					if (!filters[j].select(this.treeViewer, preferenceManager.getRoot(), selectedNode)) {
+					if (!filters[j].select(this.treeViewer, preferenceManager
+							.getRoot(), selectedNode)) {
 						selectedNode = null;
 						break;
 					}
