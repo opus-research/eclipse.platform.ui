@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 269844
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
- *     Mickael Istria (Red Hat Inc.) - [Cleanup] Take advantage of autoboxing
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -158,7 +157,8 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 			}
 			message = NLS.bind(IDEWorkbenchMessages.CloseUnrelatedProjectsAction_confirmMsg1, projectName);
 		} else // if more then one project is selected then print there number
-			message = NLS.bind(IDEWorkbenchMessages.CloseUnrelatedProjectsAction_confirmMsgN, selectionSize);
+			message = NLS.bind(IDEWorkbenchMessages.CloseUnrelatedProjectsAction_confirmMsgN,
+					new Integer(selectionSize));
 
 			MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(
 						getShell(), IDEWorkbenchMessages.CloseUnrelatedProjectsAction_toolTip,
