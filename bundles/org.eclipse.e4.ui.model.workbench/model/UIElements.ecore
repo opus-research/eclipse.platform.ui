@@ -558,7 +558,6 @@
         </eAnnotations>
       </eStructuralFeatures>
     </eClassifiers>
-    <eClassifiers xsi:type="ecore:EClass" name="ImperativeExpression" eSuperTypes="#//ui/Expression #//Contribution"/>
     <eClassifiers xsi:type="ecore:EClass" name="SnippetContainer" abstract="true"
         interface="true">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
