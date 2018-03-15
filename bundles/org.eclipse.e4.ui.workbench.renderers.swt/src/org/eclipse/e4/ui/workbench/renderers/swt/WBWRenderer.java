@@ -374,11 +374,11 @@ public class WBWRenderer extends SWTPartRenderer {
 
 		int styleOverride = getStyleOverride(wbwModel) | rtlStyle;
 		if (parentShell == null) {
-			int style = styleOverride == -1 ? SWT.SHELL_TRIM | SWT.NO_BACKGROUND | rtlStyle : styleOverride;
+			int style = styleOverride == -1 ? SWT.SHELL_TRIM | rtlStyle : styleOverride;
 			wbwShell = new Shell(display, style);
 			wbwModel.getTags().add("topLevel"); //$NON-NLS-1$
 		} else {
-			int style = SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.CLOSE | SWT.NO_BACKGROUND | rtlStyle;
+			int style = SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.CLOSE | rtlStyle;
 			style = styleOverride == -1 ? style : styleOverride;
 			if (wbwModel.getTags().contains(IPresentationEngine.WINDOW_TOP_LEVEL)) {
 				wbwShell = new Shell(display, style);

@@ -620,7 +620,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		}
 
 		int styleOverride = getStyleOverride(pStack);
-		int style = styleOverride == -1 ? SWT.BORDER | SWT.NO_BACKGROUND : styleOverride;
+		int style = styleOverride == -1 ? SWT.BORDER : styleOverride;
 		final CTabFolder tabFolder = new CTabFolder(parentComposite, style);
 		tabFolder.setMRUVisible(getMRUValue(tabFolder));
 
