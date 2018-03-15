@@ -10,11 +10,13 @@
  *     Snjezana Peco (Red Hat Inc.)
  *     Lars Vogel <Lars.Vogel@vogella.com>
  *     Rüdiger Herrmann <ruediger.herrmann@gmx.de>
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 500836
  ******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -108,14 +110,14 @@ public class SmartImportRootWizardPage extends WizardPage {
 	private class FolderForProjectsLabelProvider extends CellLabelProvider implements IColorProvider {
 		public String getText(Object o) {
 			File file = (File) o;
-			String label = file.getAbsolutePath();
-			File root = getWizard().getImportJob().getRoot();
-			if (label.startsWith(root.getAbsolutePath())) {
-				if (root.getParentFile() != null) {
-					label = label.substring(root.getParentFile().getAbsolutePath().length() + 1);
+			Path filePath = file.toPath();
+			Path rootPath = getWizard().getImportJob().getRoot().toPath();
+			if (!filePath.equals(rootPath) && filePath.startsWith(rootPath)) {
+				if (rootPath.getParent() != null) {
+					return rootPath.getParent().relativize(filePath).toString();
 				}
 			}
-			return label;
+			return filePath.toString();
 		}
 
 		@Override
