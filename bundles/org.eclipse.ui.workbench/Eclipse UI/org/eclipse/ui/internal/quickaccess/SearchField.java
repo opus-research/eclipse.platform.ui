@@ -12,7 +12,7 @@
  *     Brian de Alwis - Fix size computation to account for trim
  *     Markus Kuppe <bugs.eclipse.org@lemmster.de> - Bug 449485: [QuickAccess] "Widget is disposed" exception in errorlog during shutdown due to quickaccess.SearchField.storeDialog
  *     Elena Laskavaia <elaskavaia.cdt@gmail.com> - Bug 433746: [QuickAccess] SWTException on closing quick access shell
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278, 491317
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
@@ -36,7 +36,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.window.Window;
@@ -54,6 +53,7 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -294,12 +294,12 @@ public class SearchField {
 		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
 
 		GC gc = new GC(text);
-		Point p = gc.textExtent(QuickAccessMessages.QuickAccess_EnterSearch);
-		Rectangle r = text.computeTrim(0, 0, p.x, p.y);
+		FontMetrics fm = gc.getFontMetrics();
+		int wHint = QuickAccessMessages.QuickAccess_EnterSearch.length() * fm.getAverageCharWidth();
+		int hHint = fm.getHeight();
 		gc.dispose();
+		text.setSize(text.computeSize(wHint, hHint));
 
-		// computeTrim() may result in r.x < 0
-		GridDataFactory.fillDefaults().hint(r.width - r.x, SWT.DEFAULT).applyTo(text);
 		return text;
 	}
 
