@@ -375,20 +375,6 @@ public abstract class AbstractObservableList<E> extends AbstractList<E>
 		return super.retainAll(c);
 	}
 
-	// Comparison and hashing
-
-	@Override
-	public boolean equals(Object o) {
-		getterCalled();
-		return super.equals(o);
-	}
-
-	@Override
-	public int hashCode() {
-		getterCalled();
-		return super.hashCode();
-	}
-
 	@Override
 	public int indexOf(Object o) {
 		getterCalled();

@@ -234,7 +234,7 @@ public class MultiList<E> extends AbstractObservableList<E> {
 		IObservableList<? extends E> source = event.getObservableList();
 		int offset = 0;
 		for (IObservableList<E> list : lists) {
-			if (source == list) {
+			if (source.equals(list)) {
 				fireListChange(offsetListDiff(offset, event.diff));
 				return;
 			}
@@ -326,40 +326,6 @@ public class MultiList<E> extends AbstractObservableList<E> {
 				return true;
 		}
 		return false;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		getterCalled();
-		if (o == this)
-			return true;
-		if (o == null)
-			return false;
-		if (!(o instanceof List))
-			return false;
-		List<?> that = (List<?>) o;
-		if (doGetSize() != that.size())
-			return false;
-
-		int subListIndex = 0;
-		for (IObservableList<E> list : lists) {
-			List<?> subList = that.subList(subListIndex, subListIndex + list.size());
-			if (!list.equals(subList)) {
-				return false;
-			}
-			subListIndex += list.size();
-		}
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		getterCalled();
-		int result = 1;
-		for (IObservableList<E> list : lists) {
-			result = result * 31 + list.hashCode();
-		}
-		return result;
 	}
 
 	@Override

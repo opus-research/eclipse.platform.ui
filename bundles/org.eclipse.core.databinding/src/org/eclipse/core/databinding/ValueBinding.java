@@ -196,7 +196,7 @@ class ValueBinding extends Binding {
 					destination.getRealm().exec(new Runnable() {
 						@Override
 						public void run() {
-							if (destination == target) {
+							if (destination.equals(target)) {
 								updatingTarget = true;
 							} else {
 								updatingModel = true;
@@ -207,7 +207,7 @@ class ValueBinding extends Binding {
 
 								mergeStatus(multiStatus, setterStatus);
 							} finally {
-								if (destination == target) {
+								if (destination.equals(target)) {
 									updatingTarget = false;
 								} else {
 									updatingModel = false;
