@@ -34,7 +34,8 @@ import org.eclipse.ui.internal.dialogs.PropertyDialog;
 import org.eclipse.ui.internal.dialogs.PropertyPageContributorManager;
 import org.eclipse.ui.internal.dialogs.PropertyPageManager;
 import org.eclipse.ui.model.IWorkbenchAdapter;
-import org.junit.Assert;
+
+import junit.framework.Assert;
 
 public class UITestHelper {
 	private static class PreferenceDialogWrapper extends PreferenceDialog {
