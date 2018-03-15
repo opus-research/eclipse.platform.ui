@@ -11,7 +11,6 @@
  *     Carsten Pfeiffer, Gebit Solutions GmbH - bug 259536
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *     Mickael Istria, Red Hat Inc. - [91965] Add ct/editor mapping in user space
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 527069
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -304,10 +303,6 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 				mapIDtoEditor.put(desc.getId(), desc);
             }
         }
-		// Add external editors from OS
-		for (IEditorDescriptor desc : getSortedEditorsFromOS()) {
-			mapIDtoEditor.put(desc.getId(), desc);
-		}
     }
 
     @Override
