@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
@@ -82,8 +83,7 @@ import com.ibm.icu.text.Collator;
  *
  * @since 3.3
  */
-public class FilteredResourcesSelectionDialog extends
-		FilteredItemsSelectionDialog {
+public class FilteredResourcesSelectionDialog extends FilteredItemsSelectionDialog {
 
 	private static final String DIALOG_SETTINGS = "org.eclipse.ui.dialogs.FilteredResourcesSelectionDialog"; //$NON-NLS-1$
 
@@ -507,28 +507,25 @@ public class FilteredResourcesSelectionDialog extends
 			throws CoreException {
 		if (itemsFilter instanceof ResourceFilter) {
 			IResource[] members = container.members();
-			progressMonitor
-					.beginTask(
-							WorkbenchMessages.FilteredItemsSelectionDialog_searchJob_taskName,
-							members.length);
+			SubMonitor subMonitor = SubMonitor.convert(progressMonitor,
+					WorkbenchMessages.FilteredItemsSelectionDialog_searchJob_taskName,
+					members.length);
 
 			ResourceProxyVisitor visitor = new ResourceProxyVisitor(
 					contentProvider, (ResourceFilter) itemsFilter,
-					progressMonitor);
+					subMonitor.split(0));
 
 			if (visitor.visit(container.createProxy())) {
 				for (int i= 0; i < members.length; i++) {
 					IResource member = members[i];
-					if (member.isAccessible())
+					if (member.isAccessible()) {
 						member.accept(visitor, IResource.NONE);
-					progressMonitor.worked(1);
-					if (progressMonitor.isCanceled())
-						break;
+					}
+					subMonitor.step(1);
 				}
 			}
 
 		}
-		progressMonitor.done();
 	}
 
 	/**

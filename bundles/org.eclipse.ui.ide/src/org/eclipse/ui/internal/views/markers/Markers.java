@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ui.views.markers.MarkerItem;
 import org.eclipse.ui.views.markers.internal.MarkerGroup;
 import org.eclipse.ui.views.markers.internal.MarkerGroupingEntry;
@@ -140,40 +141,30 @@ class Markers {
 	 * @param monitor
 	 */
 	synchronized boolean sortMarkerEntries(IProgressMonitor monitor) {
-		if (monitor.isCanceled()) {
-			return false;
-		}
+		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 		boolean initialVal = inChange;
 		try {
 			inChange = true;
 			if (builder.isShowingHierarchy()) {
 				Comparator<MarkerItem> comparator = builder.getComparator().getFieldsComparator();
-				for (int i = 0; i < categories.length; i++) {
-					if (monitor.isCanceled()) {
-						return false;
-					}
+				for (MarkerCategory category : categories) {
 					// sort various categories
-					MarkerCategory category = categories[i];
 					category.children = null; // reset cached children
 					int avaliable = category.end - category.start + 1;
 					int effLimit = getShowingLimit(avaliable);
 					MarkerSortUtil.sortStartingKElement(markerEntryArray,
 							comparator, category.start, category.end, effLimit,
-							monitor);
+							subMonitor.split(50));
 				}
 			} else {
-				if (monitor.isCanceled()) {
-					return false;
-				}
+
 				int avaialble = markerEntryArray.length - 1;
 				int effLimit = getShowingLimit(avaialble);
 				MarkerSortUtil.sortStartingKElement(markerEntryArray,
-						builder.getComparator(), effLimit, monitor);
+						builder.getComparator(), effLimit, subMonitor.split(50));
 			}
-			if (monitor.isCanceled()) {
-				return false;
-			}
-			monitor.worked(50);
+
+			subMonitor.step(50);
 			return true;
 		} finally {
 			inChange = initialVal;
