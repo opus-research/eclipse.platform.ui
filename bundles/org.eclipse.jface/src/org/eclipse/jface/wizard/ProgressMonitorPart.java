@@ -330,23 +330,25 @@ public class ProgressMonitorPart extends Composite implements
         updateLabel();
     }
 
-    /**
-     * Updates the label with the current task and subtask names.
-     */
-    protected void updateLabel() {
-		if (fLabel.isDisposed() || fLabel.isAutoDirection()) {
-			return;
-		}
-        if (blockedStatus == null) {
-            String text = taskLabel();
-            fLabel.setText(text);
-        } else {
-			fLabel.setText(blockedStatus.getMessage());
-		}
+	/**
+	 * Updates the label with the current task and subtask names.
+	 */
+	protected void updateLabel() {
+		fLabel.getDisplay().asyncExec(() -> {
+			if (fLabel.isDisposed() || fLabel.isAutoDirection()) {
+				return;
+			}
+			if (blockedStatus == null) {
+				String text = taskLabel();
+				fLabel.setText(text);
+			} else {
+				fLabel.setText(blockedStatus.getMessage());
+			}
 
-        //Force an update as we are in the UI Thread
-        fLabel.update();
-    }
+			// Force an update as we are in the UI Thread
+			fLabel.update();
+		});
+	}
 
     /**
      * Return the label for showing tasks
