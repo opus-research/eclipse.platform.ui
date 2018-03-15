@@ -16,8 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import org.eclipse.core.commands.common.NotDefinedException;
-import org.eclipse.core.commands.contexts.Context;
+
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManager;
 import org.eclipse.jface.bindings.TriggerSequence;
@@ -31,7 +30,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 public class ConflictModel extends CommonModel {
 
 	public static final String PROP_CONFLICTS = "conflicts"; //$NON-NLS-1$
-	public static final String PROP_OVERRIDES = "overrrides"; //$NON-NLS-1$
 	public static final String PROP_CONFLICTS_ADD = "conflictsAdd"; //$NON-NLS-1$
 	public static final String PROP_CONFLICTS_REMOVE = "conflictsRemove"; //$NON-NLS-1$
 
@@ -40,13 +38,9 @@ public class ConflictModel extends CommonModel {
 	 */
 	private Collection conflicts;
 
-	private Collection<BindingElement> overrides;
-
 	private BindingManager bindingManager;
 
 	private BindingModel bindingModel;
-
-	private ContextModel contextModel;
 
 	/**
 	 * A mapping of binding element to known conflicts.
@@ -224,10 +218,9 @@ public class ConflictModel extends CommonModel {
 		}
 	}
 
-	public void init(BindingManager manager, BindingModel model, ContextModel context) {
+	public void init(BindingManager manager, BindingModel model) {
 		bindingManager = manager;
 		bindingModel = model;
-		contextModel = context;
 		conflictsMap = new HashMap();
 		Iterator i = bindingModel.getBindings().iterator();
 		while (i.hasNext()) {
@@ -248,7 +241,6 @@ public class ConflictModel extends CommonModel {
 								(BindingElement) event.getNewValue());
 						setConflicts((Collection) conflictsMap.get(event
 								.getNewValue()));
-						updateOverridesFor((BindingElement) event.getNewValue());
 					} else {
 						setConflicts(null);
 					}
@@ -259,54 +251,5 @@ public class ConflictModel extends CommonModel {
 				}
 			}
 		});
-	}
-
-	public void updateOverridesFor(BindingElement bindingElement) {
-		Collection<BindingElement> newOverrides = new ArrayList<>();
-		if (bindingElement.getModelObject() instanceof Binding) {
-			Binding selectedBinding = (Binding) bindingElement.getModelObject();
-			@SuppressWarnings("unchecked")
-			Collection<Binding> matches = (Collection<Binding>) bindingManager.getActiveBindingsDisregardingContext()
-					.get(bindingElement.getTrigger());
-			if (matches != null) {
-				for (Binding b : matches) {
-					if (selectedBinding != b && b.getSchemeId().equals(selectedBinding.getSchemeId())
-							&& isChildAndParent(b.getContextId(), selectedBinding.getContextId())) {
-						Object element = bindingModel.getBindingToElement().get(b);
-						if (element != null) {
-							newOverrides.add((BindingElement) element);
-						}
-					}
-				}
-			}
-			controller.firePropertyChange(this, PROP_OVERRIDES, overrides, newOverrides);
-			overrides = newOverrides;
-		}
-	}
-
-	/**
-	 * Checks if contexts are in the same hierarchy vertical
-	 */
-	private boolean isChildAndParent(String childContextId, String parentContextId) {
-		for (String c = getParentContextId(childContextId); c != null; c = getParentContextId(c)) {
-			if (c.equals(parentContextId)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * @param contextId
-	 * @return parent context id or null if none
-	 */
-	private String getParentContextId(String contextId) {
-		ContextElement contextElement = (ContextElement) contextModel.getContextIdToElement().get(contextId);
-		try {
-			return ((Context) contextElement.getModelObject()).getParentId();
-		} catch (NotDefinedException e) {
-			return null;
-		}
-
 	}
 }
