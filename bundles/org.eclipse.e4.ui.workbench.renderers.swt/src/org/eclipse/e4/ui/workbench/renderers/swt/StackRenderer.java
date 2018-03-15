@@ -1760,19 +1760,21 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 				removeHighlight(part, cti, isCssEngineActive);
 			}
 
-			String prevCssCls = WidgetElement.getCSSClass(cti);
-			setCSSInfo(part, cti);
+			if (isCssEngineActive) {
+				String prevCssCls = WidgetElement.getCSSClass(cti);
+				setCSSInfo(part, cti);
 
-			if (prevCssCls == null || !prevCssCls.equals(WidgetElement.getCSSClass(cti))) {
-				reapplyStyles(cti.getParent());
+				if (prevCssCls == null || !prevCssCls.equals(WidgetElement.getCSSClass(cti))) {
+					reapplyStyles(cti.getParent());
+				}
+			} else {
+				// if the CSS engine is not active, we must update busy state
+				if (partActivatedEvent) {
+					return;
+				}
+
+				updateBusyStateNoCss(cti, newValue, oldValue);
 			}
-
-			// Only update tab busy state if the CSS engine is not active
-			if (isCssEngineActive || partActivatedEvent) {
-				return;
-			}
-
-			updateBusyStateNoCss(cti, newValue, oldValue);
 		}
 
 		public boolean validateElement(Object element) {
