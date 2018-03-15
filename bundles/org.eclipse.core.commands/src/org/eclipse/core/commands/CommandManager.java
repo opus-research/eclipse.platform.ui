@@ -459,8 +459,8 @@ public final class CommandManager extends HandleObjectManager implements
 		}
 
 		final Object[] listeners = getListeners();
-		for (int i = 0; i < listeners.length; i++) {
-			final ICommandManagerListener listener = (ICommandManagerListener) listeners[i];
+		for (Object listener2 : listeners) {
+			final ICommandManagerListener listener = (ICommandManagerListener) listener2;
 			listener.commandManagerChanged(event);
 		}
 	}
@@ -711,8 +711,7 @@ public final class CommandManager extends HandleObjectManager implements
 				parameterValue = unescape(idEqualsValue.substring(equalsPosition + 1));
 			}
 
-			for (int i = 0; i < parameters.length; i++) {
-				final IParameter parameter = parameters[i];
+			for (final IParameter parameter : parameters) {
 				if (parameter.getId().equals(parameterId)) {
 					paramList.add(new Parameterization(parameter, parameterValue));
 					break;

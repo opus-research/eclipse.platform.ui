@@ -71,8 +71,8 @@ public class State extends EventManager {
 	 */
 	protected final void fireStateChanged(final Object oldValue) {
 		final Object[] listeners = getListeners();
-		for (int i = 0; i < listeners.length; i++) {
-			final IStateListener listener = (IStateListener) listeners[i];
+		for (Object listener2 : listeners) {
+			final IStateListener listener = (IStateListener) listener2;
 			listener.handleStateChange(this, oldValue);
 		}
 	}
