@@ -15,10 +15,10 @@ import org.osgi.framework.FrameworkUtil;
 
 /**
  * Tests to ensure the correct bundles are activated. Their are two reasons why a bundle is activated:
- * 
+ *
  * - a plugin contributes OSGi services
  * - a plugin contains an activator
- * 
+ *
  * Additional plug-ins with activators should be avoided as they can slow down the startup of the Eclipse IDE
  * Additional plug-ins provided OSGi services is desired as the OSGi framework initializes these services asynchronously
  *
@@ -91,9 +91,8 @@ public class PluginActivationTests {
 			"org.eclipse.ui.console",
 			"org.eclipse.ui.editors.tests",
 			"org.eclipse.ui.externaltools",
-// Bug 416915: Allow to run tests with tycho-surefire-plugin
-//			"org.eclipse.ui.navigator",
-//			"org.eclipse.ui.navigator.resources",
+			"org.eclipse.ui.navigator",
+			"org.eclipse.ui.navigator.resources",
 			"org.eclipse.ui.views.properties.tabbed",
 			"org.eclipse.ui.win32",
 			"org.eclipse.ui.workbench.compatibility",
@@ -134,7 +133,6 @@ public class PluginActivationTests {
 			"org.eclipse.core.resources",
 			"org.eclipse.core.runtime",
 			"org.eclipse.debug.core",
-			"org.eclipse.debug.ui",
 			"org.eclipse.e4.core.contexts",
 			"org.eclipse.e4.core.di",
 			"org.eclipse.e4.core.di.extensions",
@@ -182,13 +180,11 @@ public class PluginActivationTests {
 			"org.eclipse.pde.junit.runtime",
 			"org.eclipse.pde.launching",
 			"org.eclipse.pde.ui",
-			"org.eclipse.search",
 			"org.eclipse.team.core",
 			"org.eclipse.team.ui",
 			"org.eclipse.ui",
 			"org.eclipse.ui.editors",
 			"org.eclipse.ui.examples.contributions",
-			"org.eclipse.ui.externaltools",
 			"org.eclipse.ui.ide",
 			"org.eclipse.ui.ide.application",
 			"org.eclipse.ui.intro",
@@ -278,8 +274,6 @@ public class PluginActivationTests {
 
 	@Test
 	public void pluginsWithoutOSGiServiceOrActivatorShouldNotActive() {
-		printPluginStatus(true);
-		// int i = 0;
 		StringBuffer buf = new StringBuffer();
 		for (String element : NOT_ACTIVE_BUNDLES) {
 			Bundle bundle = Platform.getBundle(element);
@@ -293,7 +287,10 @@ public class PluginActivationTests {
 				buf.append(element);
 				buf.append('\n');
 			}
-			// i++;
+		}
+		// add some debug output
+		if (buf.length() > 0) {
+			printPluginStatus(true);
 		}
 		assertTrue("Wrong bundles in active status:\n" + buf, buf.length() == 0);
 	}
@@ -327,6 +324,10 @@ public class PluginActivationTests {
 				buf.append(element);
 				buf.append('\n');
 			}
+		}
+		// add some debug output
+		if (buf.length() > 0) {
+			printPluginStatus(true);
 		}
 		assertTrue("Wrong bundles loaded:\n" + buf, buf.length() == 0);
 	}
