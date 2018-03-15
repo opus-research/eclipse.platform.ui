@@ -85,6 +85,7 @@ import org.eclipse.swt.widgets.Decorations;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 
 /**
  * Create a contribute part.
@@ -232,20 +233,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
-	@Inject
-	@Optional
-	private void subscribeSelectionUpdated(@UIEventTopic(UIEvents.Item.TOPIC_SELECTED) Event event) {
-		// Ensure that this event is for a MToolItem
-		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
-			return;
-
-		MMenuItem itemModel = (MMenuItem) event.getProperty(UIEvents.EventTags.ELEMENT);
-		IContributionItem ici = getContribution(itemModel);
-		if (ici != null) {
-			ici.update();
-		}
-	};
-
 
 	/**
 	 * @param event
@@ -290,10 +277,25 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
+
+	private EventHandler selectionUpdater = event -> {
+		// Ensure that this event is for a MToolItem
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
+			return;
+
+		MMenuItem itemModel = (MMenuItem) event.getProperty(UIEvents.EventTags.ELEMENT);
+		IContributionItem ici = getContribution(itemModel);
+		if (ici != null) {
+			ici.update();
+		}
+	};
+
 	private MenuManagerRendererFilter rendererFilter;
 
 	@PostConstruct
 	public void init() {
+		eventBroker.subscribe(UIEvents.Item.TOPIC_SELECTED, selectionUpdater);
+
 		context.set(MenuManagerRenderer.class, this);
 		Display display = context.get(Display.class);
 		rendererFilter = ContextInjectionFactory.make(MenuManagerRendererFilter.class, context);
@@ -325,6 +327,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	@PreDestroy
 	public void contextDisposed() {
+		eventBroker.unsubscribe(selectionUpdater);
+
 		ContextInjectionFactory.uninject(MenuManagerEventHelper.getInstance().getShowHelper(), context);
 		MenuManagerEventHelper.getInstance().setShowHelper(null);
 		ContextInjectionFactory.uninject(MenuManagerEventHelper.getInstance().getHideHelper(), context);
