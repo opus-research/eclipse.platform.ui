@@ -108,7 +108,13 @@ public class ProgressAnimationItemTest {
 	}
 
 	private void assertSingleAccessibleListener() throws Exception {
-		assertEquals(1, getAccessibleListenersSize(getToolBar(animationItem).getAccessible()));
+		PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+			try {
+				assertEquals(1, getAccessibleListenersSize(getToolBar(animationItem).getAccessible()));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
 	}
 
 	private ToolBar getToolBar(ProgressAnimationItem animationItem) {
