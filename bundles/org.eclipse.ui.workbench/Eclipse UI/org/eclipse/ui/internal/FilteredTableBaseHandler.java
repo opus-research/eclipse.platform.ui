@@ -457,16 +457,13 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 
 	/**
 	 * Add modify listener to the search text, trigger search each time text
-	 * changes. After the search the first matching result is selected. 
+	 * changes
 	 */
 	protected void addModifyListener(Text text) {
 		text.addModifyListener(e -> {
 			String searchText = ((Text) e.widget).getText();
 			setMatcherString(searchText);
 			tableViewer.refresh();
-			if (tableViewer.getTable().getColumnCount() > 0) {
-				tableViewer.getTable().select(0);
-			}
 		});
 	}
 
