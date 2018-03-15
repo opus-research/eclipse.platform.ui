@@ -28,10 +28,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.tests.forms.layout.ControlFactory;
 import org.junit.After;
 import org.junit.Before;
@@ -391,16 +393,16 @@ public class ExpandableCompositeTest {
 			assertEquals(bounds.height, sepBounds.y + sepBounds.height);
 	}
 
-	private void width500() {
+	private void width(int setWidth) {
 		GridData layoutData = new GridData();
-		layoutData.widthHint = 500;
+		layoutData.widthHint = setWidth;
 		ec.setLayoutData(layoutData);
 	}
 
 	@Test
 	public void testLabelLong() {
 		createExtendableComposite(longText, 0);
-		width500();
+		width(500);
 		Rectangle bounds = update();
 		assertEquals(500, bounds.width);
 		assertTextLines(4, bounds);
@@ -409,10 +411,36 @@ public class ExpandableCompositeTest {
 	@Test
 	public void testLinkLong() {
 		createExtendableComposite(longText, ExpandableComposite.FOCUS_TITLE);
-		width500();
+		width(500);
 		Rectangle bounds = update();
 		assertAround("Width", 500, bounds.width, 8);
 		assertTextLines(4, bounds);
+	}
+
+	@Test
+	public void testWrappingClientText() {
+		createExtendableComposite(shortText, ExpandableComposite.TWISTIE);
+		width(200);
+		Composite client = new Composite(ec, SWT.NONE);
+		client.setLayout(new TableWrapLayout());
+		ec.setClient(client);
+		Text text = createText(client, longText);
+		ec.setExpanded(true);
+		update();
+		assertAround("Wrapped Text Width", 190, text.getBounds().width, 1);
+	}
+
+	@Test
+	public void testWrappingClientLabel() {
+		createExtendableComposite(shortText, ExpandableComposite.TWISTIE);
+		width(200);
+		Composite client = new Composite(ec, SWT.NONE);
+		client.setLayout(new TableWrapLayout());
+		ec.setClient(client);
+		Label label = createLabel(client, longText);
+		ec.setExpanded(true);
+		update();
+		assertAround("Wrapped Label Width", 190, label.getBounds().width, 1);
 	}
 
 	private void assertTextLines(int lines, Rectangle bounds) {
@@ -428,10 +456,17 @@ public class ExpandableCompositeTest {
 		return l;
 	}
 
+	private Text createText(Composite comp, String text) {
+		Text t = new Text(comp, SWT.READ_ONLY | SWT.WRAP);
+		t.setText(text);
+		t.setFont(font);
+		return t;
+	}
+
 	@Test
 	public void testLabelLongAndTextClientLabel() {
 		createExtendableComposite(longText, 0);
-		width500();
+		width(500);
 
 		Label client = createLabel(ec, longText);
 		ec.setTextClient(client);
@@ -467,7 +502,7 @@ public class ExpandableCompositeTest {
 	@Test
 	public void testLabelLongAndTextClientComp() {
 		createExtendableComposite(longText, 0);
-		width500();
+		width(500);
 
 		Control client = createFillComp(ec);
 		ec.setTextClient(client);
@@ -482,7 +517,7 @@ public class ExpandableCompositeTest {
 	@Test
 	public void testLabelShortAndTextClientComp() {
 		createExtendableComposite(shortText, 0);
-		width500();
+		width(500);
 
 		Control client = createFillComp(ec);
 		ec.setTextClient(client);
@@ -503,7 +538,7 @@ public class ExpandableCompositeTest {
 	@Test
 	public void testLabelLongAndTextClientCompFixed() {
 		createExtendableComposite(longText, 0);
-		width500();
+		width(500);
 
 		Control client = createFixedComp(ec);
 		ec.setTextClient(client);
@@ -518,7 +553,7 @@ public class ExpandableCompositeTest {
 	@Test
 	public void testLabelLongAndTextClientCompFixedL() {
 		createExtendableComposite(longText, ExpandableComposite.LEFT_TEXT_CLIENT_ALIGNMENT);
-		width500();
+		width(500);
 
 		Control client = createFixedComp(ec);
 		ec.setTextClient(client);
@@ -535,7 +570,7 @@ public class ExpandableCompositeTest {
 	public void testTwistieIsVerticallyCentered() {
 		createExtendableComposite(shortText,
 				ExpandableComposite.LEFT_TEXT_CLIENT_ALIGNMENT | ExpandableComposite.TWISTIE);
-		width500();
+		width(500);
 		update();
 
 		Control[] children = ec.getChildren();
