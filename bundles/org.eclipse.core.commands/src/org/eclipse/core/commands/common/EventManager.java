@@ -61,7 +61,7 @@ public abstract class EventManager {
 	/**
 	 * Clears all of the listeners from the listener list.
 	 */
-	protected final void clearListeners() {
+	protected synchronized final void clearListeners() {
 		listenerList = null;
 	}
 
