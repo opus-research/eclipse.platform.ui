@@ -366,6 +366,16 @@ public interface IDialogConstants {
      */
     public String HELP_LABEL = JFaceResources.getString(IDialogLabelKeys.HELP_LABEL_KEY);
 
+	/**
+	 * The label for Restart buttons. Using this static label string provides
+	 * optimum performance by looking up the label only once when JFace is
+	 * initialized. However, clients that wish to support multiple locales in
+	 * one system should instead use the pattern
+	 * <code>JFaceResources.getString(IDialogLabelKeys.RESTART_KEY)</code> so
+	 * that a locale other than the default may be consulted.
+	 */
+	public String RESTART_LABEL = JFaceResources.getString(IDialogLabelKeys.RESTART_LABEL_KEY);
+
     // Margins, spacings, and sizes
     /**
      * Vertical margin in dialog units (value 7).
