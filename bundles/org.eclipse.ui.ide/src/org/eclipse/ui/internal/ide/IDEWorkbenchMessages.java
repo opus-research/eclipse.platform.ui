@@ -954,6 +954,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ChooseWorkspaceDialog_defaultProductName;
 	public static String ChooseWorkspaceDialog_workspaceEntryLabel;
 	public static String ChooseWorkspaceDialog_browseLabel;
+	public static String ChooseWorkspaceDialog_launchLabel;
 	public static String ChooseWorkspaceDialog_directoryBrowserTitle;
 	public static String ChooseWorkspaceDialog_directoryBrowserMessage;
 	public static String ChooseWorkspaceDialog_removeWorkspaceSelection;
@@ -989,14 +990,13 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String CleanDialog_buildCleanManual;
 	public static String CleanDialog_title;
 	public static String CleanDialog_clean_button_label;
-	public static String CleanDialog_selectAllButton;
-	public static String CleanDialog_deselectedAllButton;
+	public static String CleanDialog_cleanAllButton;
+	public static String CleanDialog_cleanSelectedButton;
 	public static String CleanDialog_buildNowButton;
 	public static String CleanDialog_globalBuildButton;
 	public static String CleanDialog_buildSelectedProjectsButton;
 	public static String CleanDialog_cleanSelectedTaskName;
 	public static String CleanDialog_cleanAllTaskName;
-	public static String CleanDialog_alwaysCleanAllButton;
 	public static String IDEEncoding_EncodingJob;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_viewsRelatedLink;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_FileEditorsRelatedLink;
