@@ -307,8 +307,8 @@ public class ScopedPreferenceStore extends EventManager implements
 
 		// Assert that the default was not included (we automatically add it to
 		// the end)
-		for (int i = 0; i < scopes.length; i++) {
-			if (scopes[i].equals(defaultContext)) {
+		for (IScopeContext scope : scopes) {
+			if (scope.equals(defaultContext)) {
 				Assert
 						.isTrue(
 								false,
@@ -337,8 +337,8 @@ public class ScopedPreferenceStore extends EventManager implements
 		}
 		final PropertyChangeEvent event = new PropertyChangeEvent(this, name,
 				oldValue, newValue);
-		for (int i = 0; i < list.length; i++) {
-			final IPropertyChangeListener listener = (IPropertyChangeListener) list[i];
+		for (Object element : list) {
+			final IPropertyChangeListener listener = (IPropertyChangeListener) element;
 			SafeRunner.run(new SafeRunnable(JFaceResources
 					.getString("PreferenceStore.changeError")) { //$NON-NLS-1$
 						@Override
