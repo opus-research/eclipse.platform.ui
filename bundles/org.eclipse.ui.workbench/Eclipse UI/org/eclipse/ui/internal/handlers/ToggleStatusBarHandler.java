@@ -15,9 +15,7 @@ import java.util.Map;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.commands.ICommandService;
@@ -28,8 +26,6 @@ import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.services.IWorkbenchLocationService;
 import org.eclipse.ui.menus.UIElement;
 import org.eclipse.ui.services.IServiceScopes;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventHandler;
 
 /**
  * Toggle the visibility of the status bar. Implementation of the
@@ -43,47 +39,23 @@ public class ToggleStatusBarHandler extends AbstractHandler implements IElementU
 	// id of the statusbar, as defined in the LegacyIDE.e4xmi
 	private static final String BOTTOM_TRIM_ID = "org.eclipse.ui.trim.status"; //$NON-NLS-1$
 
-	private IEventBroker eventBroker;
-	private EventHandler eventHandler;
-
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 		if (!(window instanceof WorkbenchWindow))
 			return null;
-		// initialize event handler
-		if (eventHandler == null) {
-			eventBroker = window.getService(IEventBroker.class);
-			eventHandler = new EventHandler() {
-				@Override
-				public void handleEvent(Event event) {
-					Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
-					if (element instanceof MUIElement && ((MUIElement) element).getElementId().equals(BOTTOM_TRIM_ID)) {
-						// refresh menu item label, triggering updateElement()
-						ICommandService commandService = window.getService(ICommandService.class);
-						Map<String, WorkbenchWindow> filter = new HashMap<>();
-						filter.put(IServiceScopes.WINDOW_SCOPE, (WorkbenchWindow) window);
-						commandService.refreshElements(COMMAND_ID_TOGGLE_STATUSBAR, filter);
-					}
-				}
-			};
-			eventBroker.subscribe(UIEvents.UIElement.TOPIC_VISIBLE, eventHandler);
-		}
-		// perform operation
 		MUIElement trimStatus = getTrimStatus((WorkbenchWindow) window);
+
 		if (trimStatus != null) {
 			// toggle statusbar visibility
 			trimStatus.setVisible(!trimStatus.isVisible());
+			// refresh menu item label, triggering updateElement()
+			ICommandService commandService = window.getService(ICommandService.class);
+			Map<String, WorkbenchWindow> filter = new HashMap<>();
+			filter.put(IServiceScopes.WINDOW_SCOPE, (WorkbenchWindow) window);
+			commandService.refreshElements(COMMAND_ID_TOGGLE_STATUSBAR, filter);
 		}
 		return null;
-	}
-
-	@Override
-	public void dispose() {
-		if (eventBroker != null && eventHandler != null) {
-			eventBroker.unsubscribe(eventHandler);
-		}
-		super.dispose();
 	}
 
 	/**
