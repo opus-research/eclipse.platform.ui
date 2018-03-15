@@ -10,7 +10,6 @@
  *     Stefan Xenos, IBM; Chris Torrence, ITT Visual Information Solutions - bug 51580
  *     Nikolay Botev - bug 240651
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 495940
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -170,22 +169,18 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 			contextEventHandler = new EventHandler() {
 				@Override
 				public void handleEvent(Event event) {
-					handleContextSet(event);
+					Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+					MPart part = getModel();
+					if (element == part) {
+						if (part.getContext() != null) {
+							part.getContext().set(getClass().getName(), this);
+							unsubscribe();
+						}
+					}
 				}
 			};
 		}
 		return contextEventHandler;
-	}
-
-	private void handleContextSet(Event event) {
-		Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
-		MPart part = getModel();
-		if (element == part) {
-			if (part.getContext() != null) {
-				part.getContext().set(getClass().getName(), this);
-				unsubscribe();
-			}
-		}
 	}
 
 	public void subscribe() {
