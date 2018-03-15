@@ -138,7 +138,7 @@ public class SearchField {
 
 	private IBindingManagerListener bindingManagerListener;
 
-	private String quickAccessTriggerSequenceFormat;
+	private TriggerSequence triggerSequence = null;
 
 	@PostConstruct
 	void createControls(final Composite parent, MApplication application, MWindow window) {
@@ -334,44 +334,31 @@ public class SearchField {
 
 	/** recompute key binding and update the QuickAccess Text */
 	private void updateKeyBindingText() {
-		updateQuickAccessTriggerSequenceFormat();
+		updateQuickAccessTriggerSequence();
 		updateText(txtQuickAcesss);
 		txtQuickAcesss.requestLayout();
-	}
-
-	/**
-	 * @return Returns the quickAccessTriggerSequenceFormat.
-	 */
-	public String getQuickAccessTriggerSequenceFormat() {
-		if (quickAccessTriggerSequenceFormat == null) {
-			updateQuickAccessTriggerSequenceFormat();
-		}
-		return quickAccessTriggerSequenceFormat;
 	}
 
 	@Inject
 	private BindingTableManager manager;
 	@Inject
 	private ECommandService eCommandService;
-
 	@Inject
-	IContextService contextService;
+	private IContextService contextService;
 
 	/**
-	 * Compute the best binding for the command and returns the trigger
+	 * Compute the best binding for the command and sets the trigger
 	 *
-	 * @return the trigger
 	 */
-	protected void updateQuickAccessTriggerSequenceFormat() {
-		TriggerSequence triggerSequence;
-		// FIXME: workaround for
-		// bindingService.getBestActiveBindingFor(QUICK_ACCESS_COMMAND_ID)
-		ParameterizedCommand cmd = eCommandService.createCommand(QUICK_ACCESS_COMMAND_ID, null);
-		ContextSet contextSet = manager.createContextSet(Arrays.asList(contextService.getDefinedContexts()));
-		Binding binding = manager.getBestSequenceFor(contextSet, cmd);
-		triggerSequence = binding.getTriggerSequence();
-		//
-		this.quickAccessTriggerSequenceFormat = (triggerSequence == null) ? "" : triggerSequence.format(); //$NON-NLS-1$
+	protected void updateQuickAccessTriggerSequence() {
+		triggerSequence = bindingService.getBestActiveBindingFor(QUICK_ACCESS_COMMAND_ID);
+		// FIXME Bug 491701 - [KeyBinding] get best active binding is not working
+		if (triggerSequence == null) {
+			ParameterizedCommand cmd = eCommandService.createCommand(QUICK_ACCESS_COMMAND_ID, null);
+			ContextSet contextSet = manager.createContextSet(Arrays.asList(contextService.getDefinedContexts()));
+			Binding binding = manager.getBestSequenceFor(contextSet, cmd);
+			triggerSequence = binding.getTriggerSequence();
+		}
 	}
 
 	private Text createText(Composite parent) {
@@ -393,7 +380,11 @@ public class SearchField {
 			return;
 		}
 
-		text.setMessage(NLS.bind(QuickAccessMessages.QuickAccess_EnterSearch, getQuickAccessTriggerSequenceFormat()));
+		if (triggerSequence != null) {
+			text.setMessage(NLS.bind(QuickAccessMessages.QuickAccess_EnterSearch, triggerSequence.format()));
+		} else {
+			text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch_Empty);
+		}
 
 		GC gc = new GC(text);
 
