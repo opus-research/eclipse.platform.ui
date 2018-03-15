@@ -14,6 +14,8 @@ package org.eclipse.ui.tests.forms.util;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
+import junit.framework.TestCase;
+
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -21,8 +23,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.internal.forms.widgets.FormImages;
 import org.junit.Assert;
-
-import junit.framework.TestCase;
 
 public class FormImagesTests extends TestCase {
 	public void testSingleton() throws Exception {
@@ -198,9 +198,9 @@ public class FormImagesTests extends TestCase {
 		Assert.assertNull("descriptors map", getDescriptors(FormImages.getInstance()));
 	}
 
-	private static HashMap<?, ?> getDescriptors(FormImages formImages) throws Exception {
+	private static HashMap getDescriptors(FormImages formImages) throws Exception {
 		Field field = formImages.getClass().getDeclaredField("descriptors");
 		field.setAccessible(true);
-		return (HashMap<?, ?>) field.get(formImages);
+		return (HashMap) field.get(formImages);
 	}
 }
