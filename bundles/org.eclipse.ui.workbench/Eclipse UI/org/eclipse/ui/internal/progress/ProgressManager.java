@@ -30,10 +30,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -57,7 +56,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -150,11 +148,7 @@ public class ProgressManager extends ProgressProvider implements
 
 	private final ConcurrentMap<JobInfo, ScheduledFuture<?>> scheduledUpdates = new ConcurrentHashMap<>();
 
-	private final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1, (runnable, executor) -> {
-		WorkbenchPlugin.log(new Status(IStatus.INFO, PlatformUI.PLUGIN_ID,
-				NLS.bind(ProgressMessages.ProgressManager_listenersRefreshRejected, executor.toString(),
-						new RejectedExecutionException(ProgressMessages.ProgressManager_rejectedRefreshException))));
-	});
+	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
 	private static final String IMAGE_KEY = "org.eclipse.ui.progress.images"; //$NON-NLS-1$
 
@@ -186,9 +180,6 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public ScheduledFuture<?> apply(JobInfo jobInfo) {
-			if (executor.isShutdown()) {
-				return null;
-			}
 			return executor.schedule(() -> {
 				scheduledUpdates.remove(jobInfo);
 				GroupInfo group = jobInfo.getGroupInfo();
