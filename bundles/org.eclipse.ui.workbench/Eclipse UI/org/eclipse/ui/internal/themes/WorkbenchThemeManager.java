@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -366,7 +366,7 @@ public class WorkbenchThemeManager extends EventManager implements
 				if (oldTheme != null && eventBroker != null) {
 					eventBroker.send(UIEvents.UILifeCycle.THEME_CHANGED, null);
 					eventBroker.send(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED,
-							context.get(MApplication.class));
+							context.get(MApplication.class.getName()));
 				}
 			}
 		}
@@ -389,11 +389,11 @@ public class WorkbenchThemeManager extends EventManager implements
 		}
 
 		protected IStylingEngine getStylingEngine() {
-			return getContext().get(IStylingEngine.class);
+			return (IStylingEngine) getContext().get(IStylingEngine.SERVICE_NAME);
 		}
 
 		protected ThemeRegistry getThemeRegistry() {
-			return (ThemeRegistry) getContext().get(IThemeRegistry.class);
+			return (ThemeRegistry) getContext().get(IThemeRegistry.class.getName());
 		}
 
 		protected FontRegistry getFontRegistry() {
@@ -405,7 +405,8 @@ public class WorkbenchThemeManager extends EventManager implements
 		}
 
 		protected void sendThemeRegistryRestyledEvent() {
-			IEventBroker eventBroker = getContext().get(IEventBroker.class);
+			IEventBroker eventBroker = (IEventBroker) getContext()
+					.get(IEventBroker.class.getName());
 			eventBroker.send(Events.THEME_REGISTRY_RESTYLED, null);
 		}
 
@@ -421,7 +422,8 @@ public class WorkbenchThemeManager extends EventManager implements
 			org.eclipse.e4.ui.css.swt.theme.ITheme theme = (org.eclipse.e4.ui.css.swt.theme.ITheme) event
 					.getProperty(IThemeEngine.Events.THEME);
 			if (theme == null) {
-				IThemeEngine themeEngine = getContext().get(IThemeEngine.class);
+				IThemeEngine themeEngine = (IThemeEngine) getContext().get(
+						IThemeEngine.class.getName());
 				theme = themeEngine != null ? themeEngine.getActiveTheme() : null;
 			}
 			return theme;
@@ -539,12 +541,13 @@ public class WorkbenchThemeManager extends EventManager implements
 		}
 
 		protected org.eclipse.e4.ui.css.swt.theme.ITheme getTheme() {
-			IThemeEngine themeEngine = getContext().get(IThemeEngine.class);
+			IThemeEngine themeEngine = (IThemeEngine) getContext()
+					.get(IThemeEngine.class.getName());
 			return themeEngine != null ? themeEngine.getActiveTheme() : null;
 		}
 
 		protected ThemeRegistry getThemeRegistry() {
-			return (ThemeRegistry) getContext().get(IThemeRegistry.class);
+			return (ThemeRegistry) getContext().get(IThemeRegistry.class.getName());
 		}
 
 		protected FontRegistry getFontRegistry() {
@@ -564,7 +567,8 @@ public class WorkbenchThemeManager extends EventManager implements
 		}
 
 		protected void sendThemeDefinitionChangedEvent() {
-			MApplication application = getContext().get(MApplication.class);
+			MApplication application = (MApplication) getContext()
+					.get(MApplication.class.getName());
 			getInstance().eventBroker.send(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED,
 					application);
 		}

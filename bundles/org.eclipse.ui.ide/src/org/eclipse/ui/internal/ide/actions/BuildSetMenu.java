@@ -63,7 +63,7 @@ public class BuildSetMenu extends ContributionItem {
      * @param index the index to add it at
      */
     private void addMnemonic(BuildSetAction action, int index) {
-        StringBuilder label = new StringBuilder();
+        StringBuffer label = new StringBuffer();
         //add the numerical accelerator
         if (index < 9) {
             label.append('&');

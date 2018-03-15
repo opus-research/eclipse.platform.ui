@@ -294,7 +294,7 @@ public class OpenWorkspaceAction extends Action implements
 			return null;
 		}
 
-		StringBuilder result = new StringBuilder(512);
+		StringBuffer result = new StringBuffer(512);
 		result.append(property);
 		result.append(NEW_LINE);
 
