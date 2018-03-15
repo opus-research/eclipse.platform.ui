@@ -403,7 +403,7 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 		Control area = super.createDialogArea(parent);
 		// Give the job info as the initial details
 		getProgressMonitor().setTaskName(
-				ProgressManager.getInstance().getJobInfo(this.job)
+				ProgressManager.getInstance().getOrCreateJobInfo(this.job)
 						.getDisplayString());
 		return area;
 	}

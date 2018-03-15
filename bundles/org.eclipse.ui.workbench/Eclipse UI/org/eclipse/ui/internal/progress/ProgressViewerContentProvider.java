@@ -13,13 +13,7 @@ package org.eclipse.ui.internal.progress;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.internal.progress.FinishedJobs.KeptJobsListener;
-import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
  * The ProgressViewerContentProvider is the content provider progress viewers.
@@ -63,48 +57,18 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 			@Override
 			public void finished(JobTreeElement jte) {
-				final JobTreeElement element = jte;
-				Job updateJob = new WorkbenchJob("Refresh finished") {//$NON-NLS-1$
-					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-						refresh(new Object[] { element });
-						return Status.OK_STATUS;
-					}
-
-					@Override
-					public boolean shouldSchedule() {
-						return !progressViewer.getControl().isDisposed();
-					}
-
-
-					@Override
-					public boolean shouldRun() {
-						return !progressViewer.getControl().isDisposed();
-					}
-				};
-				updateJob.setSystem(true);
-				updateJob.schedule();
-
+				if (!progressViewer.getControl().isDisposed()) {
+					refresh(new Object[] { jte });
+				}
 			}
 
 			@Override
 			public void removed(JobTreeElement jte) {
-				final JobTreeElement element = jte;
-				Job updateJob = new WorkbenchJob("Remove finished") {//$NON-NLS-1$
-					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-						if (element == null) {
-							refresh();
-						} else {
-							ProgressViewerContentProvider.this
-									.remove(new Object[] { element });
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				updateJob.setSystem(true);
-				updateJob.schedule();
-
+				if (jte == null) {
+					refresh();
+				} else {
+					ProgressViewerContentProvider.this.remove(new Object[] { jte });
+				}
 			}
 
 		};

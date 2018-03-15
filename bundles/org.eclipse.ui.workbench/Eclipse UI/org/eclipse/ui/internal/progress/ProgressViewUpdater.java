@@ -13,14 +13,7 @@ package org.eclipse.ui.internal.progress;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.util.PrefUtil;
-import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
  * The ProgressViewUpdater is the singleton that updates viewers.
@@ -31,24 +24,11 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
     private IProgressUpdateCollector[] collectors;
 
-    Job updateJob;
-
     UpdatesInfo currentInfo = new UpdatesInfo();
-
-    Object updateLock = new Object();
 
 	class MutableBoolean {
 		boolean value;
 	}
-
-	/*
-	 * True when update job is scheduled or running. This is used to limit the
-	 * update job to no more than once every 100 ms. See bug 258352 and 395645.
-	 */
-	MutableBoolean updateScheduled = new MutableBoolean();
-
-    boolean debug;
-
 
     /**
      * The UpdatesInfo is a private class for keeping track of the updates
@@ -61,8 +41,6 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
         Collection deletions = new HashSet();
 
         Collection refreshes = new HashSet();
-
-        boolean updateAll = false;
 
         private UpdatesInfo() {
             //Create a new instance of the info
@@ -102,7 +80,6 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
             additions.clear();
             deletions.clear();
             refreshes.clear();
-            updateAll = false;
         }
 
         void processForUpdate() {
@@ -184,12 +161,8 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
      * Create a new instance of the receiver.
      */
     private ProgressViewUpdater() {
-        createUpdateJob();
         collectors = new IProgressUpdateCollector[0];
         ProgressManager.getInstance().addListener(this);
-        debug =
-        	PrefUtil.getAPIPreferenceStore().
-        		getBoolean(IWorkbenchPreferenceConstants.SHOW_SYSTEM_JOBS);
     }
 
     /**
@@ -231,87 +204,36 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
      */
     void scheduleUpdate() {
         if (PlatformUI.isWorkbenchRunning()) {
-            // make sure we don't schedule too often
-			boolean scheduleUpdate = false;
-			synchronized (updateScheduled) {
-				if (!updateScheduled.value || updateJob.getState() == Job.NONE) {
-					updateScheduled.value = scheduleUpdate = true;
-				}
-        	}
-			if (scheduleUpdate)
-				updateJob.schedule(100);
-        }
-    }
-
-    /**
-     * Create the update job that handles the updatesInfo.
-     */
-    private void createUpdateJob() {
-        updateJob = new WorkbenchJob(ProgressMessages.ProgressContentProvider_UpdateProgressJob) {
-            @Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				synchronized (updateScheduled) {
-					// updates requested while we are running should cause it to
-					// be rescheduled
-					updateScheduled.value = false;
-				}
-				// Abort the job if there isn't anything
-				if (collectors.length == 0) {
-					return Status.CANCEL_STATUS;
-				}
-
-				if (currentInfo.updateAll) {
-					synchronized (updateLock) {
-						currentInfo.reset();
-					}
-					for (int i = 0; i < collectors.length; i++) {
-						collectors[i].refresh();
-					}
-
-				} else {
-					// Lock while getting local copies of the caches.
-					Object[] updateItems;
-					Object[] additionItems;
-					Object[] deletionItems;
-					synchronized (updateLock) {
-						currentInfo.processForUpdate();
-
-						updateItems = currentInfo.refreshes.toArray();
-						additionItems = currentInfo.additions.toArray();
-						deletionItems = currentInfo.deletions.toArray();
-
-						currentInfo.reset();
-					}
-
-					for (int v = 0; v < collectors.length; v++) {
-						IProgressUpdateCollector collector = collectors[v];
-
-						if (updateItems.length > 0) {
-							collector.refresh(updateItems);
-						}
-						if (additionItems.length > 0) {
-							collector.add(additionItems);
-						}
-						if (deletionItems.length > 0) {
-							collector.remove(deletionItems);
-						}
-					}
-				}
-
-				return Status.OK_STATUS;
+			// Abort the job if there isn't anything
+			if (collectors.length == 0) {
+				return;
 			}
 
-			@Override
-			protected void canceling() {
-				synchronized (updateScheduled) {
-					updateScheduled.value = false;
-				}
-            }
-        };
-        updateJob.setSystem(true);
-        updateJob.setPriority(Job.DECORATE);
-        updateJob.setProperty(ProgressManagerUtil.INFRASTRUCTURE_PROPERTY, new Object());
+			Object[] updateItems;
+			Object[] additionItems;
+			Object[] deletionItems;
+			currentInfo.processForUpdate();
 
+			updateItems = currentInfo.refreshes.toArray();
+			additionItems = currentInfo.additions.toArray();
+			deletionItems = currentInfo.deletions.toArray();
+
+			currentInfo.reset();
+
+			for (int v = 0; v < collectors.length; v++) {
+				IProgressUpdateCollector collector = collectors[v];
+
+				if (updateItems.length > 0) {
+					collector.refresh(updateItems);
+				}
+				if (additionItems.length > 0) {
+					collector.add(additionItems);
+				}
+				if (deletionItems.length > 0) {
+					collector.remove(deletionItems);
+				}
+			}
+		}
     }
 
     /**
@@ -329,17 +251,11 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
      */
     public void refresh(JobInfo info) {
 
-        if (isUpdateJob(info.getJob())) {
-			return;
-		}
-
-        synchronized (updateLock) {
             currentInfo.refresh(info);
             GroupInfo group = info.getGroupInfo();
             if (group != null) {
 				currentInfo.refresh(group);
 			}
-        }
         //Add in a 100ms delay so as to keep priority low
         scheduleUpdate();
 
@@ -348,13 +264,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
     @Override
 	public void refreshJobInfo(JobInfo info) {
 
-        if (isUpdateJob(info.getJob())) {
-			return;
-		}
-
-        synchronized (updateLock) {
             currentInfo.refresh(info);
-        }
         //Add in a 100ms delay so as to keep priority low
         scheduleUpdate();
 
@@ -362,9 +272,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
     @Override
 	public void refreshGroup(GroupInfo info) {
-        synchronized (updateLock) {
             currentInfo.refresh(info);
-        }
         //Add in a 100ms delay so as to keep priority low
         scheduleUpdate();
 
@@ -373,33 +281,29 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
     @Override
 	public void addGroup(GroupInfo info) {
 
-        synchronized (updateLock) {
             currentInfo.add(info);
-        }
         scheduleUpdate();
 
     }
 
     @Override
-	public void refreshAll() {
+	public void refreshAll(Collection<JobInfo> infos) {
+		if (PlatformUI.isWorkbenchRunning()) {
+			if (collectors.length == 0) {
+				return;
+			}
 
-        synchronized (updateLock) {
-            currentInfo.updateAll = true;
-        }
-
-        //Add in a 100ms delay so as to keep priority low
-        scheduleUpdate();
-
+			currentInfo.reset();
+			for (int i = 0; i < collectors.length; i++) {
+				collectors[i].refresh();
+			}
+		}
     }
 
     @Override
 	public void addJob(JobInfo info) {
 
-        if (isUpdateJob(info.getJob())) {
-			return;
-		}
 
-        synchronized (updateLock) {
             GroupInfo group = info.getGroupInfo();
 
             if (group == null) {
@@ -407,7 +311,6 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 			} else {
                 currentInfo.refresh(group);
             }
-        }
         scheduleUpdate();
 
     }
@@ -415,44 +318,20 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
     @Override
 	public void removeJob(JobInfo info) {
 
-        if (isUpdateJob(info.getJob())) {
-			return;
-		}
 
-        synchronized (updateLock) {
             GroupInfo group = info.getGroupInfo();
             if (group == null) {
 				currentInfo.remove(info);
 			} else {
                 currentInfo.refresh(group);
             }
-        }
         scheduleUpdate();
     }
 
     @Override
 	public void removeGroup(GroupInfo group) {
-        synchronized (updateLock) {
             currentInfo.remove(group);
-        }
         scheduleUpdate();
 
-    }
-
-    @Override
-	public boolean showsDebug() {
-        return debug;
-    }
-
-    /**
-     * Return whether or not this is the update job. This is used to determine
-     * if a final refresh is required.
-     *
-     * @param job
-     * @return boolean <code>true</true> if this is the
-     * update job
-     */
-    boolean isUpdateJob(Job job) {
-        return job.equals(updateJob);
     }
 }
