@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.internal.workbench.PartServiceImpl;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MGenericStack;
@@ -69,19 +68,8 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 				hideElementRecursive(oldSel);
 			}
 
-			MUIElement selectedElement = stack.getSelectedElement();
-			if (selectedElement != null) {
-				try {
-					if (oldSel != null) {
-						oldSel.getTransientData().put(PartServiceImpl.PERSP_DESELECTING, Boolean.TRUE);
-					}
-					lsr.showTab(selectedElement);
-				} finally {
-					if (oldSel != null) {
-						oldSel.getTransientData().remove(PartServiceImpl.PERSP_DESELECTING);
-					}
-				}
-			}
+			if (stack.getSelectedElement() != null)
+				lsr.showTab(stack.getSelectedElement());
 		}
 	};
 
