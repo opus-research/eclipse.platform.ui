@@ -31,12 +31,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.help.IContext;
 import org.eclipse.help.IContextProvider;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionManager;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.EditingSupport;
@@ -75,7 +71,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
@@ -155,9 +150,6 @@ public class ExtendedMarkersView extends ViewPart {
 	private UIUpdateJob uiUpdateJob;
 
 	private MarkersTreeViewer viewer;
-
-	private Action filterAction;
-
 
 	/**
 	 * Tells whether the tree has been painted.
@@ -346,27 +338,6 @@ public class ExtendedMarkersView extends ViewPart {
 	}
 
 	/**
-	 * Create the Filter action for the receiver.
-	 */
-	private void createFilterAction() {
-		filterAction = new Action(MarkerMessages.configureFiltersCommand_title) { // $NON-NLS-1$
-			@Override
-			public void run() {
-				openFiltersDialog();
-			}
-		};
-		filterAction.setToolTipText(MarkerMessages.configureFiltersCommand_title);// $NON-NLS-1$
-		ImageDescriptor id = IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/filter_ps.png"); //$NON-NLS-1$
-		if (id != null) {
-			filterAction.setImageDescriptor(id);
-		}
-		id = IDEWorkbenchPlugin.getIDEImageDescriptor("/dlcl16/filter_ps.png"); //$NON-NLS-1$
-		if (id != null) {
-			filterAction.setDisabledImageDescriptor(id);
-		}
-	}
-
-	/**
 	 *
 	 * @param markerField
 	 * @param preferredWidth
@@ -429,8 +400,6 @@ public class ExtendedMarkersView extends ViewPart {
 
 		initDragAndDrop();
 
-		initToolBar();
-
 		getSite().setSelectionProvider(viewer);
 
 		IUndoContext undoContext= getUndoContext();
@@ -440,7 +409,6 @@ public class ExtendedMarkersView extends ViewPart {
 		redoAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_REDO);
 		getViewSite().getActionBars().setGlobalActionHandler(ActionFactory.UNDO.getId(), undoAction);
 		getViewSite().getActionBars().setGlobalActionHandler(ActionFactory.REDO.getId(), redoAction);
-
 
 		startView();
 
@@ -1446,17 +1414,6 @@ public class ExtendedMarkersView extends ViewPart {
 		};
 
 		viewer.addDragSupport(operations, transferTypes, listener);
-	}
-
-	/**
-	 * Add additional actions to the tool bar.
-	 */
-	private void initToolBar() {
-		IActionBars bars = getViewSite().getActionBars();
-		IToolBarManager tm = bars.getToolBarManager();
-		createFilterAction();
-		tm.add(new Separator("filterGroup")); //$NON-NLS-1$
-		tm.add(filterAction);
 	}
 
 	/**
