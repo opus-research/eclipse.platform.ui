@@ -15,9 +15,12 @@ package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -32,6 +35,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.swt.widgets.Display;
 
 public class ToolBarContributionRecord {
 	public static final String FACTORY = "ToolBarContributionFactory"; //$NON-NLS-1$
@@ -46,6 +50,10 @@ public class ToolBarContributionRecord {
 	private IEclipseContext infoContext;
 	private Runnable factoryDispose;
 
+	private static final boolean ENABLED_OPTIMIZATION = Boolean.getBoolean("visibleWhenOpt"); //$NON-NLS-1$
+	private Map<IEclipseContext, Runnable> scheduledUpdate = new HashMap<>();
+	private static AtomicInteger VISIBILITY_COUNT = new AtomicInteger();
+
 	public ToolBarContributionRecord(MToolBar model,
 			MToolBarContribution contribution, ToolBarManagerRenderer renderer) {
 		this.toolbarModel = model;
@@ -57,10 +65,39 @@ public class ToolBarContributionRecord {
 		return renderer.getManager(toolbarModel);
 	}
 
+	public void updateVisibility(IEclipseContext context) {
+		if (ENABLED_OPTIMIZATION) {
+			synchronized (scheduledUpdate) {
+				if (!scheduledUpdate.containsKey(context)) {
+					Display current = Display.getCurrent();
+					if (current == null) {
+						_updateVisibility(context);
+					} else {
+						Runnable r = () -> {
+							try {
+								_updateVisibility(context);
+							} finally {
+								synchronized (scheduledUpdate) {
+									scheduledUpdate.remove(context);
+								}
+							}
+						};
+						scheduledUpdate.put(context, r);
+						current.asyncExec(r);
+					}
+				}
+			}
+
+		} else {
+			_updateVisibility(context);
+		}
+	}
+
 	/**
 	 * @param context
 	 */
-	public void updateVisibility(IEclipseContext context) {
+	public void _updateVisibility(IEclipseContext context) {
+		System.err.println("ToolBarContributionRecord#updateVisibility: " + VISIBILITY_COUNT.incrementAndGet()); //$NON-NLS-1$
 		ExpressionContext exprContext = new ExpressionContext(context);
 		updateIsVisible(exprContext);
 		HashSet<ToolBarContributionRecord> recentlyUpdated = new HashSet<>();
