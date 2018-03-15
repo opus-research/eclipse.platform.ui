@@ -12,7 +12,7 @@
  *     Brian de Alwis - Fix size computation to account for trim
  *     Markus Kuppe <bugs.eclipse.org@lemmster.de> - Bug 449485: [QuickAccess] "Widget is disposed" exception in errorlog during shutdown due to quickaccess.SearchField.storeDialog
  *     Elena Laskavaia <elaskavaia.cdt@gmail.com> - Bug 433746: [QuickAccess] SWTException on closing quick access shell
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278, 491291, 491312
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278, 491291, 491312, 491293, 436788
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
@@ -62,8 +62,6 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -199,6 +197,11 @@ public class SearchField {
 					txtQuickAccess.setText(""); //$NON-NLS-1$
 					element.execute();
 
+					// after execution, the search box might be disposed
+					if (txtQuickAccess.isDisposed()) {
+						return;
+					}
+
 					/*
 					 * By design, attempting to activate a part that is already
 					 * active does not change the focus. However in the case of
@@ -223,6 +226,7 @@ public class SearchField {
 		shell.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		shell.setText(QuickAccessMessages.QuickAccess_EnterSearch); // just for debugging, not shown anywhere
 		GridLayoutFactory.fillDefaults().applyTo(shell);
+		quickAccessContents.createHintText(shell, Window.getDefaultOrientation());
 		table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
 		txtQuickAccess.addMouseListener(new MouseAdapter() {
 			@Override
@@ -235,12 +239,7 @@ public class SearchField {
 			@Override
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close the shell
-				table.getDisplay().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						checkFocusLost(table, txtQuickAccess);
-					}
-				});
+				table.getDisplay().asyncExec(() -> checkFocusLost(table, txtQuickAccess));
 				activated = false;
 			}
 
@@ -259,20 +258,10 @@ public class SearchField {
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close
 				// the shell
-				table.getDisplay().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						checkFocusLost(table, txtQuickAccess);
-					}
-				});
+				table.getDisplay().asyncExec(() -> checkFocusLost(table, txtQuickAccess));
 			}
 		});
-		txtQuickAccess.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				showList();
-			}
-		});
+		txtQuickAccess.addModifyListener(e -> showList());
 		txtQuickAccess.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {

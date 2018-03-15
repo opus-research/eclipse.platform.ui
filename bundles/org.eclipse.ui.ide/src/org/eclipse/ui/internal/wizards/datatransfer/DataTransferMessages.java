@@ -176,12 +176,18 @@ public class DataTransferMessages extends NLS {
 	public static String SmartImportWizardPage_overwriteArchiveDirectory_message;
 	public static String SmartImportWizardPage_incompleteExpand_title;
 	public static String SmartImportWizardPage_incompleteExpand_message;
+	public static String SmartImportWizardPage_scanProjectsFailed;
+	public static String SmartImportWizardPage_selectAtLeastOneFolderToOpenAsProject;
+	public static String SmartImportWizardPage_showOtherSpecializedImportWizard;
 
 	public static String SmartImportJob_discardRootProject_title;
 	public static String SmartImportJob_discardRootProject_description;
 	public static String SmartImportProposals_selectionSummary;
 	public static String SmartImportProposals_folder;
 	public static String SmartImportProposals_importAs;
+	public static String SmartImportProposals_hideExistingProjects;
+	public static String SmartImportProposals_inspecitionCanceled;
+	public static String SmartImportProposals_errorWhileInspecting;
 
 	public static String SmartImportReport_importedProjects;
 	public static String SmartImportReport_importedProjectsWithCount;
@@ -198,8 +204,6 @@ public class DataTransferMessages extends NLS {
 	public static String SmartImportJob_continuingConfiguration;
 	public static String SmartImportJob_inspecting;
 	public static String SmartImportJob_importingProjectIntoWorkspace;
-
-
 
 	static {
 		// load message values from bundle file

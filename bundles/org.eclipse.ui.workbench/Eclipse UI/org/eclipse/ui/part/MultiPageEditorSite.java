@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,7 +45,6 @@ import org.eclipse.ui.internal.services.IServiceLocatorCreator;
 import org.eclipse.ui.internal.services.IWorkbenchLocationService;
 import org.eclipse.ui.internal.services.ServiceLocator;
 import org.eclipse.ui.internal.services.WorkbenchLocationService;
-import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.services.IServiceScopes;
 
 /**
@@ -129,16 +128,11 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 
 		PartSite site = (PartSite) multiPageEditor.getSite();
 
-		IServiceLocatorCreator slc = (IServiceLocatorCreator) site
+		IServiceLocatorCreator slc = site
 				.getService(IServiceLocatorCreator.class);
 		context = site.getModel().getContext().createChild("MultiPageEditorSite"); //$NON-NLS-1$
 		serviceLocator = (ServiceLocator) slc.createServiceLocator(
-				multiPageEditor.getSite(), null, new IDisposable(){
-					@Override
-					public void dispose() {
-						getMultiPageEditor().close();
-					}
-				}, context);
+				multiPageEditor.getSite(), null, () -> getMultiPageEditor().close(), context);
 
 		initializeDefaultServices();
 	}
@@ -153,12 +147,7 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 						getWorkbenchWindow(), getMultiPageEditor().getSite(),
 						this, null, 3));
 		serviceLocator.registerService(IMultiPageEditorSiteHolder.class,
-				new IMultiPageEditorSiteHolder() {
-					@Override
-					public MultiPageEditorSite getSite() {
-						return MultiPageEditorSite.this;
-					}
-				});
+				(IMultiPageEditorSiteHolder) () -> MultiPageEditorSite.this);
 
 		context.set(IContextService.class.getName(), new ContextFunction() {
 			@Override
@@ -272,7 +261,7 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 	}
 
 	@Override
-	public Object getAdapter(Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
 		return null;
 	}
 
@@ -379,12 +368,7 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 	 */
 	private ISelectionChangedListener getPostSelectionChangedListener() {
 		if (postSelectionChangedListener == null) {
-			postSelectionChangedListener = new ISelectionChangedListener() {
-				@Override
-				public void selectionChanged(SelectionChangedEvent event) {
-					MultiPageEditorSite.this.handlePostSelectionChanged(event);
-				}
-			};
+			postSelectionChangedListener = event -> MultiPageEditorSite.this.handlePostSelectionChanged(event);
 		}
 		return postSelectionChangedListener;
 	}
@@ -409,12 +393,7 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 	 */
 	private ISelectionChangedListener getSelectionChangedListener() {
 		if (selectionChangedListener == null) {
-			selectionChangedListener = new ISelectionChangedListener() {
-				@Override
-				public void selectionChanged(SelectionChangedEvent event) {
-					MultiPageEditorSite.this.handleSelectionChanged(event);
-				}
-			};
+			selectionChangedListener = event -> MultiPageEditorSite.this.handleSelectionChanged(event);
 		}
 		return selectionChangedListener;
 	}
@@ -432,8 +411,8 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 	}
 
 	@Override
-	public final Object getService(final Class key) {
-		Object service = serviceLocator.getService(key);
+	public final <T> T getService(final Class<T> key) {
+		T service = serviceLocator.getService(key);
 		if (active && service instanceof INestable) {
 			// services need to know that it is currently in an active state
 			((INestable) service).activate();

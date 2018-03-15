@@ -18,7 +18,7 @@
  * Lars Vogel <Lars.Vogel@vogella.com> - Bug 431862
  * Christian Georgi (SAP SE)           - bug 432480, bug 458811
  * Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
- * Patrik Suzzi <psuzzi@gmail.com> - Bug 485201
+ * Patrik Suzzi <psuzzi@gmail.com> - Bug 485201, 502050
  * Simon Scholz <simon.scholz@vogella.com> - Bug 486777
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
@@ -522,8 +522,12 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEWorkspacePreference_openReferencedProjects;
 	public static String IDEWorkspacePreference_closeUnrelatedProjectsToolTip;
 	public static String IDEWorkspacePreference_workspaceLocation;
+	public static String IDEWorkspacePreference_windowTitleGroupText;
 	public static String IDEWorkspacePreference_showLocationInWindowTitle;
 	public static String IDEWorkspacePreference_showLocationInWindowTitle_lockedByCommandLine;
+	public static String IDEWorkspacePreference_showLocationNameInWindowTitle;
+	public static String IDEWorkspacePreference_showPerspectiveNameInWindowTitle;
+	public static String IDEWorkspacePreference_showProductNameInWindowTitle;
 	public static String IDEWorkspacePreference_workspaceName;
 	public static String IDEWorkbenchPreference_workbenchSystemExplorer;
 
@@ -698,6 +702,14 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String LinkedResourceEditor_removeMessage;
 	public static String LinkedResourceEditor_removingMessage;
 
+	// --- Auto-save ---
+	public static String AutoSavePreferencPage_autoSaveButton;
+	public static String AutoSavePreferencPage_intervalMessage;
+	public static String AutoSavePreferencPage_errorMessage;
+	public static String AutoSavePreferencPage_resetMessage;
+	public static String AutoSavePreferencPage_noteLabel;
+	public static String AutoSavePreferencPage_noteMessage;
+
 	// ==============================================================================
 	// Editors
 	// ==============================================================================
@@ -770,6 +782,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ResourceSelectionDialog_showDerived;
 
 	public static String OpenResourceDialog_title;
+	public static String OpenResourceDialog_message;
 	public static String OpenResourceDialog_openWithButton_text;
 
 	public static String OpenResourceDialog_openWithMenu_label;
@@ -857,8 +870,6 @@ public class IDEWorkbenchMessages extends NLS {
 	// ==============================================================================
 	// Workbench
 	// ==============================================================================
-	public static String WorkbenchWindow_shellTitle;
-
 	public static String Internal_error;
 	public static String InternalError;
 	public static String InternalErrorNoArg;

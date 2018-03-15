@@ -74,7 +74,7 @@ import org.eclipse.ui.model.WorkbenchPartLabelProvider;
  */
 public class SaveablesList implements ISaveablesLifecycleListener {
 
-	private ListenerList listeners = new ListenerList();
+	private ListenerList<ISaveablesLifecycleListener> listeners = new ListenerList<>();
 
 	// event source (mostly ISaveablesSource) -> Set of Saveable
 	private Map<Object, Set<Saveable>> modelMap = new HashMap<>();
@@ -305,10 +305,8 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 * @param event
 	 */
 	private void fireModelLifecycleEvent(SaveablesLifecycleEvent event) {
-		Object[] listenerArray = listeners.getListeners();
-		for (int i = 0; i < listenerArray.length; i++) {
-			((ISaveablesLifecycleListener) listenerArray[i])
-					.handleLifecycleEvent(event);
+		for (ISaveablesLifecycleListener listener : listeners) {
+			listener.handleLifecycleEvent(event);
 		}
 	}
 
@@ -651,26 +649,23 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 */
 	public boolean saveModels(final List<Saveable> finalModels, final IShellProvider shellProvider,
 			IRunnableContext runnableContext, final boolean blockUntilSaved) {
-		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
-			@Override
-			public void run(IProgressMonitor monitor) {
-				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
-				SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Saving_Modifications,
-						finalModels.size());
-				for (Saveable model : finalModels) {
-					// handle case where this model got saved as a result of
-					// saving another
-					if (!model.isDirty()) {
-						subMonitor.worked(1);
-						continue;
-					}
-					SaveableHelper.doSaveModel(model, subMonitor.split(1),
-							shellProvider, blockUntilSaved);
-					if (subMonitor.isCanceled())
-						break;
+		IRunnableWithProgress progressOp = monitor -> {
+			IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
+			SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Saving_Modifications,
+					finalModels.size());
+			for (Saveable model : finalModels) {
+				// handle case where this model got saved as a result of
+				// saving another
+				if (!model.isDirty()) {
+					subMonitor.worked(1);
+					continue;
 				}
-				monitorWrap.done();
+				SaveableHelper.doSaveModel(model, subMonitor.split(1),
+						shellProvider, blockUntilSaved);
+				if (subMonitor.isCanceled())
+					break;
 			}
+			monitorWrap.done();
 		};
 
 		// Do the save.

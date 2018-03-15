@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.eclipse.core.databinding.observable.ISideEffect;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.runtime.Assert;
 
@@ -64,6 +63,8 @@ public final class CompositeSideEffect implements ISideEffect {
 	 */
 	private List<Consumer<ISideEffect>> disposeListeners;
 
+	private Consumer<ISideEffect> removalConsumer = this::remove;
+
 	/**
 	 * Default constructor of an CompositeSideEffect.
 	 */
@@ -82,6 +83,7 @@ public final class CompositeSideEffect implements ISideEffect {
 		if (isDisposed) {
 			return;
 		}
+		sideEffects.forEach(s -> s.removeDisposeListener(removalConsumer));
 		sideEffects.forEach(s -> s.dispose());
 		sideEffects.clear();
 		isDisposed = true;
@@ -170,7 +172,7 @@ public final class CompositeSideEffect implements ISideEffect {
 			if (pauseDepth > 0) {
 				sideEffect.pause();
 			}
-			sideEffect.addDisposeListener(this::remove);
+			sideEffect.addDisposeListener(removalConsumer);
 		}
 	}
 
@@ -188,7 +190,7 @@ public final class CompositeSideEffect implements ISideEffect {
 			if (pauseDepth > 0) {
 				sideEffect.resume();
 			}
-			sideEffect.removeDisposeListener(this::remove);
+			sideEffect.removeDisposeListener(removalConsumer);
 		}
 	}
 }
