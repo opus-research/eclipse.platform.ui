@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.Status;
  * @since 1.0
  *
  */
-public class ValueBinding extends Binding {
+class ValueBinding extends Binding {
 	private final UpdateValueStrategy targetToModel;
 	private final UpdateValueStrategy modelToTarget;
 	private WritableValue validationStatusObservable;
@@ -72,6 +72,16 @@ public class ValueBinding extends Binding {
 		this.model = modelObservableValue;
 		this.targetToModel = targetToModel;
 		this.modelToTarget = modelToTarget;
+		if ((targetToModel.getUpdatePolicy() & (UpdateValueStrategy.POLICY_CONVERT | UpdateValueStrategy.POLICY_UPDATE)) != 0) {
+			target.addValueChangeListener(targetChangeListener);
+		} else {
+			targetChangeListener = null;
+		}
+		if ((modelToTarget.getUpdatePolicy() & (UpdateValueStrategy.POLICY_CONVERT | UpdateValueStrategy.POLICY_UPDATE)) != 0) {
+			model.addValueChangeListener(modelChangeListener);
+		} else {
+			modelChangeListener = null;
+		}
 	}
 
 	@Override
@@ -88,27 +98,13 @@ public class ValueBinding extends Binding {
 	@Override
 	protected void postInit() {
 		if (modelToTarget.getUpdatePolicy() == UpdateValueStrategy.POLICY_UPDATE) {
-			model.addValueChangeListener(modelChangeListener);
 			updateModelToTarget();
 		} else if (modelToTarget.getUpdatePolicy() == UpdateValueStrategy.POLICY_CONVERT) {
-			model.addValueChangeListener(modelChangeListener);
 			validateModelToTarget();
-		} else {
-			modelChangeListener = null;
 		}
-
-		if (targetToModel.getUpdatePolicy() == UpdateValueStrategy.POLICY_UPDATE) {
-			target.addValueChangeListener(targetChangeListener);
-			if (modelToTarget.getUpdatePolicy() == UpdateValueStrategy.POLICY_NEVER) {
-				updateTargetToModel();
-			} else {
-				validateTargetToModel();
-			}
-		} else if (targetToModel.getUpdatePolicy() == UpdateValueStrategy.POLICY_CONVERT) {
-			target.addValueChangeListener(targetChangeListener);
+		if (targetToModel.getUpdatePolicy() == UpdateValueStrategy.POLICY_UPDATE
+				|| targetToModel.getUpdatePolicy() == UpdateValueStrategy.POLICY_CONVERT) {
 			validateTargetToModel();
-		} else {
-			targetChangeListener = null;
 		}
 	}
 
