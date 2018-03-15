@@ -16,6 +16,7 @@ package org.eclipse.ui.internal.dialogs;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
@@ -174,7 +175,7 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 
 	IWorkingCopyManager workingCopyManager;
 
-	private Collection<Job> updateJobs = new ArrayList<>();
+	private Collection updateJobs = new ArrayList();
 
 	/**
 	 * The preference page history.
@@ -487,7 +488,10 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		}
 
 		// Run the update jobs
-		updateJobs.forEach(Job::schedule);
+		Iterator updateIterator = updateJobs.iterator();
+		while (updateIterator.hasNext()) {
+			((Job) updateIterator.next()).schedule();
+		}
 	}
 
 	@Override

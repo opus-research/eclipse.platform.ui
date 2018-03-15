@@ -17,7 +17,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.dialogs.WorkbenchPreferenceDialog;
-import org.eclipse.ui.internal.preferences.WorkbenchPreferenceExtensionNode;
 
 /**
  * @since 3.3
@@ -30,8 +29,6 @@ public class PreferenceElement extends QuickAccessElement {
 	private IPreferenceNode preferenceNode;
 
 	private String prefix;
-
-	private String sortLabelCache;
 
 	/* package */PreferenceElement(IPreferenceNode preferenceNode, String prefix, PreferenceProvider preferenceProvider) {
 		super(preferenceProvider);
@@ -72,22 +69,6 @@ public class PreferenceElement extends QuickAccessElement {
 					+ prefix;
 		}
 		return preferenceNode.getLabelText();
-	}
-
-	@Override
-	public String getSortLabel() {
-		if (this.sortLabelCache == null) {
-			StringBuilder builder = new StringBuilder();
-			builder.append(super.getSortLabel());
-			if (preferenceNode instanceof WorkbenchPreferenceExtensionNode) {
-				((WorkbenchPreferenceExtensionNode) preferenceNode).getKeywordLabels().forEach(label -> {
-					builder.append(separator);
-					builder.append(label);
-				});
-			}
-			this.sortLabelCache = builder.toString();
-		}
-		return this.sortLabelCache;
 	}
 
 	@Override
