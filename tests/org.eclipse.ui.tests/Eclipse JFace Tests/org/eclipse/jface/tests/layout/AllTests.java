@@ -27,5 +27,6 @@ public class AllTests extends TestSuite {
 		addTestSuite(GeometryTest.class);
 		addTestSuite(AbstractColumnLayoutTest.class);
 		addTestSuite(TreeColumnLayoutTest.class);
+		addTestSuite(GridDataFactoryTest.class);
 	}
 }
