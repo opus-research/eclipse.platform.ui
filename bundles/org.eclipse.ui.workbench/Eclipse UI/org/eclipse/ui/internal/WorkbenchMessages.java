@@ -16,6 +16,7 @@
  * Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
  * Patrik Suzzi <psuzzi@gmail.com> - Bug 491785, 368977, 501811, 511198
  * Kaloyan Raev <kaloyan.r@zend.com> - Bug 322002
+ * Lucas Bullen <lbullen@redhat.com> - Bug 500051
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -452,6 +453,11 @@ public class WorkbenchMessages extends NLS {
 	public static String PreferenceNode_errorMessage;
     public static String PreferenceNode_NotFound;
 	public static String Preference_note;
+
+	// --- Import/Export ---
+	public static String ImportExportPreferences_title;
+	public static String ImportExportPreferences_import;
+	public static String ImportExportPreferences_export;
 
 	// --- Workbench ---
 	public static String WorkbenchPreference_showMultipleEditorTabsButton;
