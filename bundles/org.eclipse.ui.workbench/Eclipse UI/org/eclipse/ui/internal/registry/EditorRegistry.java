@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -242,23 +243,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 			if (contentTypeId != null && contentTypeId.length() > 0) {
 				IContentType contentType = Platform.getContentTypeManager().getContentType(contentTypeId);
 				if (contentType != null) {
-					IEditorDescriptor [] editorArray = contentTypeToEditorMappings.get(contentType);
-					if (editorArray == null) {
-						editorArray = new IEditorDescriptor[] {editor};
-						contentTypeToEditorMappings.put(contentType, editorArray);
-					}
-					else {
-						IEditorDescriptor [] newArray = new IEditorDescriptor[editorArray.length + 1];
-						if (bDefault) { // default editors go to the front of the line
-							newArray[0] = editor;
-							System.arraycopy(editorArray, 0, newArray, 1, editorArray.length);
-						}
-						else {
-							newArray[editorArray.length] = editor;
-							System.arraycopy(editorArray, 0, newArray, 0, editorArray.length);
-						}
-						contentTypeToEditorMappings.put(contentType, newArray);
-					}
+					addContentTypeBinding(contentType, editor, bDefault);
 				}
 			}
 		}
@@ -266,6 +251,26 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
         // Update editor map.
         mapIDtoEditor.put(editor.getId(), editor);
     }
+
+	void addContentTypeBinding(IContentType contentType, IEditorDescriptor editor, boolean bDefault) {
+		IEditorDescriptor [] editorArray = contentTypeToEditorMappings.get(contentType);
+		if (editorArray == null) {
+			editorArray = new IEditorDescriptor[] {editor};
+			contentTypeToEditorMappings.put(contentType, editorArray);
+		}
+		else {
+			IEditorDescriptor [] newArray = new IEditorDescriptor[editorArray.length + 1];
+			if (bDefault) { // default editors go to the front of the line
+				newArray[0] = editor;
+				System.arraycopy(editorArray, 0, newArray, 1, editorArray.length);
+			}
+			else {
+				newArray[editorArray.length] = editor;
+				System.arraycopy(editorArray, 0, newArray, 0, editorArray.length);
+			}
+			contentTypeToEditorMappings.put(contentType, newArray);
+		}
+	}
 
     /**
      * Add external editors to the editor mapping.
@@ -639,7 +644,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
                         .append(IWorkbenchConstants.EDITOR_FILE_NAME)
                         .toOSString());
                 reader = new BufferedReader(new InputStreamReader(stream,
-                        "utf-8")); //$NON-NLS-1$
+						StandardCharsets.UTF_8));
             } else {
                 reader = new StringReader(xmlString);
             }
@@ -816,22 +821,20 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 				}
 			}
             else { // guess at pre 3.1 format defaults
-            		if (!editors.isEmpty()) {
+				if (!editors.isEmpty()) {
 					IEditorDescriptor editor = editors.get(0);
-            			if (editor != null) {
-                			defaultEditors.add(editor);
-                		}
-            		}
-            		defaultEditors.addAll(Arrays.asList(mapping.getDeclaredDefaultEditors()));
+					defaultEditors.add(editor);
+				}
+				defaultEditors.addAll(Arrays.asList(mapping.getDeclaredDefaultEditors()));
             }
 
             // Add any new editors that have already been read from the registry
             // which were not deleted.
             IEditorDescriptor[] editorsArray = mapping.getEditors();
             for (int j = 0; j < editorsArray.length; j++) {
-                if (!contains(editors, editorsArray[j])
-                        && !deletedEditors.contains(editorsArray[j])) {
-                    editors.add(editorsArray[j]);
+				IEditorDescriptor descriptor = editorsArray[j];
+				if (descriptor != null && !contains(editors, descriptor) && !deletedEditors.contains(descriptor)) {
+					editors.add(descriptor);
                 }
             }
             // Map the editor(s) to the file type
@@ -887,7 +890,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
                         .append(IWorkbenchConstants.RESOURCE_TYPE_FILE_NAME)
                         .toOSString());
                 reader = new BufferedReader(new InputStreamReader(stream,
-                        "utf-8")); //$NON-NLS-1$
+						StandardCharsets.UTF_8));
             } else {
                 reader = new StringReader(xmlString);
             }

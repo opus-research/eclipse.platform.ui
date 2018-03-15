@@ -43,6 +43,7 @@ public class SplitFeedbackOverlay {
 
 		feedbackShell = new Shell(dragShell, SWT.NO_TRIM | SWT.ON_TOP);
 		feedbackShell.setBounds(dragShell.getBounds());
+		feedbackShell.setData(DragAndDropUtil.IGNORE_AS_DROP_TARGET, DragAndDropUtil.IGNORE_AS_DROP_TARGET);
 
 		MWindow winModel = (MWindow) dragShell.getData(AbstractPartRenderer.OWNING_ME);
 		stylingEngine = winModel.getContext().get(IStylingEngine.class);
@@ -56,16 +57,18 @@ public class SplitFeedbackOverlay {
 	public void dispose() {
 		if (feedbackShell != null && !feedbackShell.isDisposed()) {
 			Region region = feedbackShell.getRegion();
-			if (region != null && !region.isDisposed())
+			if (region != null && !region.isDisposed()) {
 				region.dispose();
+			}
 			feedbackShell.dispose();
 		}
 		feedbackShell = null;
 	}
 
 	private void showRects(boolean enclosed) {
-		if (curSide == 0)
+		if (curSide == 0) {
 			return;
+		}
 
 		Rectangle ca = new Rectangle(outerRect.x, outerRect.y, outerRect.width, outerRect.height);
 		rects.clear();
@@ -120,8 +123,9 @@ public class SplitFeedbackOverlay {
 			rgn.add(bounds.width - 1, bounds.height - 1, 1, 1);
 		}
 
-		if (feedbackShell.getRegion() != null && !feedbackShell.getRegion().isDisposed())
+		if (feedbackShell.getRegion() != null && !feedbackShell.getRegion().isDisposed()) {
 			feedbackShell.getRegion().dispose();
+		}
 		feedbackShell.setRegion(rgn);
 
 		feedbackShell.redraw();
@@ -135,8 +139,9 @@ public class SplitFeedbackOverlay {
 	}
 
 	public void setFeedback(boolean enclosed, boolean modified) {
-		if (isModified == null)
+		if (isModified == null) {
 			isModified = !modified;
+		}
 
 		// Update the feedback color if the drag is 'modified'
 		if (modified != isModified) {
