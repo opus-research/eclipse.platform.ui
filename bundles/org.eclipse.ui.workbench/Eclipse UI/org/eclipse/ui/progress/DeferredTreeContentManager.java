@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,7 +51,7 @@ public class DeferredTreeContentManager {
 
 	IWorkbenchSiteProgressService progressService;
 
-	private ListenerList<IJobChangeListener> updateCompleteListenerList;
+	private ListenerList updateCompleteListenerList;
 
 	/**
 	 * The DeferredContentFamily is a class used to keep track of a
@@ -385,8 +385,10 @@ public class DeferredTreeContentManager {
 		clearJob.setSystem(true);
 
 		if (updateCompleteListenerList != null) {
-			for (IJobChangeListener listener : updateCompleteListenerList) {
-				clearJob.addJobChangeListener(listener);
+			Object[] listeners = updateCompleteListenerList.getListeners();
+			for (int i = 0; i < listeners.length; i++) {
+				clearJob
+						.addJobChangeListener((IJobChangeListener) listeners[i]);
 			}
 		}
 		clearJob.schedule();
@@ -464,7 +466,7 @@ public class DeferredTreeContentManager {
 			}
 		} else {
 			if (updateCompleteListenerList == null) {
-				updateCompleteListenerList = new ListenerList<>();
+				updateCompleteListenerList = new ListenerList();
 			}
 			updateCompleteListenerList.add(listener);
 		}
