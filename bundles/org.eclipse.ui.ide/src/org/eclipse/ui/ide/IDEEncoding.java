@@ -126,7 +126,7 @@ public final class IDEEncoding {
 	private static void writeEncodingsPreference(String value, Collection encodings) {
 		boolean addValue = (value != null);
 
-		StringBuilder result = new StringBuilder();
+		StringBuffer result = new StringBuffer();
 
 		Iterator currentEncodings = encodings.iterator();
 
@@ -163,10 +163,12 @@ public final class IDEEncoding {
 			return new ArrayList();
 		}
 
+		String[] preferenceEncodings = encodings.split(PREFERENCE_SEPARATOR);
 		ArrayList result = new ArrayList();
 
 		//Drop any encodings that are not valid
-		for (String string : encodings.split(PREFERENCE_SEPARATOR)) {
+		for (int i = 0; i < preferenceEncodings.length; i++) {
+			String string = preferenceEncodings[i];
 			boolean isSupported;
 			try {
 				isSupported = Charset.isSupported(string);

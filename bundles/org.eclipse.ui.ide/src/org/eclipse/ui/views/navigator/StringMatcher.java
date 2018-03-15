@@ -285,7 +285,7 @@ import java.util.Vector;
         Vector temp = new Vector();
 
         int pos = 0;
-        StringBuilder buf = new StringBuilder();
+        StringBuffer buf = new StringBuffer();
         while (pos < fLength) {
             char c = fPattern.charAt(pos++);
             switch (c) {

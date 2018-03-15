@@ -28,13 +28,12 @@ import org.eclipse.swt.widgets.Layout;
  */
 public class TrimPaneLayout extends Layout {
 	private static int BORDER_WIDTH = 4;
-	private static final Rectangle EMPTY_RECT = new Rectangle(0, 0, 0, 0);
 	private int fixedCorner;
 
-	public Rectangle hSizingRect = EMPTY_RECT;
-	public Rectangle vSizingRect = EMPTY_RECT;
-	public Rectangle cornerRect = EMPTY_RECT;
-	private Rectangle clientRect = EMPTY_RECT;
+	public Rectangle hSizingRect;
+	public Rectangle vSizingRect;
+	public Rectangle cornerRect;
+	private Rectangle clientRect;
 	private boolean resizeInstalled = false;
 
 	private static int NOT_SIZING = 0;
@@ -60,13 +59,11 @@ public class TrimPaneLayout extends Layout {
 	protected void layout(Composite composite, boolean flushCache) {
 		installResize(composite);
 
-		if (composite.getChildren().length != 1) {
+		if (composite.getChildren().length != 1)
 			return;
-		}
 
-		if (fixedCorner == SWT.NONE) {
+		if (fixedCorner == SWT.NONE)
 			return;
-		}
 
 		Rectangle bounds = composite.getBounds();
 
@@ -113,9 +110,8 @@ public class TrimPaneLayout extends Layout {
 	}
 
 	private void installResize(final Composite composite) {
-		if (resizeInstalled) {
+		if (resizeInstalled)
 			return;
-		}
 
 		composite.addMouseMoveListener(new MouseMoveListener() {
 			@Override
@@ -201,17 +197,15 @@ public class TrimPaneLayout extends Layout {
 			composite.setCursor(composite.getDisplay().getSystemCursor(SWT.CURSOR_SIZENS));
 		} else if (cornerRect.contains(p)) {
 			if (isFixed(SWT.TOP)) {
-				if (isFixed(SWT.RIGHT)) {
+				if (isFixed(SWT.RIGHT))
 					composite.setCursor(composite.getDisplay().getSystemCursor(SWT.CURSOR_SIZESW));
-				} else {
+				else
 					composite.setCursor(composite.getDisplay().getSystemCursor(SWT.CURSOR_SIZESE));
-				}
 			} else if (isFixed(SWT.BOTTOM)) {
-				if (isFixed(SWT.RIGHT)) {
+				if (isFixed(SWT.RIGHT))
 					composite.setCursor(composite.getDisplay().getSystemCursor(SWT.CURSOR_SIZESE));
-				} else {
+				else
 					composite.setCursor(composite.getDisplay().getSystemCursor(SWT.CURSOR_SIZESW));
-				}
 			}
 		} else {
 			composite.setCursor(null);

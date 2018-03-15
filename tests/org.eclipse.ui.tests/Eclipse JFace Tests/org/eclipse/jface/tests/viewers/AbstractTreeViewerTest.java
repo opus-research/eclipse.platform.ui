@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Widget;
@@ -37,10 +38,12 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
 
 	@Override
 	protected void assertSelectionEquals(String message, TestElement expected) {
-		IStructuredSelection selection = fViewer.getStructuredSelection();
-		List<TestElement> expectedList = new ArrayList<>();
-		expectedList.add(expected);
-		assertEquals("selectionEquals - " + message, expectedList, selection.toList());
+	    ISelection selection = fViewer.getSelection();
+	    assertTrue(selection instanceof IStructuredSelection);
+	    List expectedList = new ArrayList();
+	    expectedList.add(expected);
+	    IStructuredSelection structuredSelection = (IStructuredSelection)selection;
+	    assertEquals("selectionEquals - " + message, expectedList, (structuredSelection).toList());
 	}
 
     protected abstract int getItemCount(TestElement element); //was IElement
@@ -120,7 +123,6 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
         TestElement first2 = first.getFirstChild();
         TestElement first3 = first2.getFirstChild();
         fTreeViewer.expandToLevel(3);
-        processEvents();
         assertNotNull("first2 is visible", fViewer.testFindItem(first2));
         assertNotNull("first3 is visible", fViewer.testFindItem(first3));
     }
@@ -178,10 +180,7 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
         // allow there to be an empty expanded tree item, even if you do a
         // setExpanded(true)).
         // This behaviour makes it impossible to do this regression test.
-		// See bug 40797 for more details. Because GTK 3 takes longer to
-		// process, a wait statement is needed so that the assert will be done
-		// correctly without failing.
-        waitForJobs(300, 1000);
+        // See bug 40797 for more details.
         processEvents();
         if (((AbstractTreeViewer) fViewer).getExpandedState(parent)) {
             assertNotNull("new child is visible", fViewer.testFindItem(child));

@@ -151,7 +151,7 @@ public class ObservableValueEditingSupportTest extends AbstractSWTTestCase {
 
 	private static class ObservableValueEditingSupportStub extends
 			ObservableValueEditingSupport {
-		StringBuilder events = new StringBuilder();
+		StringBuffer events = new StringBuffer();
 
 		Text text;
 

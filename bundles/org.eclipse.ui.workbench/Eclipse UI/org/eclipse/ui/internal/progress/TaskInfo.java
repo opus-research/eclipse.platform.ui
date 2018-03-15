@@ -19,11 +19,12 @@ import org.eclipse.osgi.util.NLS;
  * deleted.
  */
 public class TaskInfo extends SubTaskInfo {
-	double preWork;
-	int totalWork;
+	double preWork = 0;
+
+	int totalWork = 0;
 
 	/**
-	 * Creates a new instance of the receiver with the supplied total work and
+	 * Create a new instance of the receiver with the supplied total work and
 	 * task name.
 	 *
 	 * @param parentJobInfo
@@ -36,20 +37,22 @@ public class TaskInfo extends SubTaskInfo {
 	}
 
 	/**
-	 * Adds the work increment to the total.
+	 * Add the work increment to the total.
 	 *
 	 * @param workIncrement
 	 */
 	void addWork(double workIncrement) {
+
 		// Don't bother if we are indeterminate
 		if (totalWork == IProgressMonitor.UNKNOWN) {
 			return;
 		}
 		preWork += workIncrement;
+
 	}
 
 	/**
-	 * Adds the amount of work to the receiver. Update a parent monitor by the
+	 * Add the amount of work to the recevier. Update a parent monitor by the
 	 * increment scaled to the amount of ticks this represents.
 	 *
 	 * @param workIncrement
@@ -59,8 +62,9 @@ public class TaskInfo extends SubTaskInfo {
 	 * @param parentTicks
 	 *            the number of ticks this monitor represents
 	 */
-	void addWork(double workIncrement, IProgressMonitor parentMonitor, int parentTicks) {
-		// Don't bother if we are indeterminate.
+	void addWork(double workIncrement, IProgressMonitor parentMonitor,
+			int parentTicks) {
+		// Don't bother if we are indeterminate
 		if (totalWork == IProgressMonitor.UNKNOWN) {
 			return;
 		}
@@ -71,6 +75,7 @@ public class TaskInfo extends SubTaskInfo {
 
 	@Override
 	String getDisplayString(boolean showProgress) {
+
 		if (totalWork == IProgressMonitor.UNKNOWN) {
 			return unknownProgress();
 		}
@@ -85,17 +90,20 @@ public class TaskInfo extends SubTaskInfo {
 			messageValues[1] = jobInfo.getJob().getName();
 			messageValues[2] = taskName;
 
-			return NLS.bind(ProgressMessages.JobInfo_DoneMessage, messageValues);
+			return NLS
+					.bind(ProgressMessages.JobInfo_DoneMessage, messageValues);
 		}
 		String[] messageValues = new String[2];
 		messageValues[0] = jobInfo.getJob().getName();
 		messageValues[1] = taskName;
 
-		return NLS.bind(ProgressMessages.JobInfo_DoneNoProgressMessage, messageValues);
+		return NLS.bind(ProgressMessages.JobInfo_DoneNoProgressMessage,
+				messageValues);
+
 	}
 
 	/**
-	 * Returns the display String without the task name.
+	 * Get the display String without the task name.
 	 *
 	 * @param showProgress
 	 *            Whether or not we are showing progress
@@ -103,16 +111,17 @@ public class TaskInfo extends SubTaskInfo {
 	 * @return String
 	 */
 	String getDisplayStringWithoutTask(boolean showProgress) {
+
 		if (!showProgress || totalWork == IProgressMonitor.UNKNOWN) {
 			return jobInfo.getJob().getName();
 		}
 
-		return NLS.bind(ProgressMessages.JobInfo_NoTaskNameDoneMessage, jobInfo.getJob().getName(),
-				String.valueOf(getPercentDone()));
+		return NLS.bind(ProgressMessages.JobInfo_NoTaskNameDoneMessage, jobInfo
+				.getJob().getName(), String.valueOf(getPercentDone()));
 	}
 
 	/**
-	 * Returns an integer representing the amount of work completed. If progress
+	 * Return an integer representing the amount of work completed. If progress
 	 * is indeterminate return IProgressMonitor.UNKNOWN.
 	 *
 	 * @return int IProgressMonitor.UNKNOWN or a value between 0 and 100.
@@ -126,7 +135,7 @@ public class TaskInfo extends SubTaskInfo {
 	}
 
 	/**
-	 * Returns the progress for a monitor whose totalWork is
+	 * Return the progress for a monitor whose totalWork is
 	 * <code>IProgressMonitor.UNKNOWN</code>.
 	 *
 	 * @return String
@@ -138,6 +147,8 @@ public class TaskInfo extends SubTaskInfo {
 		String[] messageValues = new String[2];
 		messageValues[0] = jobInfo.getJob().getName();
 		messageValues[1] = taskName;
-		return NLS.bind(ProgressMessages.JobInfo_UnknownProgress, messageValues);
+		return NLS
+				.bind(ProgressMessages.JobInfo_UnknownProgress, messageValues);
+
 	}
 }

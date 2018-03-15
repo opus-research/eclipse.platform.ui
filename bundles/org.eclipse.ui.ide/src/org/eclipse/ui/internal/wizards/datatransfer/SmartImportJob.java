@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2017 Red Hat Inc., and others
+ * Copyright (c) 2014-2016 Red Hat Inc., and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -105,27 +105,16 @@ public class SmartImportJob extends Job {
 		super(rootDirectory.getAbsolutePath());
 		this.workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		this.rootDirectory = rootDirectory;
-		setWorkingSets(workingSets);
-		this.configureProjects = configureProjects;
-		this.deepChildrenDetection = recuriveChildrenDetection;
-		this.report = Collections.synchronizedMap(new HashMap<IProject, List<ProjectConfigurator>>());
-		this.errors = Collections.synchronizedMap(new HashMap<IPath, Exception>());
-		this.crawlerJobGroup = new JobGroup(DataTransferMessages.SmartImportJob_detectAndConfigureProjects, 0, 1);
-	}
-
-	/**
-	 * Sets the working sets to assign to newly imported projects.
-	 *
-	 * @param workingSets
-	 *            to assign to newly imported projects.
-	 * @since 3.13
-	 */
-	public void setWorkingSets(Set<IWorkingSet> workingSets) {
 		if (workingSets != null) {
 			this.workingSets = workingSets.toArray(new IWorkingSet[workingSets.size()]);
 		} else {
 			this.workingSets = new IWorkingSet[0];
 		}
+		this.configureProjects = configureProjects;
+		this.deepChildrenDetection = recuriveChildrenDetection;
+		this.report = Collections.synchronizedMap(new HashMap<IProject, List<ProjectConfigurator>>());
+		this.errors = Collections.synchronizedMap(new HashMap<IPath, Exception>());
+		this.crawlerJobGroup = new JobGroup(DataTransferMessages.SmartImportJob_detectAndConfigureProjects, 0, 1);
 	}
 
 	/**
@@ -328,15 +317,10 @@ public class SmartImportJob extends Job {
 		}
 	}
 
-	private Set<IProject> searchAndImportChildrenProjectsRecursively(final IContainer parentContainer,
-			Set<IPath> directoriesToExclude, final IProgressMonitor progressMonitor) throws Exception {
+	private Set<IProject> searchAndImportChildrenProjectsRecursively(IContainer parentContainer, Set<IPath> directoriesToExclude, final IProgressMonitor progressMonitor) throws Exception {
 		SubMonitor subMonitor = SubMonitor.convert(progressMonitor, parentContainer.members().length);
-		IPath parentLocation = parentContainer.getLocation();
-		if (parentLocation == null) {
-			return Collections.emptySet();
-		}
 		for (IProject processedProjects : Collections.synchronizedSet(this.report.keySet())) {
-			if (parentLocation.equals(processedProjects.getLocation())) {
+			if (processedProjects.getLocation().equals(parentContainer.getLocation())) {
 				return Collections.emptySet();
 			}
 		}
@@ -345,14 +329,10 @@ public class SmartImportJob extends Job {
 		final Set<IProject> res = Collections.synchronizedSet(new HashSet<IProject>());
 		for (IResource childResource : parentContainer.members()) {
 			if (childResource.getType() == IResource.FOLDER && !childResource.isDerived()) {
-				IPath location = childResource.getLocation();
-				if (location == null) {
-					continue;
-				}
 				boolean excluded = false;
 				if (directoriesToExclude != null) {
 					for (IPath excludedPath : directoriesToExclude) {
-						if (!excludedPath.isPrefixOf(parentLocation) && excludedPath.isPrefixOf(location)) {
+						if (!excludedPath.isPrefixOf(parentContainer.getLocation()) && excludedPath.isPrefixOf(childResource.getLocation())) {
 							excluded = true;
 						}
 					}
@@ -366,8 +346,7 @@ public class SmartImportJob extends Job {
 		Set<CrawlFolderJob> jobs = new HashSet<>();
 		for (final IFolder childFolder : childrenToProcess) {
 			CrawlFolderJob crawlerJob = new CrawlFolderJob(
-					NLS.bind(DataTransferMessages.SmartImportJob_crawling,
-							SmartImportWizard.toAbsolutePath(childFolder)),
+					NLS.bind(DataTransferMessages.SmartImportJob_crawling, childFolder.getLocation().toString()),
 					childFolder, res);
 			if (crawlerJobGroup.getMaxThreads() == 0 || crawlerJobGroup.getActiveJobs().size() < crawlerJobGroup.getMaxThreads()) {
 				crawlerJob.setJobGroup(crawlerJobGroup);
@@ -385,18 +364,14 @@ public class SmartImportJob extends Job {
 		return res;
 	}
 
-	private Set<IProject> importProjectAndChildrenRecursively(final IContainer container, boolean forceFullProjectCheck,
+	private Set<IProject> importProjectAndChildrenRecursively(IContainer container, boolean forceFullProjectCheck,
 			IProgressMonitor progressMonitor) throws Exception {
-		Set<IProject> projectFromCurrentContainer = new HashSet<>();
-		final IPath containerLocation = container.getLocation();
-		if (containerLocation == null) {
-			return projectFromCurrentContainer;
-		}
 		int allWork = 30 + ProjectConfiguratorExtensionManager.getAllExtensionLabels().size() * 5;
 		SubMonitor subMonitor = SubMonitor.convert(progressMonitor,
 				NLS.bind(DataTransferMessages.SmartImportJob_inspecting,
-						SmartImportWizard.toAbsolutePath(container)),
+						container.getLocation().toFile().getAbsolutePath()),
 				allWork);
+		Set<IProject> projectFromCurrentContainer = new HashSet<>();
 		boolean isAlreadyAnEclipseProject = false;
 		Set<ProjectConfigurator> mainProjectConfigurators = new HashSet<>();
 		Set<IPath> excludedPaths = new HashSet<>();
@@ -429,12 +404,12 @@ public class SmartImportJob extends Job {
 				if (project == null) {
 					// Create project
 					try {
-						project = toExistingOrNewProject(containerLocation.toFile(), subMonitor.split(1),
+						project = toExistingOrNewProject(container.getLocation().toFile(), subMonitor.split(1),
 								IResource.BACKGROUND_REFRESH);
 					} catch (CouldNotImportProjectException ex) {
-						this.errors.put(containerLocation, ex);
+						this.errors.put(container.getLocation(), ex);
 						if (this.listener != null) {
-							this.listener.errorHappened(containerLocation, ex);
+							this.listener.errorHappened(container.getLocation(), ex);
 						}
 						return projectFromCurrentContainer;
 					}
@@ -460,18 +435,11 @@ public class SmartImportJob extends Job {
 			excludedPaths.addAll(toPathSet(configurator.getFoldersToIgnore(project, subMonitor.split(20))));
 		}
 
+		Set<IProject> allNestedProjects = new HashSet<>();
 		if (deepChildrenDetection) {
-			Set<IProject> allNestedProjects = searchAndImportChildrenProjectsRecursively(container, excludedPaths,
-					progressMonitor);
+			allNestedProjects.addAll( searchAndImportChildrenProjectsRecursively(container, excludedPaths, progressMonitor) );
+			excludedPaths.addAll(toPathSet(allNestedProjects));
 			projectFromCurrentContainer.addAll(allNestedProjects);
-		}
-		// exclude all known children projects
-		for (IProject other : container.getWorkspace().getRoot().getProjects()) {
-			IPath otherLocation = other.getLocation();
-			if (otherLocation != null && !containerLocation.equals(otherLocation)
-					&& containerLocation.isPrefixOf(otherLocation)) {
-				excludedPaths.add(otherLocation);
-			}
 		}
 
 		if (mainProjectConfigurators.isEmpty() && (!isAlreadyAnEclipseProject || forceFullProjectCheck)) {
@@ -479,12 +447,12 @@ public class SmartImportJob extends Job {
 			if (project == null) {
 				// Create project
 				try {
-					project = toExistingOrNewProject(containerLocation.toFile(), subMonitor.split(1),
+					project = toExistingOrNewProject(container.getLocation().toFile(), subMonitor.split(1),
 							IResource.BACKGROUND_REFRESH);
 				} catch (CouldNotImportProjectException ex) {
-					this.errors.put(containerLocation, ex);
+					this.errors.put(container.getLocation(), ex);
 					if (this.listener != null) {
-						this.listener.errorHappened(containerLocation, ex);
+						this.listener.errorHappened(container.getLocation(), ex);
 					}
 					return projectFromCurrentContainer;
 				}
@@ -506,10 +474,6 @@ public class SmartImportJob extends Job {
 				}
 			}
 		}
-		if (project != null) {
-			// make sure this folder isn't going to be processed again
-			excludedPaths.add(project.getLocation());
-		}
 		subMonitor.done();
 		return projectFromCurrentContainer;
 	}
@@ -520,10 +484,7 @@ public class SmartImportJob extends Job {
 		}
 		Set<IPath> res = new HashSet<>();
 		for (IContainer container : resources) {
-			IPath location = container.getLocation();
-			if (location != null) {
-				res.add(location);
-			}
+			res.add(container.getLocation());
 		}
 		return res;
 	}
@@ -561,11 +522,7 @@ public class SmartImportJob extends Job {
 
 	private IProject projectAlreadyExistsInWorkspace(File directory) {
 		for (IProject project : workspaceRoot.getProjects()) {
-			File file = SmartImportWizard.toFile(project);
-			if (file == null) {
-				continue;
-			}
-			if (file.getAbsoluteFile().equals(directory.getAbsoluteFile())) {
+			if (project.getLocation().toFile().getAbsoluteFile().equals(directory.getAbsoluteFile())) {
 				return project;
 			}
 		}
@@ -580,7 +537,7 @@ public class SmartImportJob extends Job {
 			String expectedName = desc.getName();
 			IProject projectWithSameName = this.workspaceRoot.getProject(expectedName);
 			if (projectWithSameName.exists()) {
-				if (directory.equals(SmartImportWizard.toFile(projectWithSameName))) {
+				if (projectWithSameName.getLocation().toFile().equals(directory)) {
 					// project seems already there
 					return projectWithSameName;
 				}

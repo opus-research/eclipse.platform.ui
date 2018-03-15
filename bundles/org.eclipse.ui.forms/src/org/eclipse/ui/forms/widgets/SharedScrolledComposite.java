@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2000, 2016 IBM Corporation and others.
+ *  Copyright (c) 2000, 2015 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -20,6 +20,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.ui.internal.forms.widgets.FormUtil;
 
@@ -59,9 +61,12 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	 */
 	public SharedScrolledComposite(Composite parent, int style) {
 		super(parent, style);
-		addListener(SWT.Resize, e -> {
-			if (!ignoreResizes) {
-				scheduleReflow(false);
+		addListener(SWT.Resize, new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				if (!ignoreResizes) {
+					scheduleReflow(false);
+				}
 			}
 		});
 		initializeScrollBars();
@@ -180,17 +185,15 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 		if (flushCache) {
 			contentCache.flush();
 		}
-
-		int minWidth = contentCache.computeMinimumWidth();
-		int minHeight = contentCache.computeSize(minWidth, SWT.DEFAULT).y;
+		Point newSize = contentCache.computeSize(FormUtil.getWidthHint(
+				clientArea.width, c), FormUtil.getHeightHint(clientArea.height,
+				c));
 
 		if (!(expandHorizontal && expandVertical)) {
-			Point preferredSize = contentCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-
-			c.setSize(preferredSize);
+			c.setSize(newSize);
 		}
 
-		setMinSize(new Point(minWidth, minHeight));
+		setMinSize(newSize);
 		FormUtil.updatePageIncrement(this);
 
 		// reduce vertical scroll increment if necessary
@@ -222,10 +225,13 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 				return;
 			}
 			reflowPending = true;
-			getDisplay().asyncExec(() -> {
-				reflowPending = false;
-				if (!isDisposed())
-					reflow(flushCache);
+			getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					reflowPending = false;
+					if (!isDisposed())
+						reflow(flushCache);
+				}
 			});
 		} else
 			reflow(flushCache);

@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.decorators;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
@@ -38,32 +39,19 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 * applied.
 	 */
 
-	private static class LightweightRunnable implements ISafeRunnable {
+	private class LightweightRunnable implements ISafeRunnable {
+		private Object element;
 
-		static class RunnableData {
+		private DecorationBuilder decoration;
 
-			final DecorationBuilder builder;
-
-			final LightweightDecoratorDefinition decorator;
-
-			final Object element;
-
-			public RunnableData(Object object, DecorationBuilder builder, LightweightDecoratorDefinition definition) {
-				this.element = object;
-				this.builder = builder;
-				this.decorator = definition;
-			}
-
-			boolean isConsistent() {
-				return builder != null && decorator != null && element != null;
-			}
-		}
-
-		private volatile RunnableData data = new RunnableData(null, null, null);
+		private LightweightDecoratorDefinition decorator;
 
 		void setValues(Object object, DecorationBuilder builder,
 				LightweightDecoratorDefinition definition) {
-			data = new RunnableData(object, builder, definition);
+			element = object;
+			decoration = builder;
+			decorator = definition;
+
 		}
 
 		/*
@@ -73,17 +61,12 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		public void handleException(Throwable exception) {
 			IStatus status = StatusUtil.newStatus(IStatus.ERROR, exception
 					.getMessage(), exception);
-			LightweightDecoratorDefinition decorator = data.decorator;
 			String message;
 			if (decorator == null) {
 				message = WorkbenchMessages.DecoratorError;
 			} else {
-				String name = decorator.getName();
-				if (name == null) {
-					// decorator definition is not accessible anymore
-					name = decorator.getId();
-				}
-				message = NLS.bind(WorkbenchMessages.DecoratorWillBeDisabled, name);
+				message = NLS.bind(WorkbenchMessages.DecoratorWillBeDisabled,
+						decorator.getName());
 			}
 			WorkbenchPlugin.log(message, status);
 			if (decorator != null) {
@@ -97,12 +80,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		 */
 		@Override
 		public void run() throws Exception {
-			// Copy to local variables, see
-			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=300358
-			RunnableData data = this.data;
-			if (data.isConsistent()) {
-				data.decorator.decorate(data.element, data.builder);
-			}
+			decorator.decorate(element, decoration);
 			clearReferences();
 		}
 
@@ -112,7 +90,9 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		 * @since 3.1
 		 */
 		void clearReferences() {
-			data = new RunnableData(null, null, null);
+			decorator = null;
+			element = null;// Clear the element
+			decoration = null;
 		}
 	}
 
@@ -143,9 +123,11 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 * can occur.
 	 */
 	private void buildContributors() {
-		for (LightweightDecoratorDefinition decorator : lightweightDefinitions) {
-			for (String type : getTargetTypes(decorator)) {
-				registerContributor(decorator, type);
+		for (int i = 0; i < lightweightDefinitions.length; i++) {
+			LightweightDecoratorDefinition decorator = lightweightDefinitions[i];
+			String[] types = getTargetTypes(decorator);
+			for (int j = 0; j < types.length; j++) {
+				registerContributor(decorator, types[j]);
 			}
 		}
 	}
@@ -167,8 +149,8 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 			lightweightDefinitions[oldDefs.length] = decorator;
 			// no reset - handled in the DecoratorManager
 			String[] types = getTargetTypes(decorator);
-			for (String type : types) {
-				registerContributor(decorator, type);
+			for (int i = 0; i < types.length; i++) {
+				registerContributor(decorator, types[i]);
 			}
 			return true;
 		}
@@ -197,13 +179,15 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		int idx = getLightweightDecoratorDefinitionIdx(decorator.getId());
 		if (idx != -1) {
 			LightweightDecoratorDefinition[] oldDefs = lightweightDefinitions;
-			Util.arrayCopyWithRemoval(
+			Util
+					.arrayCopyWithRemoval(
 							oldDefs,
 							lightweightDefinitions = new LightweightDecoratorDefinition[lightweightDefinitions.length - 1],
 							idx);
 			// no reset - handled in the DecoratorManager
-			for (String type : getTargetTypes(decorator)) {
-				unregisterContributor(decorator, type);
+			String[] types = getTargetTypes(decorator);
+			for (int i = 0; i < types.length; i++) {
+				unregisterContributor(decorator, types[i]);
 
 			}
 			return true;
@@ -253,9 +237,9 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 */
 	LightweightDecoratorDefinition[] enabledDefinitions() {
 		ArrayList result = new ArrayList();
-		for (LightweightDecoratorDefinition lightweightDefinition : lightweightDefinitions) {
-			if (lightweightDefinition.isEnabled()) {
-				result.add(lightweightDefinition);
+		for (int i = 0; i < lightweightDefinitions.length; i++) {
+			if (lightweightDefinitions[i].isEnabled()) {
+				result.add(lightweightDefinitions[i]);
 			}
 		}
 		LightweightDecoratorDefinition[] returnArray = new LightweightDecoratorDefinition[result
@@ -270,8 +254,8 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 * @return boolean
 	 */
 	boolean hasEnabledDefinitions() {
-		for (LightweightDecoratorDefinition lightweightDefinition : lightweightDefinitions) {
-			if (lightweightDefinition.isEnabled()) {
+		for (int i = 0; i < lightweightDefinitions.length; i++) {
+			if (lightweightDefinitions[i].isEnabled()) {
 				return true;
 			}
 		}
@@ -292,9 +276,9 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	void shutdown() {
 		// Disable all fo the enabled decorators
 		// so as to force a dispose of thier decorators
-		for (LightweightDecoratorDefinition lightweightDefinition : lightweightDefinitions) {
-			if (lightweightDefinition.isEnabled()) {
-				lightweightDefinition.setEnabled(false);
+		for (int i = 0; i < lightweightDefinitions.length; i++) {
+			if (lightweightDefinitions[i].isEnabled()) {
+				lightweightDefinitions[i].setEnabled(false);
 			}
 		}
 	}
@@ -308,9 +292,9 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 *            String
 	 */
 	LightweightDecoratorDefinition getDecoratorDefinition(String decoratorId) {
-		for (LightweightDecoratorDefinition lightweightDefinition : lightweightDefinitions) {
-			if (lightweightDefinition.getId().equals(decoratorId)) {
-				return lightweightDefinition;
+		for (int i = 0; i < lightweightDefinitions.length; i++) {
+			if (lightweightDefinitions[i].getId().equals(decoratorId)) {
+				return lightweightDefinitions[i];
 			}
 		}
 		return null;
@@ -354,9 +338,15 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 *            true.
 	 */
 	public void getDecorations(Object element, DecorationBuilder decoration) {
-		for (LightweightDecoratorDefinition decorator : getDecoratorsFor(element)) {
-			decoration.setCurrentDefinition(decorator);
-			decorate(element, decoration, decorator);
+
+		LightweightDecoratorDefinition[] decorators = getDecoratorsFor(element);
+
+		for (int i = 0; i < decorators.length; i++) {
+			// If we are doing the adaptable one make sure we are
+			// only applying the adaptable decorations
+			LightweightDecoratorDefinition dd = decorators[i];
+			decoration.setCurrentDefinition(dd);
+			decorate(element, decoration, dd);
 		}
 	}
 

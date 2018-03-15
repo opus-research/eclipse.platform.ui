@@ -13,8 +13,6 @@
  *******************************************************************************/
 package org.eclipse.jface.wizard;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
@@ -23,6 +21,8 @@ import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -157,12 +157,10 @@ public class ProgressMonitorPart extends Composite implements
         fTaskName = name;
         fSubTaskName = ""; //$NON-NLS-1$
         updateLabel();
-		if (!fProgressIndicator.isDisposed()) {
-			if (totalWork == IProgressMonitor.UNKNOWN || totalWork == 0) {
-				fProgressIndicator.beginAnimatedTask();
-			} else {
-				fProgressIndicator.beginTask(totalWork);
-			}
+        if (totalWork == IProgressMonitor.UNKNOWN || totalWork == 0) {
+            fProgressIndicator.beginAnimatedTask();
+        } else {
+            fProgressIndicator.beginTask(totalWork);
         }
         if (fToolBar != null && !fToolBar.isDisposed()) {
         	fToolBar.setVisible(true);
@@ -192,7 +190,7 @@ public class ProgressMonitorPart extends Composite implements
 			return in;
 		}
         int length = in.length();
-        StringBuilder out = new StringBuilder(length + 1);
+        StringBuffer out = new StringBuffer(length + 1);
         for (int i = 0; i < length; i++) {
             char c = in.charAt(i);
             if (c == '&') {
@@ -256,12 +254,15 @@ public class ProgressMonitorPart extends Composite implements
         	fStopButton = new ToolItem(fToolBar, SWT.PUSH);
         	// It would have been nice to use the fCancelListener, but that
         	// listener operates on the fCancelComponent which must be a control.
-        	fStopButton.addSelectionListener(widgetSelectedAdapter(e -> {
-				setCanceled(true);
-				if (fStopButton != null) {
-					fStopButton.setEnabled(false);
-				}
-			}));
+        	fStopButton.addSelectionListener(new SelectionAdapter() {
+        		@Override
+				public void widgetSelected(SelectionEvent e) {
+        			setCanceled(true);
+        			if (fStopButton != null) {
+        				fStopButton.setEnabled(false);
+        			}
+        		}
+        	});
         	final Image stopImage = ImageDescriptor.createFromFile(
         			ProgressMonitorPart.class, "images/stop.png").createImage(getDisplay()); //$NON-NLS-1$
         	final Cursor arrowCursor = new Cursor(this.getDisplay(), SWT.CURSOR_ARROW);
@@ -278,9 +279,7 @@ public class ProgressMonitorPart extends Composite implements
 
     @Override
 	public void internalWorked(double work) {
-		if (!fProgressIndicator.isDisposed()) {
-			fProgressIndicator.worked(work);
-		}
+        fProgressIndicator.worked(work);
     }
 
     @Override
@@ -334,9 +333,6 @@ public class ProgressMonitorPart extends Composite implements
      * Updates the label with the current task and subtask names.
      */
     protected void updateLabel() {
-		if (fLabel.isDisposed() || fLabel.isAutoDirection()) {
-			return;
-		}
         if (blockedStatus == null) {
             String text = taskLabel();
             fLabel.setText(text);

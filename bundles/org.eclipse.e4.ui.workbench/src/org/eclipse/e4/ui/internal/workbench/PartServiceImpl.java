@@ -50,6 +50,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -58,13 +59,12 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.IPartListener;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.osgi.util.NLS;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
-/**
- * A window-based {@link EPartService}.
- */
 public class PartServiceImpl implements EPartService {
 
 	/**
@@ -501,7 +501,9 @@ public class PartServiceImpl implements EPartService {
 
 	private boolean isMinimized(MUIElement elt) {
 		List<String> tags = elt.getTags();
-		return tags.contains(IPresentationEngine.MINIMIZED) && !tags.contains(IPresentationEngine.ACTIVE);
+		return (tags.contains(IPresentationEngine.MINIMIZED)
+				|| tags.contains(IPresentationEngine.MINIMIZED_BY_ZOOM))
+				&& !tags.contains(IPresentationEngine.ACTIVE);
 	}
 
 	private boolean isInActivePerspective(MUIElement element) {
@@ -648,8 +650,7 @@ public class PartServiceImpl implements EPartService {
 				perspective.getContext().activate();
 			} else {
 				if ((modelService.getElementLocation(newActivePart) & EModelService.IN_SHARED_AREA) != 0) {
-					if (newActivePart.getParent() != null
-							&& newActivePart.getParent().getSelectedElement() != newActivePart) {
+					if (newActivePart.getParent().getSelectedElement() != newActivePart) {
 						newActivePart = (MPart) newActivePart.getParent().getSelectedElement();
 					}
 				}
@@ -817,10 +818,35 @@ public class PartServiceImpl implements EPartService {
 		return activePart;
 	}
 
+	private MPart createPart(MPartDescriptor descriptor) {
+		if (descriptor == null) {
+			return null;
+		}
+		MPart part = modelService.createModelElement(MPart.class);
+		part.setElementId(descriptor.getElementId());
+		part.getMenus().addAll(EcoreUtil.copyAll(descriptor.getMenus()));
+		if (descriptor.getToolbar() != null) {
+			part.setToolbar((MToolBar) EcoreUtil.copy((EObject) descriptor.getToolbar()));
+		}
+		part.setContributorURI(descriptor.getContributorURI());
+		part.setCloseable(descriptor.isCloseable());
+		part.setContributionURI(descriptor.getContributionURI());
+		part.setLabel(descriptor.getLabel());
+		part.setIconURI(descriptor.getIconURI());
+		part.setTooltip(descriptor.getTooltip());
+		part.getHandlers().addAll(EcoreUtil.copyAll(descriptor.getHandlers()));
+		part.getTags().addAll(descriptor.getTags());
+		part.getVariables().addAll(descriptor.getVariables());
+		part.getProperties().putAll(descriptor.getProperties());
+		part.getPersistedState().putAll(descriptor.getPersistedState());
+		part.getBindingContexts().addAll(descriptor.getBindingContexts());
+		return part;
+	}
+
 	@Override
 	public MPart createPart(String id) {
 		MPartDescriptor descriptor = modelService.getPartDescriptor(id);
-		return modelService.createPart(descriptor);
+		return createPart(descriptor);
 	}
 
 	@Override
@@ -835,44 +861,20 @@ public class PartServiceImpl implements EPartService {
 		MPart sharedPart = null;
 
 		// check for existing parts if necessary
-		boolean secondaryId = false;
-		String descId = id;
 		if (!force) {
-			int colonIndex = id.indexOf(':');
-			if (colonIndex >= 0) {
-				secondaryId = true;
-				descId = id.substring(0, colonIndex);
-				descId += ":*"; //$NON-NLS-1$
-			}
 			for (MUIElement element : sharedWindow.getSharedElements()) {
-				if (element.getElementId().equals(descId)) {
+				if (element.getElementId().equals(id)) {
 					sharedPart = (MPart) element;
 					break;
 				}
 			}
 		}
 
-		if (sharedPart == null || secondaryId) {
+		if (sharedPart == null) {
 			MPartDescriptor descriptor = modelService.getPartDescriptor(id);
-			sharedPart = modelService.createPart(descriptor);
+			sharedPart = createPart(descriptor);
 			if (sharedPart == null) {
 				return null;
-			}
-			if (secondaryId && getActivePart() != null) {
-				MElementContainer<MUIElement> parent = getActivePart().getParent();
-				if (getActivePart().getCurSharedRef() != null) {
-					parent = getActivePart().getCurSharedRef().getParent();
-				}
-				while (!(MPerspective.class.isInstance(parent) || MWindow.class.isInstance(parent))) {
-					parent = parent.getParent();
-				}
-
-				List<MPlaceholder> phs = modelService.findElements(parent, descId, MPlaceholder.class, null);
-				if (phs.size() == 1) {
-					MPlaceholder ph = phs.get(0);
-					sharedPart.setCloseable(ph.isCloseable());
-					sharedPart.getTags().addAll(ph.getTags());
-				}
 			}
 
 			// Replace the id to ensure that multi-instance parts work correctly
@@ -889,8 +891,6 @@ public class PartServiceImpl implements EPartService {
 		MPlaceholder sharedPartRef = modelService.createModelElement(MPlaceholder.class);
 		sharedPartRef.setElementId(sharedPart.getElementId());
 		sharedPartRef.setRef(sharedPart);
-		sharedPartRef.setCloseable(sharedPart.isCloseable());
-		sharedPartRef.getTags().addAll(sharedPart.getTags());
 		return sharedPartRef;
 	}
 
@@ -1180,7 +1180,7 @@ public class PartServiceImpl implements EPartService {
 		MPart part = findPart(id);
 		if (part == null) {
 			MPartDescriptor descriptor = modelService.getPartDescriptor(id);
-			part = modelService.createPart(descriptor);
+			part = createPart(descriptor);
 			if (part == null) {
 				return null;
 			}

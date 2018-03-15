@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2017 Versant Corp. and others.
+ * Copyright (c) 2008, 2009 Versant Corp. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,7 +45,6 @@ import org.eclipse.ui.views.properties.NewPropertySheetHandler;
 import org.eclipse.ui.views.properties.PropertySheet;
 import org.eclipse.ui.views.properties.PropertySheetEntry;
 import org.eclipse.ui.views.properties.PropertySheetPage;
-import org.eclipse.ui.views.properties.PropertyShowInContext;
 
 /**
  * @since 3.4
@@ -279,32 +278,11 @@ public class MultiInstancePropertySheetTest extends AbstractPropertySheetTest {
 	 * @throws NotDefinedException
 	 * @throws ExecutionException
 	 */
-	public void testNewPropertySheet() throws Exception {
-		assertEquals(1, countPropertySheetViews());
-		Platform.addLogListener(logListener);
+	public void testNewPropertySheet() throws ExecutionException,
+			NotDefinedException, NotEnabledException, NotHandledException {
+		assertTrue(countPropertySheetViews() == 1);
 		executeNewPropertySheetHandler();
-		assertEquals(2, countPropertySheetViews());
-		if (e != null) {
-			throw e;
-		}
-	}
-
-	/**
-	 * Test if the PropertySheet's new handler creates a new instance without
-	 * errors if the original view has no selection
-	 */
-	public void testNewPropertySheetNoSelection() throws Exception {
-		activePage.hideView(selectionProviderView);
-		propertySheet = (PropertySheet) activePage.showView(IPageLayout.ID_PROP_SHEET);
-		assertEquals(1, countPropertySheetViews());
-		PropertyShowInContext context = (PropertyShowInContext) propertySheet.getShowInContext();
-		assertNull(context.getPart());
-		Platform.addLogListener(logListener);
-		executeNewPropertySheetHandler();
-		assertEquals(2, countPropertySheetViews());
-		if (e != null) {
-			throw e;
-		}
+		assertTrue(countPropertySheetViews() == 2);
 	}
 
 	/**
@@ -637,6 +615,7 @@ public class MultiInstancePropertySheetTest extends AbstractPropertySheetTest {
 
 	private void processUiEvents() {
 		while (fWorkbench.getDisplay().readAndDispatch()) {
+			;
 		}
 	}
 

@@ -169,7 +169,9 @@ public class NavigatorContentDescriptorManager {
 			addDescriptorsConsideringOverrides(anElement, firstClassDescriptorsSet, aVisibilityAssistant, descriptors, possibleChild);
 		} else {
 			/* Find other ContentProviders which enable for this object */
-			for (NavigatorContentDescriptor descriptor : firstClassDescriptorsSet) {
+			for (Iterator<NavigatorContentDescriptor> contentDescriptorsItr = firstClassDescriptorsSet.iterator(); contentDescriptorsItr.hasNext();) {
+				NavigatorContentDescriptor descriptor = contentDescriptorsItr.next();
+
 				if (aVisibilityAssistant.isActive(descriptor) && aVisibilityAssistant.isVisible(descriptor)
 						&& (possibleChild ? descriptor.isPossibleChild(anElement) : descriptor.isTriggerPoint(anElement))) {
 					descriptors.add(descriptor);
@@ -275,19 +277,17 @@ public class NavigatorContentDescriptorManager {
 
 		Image image = null;
 		if (contentDescriptor != null) {
-			String iconPath = contentDescriptor.getIcon();
-			if (iconPath != null) {
-				String prefix = contentDescriptor.getId() == null ? "" : contentDescriptor.getId(); //$NON-NLS-1$
-				String iconKey = prefix + "::" + iconPath; //$NON-NLS-1$
-				image = getImageRegistry().get(iconKey);
+			String icon = contentDescriptor.getIcon();
+			if (icon != null) {
+				image = getImageRegistry().get(icon);
 				if (image == null || image.isDisposed()) {
 					ImageDescriptor imageDescriptor = AbstractUIPlugin
 							.imageDescriptorFromPlugin(contentDescriptor
-							.getContribution().getPluginId(), iconPath);
+							.getContribution().getPluginId(), icon);
 					if (imageDescriptor != null) {
 						image = imageDescriptor.createImage();
 						if (image != null) {
-							getImageRegistry().put(iconKey, image);
+							getImageRegistry().put(icon, image);
 						}
 					}
 				}
@@ -422,8 +422,8 @@ public class NavigatorContentDescriptorManager {
 		NavigatorContentDescriptor[] descs = getAllContentDescriptors();
 
 		LinkedList<NavigatorContentDescriptor> list = new LinkedList<NavigatorContentDescriptor>();
-		for (NavigatorContentDescriptor desc : descs) {
-			list.add(desc);
+		for (int i = 0; i < descs.length; i++) {
+			list.add(descs[i]);
 		}
 
 		boolean changed = true;

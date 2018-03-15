@@ -11,7 +11,9 @@
 package org.eclipse.ui.internal.progress;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -35,7 +37,7 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
         manager = animationManager;
     }
 
-	List items = new ArrayList();
+    List items = Collections.synchronizedList(new ArrayList());
 
     public void startAnimationLoop(IProgressMonitor monitor) {
 
@@ -52,8 +54,9 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
             //Do nothing while animation is happening
         }
 
-		for (ProgressAnimationItem animationItem : getAnimationItems()) {
-            animationItem.animationDone();
+        ProgressAnimationItem[] animationItems = getAnimationItems();
+        for (int i = 0; i < animationItems.length; i++) {
+            animationItems[i].animationDone();
         }
 
     }
@@ -82,8 +85,9 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
 
     @Override
 	public void animationStarted() {
-		for (AnimationItem animationItem : getAnimationItems()) {
-            animationItem.animationStart();
+        AnimationItem[] animationItems = getAnimationItems();
+        for (int i = 0; i < animationItems.length; i++) {
+            animationItems[i].animationStart();
         }
 
     }
@@ -99,15 +103,17 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
      * @return ProgressAnimationItem[]
      */
     private ProgressAnimationItem[] getAnimationItems() {
-		ProgressAnimationItem[] animationItems = new ProgressAnimationItem[items.size()];
+        ProgressAnimationItem[] animationItems = new ProgressAnimationItem[items
+                .size()];
         items.toArray(animationItems);
         return animationItems;
     }
 
     @Override
 	public void animationFinished() {
-		for (AnimationItem animationItem : getAnimationItems()) {
-            animationItem.animationDone();
+        AnimationItem[] animationItems = getAnimationItems();
+        for (int i = 0; i < animationItems.length; i++) {
+            animationItems[i].animationDone();
         }
 
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,10 +14,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.mapping.ModelProvider;
-import org.eclipse.core.resources.mapping.ResourceMapping;
-import org.eclipse.core.resources.mapping.ResourceMappingContext;
-import org.eclipse.core.resources.mapping.ResourceTraversal;
+import org.eclipse.core.resources.mapping.*;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -63,22 +60,20 @@ public class ObjectContributionClasses implements IAdapterFactory {
 	}
 
 	public static class CResource implements IAdaptable {
-		@SuppressWarnings("unchecked")
 		@Override
-		public <T> T getAdapter(Class<T> adapter) {
+		public Object getAdapter(Class adapter) {
 			if(adapter == IContributorResourceAdapter.class) {
-				return (T) new ResourceAdapter();
+				return new ResourceAdapter();
 			}
 			return null;
 		}
 	}
 
 	public static class CFile implements IAdaptable {
-		@SuppressWarnings("unchecked")
 		@Override
-		public <T> T getAdapter(Class<T> adapter) {
+		public Object getAdapter(Class adapter) {
 			if(adapter == IContributorResourceAdapter.class) {
-				return (T) new ResourceAdapter();
+				return new ResourceAdapter();
 			}
 			return null;
 		}
@@ -86,11 +81,10 @@ public class ObjectContributionClasses implements IAdapterFactory {
 
 	// Returns a contribution adapter that doesn't handle ResourceMappings
 	public static class CResourceOnly implements IAdaptable {
-		@SuppressWarnings("unchecked")
 		@Override
-		public <T> T getAdapter(Class<T> adapter) {
+		public Object getAdapter(Class adapter) {
 			if(adapter == IContributorResourceAdapter.class) {
-				return (T) new ResourceOnlyAdapter();
+				return new ResourceOnlyAdapter();
 			}
 			return null;
 		}
@@ -117,7 +111,7 @@ public class ObjectContributionClasses implements IAdapterFactory {
 		}
         @Override
 		public ResourceMapping getAdaptedResourceMapping(IAdaptable adaptable) {
-			return getAdaptedResource(adaptable).getAdapter(ResourceMapping.class);
+            return (ResourceMapping)getAdaptedResource(adaptable).getAdapter(ResourceMapping.class);
         }
 	}
 
@@ -135,23 +129,22 @@ public class ObjectContributionClasses implements IAdapterFactory {
 
 	// Adapter methods
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getAdapter(final Object adaptableObject, Class<T> adapterType) {
+	public Object getAdapter(final Object adaptableObject, Class adapterType) {
 		if(adapterType == IContributorResourceAdapter.class) {
-			return (T) new ResourceAdapter();
+			return new ResourceAdapter();
 		}
 		if(adaptableObject instanceof IA && adapterType == IA.class) {
-			return (T) new A();
+			return new A();
 		}
 		if(adapterType == IResource.class) {
-			return (T) ResourcesPlugin.getWorkspace().getRoot();
+			return ResourcesPlugin.getWorkspace().getRoot();
 		}
 		if(adapterType == ICommon.class) {
-			return (T) new Common();
+			return new Common();
 		}
         if(adapterType == ResourceMapping.class) {
-			return (T) new ResourceMapping() {
+            return new ResourceMapping() {
                 @Override
 				public ResourceTraversal[] getTraversals(ResourceMappingContext context, IProgressMonitor monitor) {
                     return new ResourceTraversal[] {
@@ -177,7 +170,7 @@ public class ObjectContributionClasses implements IAdapterFactory {
 	}
 
 	@Override
-	public Class<?>[] getAdapterList() {
+	public Class[] getAdapterList() {
 		return new Class[] { ICommon.class, IResource.class, IFile.class, IContributorResourceAdapter.class, ResourceMapping.class};
 	}
 }

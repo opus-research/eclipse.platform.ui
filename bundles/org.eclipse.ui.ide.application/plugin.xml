@@ -18,7 +18,6 @@
             class="org.eclipse.ui.internal.ide.application.dialogs.IDEStartupPreferencePage"
             id="org.eclipse.ui.preferencePages.Startup">
          <keywordReference id="org.eclipse.ui.ide.startupAndShutdown"/>
-         <keywordReference id="org.eclipse.ui.ide.application.problems"/>
       </page>
      <page
             name="%PreferencePages.Startup.Workspaces"
@@ -52,7 +51,7 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="menu:file?before=quit">
+            locationURI="menu:file?after=open.ext">
          <command
                commandId="org.eclipse.ui.file.restartWorkbench"
                id="org.eclipse.ui.file.restartWorkbench"
@@ -96,7 +95,6 @@
                mnemonic="%menu.editor.mnemonic">
             <command
                   commandId="org.eclipse.ui.window.splitEditor"
-                  icon="icons/full/elcl16/split_horizontal.png"
                   mnemonic="%command.split.horizontal.mnemonic"
                   style="push">
                <parameter
@@ -106,7 +104,6 @@
             </command>
             <command
                   commandId="org.eclipse.ui.window.splitEditor"
-                  icon="icons/full/elcl16/split_vertical.png"
                   mnemonic="%command.split.vertical.mnemonic"
                   style="push">
                <parameter
@@ -120,38 +117,6 @@
                   mnemonic="%command.clone.mnemonic"
                   style="push">
             </command>
-            <command
-                  commandId="org.eclipse.ui.edit.text.toggleWordWrap"
-                  mnemonic="%command.wordwrap.mnemonic"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="true">
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="org.eclipse.ui.edit.text.toggleShowWhitespaceCharacters"
-                  mnemonic="%command.whitespace.mnemonic"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="true">
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="org.eclipse.ui.edit.text.zoomIn"
-                  mnemonic="%command.zoomIn.mnemonic"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="true">
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="org.eclipse.ui.edit.text.zoomOut"
-                  mnemonic="%command.zoomOut.mnemonic"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="true">
-               </visibleWhen>
-            </command>
          </menu>
       </menuContribution>
    </extension>
@@ -161,12 +126,5 @@
       <fragment
             uri="LegacyIDE_fragment.e4xmi">
       </fragment>
-   </extension>
-   <extension
-         point="org.eclipse.ui.keywords">
-      <keyword
-            id="org.eclipse.ui.ide.application.problems"
-            label="%keyword.problems">
-      </keyword>
    </extension>
 </plugin>

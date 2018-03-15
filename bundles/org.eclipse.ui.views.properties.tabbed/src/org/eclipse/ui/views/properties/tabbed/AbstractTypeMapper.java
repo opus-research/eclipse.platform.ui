@@ -18,8 +18,7 @@ package org.eclipse.ui.views.properties.tabbed;
 public class AbstractTypeMapper
     implements ITypeMapper {
 
-    @Override
-	public Class mapType(Object object) {
+    public Class mapType(Object object) {
         return object.getClass();
     }
 

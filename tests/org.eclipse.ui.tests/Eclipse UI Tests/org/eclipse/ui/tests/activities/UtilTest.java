@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import junit.framework.TestCase;
 
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.expressions.EvaluationResult;
@@ -33,8 +35,6 @@ import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.services.IEvaluationService;
 
-import junit.framework.TestCase;
-
 /**
  * Tests various utility methods on WorkbenchActivityHelper as well as other misc. activities functionality.
  *
@@ -42,7 +42,7 @@ import junit.framework.TestCase;
  */
 public class UtilTest extends TestCase {
 
-	private Set<String> rememberedSet;
+	private Set rememberedSet;
 
 	public static final String ID1 = "org.eclipse.ui.tests.util.1";
 	public static final String ID2 = "org.eclipse.ui.tests.util.2";
@@ -62,7 +62,7 @@ public class UtilTest extends TestCase {
 	 * contain the same activity).
 	 */
 	public void testGetEnabledCategories1() {
-		Set<String> ids = WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID1);
+		Set ids = WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID1);
 		assertEquals(1, ids.size());
 		assertTrue(ids.contains(ID3));
 	}
@@ -72,7 +72,7 @@ public class UtilTest extends TestCase {
 	 * enabled. Cat 2 has activity 2, which depends on activity 1.
 	 */
 	public void testGetEnabledCategories2() {
-		Set<String> ids = WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID2);
+		Set ids = WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID2);
 		assertEquals(2, ids.size());
 		assertTrue(ids.contains(ID1));
 		assertTrue(ids.contains(ID3));
@@ -83,7 +83,7 @@ public class UtilTest extends TestCase {
 	 * contain the same activity).
 	 */
 	public void testGetEnabledCategories3() {
-		Set<String> ids = WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID3);
+		Set ids = WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID3);
 		assertEquals(1, ids.size());
 		assertTrue(ids.contains(ID1));
 	}
@@ -92,7 +92,7 @@ public class UtilTest extends TestCase {
 	 * Asserts that if you enable cat 4 then no other categories would change..
 	 */
 	public void testGetEnabledCategories4() {
-		Set<String> ids = WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID4);
+		Set ids = WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID4);
 		assertEquals(0, ids.size());
 	}
 
@@ -100,7 +100,7 @@ public class UtilTest extends TestCase {
 	 * Asserts that if you enable cat 5 then cat 4 will become enabled
 	 */
 	public void testGetEnabledCategories5() {
-		Set<String> ids = WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID5);
+		Set ids = WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID5);
 		assertEquals(1, ids.size());
 		assertTrue(ids.contains(ID4));
 	}
@@ -110,7 +110,7 @@ public class UtilTest extends TestCase {
 	 * then no categories would change.
 	 */
 	public void testGetEnabledCategories1_A() {
-		HashSet<String> set = new HashSet<>();
+		HashSet set = new HashSet();
 		set.add(ID1);
 		PlatformUI.getWorkbench().getActivitySupport().setEnabledActivityIds(set);
 		assertEquals(0, WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID1).size());
@@ -121,7 +121,7 @@ public class UtilTest extends TestCase {
 	 * then no categories would change.
 	 */
 	public void testGetEnabledCategories2_A() {
-		HashSet<String> set = new HashSet<>();
+		HashSet set = new HashSet();
 		set.add(ID2);
 		PlatformUI.getWorkbench().getActivitySupport().setEnabledActivityIds(set);
 		assertEquals(0, WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID2).size());
@@ -132,7 +132,7 @@ public class UtilTest extends TestCase {
 	 * then no categories would change.
 	 */
 	public void testGetEnabledCategories3_A() {
-		HashSet<String> set = new HashSet<>();
+		HashSet set = new HashSet();
 		set.add(ID1);
 		PlatformUI.getWorkbench().getActivitySupport().setEnabledActivityIds(set);
 		assertEquals(0, WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID3).size());
@@ -143,7 +143,7 @@ public class UtilTest extends TestCase {
 	 * then no categories would change.
 	 */
 	public void testGetEnabledCategories4_A() {
-		HashSet<String> set = new HashSet<>();
+		HashSet set = new HashSet();
 		set.add(ID4);
 		PlatformUI.getWorkbench().getActivitySupport().setEnabledActivityIds(set);
 		assertEquals(0, WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID4).size());
@@ -154,7 +154,7 @@ public class UtilTest extends TestCase {
 	 * then no categories would change.
 	 */
 	public void testGetEnabledCategories5_Aa() {
-		HashSet<String> set = new HashSet<>();
+		HashSet set = new HashSet();
 		set.add(ID4);
 		PlatformUI.getWorkbench().getActivitySupport().setEnabledActivityIds(set);
 		assertEquals(0, WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID5).size());
@@ -165,10 +165,10 @@ public class UtilTest extends TestCase {
 	 * then cat 4 would change.
 	 */
 	public void testGetEnabledCategories5_Ab() {
-		HashSet<String> set = new HashSet<>();
+		HashSet set = new HashSet();
 		set.add(ID5);
 		PlatformUI.getWorkbench().getActivitySupport().setEnabledActivityIds(set);
-		Set<String> ids = WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID5);
+		Set ids = WorkbenchActivityHelper.getEnabledCategories(getActivityManager(), ID5);
 		assertEquals(1, ids.size());
 		assertTrue(ids.contains(ID4));
 	}
@@ -179,7 +179,7 @@ public class UtilTest extends TestCase {
 	 */
 	public void testGetDisabledCategories1() {
 		enableAll();
-		Set<String> ids = WorkbenchActivityHelper.getDisabledCategories(getActivityManager(), ID1);
+		Set ids = WorkbenchActivityHelper.getDisabledCategories(getActivityManager(), ID1);
 		assertEquals(1, ids.size());
 		assertTrue(ids.contains(ID3));
 	}
@@ -189,7 +189,7 @@ public class UtilTest extends TestCase {
 	 */
 	public void testGetDisabledCategories2() {
 		enableAll();
-		Set<String> ids = WorkbenchActivityHelper.getDisabledCategories(getActivityManager(), ID2);
+		Set ids = WorkbenchActivityHelper.getDisabledCategories(getActivityManager(), ID2);
 		assertEquals(2, ids.size());
 		assertTrue(ids.contains(ID1));
 		assertTrue(ids.contains(ID3));
@@ -200,7 +200,7 @@ public class UtilTest extends TestCase {
 	 */
 	public void testGetDisabledCategories3() {
 		enableAll();
-		Set<String> ids = WorkbenchActivityHelper.getDisabledCategories(getActivityManager(), ID3);
+		Set ids = WorkbenchActivityHelper.getDisabledCategories(getActivityManager(), ID3);
 		assertEquals(1, ids.size());
 		assertTrue(ids.contains(ID1));
 	}
@@ -210,7 +210,7 @@ public class UtilTest extends TestCase {
 	 */
 	public void testGetDisabledCategories4() {
 		enableAll();
-		Set<String> ids = WorkbenchActivityHelper.getDisabledCategories(getActivityManager(), ID4);
+		Set ids = WorkbenchActivityHelper.getDisabledCategories(getActivityManager(), ID4);
 		assertEquals(0, ids.size());
 	}
 
@@ -219,7 +219,7 @@ public class UtilTest extends TestCase {
 	 */
 	public void testGetDisabledCategories5() {
 		enableAll();
-		Set<String> ids = WorkbenchActivityHelper.getDisabledCategories(getActivityManager(), ID5);
+		Set ids = WorkbenchActivityHelper.getDisabledCategories(getActivityManager(), ID5);
 		assertEquals(1, ids.size());
 		assertTrue(ids.contains(ID4));
 	}
@@ -229,7 +229,7 @@ public class UtilTest extends TestCase {
 	 */
 	public void testCategoryCount1_A() {
 		enableAll();
-		Set<String> ids = WorkbenchActivityHelper.getEnabledCategoriesForActivity(getActivityManager(), ID1);
+		Set ids = WorkbenchActivityHelper.getEnabledCategoriesForActivity(getActivityManager(), ID1);
 		assertEquals(2, ids.size());
 		assertTrue(ids.contains(ID1));
 		assertTrue(ids.contains(ID3));
@@ -240,7 +240,7 @@ public class UtilTest extends TestCase {
 	 */
 	public void testCategoryCount2_A() {
 		enableAll();
-		Set<String> ids = WorkbenchActivityHelper.getEnabledCategoriesForActivity(getActivityManager(), ID2);
+		Set ids = WorkbenchActivityHelper.getEnabledCategoriesForActivity(getActivityManager(), ID2);
 		assertEquals(1, ids.size());
 		assertTrue(ids.contains(ID2));
 	}
@@ -250,7 +250,7 @@ public class UtilTest extends TestCase {
 	 */
 	public void testCategoryCount4_A() {
 		enableAll();
-		Set<String> ids = WorkbenchActivityHelper.getEnabledCategoriesForActivity(getActivityManager(), ID4);
+		Set ids = WorkbenchActivityHelper.getEnabledCategoriesForActivity(getActivityManager(), ID4);
 		assertEquals(2, ids.size());
 		assertTrue(ids.contains(ID4));
 		assertTrue(ids.contains(ID5));
@@ -261,7 +261,7 @@ public class UtilTest extends TestCase {
 	 */
 	public void testCategoryCount5_A() {
 		enableAll();
-		Set<String> ids = WorkbenchActivityHelper.getEnabledCategoriesForActivity(getActivityManager(), ID5);
+		Set ids = WorkbenchActivityHelper.getEnabledCategoriesForActivity(getActivityManager(), ID5);
 		assertEquals(1, ids.size());
 		assertTrue(ids.contains(ID5));
 	}
@@ -280,7 +280,7 @@ public class UtilTest extends TestCase {
 				.getActivityManager();
 
 		testPropertyTester1(context, activityManager);
-		Set<String> set = new HashSet<>();
+		Set set = new HashSet();
 		workbenchActivitySupport.setEnabledActivityIds(set);
 
 		testPropertyTester1(context, activityManager);
@@ -320,7 +320,7 @@ public class UtilTest extends TestCase {
 				.getActivityManager();
 
 		testPropertyTester2(context, activityManager);
-		Set<String> set = new HashSet<>();
+		Set set = new HashSet();
 		workbenchActivitySupport.setEnabledActivityIds(set);
 
 		testPropertyTester2(context, activityManager);
@@ -341,7 +341,7 @@ public class UtilTest extends TestCase {
 		public static final String VARIABLE = "arbitraryVariable";
 		public static final String VALUE = "arbitraryValue";
 
-		private Map<String, String> sourceState = new HashMap<>(1);
+		private Map sourceState = new HashMap(1);
 
 		public TestSourceProvider() {
 			super();
@@ -383,7 +383,7 @@ public class UtilTest extends TestCase {
 		public void clearVariable() {
 			sourceState.put(VARIABLE, "");
 		}
-	}
+	};
 
 	public void testExpressionEnablement() throws Exception {
 		IPluginContribution filterExp = new IPluginContribution() {
@@ -425,7 +425,7 @@ public class UtilTest extends TestCase {
 		// be in the enabledActivityIds list - right from the beginning.
 		IWorkbenchActivitySupport support = PlatformUI.getWorkbench()
 				.getActivitySupport();
-		Set<String> enabledActivityIds = support.getActivityManager()
+		Set enabledActivityIds = support.getActivityManager()
 				.getEnabledActivityIds();
 		assertTrue(enabledActivityIds.contains(EXPRESSION_ACTIVITY_ID_3));
 
@@ -434,7 +434,7 @@ public class UtilTest extends TestCase {
 		// Test conventional activity depends on expression activity.
 		assertFalse(enabledActivityIds.contains(EXPRESSION_ACTIVITY_ID_4));
 		assertFalse(enabledActivityIds.contains(EXPRESSION_ACTIVITY_ID_5));
-		enabledActivityIds = new HashSet<>(enabledActivityIds);
+		enabledActivityIds = new HashSet(enabledActivityIds);
 		enabledActivityIds.add(EXPRESSION_ACTIVITY_ID_5);
 		support.setEnabledActivityIds(enabledActivityIds);
 		enabledActivityIds = support.getActivityManager()
@@ -490,7 +490,7 @@ public class UtilTest extends TestCase {
 		// problems if it not correctly recognizes the difference when already
 		// marked as enabled (by being in the list) while the expression, which
 		// controls the activity, becomes in reality only later enabled.
-			Set<String> set = new HashSet<>(support.getActivityManager().getEnabledActivityIds());
+		Set set = new HashSet(support.getActivityManager().getEnabledActivityIds());
 		set.add(EXPRESSION_ACTIVITY_ID_2);
 		support.setEnabledActivityIds(set);
 
@@ -530,7 +530,7 @@ public class UtilTest extends TestCase {
 	 * Enable all test activities.
 	 */
 	private void enableAll() {
-		HashSet<String> set = new HashSet<>();
+		HashSet set = new HashSet();
 		set.add(ID1);
 		set.add(ID2);
 		set.add(ID4);
@@ -558,16 +558,16 @@ public class UtilTest extends TestCase {
     	// Check Activity -> Binding connection.
     	IActivityManager manager = getActivityManager();
     	IActivity activity = manager.getActivity(ACTIVITY_NON_REG_EXP);
-		Set<IActivityPatternBinding> bindings = activity.getActivityPatternBindings();
+    	Set bindings = activity.getActivityPatternBindings();
     	assertTrue(bindings.size() == 1);
     	IActivityPatternBinding binding =
-    		bindings.iterator().next();
+    		(IActivityPatternBinding)bindings.iterator().next();
     	assertTrue(binding.isEqualityPattern());
 
     	// Check Binding -> Activity connection.
     	final String IDENTIFIER = "org.eclipse.ui.tests.activity{No{Reg(Exp[^d]";
     	IIdentifier identifier = manager.getIdentifier(IDENTIFIER);
-		Set<String> boundActivities = identifier.getActivityIds();
+    	Set boundActivities = identifier.getActivityIds();
     	assertTrue(boundActivities.size() == 1);
     	String id = boundActivities.iterator().next().toString();
     	assertTrue(id.equals(ACTIVITY_NON_REG_EXP));
@@ -595,9 +595,9 @@ public class UtilTest extends TestCase {
 
     		IWorkbenchActivitySupport support = PlatformUI.getWorkbench()
     			.getActivitySupport();
-			support.setEnabledActivityIds(new HashSet<>());
-			Set<String> set = new HashSet<>(support.getActivityManager().getEnabledActivityIds());
-			Set<String> previousSet = new HashSet<>(support.getActivityManager().getEnabledActivityIds());
+    		support.setEnabledActivityIds(new HashSet());
+    		Set set = new HashSet(support.getActivityManager().getEnabledActivityIds());
+    		Set previousSet = new HashSet(support.getActivityManager().getEnabledActivityIds());
     		set.add(EXPRESSION_ACTIVITY_ID_2);
     		support.setEnabledActivityIds(set);
     		assertEquals(previousSet, support.getActivityManager().getEnabledActivityIds());
@@ -605,7 +605,7 @@ public class UtilTest extends TestCase {
     		testSourceProvider.setVariable();
     		testSourceProvider.fireSourceChanged();
 
-			set = new HashSet<>(support.getActivityManager().getEnabledActivityIds());
+    		set = new HashSet(support.getActivityManager().getEnabledActivityIds());
     		assertFalse(set.equals(previousSet));
 
     		set.remove(EXPRESSION_ACTIVITY_ID_2);

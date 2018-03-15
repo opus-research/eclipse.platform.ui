@@ -75,7 +75,7 @@ public abstract class IDERegistryReader {
     protected void logError(IConfigurationElement element, String text) {
 		IExtension extension = element.getDeclaringExtension();
 		String pluginId = extension.getNamespace();
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		buf.append("Plugin " + pluginId + ", extension " //$NON-NLS-2$//$NON-NLS-1$
 				+ extension.getExtensionPointUniqueIdentifier());
 		buf.append("\n" + text);//$NON-NLS-1$
@@ -183,8 +183,8 @@ public abstract class IDERegistryReader {
             extensions = orderExtensions(extensions);
             extensionPoints.put(pointId, extensions);
         }
-        for (IExtension extension : extensions) {
-			readExtension(extension);
+        for (int i = 0; i < extensions.length; i++) {
+			readExtension(extensions[i]);
 		}
     }
 }
