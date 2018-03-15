@@ -12,8 +12,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import org.eclipse.core.runtime.IBundleGroup;
@@ -34,6 +32,10 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -121,11 +123,14 @@ public class AboutDialog extends TrayDialog {
 	protected void buttonPressed(int buttonId) {
         switch (buttonId) {
         case DETAILS_ID:
-			BusyIndicator.showWhile(getShell().getDisplay(), () -> {
-				IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-				InstallationDialog dialog = new InstallationDialog(getShell(), workbenchWindow);
-				dialog.setModalParent(AboutDialog.this);
-				dialog.open();
+			BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
+				@Override
+				public void run() {
+					IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+					InstallationDialog dialog = new InstallationDialog(getShell(), workbenchWindow);
+					dialog.setModalParent(AboutDialog.this);
+					dialog.open();
+				}
 			});
             break;
         default:
@@ -402,7 +407,13 @@ public class AboutDialog extends TrayDialog {
 						.getWorkbench(), null, IWorkbenchCommandConstants.EDIT_SELECT_ALL,
 						CommandContributionItem.STYLE_PUSH)));
 		text.setMenu(textManager.createContextMenu(text));
-		text.addDisposeListener(e -> textManager.dispose());
+		text.addDisposeListener(new DisposeListener() {
+
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				textManager.dispose();
+			}
+		});
 
 	}
 
@@ -442,12 +453,19 @@ public class AboutDialog extends TrayDialog {
 				e.result = info.getProviderName();
 			}
         });
-        button.addSelectionListener(widgetSelectedAdapter(event -> {
-			AboutBundleGroupData[] groupInfos = buttonManager.getRelatedInfos(info);
-			AboutBundleGroupData selection = (AboutBundleGroupData) event.widget.getData();
-			AboutFeaturesDialog d = new AboutFeaturesDialog(getShell(), productName, groupInfos, selection);
-		    d.open();
-		}));
+        button.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
+                AboutBundleGroupData[] groupInfos = buttonManager
+                        .getRelatedInfos(info);
+                AboutBundleGroupData selection = (AboutBundleGroupData) event.widget
+                        .getData();
+
+                AboutFeaturesDialog d = new AboutFeaturesDialog(getShell(),
+                        productName, groupInfos, selection);
+                d.open();
+            }
+        });
 
         return button;
     }

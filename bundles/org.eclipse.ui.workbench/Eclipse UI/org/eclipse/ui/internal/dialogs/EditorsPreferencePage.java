@@ -13,16 +13,17 @@
 
 package org.eclipse.ui.internal.dialogs;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -63,11 +64,14 @@ public class EditorsPreferencePage extends PreferencePage implements
 
     private IntegerFieldEditor recentFilesEditor;
 
-    private IPropertyChangeListener validityChangeListener = event -> {
-	    if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-			updateValidState();
-		}
-	};
+    private IPropertyChangeListener validityChangeListener = new IPropertyChangeListener() {
+        @Override
+		public void propertyChange(PropertyChangeEvent event) {
+            if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+				updateValidState();
+			}
+        }
+    };
 
 	private Button promptWhenStillOpenEditor;
 
@@ -251,10 +255,16 @@ public class EditorsPreferencePage extends PreferencePage implements
                 .getPreferenceStore();
         reuseEditors.setSelection(store
                 .getBoolean(IPreferenceConstants.REUSE_EDITORS_BOOLEAN));
-        reuseEditors.addSelectionListener(widgetSelectedAdapter(e -> {
-			reuseEditorsThreshold.getLabelControl(editorReuseThresholdGroup).setEnabled(reuseEditors.getSelection());
-			reuseEditorsThreshold.getTextControl(editorReuseThresholdGroup).setEnabled(reuseEditors.getSelection());
-		}));
+        reuseEditors.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                reuseEditorsThreshold
+                        .getLabelControl(editorReuseThresholdGroup).setEnabled(
+                                reuseEditors.getSelection());
+                reuseEditorsThreshold.getTextControl(editorReuseThresholdGroup)
+                        .setEnabled(reuseEditors.getSelection());
+            }
+        });
 
         editorReuseIndentGroup = new Composite(editorReuseGroup, SWT.LEFT);
         GridLayout indentLayout = new GridLayout();

@@ -15,7 +15,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import static org.eclipse.ui.internal.themes.WorkbenchThemeManager.EMPTY_COLOR_VALUE;
 
 import com.ibm.icu.text.MessageFormat;
@@ -38,13 +37,17 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IColorProvider;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -52,6 +55,12 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -355,16 +364,19 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 
         private int usableImageSize = -1;
 
-        private IPropertyChangeListener listener = event -> {
-			if (event.getNewValue() != null) {
-				fireLabelProviderChanged(new LabelProviderChangedEvent(
-						PresentationLabelProvider.this));
-			} else {
-				// Some theme definition element has been modified and we
-				// need to refresh the viewer
-				refreshAllLabels();
-			}
-		};
+        private IPropertyChangeListener listener = new IPropertyChangeListener() {
+            @Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getNewValue() != null) {
+					fireLabelProviderChanged(new LabelProviderChangedEvent(
+							PresentationLabelProvider.this));
+				} else {
+					// Some theme definition element has been modified and we
+					// need to refresh the viewer
+					refreshAllLabels();
+				}
+            }
+        };
 
         private Image emptyImage;
 
@@ -865,10 +877,13 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	protected Control createContents(Composite parent) {
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IWorkbenchHelpContextIds.FONTS_PREFERENCE_PAGE);
 
-        parent.addDisposeListener(e -> {
-		    if (appliedDialogFont != null)
-				appliedDialogFont.dispose();
-		});
+        parent.addDisposeListener(new DisposeListener() {
+            @Override
+			public void widgetDisposed(DisposeEvent e) {
+                if (appliedDialogFont != null)
+					appliedDialogFont.dispose();
+            }
+        });
 
 		final SashForm advancedComposite = new SashForm(parent, SWT.VERTICAL);
 		GridData sashData = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -1013,23 +1028,26 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 			}
 		});
 		tree.getViewer().setInput(WorkbenchPlugin.getDefault().getThemeRegistry());
-		tree.getViewer().addDoubleClickListener(event -> {
-			IStructuredSelection s = (IStructuredSelection) event.getSelection();
-			Object element = s.getFirstElement();
-			if (tree.getViewer().isExpandable(element))
-				tree.getViewer().setExpandedState(element,
-						!tree.getViewer().getExpandedState(element));
+		tree.getViewer().addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				IStructuredSelection s = (IStructuredSelection) event.getSelection();
+				Object element = s.getFirstElement();
+				if (tree.getViewer().isExpandable(element))
+					tree.getViewer().setExpandedState(element,
+							!tree.getViewer().getExpandedState(element));
 
-			if (element instanceof ThemeElementDefinition) {
-				ThemeElementDefinition definition = (ThemeElementDefinition) element;
+				if (element instanceof ThemeElementDefinition) {
+					ThemeElementDefinition definition = (ThemeElementDefinition) element;
 
-				if (element instanceof FontDefinition) {
-					editFont(tree.getDisplay());
-				} else if (element instanceof ColorDefinition
-						&& isAvailableInCurrentTheme(definition)) {
-					editColor(tree.getDisplay());
+					if (element instanceof FontDefinition) {
+						editFont(tree.getDisplay());
+					} else if (element instanceof ColorDefinition
+							&& isAvailableInCurrentTheme(definition)) {
+						editColor(tree.getDisplay());
+					}
+					updateControls();
 				}
-				updateControls();
 			}
 		});
 
@@ -1211,72 +1229,98 @@ getPreferenceStore(),
      */
     private void hookListeners() {
         TreeViewer viewer = tree.getViewer();
-		viewer.addSelectionChangedListener(event -> updateTreeSelection(event.getSelection()));
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+				public void selectionChanged(SelectionChangedEvent event) {
+                    updateTreeSelection(event.getSelection());
+                }
+		});
 
-        fontChangeButton.addSelectionListener(widgetSelectedAdapter(event -> {
-			Display display = event.display;
-			if (isFontSelected())
-				editFont(display);
-			else if (isColorSelected())
-				editColor(display);
-			updateControls();
-		}));
+        fontChangeButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
+            	Display display = event.display;
+            	if (isFontSelected())
+            		editFont(display);
+            	else if (isColorSelected())
+            		editColor(display);
+            	updateControls();
+            }
+        });
 
-        fontResetButton.addSelectionListener(widgetSelectedAdapter(e -> {
-			if (isFontSelected())
-				resetFont(getSelectedFontDefinition(), false);
-			else if (isColorSelected())
-				resetColor(getSelectedColorDefinition(), false);
-			updateControls();
-		}));
+        fontResetButton.addSelectionListener(new SelectionAdapter() {
 
-        fontSystemButton.addSelectionListener(widgetSelectedAdapter(event -> {
-		    FontDefinition definition = getSelectedFontDefinition();
-		    if (definition == null)
-		    	return;
-		    FontData[] defaultFontData = JFaceResources.getDefaultFont().getFontData();
-			setFontPreferenceValue(definition, defaultFontData, false);
-		    updateControls();
-		}));
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+            	if (isFontSelected())
+					resetFont(getSelectedFontDefinition(), false);
+            	else if (isColorSelected())
+					resetColor(getSelectedColorDefinition(), false);
+            	updateControls();
+            }
+        });
 
-		editDefaultButton.addSelectionListener(widgetSelectedAdapter(event -> {
-			Display display = event.display;
-			FontDefinition fontDefinition = getSelectedFontDefinition();
-			if (fontDefinition != null) {
-				String defaultFontId = fontDefinition.getDefaultsTo();
-				FontDefinition defaultFontDefinition = themeRegistry.findFont(defaultFontId);
-				editFont(defaultFontDefinition, display);
-			} else {
-				ColorDefinition colorDefinition = getSelectedColorDefinition();
-				if (colorDefinition != null) {
-					String defaultColorId = colorDefinition.getDefaultsTo();
-					ColorDefinition defaultColorDefinition = themeRegistry
-							.findColor(defaultColorId);
-					editColor(defaultColorDefinition, display);
+        fontSystemButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
+                FontDefinition definition = getSelectedFontDefinition();
+                if (definition == null)
+                	return;
+                FontData[] defaultFontData = JFaceResources.getDefaultFont().getFontData();
+				setFontPreferenceValue(definition, defaultFontData, false);
+                updateControls();
+            }
+        });
+
+		editDefaultButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				Display display = event.display;
+				FontDefinition fontDefinition = getSelectedFontDefinition();
+				if (fontDefinition != null) {
+					String defaultFontId = fontDefinition.getDefaultsTo();
+					FontDefinition defaultFontDefinition = themeRegistry.findFont(defaultFontId);
+					editFont(defaultFontDefinition, display);
+				} else {
+					ColorDefinition colorDefinition = getSelectedColorDefinition();
+					if (colorDefinition != null) {
+						String defaultColorId = colorDefinition.getDefaultsTo();
+						ColorDefinition defaultColorDefinition = themeRegistry
+								.findColor(defaultColorId);
+						editColor(defaultColorDefinition, display);
+					}
 				}
+				updateControls();
 			}
-			updateControls();
-		}));
+		});
 
-		goToDefaultButton.addSelectionListener(widgetSelectedAdapter(event -> {
-			FontDefinition fontDefinition = getSelectedFontDefinition();
-			if (fontDefinition != null) {
-				String defaultFontId = fontDefinition.getDefaultsTo();
-				FontDefinition defaultFontDefinition = themeRegistry.findFont(defaultFontId);
-				selectAndReveal(defaultFontDefinition);
-			} else {
-				ColorDefinition colorDefinition = getSelectedColorDefinition();
-				if (colorDefinition != null) {
-					String defaultColorId = colorDefinition.getDefaultsTo();
-					ColorDefinition defaultColorDefinition = themeRegistry
-							.findColor(defaultColorId);
-					selectAndReveal(defaultColorDefinition);
+		goToDefaultButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				FontDefinition fontDefinition = getSelectedFontDefinition();
+				if (fontDefinition != null) {
+					String defaultFontId = fontDefinition.getDefaultsTo();
+					FontDefinition defaultFontDefinition = themeRegistry.findFont(defaultFontId);
+					selectAndReveal(defaultFontDefinition);
+				} else {
+					ColorDefinition colorDefinition = getSelectedColorDefinition();
+					if (colorDefinition != null) {
+						String defaultColorId = colorDefinition.getDefaultsTo();
+						ColorDefinition defaultColorDefinition = themeRegistry
+								.findColor(defaultColorId);
+						selectAndReveal(defaultColorDefinition);
+					}
 				}
+				updateControls();
 			}
-			updateControls();
-		}));
+		});
 
-		expandAllButton.addSelectionListener(widgetSelectedAdapter(event -> tree.getViewer().expandAll()));
+		expandAllButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				tree.getViewer().expandAll();
+			}
+		});
 
     }
 
@@ -1287,14 +1331,17 @@ getPreferenceStore(),
         setPreferenceStore(PrefUtil.getInternalPreferenceStore());
 
         final IThemeManager themeManager = aWorkbench.getThemeManager();
-        themeChangeListener = event -> {
-		    if (event.getProperty().equals(
-		            IThemeManager.CHANGE_CURRENT_THEME)) {
-		        updateThemeInfo(themeManager);
-		        refreshCategory();
-				refreshAllLabels();
-		    }
-		};
+        themeChangeListener = new IPropertyChangeListener() {
+            @Override
+			public void propertyChange(PropertyChangeEvent event) {
+                if (event.getProperty().equals(
+                        IThemeManager.CHANGE_CURRENT_THEME)) {
+                    updateThemeInfo(themeManager);
+                    refreshCategory();
+					refreshAllLabels();
+                }
+            }
+        };
         themeManager.addPropertyChangeListener(themeChangeListener);
 
         updateThemeInfo(themeManager);
@@ -2010,9 +2057,12 @@ getPreferenceStore(),
 		fontSampler.setLayout(gridLayout);
 		fontSampler.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		fontSampler.addPaintListener(e -> {
-			if (currentFont != null) // do the font preview
-				paintFontSample(e.gc);
+		fontSampler.addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent e) {
+				if (currentFont != null) // do the font preview
+					paintFontSample(e.gc);
+			}
 		});
 		return fontSampler;
 	}
@@ -2051,9 +2101,12 @@ getPreferenceStore(),
 		colorSampler.setLayout(gridLayout);
 		colorSampler.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		colorSampler.addPaintListener(e -> {
-			if (currentColor != null) // do the color preview
-				paintColorSample(e.gc);
+		colorSampler.addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent e) {
+				if (currentColor != null) // do the color preview
+					paintColorSample(e.gc);
+			}
 		});
 		return colorSampler;
 	}
