@@ -14,8 +14,8 @@ package org.eclipse.core.internal.databinding.observable.sideeffect;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.eclipse.core.databinding.observable.ISideEffect;
 import org.eclipse.core.databinding.observable.Realm;
-import org.eclipse.core.databinding.observable.sideeffect.ISideEffect;
 import org.eclipse.core.databinding.observable.sideeffect.ISideEffectFactory;
 
 /**
@@ -23,18 +23,19 @@ import org.eclipse.core.databinding.observable.sideeffect.ISideEffectFactory;
  * given {@link Consumer} in {@link ISideEffectFactory#createFactory(Consumer)}.
  *
  * @since 3.3
+ *
  */
 public final class SideEffectFactory implements ISideEffectFactory {
 
 	private Consumer<ISideEffect> sideEffectConsumer;
 
 	/**
-	 * Creates a new factory which will pass all created side-effects to the
-	 * given {@link Consumer}.
+	 * Constructor.
 	 *
 	 * @param sideEffectConsumer
 	 *            {@link Consumer}, where the {@link ISideEffect} objects, which
 	 *            are created by this factory are passed to.
+	 *
 	 */
 	public SideEffectFactory(Consumer<ISideEffect> sideEffectConsumer) {
 		this.sideEffectConsumer = sideEffectConsumer;

@@ -11,22 +11,26 @@
 
 package org.eclipse.jface.databinding.swt;
 
-import org.eclipse.core.databinding.observable.sideeffect.CompositeSideEffect;
-import org.eclipse.core.databinding.observable.sideeffect.ISideEffect;
+import org.eclipse.core.databinding.observable.ISideEffect;
+import org.eclipse.core.databinding.observable.sideeffect.ICompositeSideEffect;
 import org.eclipse.core.databinding.observable.sideeffect.ISideEffectFactory;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Widget;
 
 /**
  * A factory for the creation of an {@link ISideEffectFactory}, which internally
- * manages the created ISideEffects in an {@link CompositeSideEffect}. The given
- * Widget is used to attach an {@link DisposeListener} so that all
+ * manages the created ISideEffects in an {@link ICompositeSideEffect}. The
+ * given Widget is used to attach an {@link DisposeListener} so that all
  * {@link ISideEffect} objects will be disposed automatically on Widget
  * disposal.
  *
  * @since 1.8
+ *
  */
 public final class WidgetSideEffects {
+
+	private WidgetSideEffects() {
+	}
 
 	/**
 	 * Creates an {@link ISideEffectFactory} which will dispose all created
@@ -40,17 +44,14 @@ public final class WidgetSideEffects {
 	 * @return ISideEffectFactory
 	 */
 	public static ISideEffectFactory createFactory(Widget disposableWidget) {
-		CompositeSideEffect compositeSideEffect = (CompositeSideEffect) disposableWidget
-				.getData(CompositeSideEffect.class.getName());
+		ICompositeSideEffect compositeSideEffect = (ICompositeSideEffect) disposableWidget
+				.getData(ICompositeSideEffect.class.getName());
 		if (compositeSideEffect == null) {
-			CompositeSideEffect newCompositeSideEffect = new CompositeSideEffect();
-			disposableWidget.setData(CompositeSideEffect.class.getName(), newCompositeSideEffect);
+			ICompositeSideEffect newCompositeSideEffect = ICompositeSideEffect.create();
+			disposableWidget.setData(ICompositeSideEffect.class.getName(), newCompositeSideEffect);
 			disposableWidget.addDisposeListener(e -> newCompositeSideEffect.dispose());
 			compositeSideEffect = newCompositeSideEffect;
 		}
 		return ISideEffectFactory.createFactory(compositeSideEffect::add);
-	}
-
-	private WidgetSideEffects() {
 	}
 }

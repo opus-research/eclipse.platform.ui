@@ -14,6 +14,7 @@ package org.eclipse.core.databinding.observable.sideeffect;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.eclipse.core.databinding.observable.ISideEffect;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.internal.databinding.observable.sideeffect.SideEffectFactory;
 
@@ -27,7 +28,7 @@ import org.eclipse.core.internal.databinding.observable.sideeffect.SideEffectFac
  * aggregated {@link ISideEffect} instances, which are created by this factory.
  *
  * @see SideEffectFactory
- * @see CompositeSideEffect
+ * @see ICompositeSideEffect
  *
  * @since 1.6
  * @noimplement This interface is not intended to be implemented by clients.
@@ -35,15 +36,17 @@ import org.eclipse.core.internal.databinding.observable.sideeffect.SideEffectFac
 public interface ISideEffectFactory {
 
 	/**
+	 * <p>
 	 * Creates a new {@link ISideEffectFactory} which will notify the given
 	 * {@link Consumer} of every {@link ISideEffect} that is constructed by the
 	 * factory.
+	 * </p>
 	 * <p>
 	 * For example, a {@link Consumer} could be passed to this method which
 	 * automatically inserts every {@link ISideEffect} into the same
-	 * {@link CompositeSideEffect}, allowing their lifecycle to be managed
+	 * {@link ICompositeSideEffect}, allowing their lifecycle to be managed
 	 * automatically by the object which provides the factory.
-	 * <p>
+	 * </p>
 	 * Callers who invoke this {@link #createFactory(Consumer)} method are
 	 * supposed to manage the lifecycle of the aggregated {@link ISideEffect}
 	 * instances, which are created by this factory. They do so by passing in a
@@ -58,7 +61,7 @@ public interface ISideEffectFactory {
 	 *            called on every {@link ISideEffect} it receives at some point
 	 *            in the future.
 	 * @return a newly constructed {@link ISideEffectFactory}
-	 * @see CompositeSideEffect
+	 * @see ICompositeSideEffect
 	 */
 	static ISideEffectFactory createFactory(Consumer<ISideEffect> sideEffectConsumer) {
 		return new SideEffectFactory(sideEffectConsumer);
@@ -67,14 +70,10 @@ public interface ISideEffectFactory {
 	/**
 	 * Creates a new {@link ISideEffect} on the default {@link Realm} but does
 	 * not run it immediately. The lifecycle of the returned {@link ISideEffect}
-	 * will be managed by the factory.
-	 * <p>
-	 * Callers are not required to dispose the resulting {@link ISideEffect},
-	 * but may do so if they wish to dispose it early.
-	 * <p>
-	 * This is similar to {@link ISideEffect#createPaused(Runnable)} except that
-	 * the resulting {@link ISideEffect} will have its lifecycle managed by the
-	 * factory.
+	 * will be managed by the factory. Callers are not responsible for disposing
+	 * the resulting {@link ISideEffect}. So for example pausing, resuming and
+	 * disposing should be done by the aggregating {@link Consumer} rather than
+	 * on each individual {@link ISideEffect} itself.
 	 *
 	 * @param runnable
 	 *            the runnable to execute. Must be idempotent.
@@ -88,13 +87,12 @@ public interface ISideEffectFactory {
 
 	/**
 	 * Creates a new {@link ISideEffect} on the given Realm but does not
-	 * activate it immediately. Callers are not required to dispose the
-	 * resulting {@link ISideEffect}, but may do so if they wish to dispose it
-	 * early.
-	 * <p>
-	 * This is similar to {@link ISideEffect#createPaused(Realm, Runnable)}
-	 * except that the resulting {@link ISideEffect} will have its lifecycle
-	 * managed by the factory.
+	 * activate it immediately. The lifecycle of the returned
+	 * {@link ISideEffect} will be managed by the factory. Callers are not
+	 * responsible for disposing the resulting {@link ISideEffect}. So for
+	 * example pausing, resuming and disposing should be done by the aggregating
+	 * {@link Consumer} rather than on each individual {@link ISideEffect}
+	 * itself.
 	 *
 	 * @param realm
 	 *            the realm to execute
@@ -112,14 +110,12 @@ public interface ISideEffectFactory {
 	 * Runs the given runnable once synchronously. The runnable will then run
 	 * again after any tracked getter invoked by the runnable changes. It will
 	 * continue doing so until the returned {@link ISideEffect} is disposed. The
-	 * returned {@link ISideEffect} is associated with the default realm.
-	 * <p>
-	 * Callers are not required to dispose the resulting {@link ISideEffect},
-	 * but may do so if they wish to dispose it early.
-	 * <p>
-	 * This is similar to {@link ISideEffect#create(Runnable)} except that the
-	 * resulting {@link ISideEffect} will have its lifecycle managed by the
-	 * factory.
+	 * returned {@link ISideEffect} is associated with the default realm. The
+	 * lifecycle of the returned {@link ISideEffect} will be managed by the
+	 * factory. Callers are not responsible for disposing the resulting
+	 * {@link ISideEffect}. So for example pausing, resuming and disposing
+	 * should be done by the aggregating {@link Consumer} rather than on each
+	 * individual {@link ISideEffect} itself.
 	 *
 	 * @param runnable
 	 *            an idempotent runnable which will be executed once
@@ -140,20 +136,17 @@ public interface ISideEffectFactory {
 	 * will happen again after any tracked getter invoked by the supplier
 	 * changes. It will continue to do so until the given {@link ISideEffect} is
 	 * disposed. The returned {@link ISideEffect} is associated with the default
-	 * realm.
-	 * <p>
-	 * Callers are not required to dispose the resulting {@link ISideEffect},
-	 * but may do so if they wish to dispose it early.
+	 * realm. The lifecycle of the returned {@link ISideEffect} will be managed
+	 * by the factory. Callers are not responsible for disposing the resulting
+	 * {@link ISideEffect}. So for example pausing, resuming and disposing
+	 * should be done by the aggregating {@link Consumer} rather than on each
+	 * individual {@link ISideEffect} itself.
 	 * <p>
 	 * The ISideEffect will initially be in the resumed state.
 	 * <p>
 	 * The first invocation of this method will be synchronous. This version is
 	 * slightly more efficient than {@link #createResumed(Supplier, Consumer)}
 	 * and should be preferred if synchronous execution is acceptable.
-	 * <p>
-	 * This is similar to {@link ISideEffect#create(Supplier, Consumer)} except
-	 * that the resulting {@link ISideEffect} will have its lifecycle managed by
-	 * the factory.
 	 *
 	 * @param supplier
 	 *            a supplier which will compute a value and be monitored for
@@ -177,10 +170,11 @@ public interface ISideEffectFactory {
 	 * will happen again after any tracked getter invoked by the supplier
 	 * changes. It will continue to do so until the given {@link ISideEffect} is
 	 * disposed. The returned {@link ISideEffect} is associated with the default
-	 * realm.
-	 * <p>
-	 * Callers are not required to dispose the resulting {@link ISideEffect},
-	 * but may do so if they wish to dispose it early.
+	 * realm. The lifecycle of the returned {@link ISideEffect} will be managed
+	 * by the factory. Callers are not responsible for disposing the resulting
+	 * {@link ISideEffect}. So for example pausing, resuming and disposing
+	 * should be done by the aggregating {@link Consumer} rather than on each
+	 * individual {@link ISideEffect} itself.
 	 * <p>
 	 * The ISideEffect will initially be in the resumed state.
 	 * <p>
@@ -190,10 +184,6 @@ public interface ISideEffectFactory {
 	 * first invocation of the {@link ISideEffect}. However, this extra safety
 	 * comes with a small performance cost over
 	 * {@link #create(Supplier, Consumer)}.
-	 * <p>
-	 * This is similar to {@link ISideEffect#createResumed(Supplier, Consumer)}
-	 * except that the resulting {@link ISideEffect} will have its lifecycle
-	 * managed by the factory.
 	 *
 	 * @param supplier
 	 *            a supplier which will compute a value and be monitored for
@@ -251,10 +241,6 @@ public interface ISideEffectFactory {
 	 *   })
 	 * }
 	 * </pre>
-	 * This is similar to
-	 * {@link ISideEffect#consumeOnceAsync(Supplier, Consumer)} except that the
-	 * resulting {@link ISideEffect} will have its lifecycle managed by the
-	 * factory.
 	 *
 	 * @param supplier
 	 *            supplier which returns null if the side-effect should continue
@@ -269,4 +255,5 @@ public interface ISideEffectFactory {
 	 *         paused.
 	 */
 	<T> ISideEffect consumeOnceAsync(Supplier<T> supplier, Consumer<T> consumer);
+
 }
