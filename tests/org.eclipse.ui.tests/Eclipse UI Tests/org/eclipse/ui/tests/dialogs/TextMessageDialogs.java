@@ -74,14 +74,14 @@ public class TextMessageDialogs extends TestCase {
         Dialog dialog = getConfirmDialog(
                 getEditorString("Editor_error_activated_deleted_close_title"),
                 getEditorString("Editor_error_activated_deleted_close_message"));
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 
     public void testFileChanged() {
         MessageDialog dialog = getQuestionDialog(
                 getEditorString("Editor_error_activated_outofsync_title"),
                 getEditorString("Editor_error_activated_outofsync_message"));
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 
 
@@ -94,14 +94,14 @@ public class TextMessageDialogs extends TestCase {
                 MessageDialog.QUESTION, 0,
 				getEditorString("Editor_error_activated_deleted_save_button_save"),
 				getEditorString("Editor_error_activated_deleted_save_button_close"));
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 
     public void testUpdateConflict() {
         MessageDialog dialog = getQuestionDialog(
                 getEditorString("Editor_error_save_outofsync_title"),
                 getEditorString("Editor_error_save_outofsync_message"));
-        DialogCheck.assertDialog(dialog);
+        DialogCheck.assertDialog(dialog, this);
     }
 
 
