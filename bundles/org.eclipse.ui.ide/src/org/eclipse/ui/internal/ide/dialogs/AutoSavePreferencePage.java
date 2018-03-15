@@ -45,6 +45,8 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
  *
  */
 public class AutoSavePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+	public AutoSavePreferencePage() {
+	}
 
 	private Button autoSaveButton;
 
