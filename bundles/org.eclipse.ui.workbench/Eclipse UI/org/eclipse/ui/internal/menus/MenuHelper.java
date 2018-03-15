@@ -71,6 +71,7 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionDelegate;
@@ -146,18 +147,15 @@ public class MenuHelper {
 		return getIconURI(imageDescriptor, null);
 	}
 
-	private static String getUrl(Class<? extends ImageDescriptor> idc, ImageDescriptor imageDescriptor) {
+	private static URL getUrl(Class<?> idc, ImageDescriptor imageDescriptor) {
 		try {
 			if (urlField == null) {
 				urlField = idc.getDeclaredField("url"); //$NON-NLS-1$
 				urlField.setAccessible(true);
 			}
-			Object value = urlField.get(imageDescriptor);
-			if (value != null) {
-				return value.toString();
-			}
+			return (URL) urlField.get(imageDescriptor);
 		} catch (SecurityException | NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
-			WorkbenchPlugin.log(e);
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -256,7 +254,7 @@ public class MenuHelper {
 			}
 		} catch (InvalidRegistryObjectException | CoreException e) {
 			// visWhenMap.put(configElement, null);
-			WorkbenchPlugin.log(e);
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -713,13 +711,16 @@ public class MenuHelper {
 				}
 				ActionDescriptor desc = getDescriptor(context);
 				final IAction action = desc.getAction();
-				final IPropertyChangeListener propListener = event -> {
-					if (IAction.CHECKED.equals(event.getProperty())) {
-						boolean checked = false;
-						if (event.getNewValue() instanceof Boolean) {
-							checked = ((Boolean) event.getNewValue()).booleanValue();
+				final IPropertyChangeListener propListener = new IPropertyChangeListener() {
+					@Override
+					public void propertyChange(PropertyChangeEvent event) {
+						if (IAction.CHECKED.equals(event.getProperty())) {
+							boolean checked = false;
+							if (event.getNewValue() instanceof Boolean) {
+								checked = ((Boolean) event.getNewValue()).booleanValue();
+							}
+							model.setSelected(checked);
 						}
-						model.setSelected(checked);
 					}
 				};
 				action.addPropertyChangeListener(propListener);
@@ -943,22 +944,30 @@ public class MenuHelper {
 			toolItem.setObject(new DirectProxy(action));
 			toolItem.setEnabled(action.isEnabled());
 
-			final IPropertyChangeListener propertyListener = event -> {
-				String property = event.getProperty();
-				if (property.equals(IAction.ENABLED)) {
-					toolItem.setEnabled(action.isEnabled());
-				} else if (property.equals(IAction.CHECKED)) {
-					toolItem.setSelected(action.isChecked());
-				} else if (property.equals(IAction.TEXT)) {
-					toolItem.setLabel(action.getText());
-				} else if (property.equals(IAction.TOOL_TIP_TEXT)) {
-					toolItem.setLabel(action.getToolTipText());
+			final IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent event) {
+					String property = event.getProperty();
+					if (property.equals(IAction.ENABLED)) {
+						toolItem.setEnabled(action.isEnabled());
+					} else if (property.equals(IAction.CHECKED)) {
+						toolItem.setSelected(action.isChecked());
+					} else if (property.equals(IAction.TEXT)) {
+						toolItem.setLabel(action.getText());
+					} else if (property.equals(IAction.TOOL_TIP_TEXT)) {
+						toolItem.setLabel(action.getToolTipText());
+					}
 				}
 			};
 			// property listener is removed in
 			// DirectContributionItem#handleWidgetDispose()
 			action.addPropertyChangeListener(propertyListener);
-			toolItem.getTransientData().put(AbstractContributionItem.DISPOSABLE, (Runnable) () -> action.removePropertyChangeListener(propertyListener));
+			toolItem.getTransientData().put(AbstractContributionItem.DISPOSABLE, new Runnable() {
+						@Override
+						public void run() {
+							action.removePropertyChangeListener(propertyListener);
+						}
+					});
 			return toolItem;
 		}
 		return null;
@@ -1089,8 +1098,8 @@ public class MenuHelper {
 		// Attempt to retrieve URIs from the descriptor and convert into a more
 		// durable form in case it's to be persisted
 		if (descriptor.getClass().toString().endsWith("URLImageDescriptor")) { //$NON-NLS-1$
-			String url = getUrl(descriptor.getClass(), descriptor);
-			return rewriteDurableURL(url);
+			URL url = getUrl(descriptor.getClass(), descriptor);
+			return rewriteDurableURL(url.toExternalForm());
 		} else if (descriptor.getClass().toString().endsWith("FileImageDescriptor")) { //$NON-NLS-1$
 			Class<?> sourceClass = getLocation(descriptor);
 			if (sourceClass == null) {

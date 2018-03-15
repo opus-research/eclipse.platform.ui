@@ -27,6 +27,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -82,7 +84,8 @@ public class InstallationDialog extends TrayDialog implements
 			int visibleChildren = 0;
 			Button closeButton = getButton(IDialogConstants.CLOSE_ID);
 
-			for (Control control : children) {
+			for (int i = 0; i < children.length; i++) {
+				Control control = children[i];
 				if (closeButton == control)
 					closeButton.dispose();
 				else {
@@ -182,14 +185,20 @@ public class InstallationDialog extends TrayDialog implements
 		folderData.heightHint = convertVerticalDLUsToPixels(TAB_HEIGHT_IN_DLUS);
 		folder.setLayoutData(folderData);
 		folder.addSelectionListener(createFolderSelectionListener());
-		folder.addDisposeListener(e -> releaseContributions());
+		folder.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				releaseContributions();
+			}
+		});
 		return composite;
 	}
 
 	protected void createFolderItems(TabFolder folder) {
 		IConfigurationElement[] elements = ConfigurationInfo
 				.getSortedExtensions(loadElements());
-		for (IConfigurationElement element : elements) {
+		for (int i = 0; i < elements.length; i++) {
+			IConfigurationElement element = elements[i];
 			TabItem item = new TabItem(folder, SWT.NONE);
 			item.setText(element
 					.getAttribute(IWorkbenchRegistryConstants.ATT_NAME));
@@ -261,7 +270,13 @@ public class InstallationDialog extends TrayDialog implements
 						.getAttribute(IWorkbenchRegistryConstants.ATT_ID));
 				createButtons(page);
 				item.setData(page);
-				item.addDisposeListener(e -> page.dispose());
+				item.addDisposeListener(new DisposeListener() {
+
+					@Override
+					public void widgetDisposed(DisposeEvent e) {
+						page.dispose();
+					}
+				});
 				pageComposite.layout(true, true);
 
 			} catch (CoreException e1) {
