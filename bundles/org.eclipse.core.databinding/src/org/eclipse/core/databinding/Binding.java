@@ -16,7 +16,6 @@ package org.eclipse.core.databinding;
 
 import java.util.Collections;
 
-import org.eclipse.core.databinding.observable.DisposeEvent;
 import org.eclipse.core.databinding.observable.IDisposeListener;
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Observables;
@@ -62,18 +61,10 @@ public abstract class Binding extends ValidationStatusProvider {
 			throw new IllegalArgumentException("Target observable is disposed"); //$NON-NLS-1$
 		if (model.isDisposed())
 			throw new IllegalArgumentException("Model observable is disposed"); //$NON-NLS-1$
-		this.disposeListener = new IDisposeListener() {
-			@Override
-			public void handleDispose(DisposeEvent staleEvent) {
-				Binding.this.context.getValidationRealm().exec(new Runnable() {
-					@Override
-					public void run() {
-						if (!isDisposed())
-							dispose();
-					}
-				});
-			}
-		};
+		this.disposeListener = staleEvent -> Binding.this.context.getValidationRealm().exec(() -> {
+			if (!isDisposed())
+				dispose();
+		});
 		target.addDisposeListener(disposeListener);
 		model.addDisposeListener(disposeListener);
 		preInit();
