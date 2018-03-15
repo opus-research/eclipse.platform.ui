@@ -165,7 +165,7 @@ public class ShowInMenu extends ContributionItem implements
 			return;
 		}
 		WorkbenchPartReference r = (WorkbenchPartReference) page.getActivePartReference();
-		if (r != null && r.getModel() != null) {
+		if (page != null && r != null && r.getModel() != null) {
 			((WorkbenchPage) page).updateShowInSources(r.getModel());
 		}
 

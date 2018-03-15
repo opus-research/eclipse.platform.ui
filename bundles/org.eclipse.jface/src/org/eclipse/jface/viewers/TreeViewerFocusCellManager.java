@@ -56,7 +56,8 @@ public class TreeViewerFocusCellManager extends SWTFocusCellManager {
 				return false;
 			}
 
-			return ((TreeItem) cellToCollapse.getItem()).getExpanded()
+			return cellToCollapse != null
+					&& ((TreeItem) cellToCollapse.getItem()).getExpanded()
 					&& event.keyCode == SWT.ARROW_LEFT
 					&& isFirstColumnCell(cellToCollapse);
 		}
@@ -69,7 +70,8 @@ public class TreeViewerFocusCellManager extends SWTFocusCellManager {
 				return false;
 			}
 
-			return ((TreeItem) cellToExpand.getItem()).getItemCount() > 0
+			return cellToExpand != null
+					&& ((TreeItem) cellToExpand.getItem()).getItemCount() > 0
 					&& !((TreeItem) cellToExpand.getItem()).getExpanded()
 					&& event.keyCode == SWT.ARROW_RIGHT
 					&& isFirstColumnCell(cellToExpand);
