@@ -14,8 +14,6 @@
 
 package org.eclipse.ui.internal.progress;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import com.ibm.icu.text.DateFormat;
 import java.net.URL;
 import java.util.ArrayList;
@@ -48,6 +46,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -252,10 +252,13 @@ public class ProgressInfoItem extends Composite {
 		actionButton = new ToolItem(actionBar, SWT.NONE);
 		actionButton
 				.setToolTipText(ProgressMessages.NewProgressView_CancelJobToolTip);
-		actionButton.addSelectionListener(widgetSelectedAdapter(e -> {
-			actionButton.setEnabled(false);
-			cancelOrRemove();
-		}));
+		actionButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				actionButton.setEnabled(false);
+				cancelOrRemove();
+			}
+		});
 		actionBar.addListener(SWT.Traverse, event -> {
 			if (indexListener == null) {
 				return;
@@ -771,7 +774,12 @@ public class ProgressInfoItem extends Composite {
 
 			link.setLayoutData(linkData);
 
-			link.addSelectionListener(widgetSelectedAdapter(e -> executeTrigger()));
+			link.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					executeTrigger();
+				}
+			});
 
 			link.addListener(SWT.Resize, event -> {
 
