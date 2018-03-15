@@ -15,6 +15,7 @@ package org.eclipse.ui.plugin;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -25,11 +26,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IPluginDescriptor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -393,62 +392,53 @@ public abstract class AbstractUIPlugin extends Plugin {
      * </p>
      */
     protected void loadDialogSettings() {
-    	dialogSettings = createEmptySettings();
-		boolean loaded = loadDialogSettingsFromWorkspace();
-		// otherwise look for bundle specific dialog settings
-		if (!loaded) {
-			loadDefaultDialogSettingsFromBundle();
-		}
-	}
+        dialogSettings = new DialogSettings("Workbench"); //$NON-NLS-1$
 
-	/**
-	 * @return true if the workspace settings file was successfully read
-	 */
-	private boolean loadDialogSettingsFromWorkspace() {
+        // bug 69387: The instance area should not be created (in the call to
+        // #getStateLocation) if -data @none or -data @noDefault was used
         IPath dataLocation = getStateLocationOrNull();
-		if (dataLocation == null) {
-			// bug 69387: The instance area should not be created (in the call to
-			// #getStateLocation) if -data @none or -data @noDefault was used
-			return false;
-		}
-		// try r/w state area in the local file system
-		String readWritePath = dataLocation.append(FN_DIALOG_SETTINGS).toOSString();
-		File settingsFile = new File(readWritePath);
-		if (settingsFile.exists()) {
-			try {
-				dialogSettings.load(readWritePath);
-			} catch (IOException e) {
-				// load failed so ensure we have an empty settings
-				dialogSettings = createEmptySettings();
-				getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(),
-						"Failed to load dialog settings from: " + settingsFile, e)); //$NON-NLS-1$
-			}
-			return true;
-		}
-		return false;
-    }
+        if (dataLocation != null) {
+	        // try r/w state area in the local file system
+	        String readWritePath = dataLocation.append(FN_DIALOG_SETTINGS)
+	                .toOSString();
+	        File settingsFile = new File(readWritePath);
+	        if (settingsFile.exists()) {
+	            try {
+	                dialogSettings.load(readWritePath);
+	            } catch (IOException e) {
+	                // load failed so ensure we have an empty settings
+	                dialogSettings = new DialogSettings("Workbench"); //$NON-NLS-1$
+	            }
 
-	private void loadDefaultDialogSettingsFromBundle() {
-		Bundle bundle = getBundle();
-		URL dsURL = BundleUtility.find(bundle, FN_DIALOG_SETTINGS);
-		if (dsURL == null) {
-			// no bundle defaults
+	            return;
+	        }
+        }
+
+        // otherwise look for bundle specific dialog settings
+        URL dsURL = BundleUtility.find(getBundle(), FN_DIALOG_SETTINGS);
+        if (dsURL == null) {
 			return;
 		}
-		try (BufferedReader reader = new BufferedReader(
-				new InputStreamReader(dsURL.openStream(), StandardCharsets.UTF_8))) {
-			dialogSettings.load(reader);
-		} catch (IOException e) {
-			getLog().log(new Status(IStatus.ERROR, bundle.getSymbolicName(),
-					"Failed to load dialog settings from: " + dsURL, e)); //$NON-NLS-1$
-			// load failed so ensure we have an empty settings
-			dialogSettings = createEmptySettings();
-		}
-	}
 
-	private DialogSettings createEmptySettings() {
-		return new DialogSettings("Workbench"); //$NON-NLS-1$
-	}
+        InputStream is = null;
+        try {
+            is = dsURL.openStream();
+            BufferedReader reader = new BufferedReader(
+					new InputStreamReader(is, StandardCharsets.UTF_8));
+            dialogSettings.load(reader);
+        } catch (IOException e) {
+            // load failed so ensure we have an empty settings
+            dialogSettings = new DialogSettings("Workbench"); //$NON-NLS-1$
+        } finally {
+            try {
+                if (is != null) {
+					is.close();
+				}
+            } catch (IOException e) {
+                // do nothing
+            }
+        }
+    }
 
     /**
      * Loads the preference store for this plug-in.

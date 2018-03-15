@@ -34,7 +34,7 @@ public class StringToLongValidatorTest extends StringToNumberValidatorTestHarnes
 
 	@Override
 	protected Number getOutOfRangeNumber() {
-		return Double.valueOf(Double.MAX_VALUE);
+		return new Double(Double.MAX_VALUE);
 	}
 
 	@Override
