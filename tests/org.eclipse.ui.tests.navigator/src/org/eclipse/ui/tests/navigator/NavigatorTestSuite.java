@@ -16,7 +16,6 @@ package org.eclipse.ui.tests.navigator;
 
 import org.eclipse.ui.tests.navigator.cdt.CdtTest;
 import org.eclipse.ui.tests.navigator.jst.JstPipelineTest;
-import org.eclipse.ui.tests.navigator.resources.NestedResourcesTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -26,8 +25,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		WorkingSetTest.class, ActivityTest.class, OpenTest.class, INavigatorContentServiceTests.class,
 		ProgrammaticOpenTest.class, PipelineTest.class, PipelineChainTest.class, JstPipelineTest.class,
 		LabelProviderTest.class, SorterTest.class, ViewerTest.class, CdtTest.class, M12Tests.class,
-		FirstClassM1Tests.class, LinkHelperTest.class, ResourceTransferTest.class, EvaluationCacheTest.class,
-		NestedResourcesTests.class
+		FirstClassM1Tests.class, LinkHelperTest.class, ResourceTransferTest.class, EvaluationCacheTest.class
 		// DnDTest.class, // DnDTest.testSetDragOperation() fails
 		// PerformanceTest.class // Does not pass on all platforms see bug 264449
 })

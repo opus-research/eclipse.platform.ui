@@ -220,10 +220,10 @@ public class ResourceAndContainerGroup implements Listener {
 
 		// container group
 		if (heightHint == SWT.DEFAULT) {
-			containerGroup = new ContainerSelectionGroup(composite, this, false,
+			containerGroup = new ContainerSelectionGroup(composite, this, true,
 					null, showClosedProjects);
 		} else {
-			containerGroup = new ContainerSelectionGroup(composite, this, false,
+			containerGroup = new ContainerSelectionGroup(composite, this, true,
 					null, showClosedProjects, heightHint,
 					SIZING_TEXT_FIELD_WIDTH);
 		}
