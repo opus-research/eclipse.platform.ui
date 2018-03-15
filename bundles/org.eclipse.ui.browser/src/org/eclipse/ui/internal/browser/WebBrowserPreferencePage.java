@@ -480,8 +480,8 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 	// Uncheck all the items except the current one that was just checked
 	protected void checkNewDefaultBrowser(Object browser) {
 		TableItem[] children = tableViewer.getTable().getItems();
-		for (TableItem element : children) {
-			TableItem item = element;
+		for (int i = 0; i < children.length; i++) {
+			TableItem item = children[i];
 
 			if (!(item.getData().equals(browser)))
 				item.setChecked(false);
@@ -509,11 +509,11 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 		String[] names = directory.list();
 		List<File> subDirs = new ArrayList<>();
 
-		for (String name : names) {
+		for (int i = 0; i < names.length; i++) {
 			if (monitor.isCanceled())
 				return;
 
-			File file = new File(directory, name);
+			File file = new File(directory, names[i]);
 
 			if (existingPaths.contains(file.getAbsolutePath().toLowerCase()))
 				continue;

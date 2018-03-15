@@ -15,6 +15,7 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -187,9 +188,9 @@ public class CommonFiltersTab extends CustomizationTab {
 			}
 
 			private TableItem getFirstHighlightedItem(TableItem[] items) {
-				for (TableItem item : items) {
-					if (patternFilter.match(item.getText())) {
-						return item;
+				for (int i = 0; i < items.length; i++) {
+					if (patternFilter.match(items[i].getText())) {
+						return items[i];
 					}
 				}
 				return null;
@@ -213,8 +214,8 @@ public class CommonFiltersTab extends CustomizationTab {
 		getTableViewer().refresh();
 
 		Set<Object> checkedItems = getCheckedItems();
-		for (Object object : checkedItems) {
-			getTableViewer().setChecked(object, true);
+		for (Iterator<Object> iterator = checkedItems.iterator(); iterator.hasNext();) {
+			getTableViewer().setChecked(iterator.next(), true);
 		}
 	}
 
@@ -224,13 +225,13 @@ public class CommonFiltersTab extends CustomizationTab {
 		ICommonFilterDescriptor filterDescriptor;
 		INavigatorFilterService filterService = getContentService()
 				.getFilterService();
-		for (Object element : children) {
-			filterDescriptor = (ICommonFilterDescriptor) element;
+		for (int i = 0; i < children.length; i++) {
+			filterDescriptor = (ICommonFilterDescriptor) children[i];
 			if(filterService.isActive(filterDescriptor.getId())) {
-				getTableViewer().setChecked(element, true);
-				getCheckedItems().add(element);
+				getTableViewer().setChecked(children[i], true);
+				getCheckedItems().add(children[i]);
 			} else {
-				getTableViewer().setChecked(element, false);
+				getTableViewer().setChecked(children[i], false);
 			}
 		}
 	}
