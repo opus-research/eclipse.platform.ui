@@ -316,7 +316,6 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		RowLayout layout = new RowLayout();
 		layout.type = SWT.VERTICAL;
 		layout.marginLeft = 14;
-		layout.spacing = 0;
 		panel.setLayout(layout);
 		recentWorkspacesComposites = new HashMap<>(launchData.getRecentWorkspaces().length);
 		Map<String, String> uniqueWorkspaceNames = createUniqueWorkspaceNameMap();
@@ -336,7 +335,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 			recentWorkspacePanel.setLayout(recentWorkspacePanelLayout);
 
 			Link link = new Link(recentWorkspacePanel, SWT.WRAP);
-			link.setLayoutData(new GridData(SWT.DEFAULT, SWT.DEFAULT));
+			link.setLayoutData(new GridData(500, SWT.DEFAULT));
 			link.setText("<a>" + uniqueWorkspaceEntry.getKey() + "</a>"); //$NON-NLS-1$//$NON-NLS-2$
 			link.setToolTipText(recentWorkspace);
 
