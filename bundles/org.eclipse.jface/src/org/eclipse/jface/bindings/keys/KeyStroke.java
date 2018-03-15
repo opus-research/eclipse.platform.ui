@@ -263,6 +263,7 @@ public final class KeyStroke extends Trigger {
 	 *
 	 * @return The formal string representation for this key stroke. Guaranteed
 	 *         not to be <code>null</code>.
+	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public final String toString() {
