@@ -361,7 +361,6 @@ public class StringFieldEditor extends FieldEditor {
                     @Override
 					public void focusLost(FocusEvent e) {
                         valueChanged();
-                        clearErrorMessage();
                     }
                 });
                 break;
