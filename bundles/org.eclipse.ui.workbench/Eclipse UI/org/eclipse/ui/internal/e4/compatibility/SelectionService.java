@@ -56,8 +56,8 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	private IWorkbenchPart activePart;
 
-	private ListenerList<ISelectionListener> listeners = new ListenerList<>();
-	private ListenerList<ISelectionListener> postSelectionListeners = new ListenerList<>();
+	private ListenerList listeners = new ListenerList();
+	private ListenerList postSelectionListeners = new ListenerList();
 	private Map<String, Set<ISelectionListener>> targetedListeners = new HashMap<>();
 	private Map<String, Set<ISelectionListener>> targetedPostSelectionListeners = new HashMap<>();
 
@@ -253,10 +253,10 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 	}
 
 	private void notifyListeners(IWorkbenchPart workbenchPart, ISelection selection,
-			ListenerList<ISelectionListener> listenerList) {
-		for (ISelectionListener listener : listenerList) {
+			ListenerList listenerList) {
+		for (Object listener : listenerList.getListeners()) {
 			if (selection != null || listener instanceof INullSelectionListener) {
-				listener.selectionChanged(workbenchPart, selection);
+				((ISelectionListener) listener).selectionChanged(workbenchPart, selection);
 			}
 		}
 	}
