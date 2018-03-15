@@ -160,6 +160,7 @@ import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityView;
+import org.eclipse.ui.internal.e4.compatibility.E4Util;
 import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayout;
 import org.eclipse.ui.internal.e4.compatibility.SelectionService;
 import org.eclipse.ui.internal.menus.MenuHelper;
@@ -4707,16 +4708,16 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	@Override
 	public void showEditor(IEditorReference ref) {
-		if (ref instanceof EditorReference) {
-			activate(((EditorReference) ref).getPart(true));
-		}
+		// FIXME compat showEditor
+		E4Util.unsupported("showEditor"); //$NON-NLS-1$
+
 	}
 
 	@Override
 	public void hideEditor(IEditorReference ref) {
-		if (ref instanceof EditorReference) {
-			hidePart(((EditorReference) ref).getModel(), true, true, false);
-		}
+		// FIXME compat hideEditor
+		E4Util.unsupported("hideEditor"); //$NON-NLS-1$
+
 	}
 
 	private String getEditorImageURI(EditorReference reference) {
