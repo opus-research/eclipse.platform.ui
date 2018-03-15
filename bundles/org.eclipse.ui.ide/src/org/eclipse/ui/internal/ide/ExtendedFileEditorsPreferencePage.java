@@ -46,8 +46,6 @@ public class ExtendedFileEditorsPreferencePage extends FileEditorsPreferencePage
 	protected Composite createContents(Composite parent) {
 		Composite res = (Composite)super.createContents(parent);
 
-		final UnassociatedEditorStrategyRegistry registry = IDEWorkbenchPlugin.getDefault()
-				.getUnassociatedEditorStrategyRegistry();
 		Composite defaultStrategyComposite = new Composite(res, SWT.NONE);
 		defaultStrategyComposite.setLayout(new GridLayout(2, false));
 		GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
@@ -62,7 +60,7 @@ public class ExtendedFileEditorsPreferencePage extends FileEditorsPreferencePage
 			@Override
 			public String getText(Object o) {
 				String id = (String) o;
-				String label = registry.getLabel(id);
+				String label = UnassociatedEditorStrategyRegistry.getLabel(id);
 				if (label != null) {
 					return label;
 				}
@@ -71,7 +69,7 @@ public class ExtendedFileEditorsPreferencePage extends FileEditorsPreferencePage
 			}
 		});
 		viewer.setContentProvider(new ArrayContentProvider());
-		viewer.setInput(registry.retrieveAllStrategies());
+		viewer.setInput(UnassociatedEditorStrategyRegistry.retrieveAllStrategies());
 		this.idePreferenceStore = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
 		viewer.setSelection(
 				new StructuredSelection(this.idePreferenceStore.getString(IDE.UNASSOCIATED_EDITOR_STRATEGY_PREFERENCE_KEY)));
