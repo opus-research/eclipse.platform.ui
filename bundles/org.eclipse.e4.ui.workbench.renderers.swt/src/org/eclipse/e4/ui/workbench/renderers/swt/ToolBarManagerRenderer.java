@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -359,6 +360,12 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 		};
 		context.runAndTrack(enablementUpdater);
+	}
+
+	@PreDestroy
+	public void contextDisposed() {
+		System.out.printf("TBMR:dispose: modelToManager size = %d, managerToModel size = %d\n", //$NON-NLS-1$
+				modelToManager.size(), managerToModel.size());
 	}
 
 	@Override
@@ -825,6 +832,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public void linkModelToManager(MToolBar model, ToolBarManager manager) {
 		modelToManager.put(model, manager);
 		managerToModel.put(manager, model);
+		System.out.printf("TBMR:linkModelToManager: modelToManager size = %d, managerToModel size = %d\n", //$NON-NLS-1$
+				modelToManager.size(), managerToModel.size());
 	}
 
 	/**
@@ -832,8 +841,17 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 * @param manager
 	 */
 	public void clearModelToManager(MToolBar model, ToolBarManager manager) {
+		for (MToolBarElement element : model.getChildren()) {
+			if (element instanceof MToolBar) {
+				clearModelToManager((MToolBar) element, getManager((MToolBar) element));
+			}
+			IContributionItem ici = getContribution(element);
+			clearModelToContribution(element, ici);
+		}
 		modelToManager.remove(model);
 		managerToModel.remove(manager);
+		System.out.printf("TBMR:clearModelToManager: modelToManager size = %d, managerToModel size = %d\n", //$NON-NLS-1$
+				modelToManager.size(), managerToModel.size());
 	}
 
 	/**
@@ -866,6 +884,12 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 * @param item
 	 */
 	public void clearModelToContribution(MToolBarElement model, IContributionItem item) {
+		if (model instanceof MToolBar) {
+			for (MToolBarElement element : ((MToolBar) model).getChildren()) {
+				IContributionItem ici = getContribution(element);
+				clearModelToContribution(element, ici);
+			}
+		}
 		modelToContribution.remove(model);
 		contributionToModel.remove(item);
 	}

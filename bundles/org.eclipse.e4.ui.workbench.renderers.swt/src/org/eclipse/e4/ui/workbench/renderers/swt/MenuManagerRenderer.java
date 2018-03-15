@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 460556
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 391430, 472654
  *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 473779
+ *     Axel Richard <axel.richard@oebo.fr> - Bug 354538
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -877,15 +878,22 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	public void linkModelToManager(MMenu model, MenuManager manager) {
 		modelToManager.put(model, manager);
 		managerToModel.put(manager, model);
+		System.out.printf("MMR:linkModelToManager: modelToManager size = %d, managerToModel size = %d\n", //$NON-NLS-1$
+				modelToManager.size(), managerToModel.size());
 	}
 
 	public void clearModelToManager(MMenu model, MenuManager manager) {
 		for (MMenuElement element : model.getChildren()) {
+			if (element instanceof MMenu) {
+				clearModelToManager((MMenu) element, getManager((MMenu) element));
+			}
 			IContributionItem ici = getContribution(element);
 			clearModelToContribution(element, ici);
 		}
 		modelToManager.remove(model);
 		managerToModel.remove(manager);
+		System.out.printf("MMR:clearModelToManager: modelToManager size = %d, managerToModel size = %d\n", //$NON-NLS-1$
+				modelToManager.size(), managerToModel.size());
 	}
 
 	public IContributionItem getContribution(MMenuElement model) {
@@ -902,6 +910,12 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	}
 
 	public void clearModelToContribution(MMenuElement model, IContributionItem item) {
+		if (model instanceof MMenu) {
+			for (MMenuElement element : ((MMenu) model).getChildren()) {
+				IContributionItem ici = getContribution(element);
+				clearModelToContribution(element, ici);
+			}
+		}
 		modelToContribution.remove(model);
 		contributionToModel.remove(item);
 	}
