@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,9 +33,9 @@ import org.eclipse.ui.services.ISourceProviderService;
 public class PersonService implements IPersonService, IDisposable {
 
 	private static final int ME = 1114;
-	private Map people = new TreeMap();
+	private Map<Integer, Person> people = new TreeMap<>();
 	private IServiceLocator serviceLocator;
-	private ListenerList listeners = new ListenerList(ListenerList.IDENTITY);
+	private ListenerList<IPropertyChangeListener> listeners = new ListenerList<>(ListenerList.IDENTITY);
 
 	public PersonService(IServiceLocator locator) {
 		serviceLocator = locator;
@@ -50,8 +50,8 @@ public class PersonService implements IPersonService, IDisposable {
 	private void fillModel() {
 		int i = ME;
 		for (int j = 0; j < datafill.length; j += 2) {
-			Integer iid = new Integer(i++);
-			Person p = new Person(iid.intValue(), datafill[j], datafill[j + 1]);
+			int iid = i++;
+			Person p = new Person(iid, datafill[j], datafill[j + 1]);
 			if (p.getId() == ME) {
 				p.setAdminRights(true);
 			}
@@ -59,54 +59,34 @@ public class PersonService implements IPersonService, IDisposable {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#addPersonChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
-	 */
+	@Override
 	public void addPersonChangeListener(IPropertyChangeListener listener) {
 		listeners.add(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#getPeople()
-	 */
-	public Collection getPeople() {
+	@Override
+	public Collection<Person> getPeople() {
 		return Collections.unmodifiableCollection(people.values());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#getPerson(int)
-	 */
+	@Override
 	public Person getPerson(int id) {
-		Person p = (Person) people.get(new Integer(id));
+		Person p = people.get(Integer.valueOf(id));
 		if (p == null) {
 			return null;
 		}
 		return p.copy();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#removePersonChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
-	 */
+	@Override
 	public void removePersonChangeListener(IPropertyChangeListener listener) {
 		listeners.remove(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#updatePerson(org.eclipse.ui.examples.contributions.model.Person)
-	 */
+	@Override
 	public void updatePerson(Person person) {
 		Assert.isNotNull(person);
-		Person p = (Person) people.get(new Integer(person.getId()));
+		Person p = people.get(Integer.valueOf(person.getId()));
 		if (p == null) {
 			Assert.isNotNull(p, "Must update a real person"); //$NON-NLS-1$
 		}
@@ -135,13 +115,9 @@ public class PersonService implements IPersonService, IDisposable {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#createPerson(int)
-	 */
+	@Override
 	public Person createPerson(int id) {
-		Integer iid = new Integer(id);
+		Integer iid = Integer.valueOf(id);
 		if (people.containsKey(iid)) {
 			return null;
 		}
@@ -151,24 +127,16 @@ public class PersonService implements IPersonService, IDisposable {
 		return person;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.services.IDisposable#dispose()
-	 */
+	@Override
 	public void dispose() {
 		// we'd save stuff here, maybe, if we cared
 		listeners.clear();
 		serviceLocator = null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#login(org.eclipse.ui.examples.contributions.model.Person)
-	 */
+	@Override
 	public void login(Person person) {
-		ISourceProviderService sources = (ISourceProviderService) serviceLocator
+		ISourceProviderService sources = serviceLocator
 				.getService(ISourceProviderService.class);
 		// should do some more checks
 		UserSourceProvider userProvider = (UserSourceProvider) sources
