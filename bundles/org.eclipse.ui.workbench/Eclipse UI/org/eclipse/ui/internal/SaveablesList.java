@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700, 511198
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -228,8 +228,8 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 			Saveable[] models = event.getSaveables();
 			Map<Saveable, Integer> modelsDecrementing = new HashMap<>();
 			Set<Saveable> modelsClosing = new HashSet<>();
-			for (int i = 0; i < models.length; i++) {
-				incrementRefCount(modelsDecrementing, models[i]);
+			for (Saveable model : models) {
+				incrementRefCount(modelsDecrementing, model);
 			}
 
 			fillModelsClosing(modelsClosing, modelsDecrementing);
@@ -269,8 +269,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 */
 	private void removeModels(Object source, Saveable[] modelArray) {
 		List<Saveable> removed = new ArrayList<>();
-		for (int i = 0; i < modelArray.length; i++) {
-			Saveable model = modelArray[i];
+		for (Saveable model : modelArray) {
 			if (removeModel(source, model)) {
 				removed.add(model);
 			}
@@ -288,8 +287,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 */
 	private void addModels(Object source, Saveable[] modelArray) {
 		List<Saveable> added = new ArrayList<>();
-		for (int i = 0; i < modelArray.length; i++) {
-			Saveable model = modelArray[i];
+		for (Saveable model : modelArray) {
 			if (addModel(source, model)) {
 				added.add(model);
 			}
@@ -382,10 +380,8 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 					continue;
 				}
 			}
-			Saveable[] modelsFromSource = getSaveables(part);
-			for (int i = 0; i < modelsFromSource.length; i++) {
-				incrementRefCount(postCloseInfo.modelsDecrementing,
-						modelsFromSource[i]);
+			for (Saveable saveableModel : getSaveables(part)) {
+				incrementRefCount(postCloseInfo.modelsDecrementing, saveableModel);
 			}
 		}
 		fillModelsClosing(postCloseInfo.modelsClosing,
@@ -494,10 +490,12 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 				// Show a dialog.
 				String[] buttons;
 				if(canCancel) {
-					buttons = new String[] { WorkbenchMessages.Save, WorkbenchMessages.Dont_Save,
+					buttons = new String[] { IDialogConstants.YES_LABEL,
+							IDialogConstants.NO_LABEL,
 							IDialogConstants.CANCEL_LABEL };
 				} else {
-					buttons = new String[] { WorkbenchMessages.Save, WorkbenchMessages.Dont_Save };
+					buttons = new String[] { IDialogConstants.YES_LABEL,
+							IDialogConstants.NO_LABEL};
 				}
 
 				// don't save if we don't prompt
@@ -788,7 +786,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		@Override
 		protected void createButtonsForButtonBar(Composite parent) {
 			createButton(parent, IDialogConstants.OK_ID,
-					WorkbenchMessages.Save, true);
+					IDialogConstants.OK_LABEL, true);
 			if (canCancel) {
 				createButton(parent, IDialogConstants.CANCEL_ID,
 						IDialogConstants.CANCEL_LABEL, false);
