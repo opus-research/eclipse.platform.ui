@@ -715,7 +715,6 @@ import com.ibm.icu.text.NumberFormat;
 				return converter.convert(value);
 			} catch (Exception ex) {
 				Policy.getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, ex.getMessage(), ex));
-				throw ex;
 			}
 		}
 		return value;
