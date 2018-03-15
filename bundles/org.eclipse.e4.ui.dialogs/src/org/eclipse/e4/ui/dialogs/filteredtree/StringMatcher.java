@@ -277,7 +277,7 @@ public class StringMatcher {
 	}
 
 	/**
-	 * This method parses the given pattern into segments separated by wildcard
+	 * This method parses the given pattern into segments seperated by wildcard
 	 * '*' characters. Since wildcards are not being used in this case, the
 	 * pattern consists of a single segment.
 	 */
@@ -288,7 +288,7 @@ public class StringMatcher {
 	}
 
 	/**
-	 * Parses the given pattern into segments separated by wildcard '*'
+	 * Parses the given pattern into segments seperated by wildcard '*'
 	 * characters.
 	 *
 	 * @param p
@@ -424,7 +424,7 @@ public class StringMatcher {
 	 *            String, String, a simple regular expression that may contain
 	 *            '?'
 	 * @param ignoreCase
-	 *            boolean indicating whether code>p</code> is case sensitive
+	 *            boolean indicating wether code>p</code> is case sensitive
 	 */
 	protected boolean regExpRegionMatches(String text, int tStart, String p,
 			int pStart, int plen) {
