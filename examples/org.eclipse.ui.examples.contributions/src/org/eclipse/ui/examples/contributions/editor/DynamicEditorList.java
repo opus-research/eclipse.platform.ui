@@ -96,7 +96,8 @@ public class DynamicEditorList extends CompoundContributionItem {
 				CommandContributionItem.STYLE_PUSH);
 		p.parameters = new HashMap();
 		PersonInput editorInput = (PersonInput) ref.getEditorInput();
-		p.parameters.put(ActivateEditorHandler.PARM_EDITOR, Integer.valueOf(editorInput.getIndex()));
+		p.parameters.put(ActivateEditorHandler.PARM_EDITOR, new Integer(
+				editorInput.getIndex()));
 		String menuNum = Integer.toString(i);
 		p.label = menuNum + " " + ref.getTitle(); //$NON-NLS-1$
 		p.mnemonic = menuNum;
