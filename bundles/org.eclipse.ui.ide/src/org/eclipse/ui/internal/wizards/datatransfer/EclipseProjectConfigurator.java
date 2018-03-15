@@ -12,8 +12,6 @@ package org.eclipse.ui.internal.wizards.datatransfer;
 
 import java.io.File;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
@@ -25,6 +23,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
@@ -73,9 +72,8 @@ public class EclipseProjectConfigurator implements ProjectConfigurator {
 	}
 
 	@Override
-	public void removeDirtyDirectories(Map<File, List<ProjectConfigurator>> proposals) {
-		// nothing to do: we cannot infer that a directory is dirty from
-		// .project
+	public IWizard getConfigurationWizard() {
+		return null;
 	}
 
 	@Override

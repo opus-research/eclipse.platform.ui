@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
 /**
@@ -48,6 +49,11 @@ public class EclipseWorkspaceConfigurator implements ProjectConfigurator {
 	@Override
 	public boolean canConfigure(IProject project, Set<IPath> ignoredPaths, IProgressMonitor monitor) {
 		return false;
+	}
+
+	@Override
+	public IWizard getConfigurationWizard() {
+		return null;
 	}
 
 	@Override
