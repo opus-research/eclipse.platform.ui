@@ -345,8 +345,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     private void internalSetChecked(CustomHashtable checkedElements,
             Widget widget) {
         Item[] items = getChildren(widget);
-        for (Item item2 : items) {
-            TreeItem item = (TreeItem) item2;
+        for (Item child : items) {
+            TreeItem item = (TreeItem) child;
             Object data = item.getData();
             if (data != null) {
                 boolean checked = checkedElements.containsKey(data);
@@ -366,8 +366,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
      */
     private void internalSetGrayed(CustomHashtable grayedElements, Widget widget) {
         Item[] items = getChildren(widget);
-        for (Item item2 : items) {
-            TreeItem item = (TreeItem) item2;
+        for (Item child : items) {
+            TreeItem item = (TreeItem) child;
             Object data = item.getData();
             if (data != null) {
                 boolean grayed = grayedElements.containsKey(data);
@@ -435,9 +435,9 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         createChildren(item);
         Item[] items = getChildren(item);
         if (items != null) {
-            for (Item it : items) {
-                if (it.getData() != null && (it instanceof TreeItem)) {
-                    TreeItem treeItem = (TreeItem) it;
+            for (Item child : items) {
+                if (child.getData() != null && (child instanceof TreeItem)) {
+                    TreeItem treeItem = (TreeItem) child;
                     treeItem.setChecked(state);
                     setCheckedChildren(treeItem, state);
                 }

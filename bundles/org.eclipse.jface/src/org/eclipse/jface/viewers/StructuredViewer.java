@@ -2114,8 +2114,8 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	protected void internalUpdate(Widget widget, Object element, String[] properties) {
 		boolean needsRefilter = false;
 		if (properties != null) {
-			for (String propertie : properties) {
-				needsRefilter = needsRefilter(element, propertie);
+			for (String property : properties) {
+				needsRefilter = needsRefilter(element, property);
 				if (needsRefilter) {
 					break;
 				}
@@ -2135,8 +2135,8 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		} else {
 			needsUpdate = false;
 			IBaseLabelProvider labelProvider = getLabelProvider();
-			for (String propertie : properties) {
-				needsUpdate = labelProvider.isLabelProperty(element, propertie);
+			for (String property : properties) {
+				needsUpdate = labelProvider.isLabelProperty(element, property);
 				if (needsUpdate) {
 					break;
 				}
