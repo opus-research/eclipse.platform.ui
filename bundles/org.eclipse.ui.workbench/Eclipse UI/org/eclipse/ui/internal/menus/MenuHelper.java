@@ -154,7 +154,17 @@ public class MenuHelper {
 				urlField.setAccessible(true);
 			}
 			return (URL) urlField.get(imageDescriptor);
-		} catch (SecurityException | NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -167,7 +177,11 @@ public class MenuHelper {
 				locationField.setAccessible(true);
 			}
 			return (Class<?>) locationField.get(imageDescriptor);
-		} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
+		} catch (SecurityException e) {
+			WorkbenchPlugin.log(e);
+		} catch (NoSuchFieldException e) {
+			WorkbenchPlugin.log(e);
+		} catch (IllegalAccessException e) {
 			WorkbenchPlugin.log(e);
 		}
 		return null;
@@ -180,7 +194,11 @@ public class MenuHelper {
 				nameField.setAccessible(true);
 			}
 			return (String) nameField.get(imageDescriptor);
-		} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
+		} catch (SecurityException e) {
+			WorkbenchPlugin.log(e);
+		} catch (NoSuchFieldException e) {
+			WorkbenchPlugin.log(e);
+		} catch (IllegalAccessException e) {
 			WorkbenchPlugin.log(e);
 		}
 		return null;
@@ -252,8 +270,13 @@ public class MenuHelper {
 					// visWhenMap.put(configElement, visWhen);
 				}
 			}
-		} catch (InvalidRegistryObjectException | CoreException e) {
+		} catch (InvalidRegistryObjectException e) {
 			// visWhenMap.put(configElement, null);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CoreException e) {
+			// visWhenMap.put(configElement, null);
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
