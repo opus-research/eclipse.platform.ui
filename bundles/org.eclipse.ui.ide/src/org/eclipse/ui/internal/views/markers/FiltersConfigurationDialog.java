@@ -11,7 +11,6 @@
  * 			- Fix for Bug 214443 Problem view filter created even if I hit Cancel
  *     Robert Roth <robert.roth.off@gmail.com>
  *          - Fix for Bug 364736 Setting limit to 0 has no effect
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 498056
  ******************************************************************************/
 
 package org.eclipse.ui.internal.views.markers;
@@ -190,9 +189,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 		andButton.setSelection(andFilters);
 		orButton.setSelection(!andFilters);
-		if (!filterGroups.isEmpty()) {
-			configsTable.setCheckedElements(filterGroups.iterator().next());
-		}
 		updateRadioButtonsFromTable();
 		int limits = generator.getMarkerLimits();
 		boolean limitsEnabled = generator.isMarkerLimitsEnabled();
@@ -200,7 +196,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		limitsLabel.setEnabled(limitsEnabled);
 		limitText.setEnabled(limitsEnabled);
 		limitText.setText(Integer.toString(limits));
-
 		configsTable.getTable().setFocus();
 	}
 
@@ -715,18 +710,19 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		filterGroups.clear();
 		filterGroups.addAll(generator.getDeclaredFilters());
 		configsTable.refresh();
-		if (!filterGroups.isEmpty()) {
-			configsTable.setCheckedElements(filterGroups.iterator().next());
-		}
+		configsTable.setSelection(new StructuredSelection(
+				filterGroups.size() > 1 ? filterGroups.iterator().next()
+						: new Object[0]));
 
 		IPreferenceStore preferenceStore = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
 		boolean useMarkerLimits = preferenceStore.getBoolean(IDEInternalPreferences.USE_MARKER_LIMITS);
-		int markerLimits = useMarkerLimits ? preferenceStore.getInt(IDEInternalPreferences.MARKER_LIMITS_VALUE) : 1000;
+		int markerLimits = useMarkerLimits ? preferenceStore.getInt(IDEInternalPreferences.MARKER_LIMITS_VALUE) : 100;
 
 		limitButton.setSelection(useMarkerLimits);
 		limitsLabel.setEnabled(useMarkerLimits);
 		limitText.setEnabled(useMarkerLimits);
 		limitText.setText(Integer.toString(markerLimits));
+
 		updateRadioButtonsFromTable();
 	}
 
