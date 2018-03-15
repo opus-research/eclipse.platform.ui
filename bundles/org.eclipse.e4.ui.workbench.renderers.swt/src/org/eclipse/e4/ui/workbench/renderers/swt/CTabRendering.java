@@ -27,7 +27,6 @@ import org.eclipse.swt.graphics.Pattern;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.widgets.Display;
 
 @SuppressWarnings("restriction")
@@ -261,13 +260,6 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 		int circY = bounds.y + radius;
 
 		// Fill in background
-		Region clipping = new Region();
-		gc.getClipping(clipping);
-		Region region = new Region();
-		region.add(shape);
-		region.intersect(clipping);
-		gc.setClipping(region);
-
 		int header = shadowEnabled ? onBottom ? 6 : 3 : 1; // TODO: this needs
 		// to be added to
 		// computeTrim for
@@ -281,10 +273,6 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 		trim.x = -trim.x;
 		trim.y = onBottom ? bounds.height - parent.getTabHeight() - 1 - header : -trim.y;
 		draw(PART_BACKGROUND, SWT.NONE, trim, gc);
-
-		gc.setClipping(clipping);
-		clipping.dispose();
-		region.dispose();
 
 		int[] ltt = drawCircle(circX + 1, circY + 1, radius, CirclePart.LEFT_TOP);
 		System.arraycopy(ltt, 0, points, index, ltt.length);
@@ -356,15 +344,7 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 		gc.fillPolygon(tempPoints);
 
 		// Fill in parent background for non-rectangular shape
-		Region r = new Region();
-		r.add(bounds);
-		r.subtract(tempPoints);
-		gc.setBackground(parent.getParent().getBackground());
 		Display display = parent.getDisplay();
-		Region clipping = new Region();
-		gc.getClipping(clipping);
-		r.intersect(clipping);
-		gc.setClipping(r);
 		Rectangle mappedBounds = display.map(parent, parent.getParent(), bounds);
 		parent.getParent().drawBackground(gc, bounds.x, bounds.y, bounds.width, bounds.height, mappedBounds.x,
 				mappedBounds.y);
@@ -372,10 +352,6 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 		// Shadow
 		if (shadowEnabled)
 			drawShadow(display, bounds, gc);
-
-		gc.setClipping(clipping);
-		clipping.dispose();
-		r.dispose();
 
 		// Remember for use in header drawing
 		shape = tempPoints;
