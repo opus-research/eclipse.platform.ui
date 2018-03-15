@@ -94,6 +94,9 @@ public class SplitFeedbackOverlay {
 		} else if (curSide == SWT.BOTTOM) {
 			r1 = new Rectangle(ca.x, ca.y, ca.width, ca.height - pctHeight);
 			r2 = new Rectangle(ca.x, ca.y + r1.height + 2, ca.width, pctHeight - 2);
+		} else {
+			System.out.println("curSide points to invalid location " + curSide);
+			return;
 		}
 
 		addRect(r1);
