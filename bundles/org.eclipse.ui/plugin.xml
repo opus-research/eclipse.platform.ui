@@ -263,6 +263,7 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
       <key
             commandId="org.eclipse.ui.window.openEditorDropDown"
+            contextId="org.eclipse.ui.contexts.dialogAndWindow"
             sequence="M1+E"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
       <key
@@ -2246,14 +2247,7 @@
       <handler
             class="org.eclipse.ui.internal.WorkbookEditorsHandler"
             commandId="org.eclipse.ui.window.openEditorDropDown">
-         <enabledWhen>
-            <with
-                  variable="activePart">
-               <instanceof
-                     value="org.eclipse.ui.IWorkbenchPart">
-               </instanceof>
-            </with>
-         </enabledWhen>
+         <!-- always enabled see https://git.eclipse.org/r/#/c/82009 -->
       </handler>
       <handler
             class="org.eclipse.ui.internal.SplitHandler"

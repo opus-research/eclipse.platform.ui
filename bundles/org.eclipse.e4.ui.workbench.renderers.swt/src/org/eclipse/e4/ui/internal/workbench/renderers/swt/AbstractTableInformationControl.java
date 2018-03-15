@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 502123
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.renderers.swt;
 
@@ -116,6 +117,7 @@ public abstract class AbstractTableInformationControl {
 			int controlStyle) {
 		fShell = new Shell(parent, shellStyle);
 		fShell.setLayout(new FillLayout());
+		fShell.setData(this);
 
 		// Composite for filter text and viewer
 		fComposite = new Composite(fShell, SWT.RESIZE);
@@ -560,4 +562,27 @@ public abstract class AbstractTableInformationControl {
 		fShell.forceFocus();
 		fFilterText.setFocus();
 	}
+
+	/**
+	 * Switch to the next item in the list, downwards.
+	 */
+	public void next() {
+		Table table = fTableViewer.getTable();
+		if (fFilterText.isFocusControl()) {
+			// text focused, the next element the first table item
+			fTableViewer.getTable().setFocus();
+			fTableViewer.getTable().setSelection(0);
+		} else if (table.isFocusControl()) {
+			// table focused
+			int index = fTableViewer.getTable().getSelectionIndex();
+			if (index == fTableViewer.getTable().getItemCount() - 1) {
+				// last item selected, the next element is the filterText
+				fFilterText.setFocus();
+			} else {
+				// not the last, the next element is the next table item
+				fTableViewer.getTable().setSelection(index + 1);
+			}
+		}
+	}
+
 }
