@@ -104,7 +104,7 @@ public class ImageRegistry {
 
         @Override
 		public ImageData getImageData(int zoom) {
-			return original.getImageData(zoom);
+			return getDataProvider(original).getImageData(zoom);
         }
     }
 
