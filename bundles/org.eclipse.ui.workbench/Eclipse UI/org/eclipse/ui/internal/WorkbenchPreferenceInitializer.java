@@ -118,6 +118,10 @@ public class WorkbenchPreferenceInitializer extends AbstractPreferenceInitialize
 		node.putBoolean(IPreferenceConstants.SAVE_AUTOMATICALLY, false);
 		node.putInt(IPreferenceConstants.SAVE_AUTOMATICALLY_INTERVAL, 20);
 
+		// Preference editor vs dialog
+		node.put(IPreferenceConstants.PREFERENCE_FACADE,
+				IPreferenceConstants.PREFERENCE_FACADE_MODE.DIALOG.toString());
+
 		IEclipsePreferences rootNode = (IEclipsePreferences) Platform
 				.getPreferencesService().getRootNode()
 				.node(InstanceScope.SCOPE);

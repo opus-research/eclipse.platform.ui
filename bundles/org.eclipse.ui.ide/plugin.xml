@@ -214,6 +214,13 @@
             contributorClass="org.eclipse.ui.internal.ide.dialogs.WelcomeEditorActionContributor"
             id="org.eclipse.ui.internal.ide.dialogs.WelcomeEditor">
       </editor>
+      <editor
+            class="org.eclipse.ui.internal.preferences.PreferencesEditor"
+            default="false"
+            icon="icons/full/obj16/settings_obj.png"
+            id="org.eclipse.ui.ide.preferencesEditor"
+            name="%command.preferences.label">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.elementFactories">
@@ -237,6 +244,9 @@
             class="org.eclipse.ui.internal.ide.dialogs.WelcomeEditorInputFactory"
             id="org.eclipse.ui.internal.dialogs.WelcomeEditorInputFactory">
       </factory>
+      <factory
+            class="org.eclipse.ui.internal.preferences.PreferencesEditor$PreferencesEditorInput$PreferenceEditorInputFactory"
+            id="org.eclipse.ui.ide.preferencesEditorInputFactory"/>
    </extension>
    <extension
          point="org.eclipse.ui.workingSets">

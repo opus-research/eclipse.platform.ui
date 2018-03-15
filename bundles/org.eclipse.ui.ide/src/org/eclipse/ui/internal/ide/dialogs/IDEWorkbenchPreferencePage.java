@@ -41,6 +41,7 @@ public class IDEWorkbenchPreferencePage extends WorkbenchPreferencePage
 
         createSettings(composite);
         createOpenModeGroup(composite);
+		createPreferenceMode(composite);
 
         applyDialogFont(composite);
 
