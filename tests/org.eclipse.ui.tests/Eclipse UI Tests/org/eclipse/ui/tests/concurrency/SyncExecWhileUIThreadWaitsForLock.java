@@ -58,9 +58,6 @@ public class SyncExecWhileUIThreadWaitsForLock extends TestCase {
 	}
 
 	public void testDeadlock() {
-		if (Thread.interrupted()) {
-			fail("Thread was interrupted at start of test");
-		}
 		final ILock lock = Job.getJobManager().newLock();
 		final boolean[] blocked = new boolean[] {false};
 		final boolean[] lockAcquired= new boolean[] {false};
@@ -128,9 +125,5 @@ public class SyncExecWhileUIThreadWaitsForLock extends TestCase {
 		MultiStatus status = (MultiStatus) reportedErrors.get(0);
 		assertEquals("Unexpected child status count reported: " + Arrays.toString(status.getChildren()), 2,
 				status.getChildren().length);
-		if (Thread.interrupted()) {
-			// TODO: re-enable this check after bug 505920 is fixed
-			// fail("Thread was interrupted at end of test");
-		}
 	}
 }
