@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -62,22 +61,22 @@ public final class ServiceLocator implements IDisposable, INestable,
 		}
 	}
 
-	private final AbstractServiceFactory factory;
+	private AbstractServiceFactory factory;
 
 	/**
 	 * The parent for this service locator. If a service can't be found in this
 	 * locator, then the parent is asked. This value may be <code>null</code> if
 	 * there is no parent.
 	 */
-	private final IServiceLocator parent;
+	private IServiceLocator parent;
 
-	private volatile boolean disposed;
+	private boolean disposed;
 
 	private IDisposable owner;
 
-	private volatile IEclipseContext e4Context;
+	private IEclipseContext e4Context;
 
-	private final Map<Class<?>, Object> servicesToDispose = new ConcurrentHashMap<>();
+	private Map<Class<?>, Object> servicesToDispose = new HashMap<>();
 
 	/**
 	 * Constructs a service locator with no parent.
@@ -133,18 +132,19 @@ public final class ServiceLocator implements IDisposable, INestable,
 			// See: Bug 459833 - ConcurrentModificationException in
 			// ServiceLocator.dispose
 			disposeServices();
-		}
-		// Check if there was some other leftover and warn about it.
-		if (servicesToDispose.size() > 0) {
-			WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.WARNING,
-					String.format(
-							"Services: %s register themselves while disposing (skipping dispose of such services).", //$NON-NLS-1$
-							servicesToDispose),
-					null));
+
+			// Check if there was some other leftover and warn about it.
+			if (servicesToDispose.size() > 0) {
+				WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.WARNING,
+						String.format(
+								"Services: %s register themselves while disposing (skipping dispose of such services).", //$NON-NLS-1$
+								servicesToDispose),
+						null));
+			}
 		}
 		servicesToDispose.clear();
-		disposed = true;
 		e4Context = null;
+		disposed = true;
 		owner = null;
 	}
 
@@ -163,22 +163,20 @@ public final class ServiceLocator implements IDisposable, INestable,
 	@SuppressWarnings("unchecked")
 	@Override
 	public final <T> T getService(final Class<T> key) {
-		IEclipseContext context = e4Context;
-		if (context == null) {
+		if (disposed) {
 			return null;
-		}
-		if (IEclipseContext.class.equals(key)) {
-			return (T) context;
+		} else if (IEclipseContext.class.equals(key)) {
+			return (T) e4Context;
 		}
 
-		Object service = context.get(key.getName());
+		Object service = e4Context.get(key.getName());
 		if (service == null) {
 			// this scenario can happen when we dispose the service locator
 			// after the window has been removed, in that case the window's
 			// context has been destroyed so we should check our own local cache
 			// of services first before checking the registry
 			service = servicesToDispose.get(key);
-		} else if (service == context.getLocal(key.getName())) {
+		} else if (service == e4Context.getLocal(key.getName())) {
 			// store this service retrieved from the context in the map only if
 			// it is a local service for this context, as otherwise we do not
 			// want to dispose it when this service locator gets disposed
@@ -209,11 +207,10 @@ public final class ServiceLocator implements IDisposable, INestable,
 
 	@Override
 	public final boolean hasService(final Class<?> key) {
-		IEclipseContext context = e4Context;
-		if (context == null) {
+		if (disposed) {
 			return false;
 		}
-		return context.containsKey(key.getName());
+		return e4Context.containsKey(key.getName());
 	}
 
 	/**
@@ -246,14 +243,10 @@ public final class ServiceLocator implements IDisposable, INestable,
 			((INestable) service).activate();
 		}
 
-		IEclipseContext context = e4Context;
-		if (context == null) {
-			return;
-		}
 		servicesToDispose.put(api, service);
 
 		if (saveInContext) {
-			context.set(api.getName(), service);
+			e4Context.set(api.getName(), service);
 		}
 	}
 
