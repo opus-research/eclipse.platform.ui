@@ -118,7 +118,7 @@ public final class ActiveShellExpression extends Expression {
 
 	@Override
 	public final String toString() {
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer();
 		buffer.append("ActiveShellExpression("); //$NON-NLS-1$
 		buffer.append(activeShell);
 		buffer.append(')');
