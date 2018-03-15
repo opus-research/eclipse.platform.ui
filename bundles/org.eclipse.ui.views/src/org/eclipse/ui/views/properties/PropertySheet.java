@@ -38,6 +38,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISaveablesLifecycleListener;
+import org.eclipse.ui.ISecondarySaveableSource;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -51,7 +52,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.Saveable;
 import org.eclipse.ui.SaveablesLifecycleEvent;
 import org.eclipse.ui.internal.DefaultSaveable;
-import org.eclipse.ui.internal.ISecondarySaveableSource;
 import org.eclipse.ui.internal.SaveablesList;
 import org.eclipse.ui.internal.views.properties.PropertiesMessages;
 import org.eclipse.ui.part.IContributedContentsView;
@@ -134,7 +134,7 @@ public class PropertySheet extends PageBookView
 	/**
 	 * Set of workbench parts, which should not be used as a source for PropertySheet
 	 */
-	private HashSet ignoredViews;
+	private HashSet<String> ignoredViews;
 
 	private boolean wasHidden;
 
@@ -504,7 +504,8 @@ public class PropertySheet extends PageBookView
 	 * {@link IAdaptable} and return adapter to
 	 * {@link ISecondarySaveableSource}.
 	 *
-	 * @return returns {@code false} by default.
+	 * @return returns {@code false} if the dirty state indication behavior is
+	 *         not desired.
 	 * @since 3.9
 	 */
 	@Override
@@ -536,10 +537,11 @@ public class PropertySheet extends PageBookView
 	 *
 	 * @since 3.2
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	protected Object getViewAdapter(Class key) {
+	protected <T> T getViewAdapter(Class<T> key) {
 		if (ISaveablePart.class.equals(key)) {
-			return getSaveablePart();
+			return (T) getSaveablePart();
 		}
 		return super.getViewAdapter(key);
 	}
@@ -604,9 +606,9 @@ public class PropertySheet extends PageBookView
 		updateContentDescription();
 	}
 
-	private HashSet getIgnoredViews() {
+	private HashSet<String> getIgnoredViews() {
 		if (ignoredViews == null) {
-			ignoredViews = new HashSet();
+			ignoredViews = new HashSet<>();
 	        IExtensionRegistry registry = RegistryFactory.getRegistry();
 	        IExtensionPoint ep = registry.getExtensionPoint(EXT_POINT);
 			if (ep != null) {
