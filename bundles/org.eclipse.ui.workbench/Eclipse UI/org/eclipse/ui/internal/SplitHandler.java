@@ -70,7 +70,7 @@ public class SplitHandler extends AbstractHandler {
 				taggedEditor = innerElements.get(1); // '0' is the composite part
 			}
 
-			if ("false".equals(event.getParameter("Splitter.isHorizontal"))) { //$NON-NLS-1$ //$NON-NLS-2$
+			if (Boolean.FALSE.toString().equals(event.getParameter("Splitter.isHorizontal"))) { //$NON-NLS-1$
 				if (taggedEditor.getTags().contains(IPresentationEngine.SPLIT_VERTICAL)) {
 					taggedEditor.getTags().remove(IPresentationEngine.SPLIT_VERTICAL);
 				} else {

@@ -12,7 +12,6 @@
 package org.eclipse.ui.handlers;
 
 import java.util.Hashtable;
-
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jface.commands.PersistentState;
@@ -72,7 +71,7 @@ public final class RadioState extends PersistentState implements
 
 			final Object persistedObject = parameters.get("persisted"); //$NON-NLS-1$
 			if (persistedObject instanceof String
-					&& "false".equalsIgnoreCase(((String) persistedObject))) //$NON-NLS-1$
+					&& Boolean.FALSE.toString().equalsIgnoreCase(((String) persistedObject)))
 				shouldPersist = false;
 		}
 		setShouldPersist(shouldPersist);

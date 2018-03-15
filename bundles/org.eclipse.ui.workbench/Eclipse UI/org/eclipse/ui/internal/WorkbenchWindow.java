@@ -1176,7 +1176,7 @@ STATUS_LINE_ID, model);
 			for (IConfigurationElement item : items) {
 				String id = item.getAttribute("id"); //$NON-NLS-1$
 				String classSpec = item.getAttribute("class"); //$NON-NLS-1$
-				//boolean sepVisible = "true".equals(item.getAttribute("separatorsVisible")); //$NON-NLS-1$ //$NON-NLS-2$
+				//boolean sepVisible = Boolean.TRUE.toString().equals(item.getAttribute("separatorsVisible")); //$NON-NLS-1$
 				IConfigurationElement[] locs = item.getChildren("location"); //$NON-NLS-1$
 				for (IConfigurationElement loc : locs) {
 					IConfigurationElement[] bars = loc.getChildren("bar"); //$NON-NLS-1$

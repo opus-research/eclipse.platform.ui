@@ -14,7 +14,6 @@ package org.eclipse.ui;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -218,7 +217,7 @@ public final class BasicWorkingSetElementAdapter implements
 						String param = pair.nextToken();
 						String value = pair.nextToken();
 						if ("adapt".equals(param)) { //$NON-NLS-1$
-							record.flags ^= "true".equals(value) ? Type.ADAPT : Type.NONE; //$NON-NLS-1$
+							record.flags ^= Boolean.TRUE.toString().equals(value) ? Type.ADAPT : Type.NONE;
 						}
 					}
 				}

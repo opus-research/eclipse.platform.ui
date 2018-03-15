@@ -89,7 +89,8 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 					descriptorId = createReadRoot.getString(IWorkbenchConstants.TAG_ID);
 					this.descriptor = (EditorDescriptor) registry.findEditor(descriptorId);
 
-					boolean pinnedVal = "true".equals(createReadRoot.getString(IWorkbenchConstants.TAG_PINNED)); //$NON-NLS-1$
+				boolean pinnedVal = Boolean.TRUE.toString()
+						.equals(createReadRoot.getString(IWorkbenchConstants.TAG_PINNED));
 					setPinned(pinnedVal);
 
 					String ttip = createReadRoot.getString(IWorkbenchConstants.TAG_TOOLTIP);

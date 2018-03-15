@@ -67,7 +67,8 @@ public class E4Testable extends TestableObject {
 					// property: org.eclipse.ui.testsWaitForEarlyStartup=false
 					// For details, see bug 94129 [Workbench] Performance test
 					// regression caused by workbench harness change
-					if (!"false".equalsIgnoreCase(System.getProperty("org.eclipse.ui.testsWaitForEarlyStartup"))) { //$NON-NLS-1$ //$NON-NLS-2$
+					if (!Boolean.FALSE.toString()
+							.equalsIgnoreCase(System.getProperty("org.eclipse.ui.testsWaitForEarlyStartup"))) { //$NON-NLS-1$
 						waitForEarlyStartup();
 					}
 					getTestHarness().runTests();

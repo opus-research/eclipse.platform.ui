@@ -529,6 +529,6 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) throws CoreException {
-		gotoDirection = "true".equals(data); //$NON-NLS-1$
+		gotoDirection = Boolean.TRUE.toString().equals(data);
 	}
 }

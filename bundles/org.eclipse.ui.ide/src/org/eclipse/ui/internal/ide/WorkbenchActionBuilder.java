@@ -1214,11 +1214,11 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         // Optimization: if welcome pages were found on a previous run, then just add the action.
         String quickStartKey = IDEActionFactory.QUICK_START.getId();
         String showQuickStart = prefs.getString(quickStartKey);
-        if (sameState && "true".equals(showQuickStart)) { //$NON-NLS-1$
+		if (sameState && Boolean.TRUE.toString().equals(showQuickStart)) {
             quickStartAction = IDEActionFactory.QUICK_START.create(window);
 			register(quickStartAction);
         }
-        else if (sameState && "false".equals(showQuickStart)) { //$NON-NLS-1$
+		else if (sameState && Boolean.FALSE.toString().equals(showQuickStart)) {
         	// do nothing
         }
         else {
@@ -1236,12 +1236,12 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         // Optimization: if tips and tricks were found on a previous run, then just add the action.
         String tipsAndTricksKey = IDEActionFactory.TIPS_AND_TRICKS.getId();
         String showTipsAndTricks = prefs.getString(tipsAndTricksKey);
-        if (sameState && "true".equals(showTipsAndTricks)) { //$NON-NLS-1$
+		if (sameState && Boolean.TRUE.toString().equals(showTipsAndTricks)) { // $NON-NLS-1$
             tipsAndTricksAction = IDEActionFactory.TIPS_AND_TRICKS
 					.create(window);
 			register(tipsAndTricksAction);
         }
-        else if (sameState && "false".equals(showTipsAndTricks)) { //$NON-NLS-1$
+		else if (sameState && Boolean.FALSE.toString().equals(showTipsAndTricks)) { // $NON-NLS-1$
         	// do nothing
         }
         else {

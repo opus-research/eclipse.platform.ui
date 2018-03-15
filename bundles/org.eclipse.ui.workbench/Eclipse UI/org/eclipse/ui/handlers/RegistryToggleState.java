@@ -12,7 +12,6 @@
 package org.eclipse.ui.handlers;
 
 import java.util.Hashtable;
-
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jface.commands.ToggleState;
@@ -57,7 +56,7 @@ public final class RegistryToggleState extends ToggleState implements
 	 *            The string to parse; may be <code>null</code>.
 	 */
 	private final void readDefault(final String defaultString) {
-		if ("true".equalsIgnoreCase(defaultString)) { //$NON-NLS-1$
+		if (Boolean.TRUE.toString().equalsIgnoreCase(defaultString)) {
 			setValue(Boolean.TRUE);
 		}
 	}
@@ -71,7 +70,7 @@ public final class RegistryToggleState extends ToggleState implements
 	 *            The string to parse; may be <code>null</code>.
 	 */
 	private final void readPersisted(final String persistedString) {
-		if ("false".equalsIgnoreCase(persistedString)) { //$NON-NLS-1$
+		if (Boolean.FALSE.toString().equalsIgnoreCase(persistedString)) {
 			setShouldPersist(false);
 		}else {
 			setShouldPersist(true);
