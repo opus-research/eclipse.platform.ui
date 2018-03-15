@@ -10,7 +10,6 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285, 472654
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588, 388476, 461573
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 442285, 487348
- *     Robert Roth <robert.roth.off@gmail.com> - Bug 391118
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -1416,13 +1415,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 					viewMenuMask.getImageData());
 			viewMenu.dispose();
 			viewMenuMask.dispose();
-
-			Display.getCurrent().disposeExec(new Runnable() {
-				@Override
-				public void run() {
-					viewMenuImage.dispose();
-				}
-			});
 		}
 		return viewMenuImage;
 	}
