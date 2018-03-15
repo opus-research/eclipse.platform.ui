@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -126,7 +125,6 @@ public class AnimationManager {
     /**
      * Dispose the images in the receiver.
      */
-	@PreDestroy
     void dispose() {
         setAnimated(false);
         progressManager.removeListener(listener);

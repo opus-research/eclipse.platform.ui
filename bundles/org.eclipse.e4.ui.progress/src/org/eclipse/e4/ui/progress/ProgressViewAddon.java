@@ -16,7 +16,6 @@ import javax.annotation.PostConstruct;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.progress.internal.FinishedJobs;
 import org.eclipse.e4.ui.progress.internal.PreferenceStore;
 import org.eclipse.e4.ui.progress.internal.Preferences;
 import org.eclipse.e4.ui.progress.internal.ProgressManager;
@@ -33,7 +32,6 @@ public class ProgressViewAddon {
 		ContextInjectionFactory.make(Services.class, context);
 		ProgressManager progressManager = ContextInjectionFactory.make(ProgressManager.class, context);
 		appContext.set(ProgressManager.class, progressManager);
-		ContextInjectionFactory.make(FinishedJobs.class, context);
 		// bug-fix: add a ProgressViewUpdater to the application context
 		appContext.set(ProgressViewUpdater.class, ContextInjectionFactory.make(ProgressViewUpdater.class, appContext));
 	}
