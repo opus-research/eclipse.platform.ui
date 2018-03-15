@@ -393,9 +393,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String CopyFilesAndFoldersOperation_sourceCannotBeCopiedIntoAVirtualFolder;
 	public static String CopyFilesAndFoldersOperation_copyTitle;
 	public static String CopyFilesAndFoldersOperation_moveTitle;
-	public static String CopyFilesAndFoldersOperation_overwriteButtonLabel;
-	public static String CopyFilesAndFoldersOperation_overwriteAllButtonLabel;
-	public static String CopyFilesAndFoldersOperation_dontOverwriteButtonLabel;
 
 	public static String MoveFilesAndFoldersOperation_sameSourceAndDest;
 	public static String MoveFilesAndFoldersOperation_moveFailedTitle;
@@ -965,17 +962,11 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ChooseWorkspaceDialog_recentWorkspaces;
 	public static String ChooseWorkspaceDialog_useDefaultMessage;
 
-	public static String ImportPreferencesDialog_dialogTitle;
-	public static String ImportPreferencesDialog_message;
-	public static String ImportPreferencesDialog_importButtonLabel;
-	public static String ImportPreferencesDialog_alwaysUseSelectedButtonLabel;
-
 	public static String ChooseWorkspaceWithSettingsDialog_SettingsGroupName;
 	public static String ChooseWorkspaceWithSettingsDialog_ProblemsTransferTitle;
 	public static String ChooseWorkspaceWithSettingsDialog_TransferFailedMessage;
 	public static String ChooseWorkspaceWithSettingsDialog_SaveSettingsFailed;
 	public static String ChooseWorkspaceWithSettingsDialog_ClassCreationFailed;
-	public static String ChooseWorkspaceWithSettingsDialog_copySettingsDecoLabel;
 
 	public static String IDEApplication_workspaceMandatoryTitle;
 	public static String IDEApplication_workspaceMandatoryMessage;
@@ -1010,9 +1001,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String CleanDialog_cleanSelectedTaskName;
 	public static String CleanDialog_cleanAllTaskName;
 	public static String CleanDialog_alwaysCleanAllButton;
-	public static String CleanDialog_typeFilterText;
-	public static String CleanDialog_clearToolTip;
-	public static String CleanDialog_AccessibleListenerClearButton;
 	public static String IDEEncoding_EncodingJob;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_viewsRelatedLink;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_FileEditorsRelatedLink;

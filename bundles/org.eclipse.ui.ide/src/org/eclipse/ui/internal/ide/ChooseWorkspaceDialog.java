@@ -13,15 +13,9 @@
 package org.eclipse.ui.internal.ide;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,18 +23,12 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProduct;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
@@ -48,7 +36,6 @@ import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -66,32 +53,18 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
-import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.preferences.SettingsTransfer;
 
 /**
  * A dialog that prompts for a directory to use as a workspace.
  */
 public class ChooseWorkspaceDialog extends TitleAreaDialog {
-	private static final String ENABLED_TRANSFERS = "ENABLED_TRANSFERS"; //$NON-NLS-1$
 
-	/**
-	 * The id attribute for the settings transfer.
-	 */
-	private static final String ATT_ID = "id"; //$NON-NLS-1$
-	private static final String ATT_HELP_CONTEXT = "helpContext"; //$NON-NLS-1$
-	/**
-	 * The name attribute for the settings transfer.
-	 */
-	private static final String ATT_NAME = "name"; //$NON-NLS-1$
-	private static final String DIALOG_SETTINGS_SECTION = "ChooseWorkspaceDialogSettingsSection"; //$NON-NLS-1$
+	private static final String DIALOG_SETTINGS_SECTION = "ChooseWorkspaceDialogSettings"; //$NON-NLS-1$
 
 	private ChooseWorkspaceData launchData;
 
@@ -104,10 +77,6 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 	private Map<String, Link> recentWorkspacesLinks;
 
 	private Form recentWorkspacesForm;
-
-	private Collection<IConfigurationElement> selectedSettings = new HashSet<>();
-
-	private Link settingsWorkspaceLink;
 
     /**
      * Create a modal dialog on the arugment shell, using and updating the
@@ -200,27 +169,11 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 			createRecentWorkspacesComposite = true;
 		}
         createWorkspaceBrowseRow(composite);
-
-		Composite checkboxPanel = new Composite(composite, SWT.NONE);
-		checkboxPanel.setFont(parent.getFont());
-		GridLayout layout = new GridLayout(1, false);
-		layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
-		checkboxPanel.setLayout(layout);
-		GridData data = new GridData(GridData.FILL_BOTH);
-		data.verticalAlignment = GridData.END;
-		checkboxPanel.setLayoutData(data);
-
         if (!suppressAskAgain) {
-			createShowDialogButton(checkboxPanel);
+			createShowDialogButton(composite);
 		}
-		// createPromptForCopyPreferences(checkboxPanel);
 		if (createRecentWorkspacesComposite) {
 			createRecentWorkspacesComposite(composite);
-		}
-		createSettingsControls(composite);
-
-		if (PlatformUI.isWorkbenchRunning()) {
-			PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IIDEHelpContextIds.SWITCH_WORKSPACE_ACTION);
 		}
 
         Dialog.applyDialogFont(composite);
@@ -234,149 +187,6 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
-	/**
-	 * Create the controls for selecting the controls we are going to export.
-	 *
-	 * @param workArea
-	 */
-	private void createSettingsControls(Composite workArea) {
-		final FormToolkit toolkit = new FormToolkit(workArea.getDisplay());
-		workArea.addDisposeListener(e -> toolkit.dispose());
-		final ScrolledForm form = toolkit.createScrolledForm(workArea);
-		form.getBody().setBackground(workArea.getBackground());
-		form.getBody().setLayout(new GridLayout());
-		form.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		final ExpandableComposite copySettingsExpandable = toolkit.createExpandableComposite(form.getBody(),
-				ExpandableComposite.TWISTIE);
-
-		copySettingsExpandable.setText(IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_SettingsGroupName);
-		copySettingsExpandable.setBackground(workArea.getBackground());
-		copySettingsExpandable.setLayout(new GridLayout());
-		copySettingsExpandable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		copySettingsExpandable.addExpansionListener(new IExpansionListener() {
-
-			@Override
-			public void expansionStateChanged(ExpansionEvent e) {
-				form.reflow(true);
-				Point size = getInitialSize();
-				Shell shell = getShell();
-				shell.setBounds(getConstrainedShellBounds(
-						new Rectangle(shell.getLocation().x, shell.getLocation().y, size.x, size.y)));
-			}
-
-			@Override
-			public void expansionStateChanging(ExpansionEvent e) {
-				// Nothing to do here
-
-			}
-		});
-
-		Composite sectionClient = toolkit.createComposite(copySettingsExpandable);
-		sectionClient.setBackground(workArea.getBackground());
-		RowLayout layout = new RowLayout(SWT.VERTICAL);
-		layout.marginLeft = 14;
-		layout.spacing = 6;
-		sectionClient.setLayout(layout);
-
-		createPromptForCopyPreferences(sectionClient);
-
-		if (createButtons(toolkit, sectionClient)) {
-			copySettingsExpandable.setExpanded(true);
-		}
-
-		copySettingsExpandable.setClient(sectionClient);
-	}
-
-	/**
-	 * Create the buttons for the settings transfer.
-	 *
-	 * @param toolkit
-	 * @param sectionClient
-	 * @return boolean <code>true</code> if any were selected
-	 */
-	private boolean createButtons(FormToolkit toolkit,Composite sectionClient) {
-		IDialogSettings dialogSettings = getDialogSettings();
-		String[] enabledSettings = null;
-		if (dialogSettings != null) {
-			enabledSettings = getDialogSettings().getArray(ENABLED_TRANSFERS);
-		}
-
-		for (final IConfigurationElement settingsTransfer : SettingsTransfer.getSettingsTransfers()) {
-			final Button button = toolkit.createButton(sectionClient, settingsTransfer.getAttribute(ATT_NAME),
-					SWT.CHECK);
-
-			ControlDecoration deco = new ControlDecoration(button, SWT.TOP | SWT.RIGHT);
-			Image image = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_WARNING)
-					.getImage();
-			deco.setDescriptionText(IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_copySettingsDecoLabel);
-			deco.setImage(image);
-
-			toggleDecoForSettingsImportButtons(button, deco);
-			getCombo().addModifyListener(e -> toggleDecoForSettingsImportButtons(button, deco));
-
-			String helpId = settingsTransfer.getAttribute(ATT_HELP_CONTEXT);
-
-			if (helpId != null && PlatformUI.isWorkbenchRunning()) {
-				PlatformUI.getWorkbench().getHelpSystem().setHelp(button, helpId);
-			}
-
-			if (enabledSettings != null && enabledSettings.length > 0) {
-
-				String id = settingsTransfer.getAttribute(ATT_ID);
-				for (String enabledSetting : enabledSettings) {
-					if (enabledSetting.equals(id)) {
-						button.setSelection(true);
-						selectedSettings.add(settingsTransfer);
-						break;
-					}
-				}
-			}
-
-			button.setBackground(sectionClient.getBackground());
-			button.addSelectionListener(new SelectionAdapter() {
-
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					if (button.getSelection()) {
-						selectedSettings.add(settingsTransfer);
-					} else {
-						selectedSettings.remove(settingsTransfer);
-					}
-					toggleDecoForSettingsImportButtons(button, deco);
-					settingsWorkspaceLink.setEnabled(!selectedSettings.isEmpty());
-				}
-			});
-
-		}
-		return enabledSettings != null && enabledSettings.length > 0;
-	}
-
-	private void toggleDecoForSettingsImportButtons(Button button, ControlDecoration deco) {
-		if (!button.getSelection()) {
-			deco.hide();
-			return;
-		}
-
-		if (Files.exists(Paths.get(getWorkspaceLocation()), LinkOption.NOFOLLOW_LINKS)) {
-			deco.show();
-		} else {
-			deco.hide();
-		}
-	}
-
-	private void createPromptForCopyPreferences(Composite parent) {
-		settingsWorkspaceLink = new Link(parent, SWT.WRAP);
-		settingsWorkspaceLink.setEnabled(!selectedSettings.isEmpty());
-		settingsWorkspaceLink.setText("<a>" + "No workspace selected" + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		settingsWorkspaceLink.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				ImportPreferencesDialog copyPreferencesDialog = new ImportPreferencesDialog(getShell(), launchData);
-				copyPreferencesDialog.open();
-			}
-		});
-	}
 	/**
 	 * Returns the title that the dialog (or splash) should have.
 	 *
@@ -420,28 +230,8 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
      */
     @Override
 	protected void okPressed() {
-		Iterator<IConfigurationElement> settingsIterator = selectedSettings.iterator();
-		MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
-				IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_ProblemsTransferTitle, null);
-
-		// IPath path = new Path(getWorkspaceLocation());
-		String[] selectionIDs = new String[selectedSettings.size()];
-		int index = 0;
-
-		while (settingsIterator.hasNext()) {
-			IConfigurationElement elem = settingsIterator.next();
-			// result.add(transferSettings(elem, path));
-			selectionIDs[index] = elem.getAttribute(ATT_ID);
-		}
-		if (result.getSeverity() != IStatus.OK) {
-			ErrorDialog.openError(getShell(),
-					IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_TransferFailedMessage,
-					IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_SaveSettingsFailed, result);
-			return;
-		}
-		getDialogSettings().put(ENABLED_TRANSFERS, selectionIDs);
 		workspaceSelected(getWorkspaceLocation());
-	}
+    }
 
 	/**
 	 * Set the selected workspace to the given String and close the dialog
@@ -505,13 +295,13 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		recentWorkspacesForm = toolkit.createForm(composite);
 		recentWorkspacesForm.setBackground(composite.getBackground());
 		recentWorkspacesForm.getBody().setLayout(new GridLayout());
-		ExpandableComposite recentWorkspacesExpandable = toolkit.createExpandableComposite(recentWorkspacesForm.getBody(),
+		ExpandableComposite expandableComposite = toolkit.createExpandableComposite(recentWorkspacesForm.getBody(),
 				ExpandableComposite.TWISTIE);
-		recentWorkspacesForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		recentWorkspacesExpandable.setBackground(composite.getBackground());
-		recentWorkspacesExpandable.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_recentWorkspaces);
-		recentWorkspacesExpandable.setExpanded(launchData.isShowRecentWorkspaces());
-		recentWorkspacesExpandable.addExpansionListener(new ExpansionAdapter() {
+		recentWorkspacesForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		expandableComposite.setBackground(composite.getBackground());
+		expandableComposite.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_recentWorkspaces);
+		expandableComposite.setExpanded(launchData.isShowRecentWorkspaces());
+		expandableComposite.addExpansionListener(new ExpansionAdapter() {
 			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				launchData.setShowRecentWorkspaces(((ExpandableComposite) e.getSource()).isExpanded());
@@ -522,8 +312,8 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 			}
 		});
 
-		Composite panel = new Composite(recentWorkspacesExpandable, SWT.NONE);
-		recentWorkspacesExpandable.setClient(panel);
+		Composite panel = new Composite(expandableComposite, SWT.NONE);
+		expandableComposite.setClient(panel);
 		RowLayout layout = new RowLayout(SWT.VERTICAL);
 		layout.marginLeft = 14;
 		layout.spacing = 6;
@@ -714,7 +504,18 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
      * The show dialog button allows the user to choose to neven be nagged again.
      */
     private void createShowDialogButton(Composite parent) {
-		Button button = new Button(parent, SWT.CHECK);
+        Composite panel = new Composite(parent, SWT.NONE);
+        panel.setFont(parent.getFont());
+
+        GridLayout layout = new GridLayout(1, false);
+        layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+        panel.setLayout(layout);
+
+        GridData data = new GridData(GridData.FILL_BOTH);
+        data.verticalAlignment = GridData.END;
+        panel.setLayoutData(data);
+
+        Button button = new Button(panel, SWT.CHECK);
         button.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_useDefaultMessage);
         button.setSelection(!launchData.getShowDialog());
         button.addSelectionListener(new SelectionAdapter() {
@@ -745,33 +546,12 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 			return null;
 		}
 
-		return getDialogSettings();
+        IDialogSettings settings = IDEWorkbenchPlugin.getDefault().getDialogSettings();
+        IDialogSettings section = settings.getSection(DIALOG_SETTINGS_SECTION);
+        if (section == null) {
+            section = settings.addNewSection(DIALOG_SETTINGS_SECTION);
+        }
+        return section;
 	}
 
-	public Combo getCombo() {
-		return text;
-	}
-
-	@Override
-	protected int getDialogBoundsStrategy() {
-		return DIALOG_PERSISTLOCATION;
-	}
-
-	/*
-	 * Method to return the dialog settings.
-	 *
-	 * May return null, if workspace is not yet created.
-	 *
-	 */
-	private IDialogSettings getDialogSettings() {
-		IDialogSettings dialogSettingsSection  = null;
-		if(PlatformUI.isWorkbenchRunning()) {
-			IDialogSettings dialogSettings = IDEWorkbenchPlugin.getDefault().getDialogSettings();
-			dialogSettingsSection = dialogSettings.getSection(DIALOG_SETTINGS_SECTION);
-			if (dialogSettingsSection == null) {
-				dialogSettingsSection = dialogSettings.addNewSection(DIALOG_SETTINGS_SECTION);
-			}
-		}
-		return dialogSettingsSection;
-	}
 }
