@@ -52,6 +52,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -101,9 +102,11 @@ public class SmartImportRootWizardPage extends WizardPage {
 		public String getText(Object o) {
 			File file = (File) o;
 			String label = file.getAbsolutePath();
-			if (label.startsWith(getWizard().getImportJob().getRoot().getAbsolutePath())) {
-				label = label
-						.substring(getWizard().getImportJob().getRoot().getParentFile().getAbsolutePath().length() + 1);
+			File root = getWizard().getImportJob().getRoot();
+			if (label.startsWith(root.getAbsolutePath())) {
+				if (root.getParentFile() != null) {
+					label = label.substring(root.getParentFile().getAbsolutePath().length() + 1);
+				}
 			}
 			return label;
 		}
@@ -617,10 +620,11 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 	private void refreshProposals() {
 		try {
-			getContainer().run(true, true, new IRunnableWithProgress() {
-				@Override
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-					if (sourceIsValid()) {
+			if (sourceIsValid()) {
+				Point initialSelection = rootDirectoryText.getSelection();
+				getContainer().run(true, true, new IRunnableWithProgress() {
+					@Override
+					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 						SmartImportRootWizardPage.this.potentialProjects = getWizard().getImportJob()
 								.getImportProposals(monitor);
 						if (!potentialProjects.containsKey(getWizard().getImportJob().getRoot())) {
@@ -635,13 +639,15 @@ public class SmartImportRootWizardPage extends WizardPage {
 									.remove(project.getLocation().toFile());
 							SmartImportRootWizardPage.this.alreadyExistingProjects.add(project.getLocation().toFile());
 						}
-					} else {
-						SmartImportRootWizardPage.this.potentialProjects = Collections.emptyMap();
-						SmartImportRootWizardPage.this.notAlreadyExistingProjects = Collections.emptySet();
-						SmartImportRootWizardPage.this.alreadyExistingProjects = Collections.emptySet();
 					}
-				}
-			});
+				});
+				// restore selection as getContainer().run(...) looses it
+				rootDirectoryText.setSelection(initialSelection);
+			} else {
+				SmartImportRootWizardPage.this.potentialProjects = Collections.emptyMap();
+				SmartImportRootWizardPage.this.notAlreadyExistingProjects = Collections.emptySet();
+				SmartImportRootWizardPage.this.alreadyExistingProjects = Collections.emptySet();
+			}
 			tree.setInput(potentialProjects);
 			tree.setCheckedElements(this.notAlreadyExistingProjects.toArray());
 		} catch (Exception ex) {
