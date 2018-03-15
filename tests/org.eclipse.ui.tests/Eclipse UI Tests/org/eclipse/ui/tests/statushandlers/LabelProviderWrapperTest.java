@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,14 +37,14 @@ import junit.framework.TestCase;
 public class LabelProviderWrapperTest extends TestCase {
 
 	private LabelProviderWrapper wrapper;
-	private Map<Object, Object> dialogState = new HashMap<>();
+	private Map dialogState = new HashMap();
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		dialogState = new HashMap<>();
-		dialogState.put(IStatusDialogConstants.STATUS_ADAPTERS, new HashSet<>());
-		((Collection) dialogState.get(IStatusDialogConstants.STATUS_ADAPTERS)).add(Status.OK_STATUS);
+		dialogState = new HashMap();
+		dialogState.put(IStatusDialogConstants.STATUS_ADAPTERS, new HashSet());
+		((Collection)dialogState.get(IStatusDialogConstants.STATUS_ADAPTERS)).add(Status.OK_STATUS);
 		wrapper = new LabelProviderWrapper(dialogState);
 	}
 
@@ -122,7 +122,7 @@ public class LabelProviderWrapperTest extends TestCase {
 		assertEquals(message, wrapper.getSecondaryMessage(saError));
 
 		//pretend to have more statuses
-		((Collection) dialogState.get(IStatusDialogConstants.STATUS_ADAPTERS)).add(Status.CANCEL_STATUS);
+		((Collection)dialogState.get(IStatusDialogConstants.STATUS_ADAPTERS)).add(Status.CANCEL_STATUS);
 
 		assertEquals(message, wrapper.getMainMessage(saError));
 		assertEquals(title, wrapper.getColumnText(saError, 0));
