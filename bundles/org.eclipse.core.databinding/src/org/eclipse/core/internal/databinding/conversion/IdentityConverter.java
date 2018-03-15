@@ -82,13 +82,13 @@ public class IdentityConverter implements IConverter {
 	 */
 	public boolean isPrimitiveTypeMatchedWithBoxed(Class sourceClass,
 			Class toClass) {
-		for (Class[] element : primitiveMap) {
-			if (toClass.equals(element[0])
-					&& sourceClass.equals(element[1])) {
+		for (int i = 0; i < primitiveMap.length; i++) {
+			if (toClass.equals(primitiveMap[i][0])
+					&& sourceClass.equals(primitiveMap[i][1])) {
 				return true;
 			}
-			if (sourceClass.equals(element[0])
-					&& toClass.equals(element[1])) {
+			if (sourceClass.equals(primitiveMap[i][0])
+					&& toClass.equals(primitiveMap[i][1])) {
 				return true;
 			}
 		}

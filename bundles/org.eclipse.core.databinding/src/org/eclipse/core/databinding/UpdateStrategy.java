@@ -139,7 +139,8 @@ import com.ibm.icu.text.NumberFormat;
 		Map converterMap = getConverterMap();
 		Class[] supertypeHierarchyFlattened = ClassLookupSupport
 				.getTypeHierarchyFlattened(fromClass);
-		for (Class currentFromClass : supertypeHierarchyFlattened) {
+		for (int i = 0; i < supertypeHierarchyFlattened.length; i++) {
+			Class currentFromClass = supertypeHierarchyFlattened[i];
 			if (currentFromClass == toType) {
 				// converting to toType is just a widening
 				return new IdentityConverter(fromClass, toClass);
@@ -436,8 +437,8 @@ import com.ibm.icu.text.NumberFormat;
 	private static void addNumberToByteConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
 
-		for (Class fromType2 : fromTypes) {
-			Class fromType = fromType2;
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(Byte.class) && !fromType.equals(byte.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();
@@ -464,8 +465,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToShortConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType2 : fromTypes) {
-			Class fromType = fromType2;
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(Short.class) && !fromType.equals(short.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();
@@ -491,8 +492,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToIntegerConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType2 : fromTypes) {
-			Class fromType = fromType2;
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(Integer.class)
 					&& !fromType.equals(int.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
@@ -518,8 +519,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToLongConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType2 : fromTypes) {
-			Class fromType = fromType2;
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(Long.class) && !fromType.equals(long.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();
@@ -546,8 +547,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToFloatConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType2 : fromTypes) {
-			Class fromType = fromType2;
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(Float.class) && !fromType.equals(float.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();
@@ -573,8 +574,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToDoubleConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType2 : fromTypes) {
-			Class fromType = fromType2;
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(Double.class) && !fromType.equals(double.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();
@@ -599,8 +600,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToBigIntegerConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType2 : fromTypes) {
-			Class fromType = fromType2;
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(BigInteger.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();
@@ -623,8 +624,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToBigDecimalConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType2 : fromTypes) {
-			Class fromType = fromType2;
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(BigDecimal.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();

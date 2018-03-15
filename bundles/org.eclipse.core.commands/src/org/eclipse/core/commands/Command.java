@@ -524,8 +524,8 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 		}
 
 		final Object[] listeners = getListeners();
-		for (Object listener : listeners) {
-			final ICommandListener commandListener = (ICommandListener) listener;
+		for (int i = 0; i < listeners.length; i++) {
+			final ICommandListener listener = (ICommandListener) listeners[i];
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void handleException(Throwable exception) {
@@ -533,7 +533,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 
 				@Override
 				public void run() throws Exception {
-					commandListener.commandChanged(commandEvent);
+					listener.commandChanged(commandEvent);
 				}
 			});
 		}
@@ -745,7 +745,8 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 			return null;
 		}
 
-		for (final IParameter parameter : parameters) {
+		for (int i = 0; i < parameters.length; i++) {
+			final IParameter parameter = parameters[i];
 			if (parameter.getId().equals(parameterId)) {
 				return parameter;
 			}
@@ -953,7 +954,8 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 		// Swap the state around.
 		final String[] stateIds = getStateIds();
 		if (stateIds != null) {
-			for (final String stateId : stateIds) {
+			for (int i = 0; i < stateIds.length; i++) {
+				final String stateId = stateIds[i];
 				if (this.handler instanceof IObjectWithState) {
 					((IObjectWithState) this.handler).removeState(stateId);
 				}
@@ -1096,7 +1098,8 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 		if (stateIds != null) {
 			if (handler instanceof IObjectWithState) {
 				final IObjectWithState handlerWithState = (IObjectWithState) handler;
-				for (final String stateId : stateIds) {
+				for (int i = 0; i < stateIds.length; i++) {
+					final String stateId = stateIds[i];
 					handlerWithState.removeState(stateId);
 
 					final State state = getState(stateId);
@@ -1104,7 +1107,8 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 					state.dispose();
 				}
 			} else {
-				for (final String stateId : stateIds) {
+				for (int i = 0; i < stateIds.length; i++) {
+					final String stateId = stateIds[i];
 					final State state = getState(stateId);
 					removeState(stateId);
 					state.dispose();
