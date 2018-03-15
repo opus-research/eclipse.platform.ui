@@ -40,7 +40,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -74,7 +73,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 
     private boolean centerOnMonitor = false;
 
-	private Map<String, Link> recentWorkspacesLinks;
+	private Map<String, Composite> recentWorkspacesComposites;
 
 	private Form recentWorkspacesForm;
 
@@ -255,9 +254,9 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		launchData.setRecentWorkspaces(recentWorkpaces.toArray(new String[0]));
 		launchData.writePersistedData();
 		// Remove Workspace Composite
-		recentWorkspacesLinks.get(workspace).dispose();
-		recentWorkspacesLinks.remove(workspace);
-		if (recentWorkspacesLinks.isEmpty()) {
+		recentWorkspacesComposites.get(workspace).dispose();
+		recentWorkspacesComposites.remove(workspace);
+		if (recentWorkspacesComposites.isEmpty()) {
 			recentWorkspacesForm.dispose();
 		}
 		getShell().layout();
@@ -295,13 +294,13 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		recentWorkspacesForm = toolkit.createForm(composite);
 		recentWorkspacesForm.setBackground(composite.getBackground());
 		recentWorkspacesForm.getBody().setLayout(new GridLayout());
-		ExpandableComposite recentWorkspacesExpandable = toolkit.createExpandableComposite(recentWorkspacesForm.getBody(),
+		ExpandableComposite expandableComposite = toolkit.createExpandableComposite(recentWorkspacesForm.getBody(),
 				ExpandableComposite.TWISTIE);
-		recentWorkspacesForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		recentWorkspacesExpandable.setBackground(composite.getBackground());
-		recentWorkspacesExpandable.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_recentWorkspaces);
-		recentWorkspacesExpandable.setExpanded(launchData.isShowRecentWorkspaces());
-		recentWorkspacesExpandable.addExpansionListener(new ExpansionAdapter() {
+		recentWorkspacesForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		expandableComposite.setBackground(composite.getBackground());
+		expandableComposite.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_recentWorkspaces);
+		expandableComposite.setExpanded(launchData.isShowRecentWorkspaces());
+		expandableComposite.addExpansionListener(new ExpansionAdapter() {
 			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				launchData.setShowRecentWorkspaces(((ExpandableComposite) e.getSource()).isExpanded());
@@ -312,13 +311,13 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 			}
 		});
 
-		Composite panel = new Composite(recentWorkspacesExpandable, SWT.NONE);
-		recentWorkspacesExpandable.setClient(panel);
-		RowLayout layout = new RowLayout(SWT.VERTICAL);
+		Composite panel = new Composite(expandableComposite, SWT.NONE);
+		expandableComposite.setClient(panel);
+		RowLayout layout = new RowLayout();
+		layout.type = SWT.VERTICAL;
 		layout.marginLeft = 14;
-		layout.spacing = 6;
 		panel.setLayout(layout);
-		recentWorkspacesLinks = new HashMap<>(launchData.getRecentWorkspaces().length);
+		recentWorkspacesComposites = new HashMap<>(launchData.getRecentWorkspaces().length);
 		Map<String, String> uniqueWorkspaceNames = createUniqueWorkspaceNameMap();
 
 		List<String> recentWorkspacesList = Arrays.asList(launchData.getRecentWorkspaces()).stream()
@@ -330,18 +329,22 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		for (Entry<String, String> uniqueWorkspaceEntry : sortedList) {
 			final String recentWorkspace = uniqueWorkspaceEntry.getValue();
 
-			Link link = new Link(panel, SWT.WRAP);
-			link.setLayoutData(new RowData(SWT.DEFAULT, SWT.DEFAULT));
-			link.setText("<a>" + uniqueWorkspaceEntry.getKey() + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
+			Composite recentWorkspacePanel = new Composite(panel, SWT.NONE);
+			recentWorkspacesComposites.put(recentWorkspace, recentWorkspacePanel);
+			GridLayout recentWorkspacePanelLayout = new GridLayout(3, false);
+			recentWorkspacePanel.setLayout(recentWorkspacePanelLayout);
+
+			Link link = new Link(recentWorkspacePanel, SWT.WRAP);
+			link.setLayoutData(new GridData(500, SWT.DEFAULT));
+			link.setText("<a>" + uniqueWorkspaceEntry.getKey() + "</a>"); //$NON-NLS-1$//$NON-NLS-2$
 			link.setToolTipText(recentWorkspace);
+
 			link.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					workspaceSelected(recentWorkspace);
 				}
 			});
-
-			recentWorkspacesLinks.put(recentWorkspace, link);
 
 			Menu menu = new Menu(link);
 			MenuItem forgetItem = new MenuItem(menu, SWT.PUSH);
@@ -554,7 +557,4 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         return section;
 	}
 
-	public Combo getCombo() {
-		return text;
-	}
 }

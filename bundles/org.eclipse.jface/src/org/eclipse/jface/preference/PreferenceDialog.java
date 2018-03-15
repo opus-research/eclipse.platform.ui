@@ -1099,7 +1099,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 */
 	private void setSelectedNode() {
 		String storeValue = null;
-		IStructuredSelection selection = getTreeViewer().getStructuredSelection();
+		IStructuredSelection selection = (IStructuredSelection) getTreeViewer().getSelection();
 		if (selection.size() == 1) {
 			IPreferenceNode node = (IPreferenceNode) selection.getFirstElement();
 			storeValue = node.getId();

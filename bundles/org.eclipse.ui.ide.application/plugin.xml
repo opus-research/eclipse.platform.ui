@@ -95,7 +95,6 @@
                mnemonic="%menu.editor.mnemonic">
             <command
                   commandId="org.eclipse.ui.window.splitEditor"
-                  icon="icons/full/elcl16/split_horizontal.png"
                   mnemonic="%command.split.horizontal.mnemonic"
                   style="push">
                <parameter
@@ -105,7 +104,6 @@
             </command>
             <command
                   commandId="org.eclipse.ui.window.splitEditor"
-                  icon="icons/full/elcl16/split_vertical.png"
                   mnemonic="%command.split.vertical.mnemonic"
                   style="push">
                <parameter
@@ -121,7 +119,6 @@
             </command>
             <command
                   commandId="org.eclipse.ui.edit.text.toggleWordWrap"
-                  mnemonic="%command.wordwrap.mnemonic"
                   style="push">
                <visibleWhen
                      checkEnabled="true">
@@ -129,7 +126,6 @@
             </command>
             <command
                   commandId="org.eclipse.ui.edit.text.toggleShowWhitespaceCharacters"
-                  mnemonic="%command.whitespace.mnemonic"
                   style="push">
                <visibleWhen
                      checkEnabled="true">
@@ -137,7 +133,6 @@
             </command>
             <command
                   commandId="org.eclipse.ui.edit.text.zoomIn"
-                  mnemonic="%command.zoomIn.mnemonic"
                   style="push">
                <visibleWhen
                      checkEnabled="true">
@@ -145,7 +140,6 @@
             </command>
             <command
                   commandId="org.eclipse.ui.edit.text.zoomOut"
-                  mnemonic="%command.zoomOut.mnemonic"
                   style="push">
                <visibleWhen
                      checkEnabled="true">

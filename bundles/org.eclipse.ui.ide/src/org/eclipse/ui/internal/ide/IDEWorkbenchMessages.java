@@ -18,7 +18,7 @@
  * Lars Vogel <Lars.Vogel@vogella.com> - Bug 431862
  * Christian Georgi (SAP SE)           - bug 432480, bug 458811
  * Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
- * Patrik Suzzi <psuzzi@gmail.com> - Bug 485201, 502050, 514355
+ * Patrik Suzzi <psuzzi@gmail.com> - Bug 485201, 502050
  * Simon Scholz <simon.scholz@vogella.com> - Bug 486777
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
@@ -393,9 +393,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String CopyFilesAndFoldersOperation_sourceCannotBeCopiedIntoAVirtualFolder;
 	public static String CopyFilesAndFoldersOperation_copyTitle;
 	public static String CopyFilesAndFoldersOperation_moveTitle;
-	public static String CopyFilesAndFoldersOperation_overwriteButtonLabel;
-	public static String CopyFilesAndFoldersOperation_overwriteAllButtonLabel;
-	public static String CopyFilesAndFoldersOperation_dontOverwriteButtonLabel;
 
 	public static String MoveFilesAndFoldersOperation_sameSourceAndDest;
 	public static String MoveFilesAndFoldersOperation_moveFailedTitle;
@@ -970,14 +967,11 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ChooseWorkspaceWithSettingsDialog_TransferFailedMessage;
 	public static String ChooseWorkspaceWithSettingsDialog_SaveSettingsFailed;
 	public static String ChooseWorkspaceWithSettingsDialog_ClassCreationFailed;
-	public static String ChooseWorkspaceWithSettingsDialog_copySettingsDecoLabel;
 
 	public static String IDEApplication_workspaceMandatoryTitle;
 	public static String IDEApplication_workspaceMandatoryMessage;
 	public static String IDEApplication_workspaceInUseTitle;
 	public static String IDEApplication_workspaceInUseMessage;
-	public static String IDEApplication_workspaceInUse_Cancel;
-	public static String IDEApplication_workspaceInUse_Retry;
 	public static String IDEApplication_workspaceEmptyTitle;
 	public static String IDEApplication_workspaceEmptyMessage;
 	public static String IDEApplication_workspaceInvalidTitle;
@@ -1005,9 +999,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String CleanDialog_cleanSelectedTaskName;
 	public static String CleanDialog_cleanAllTaskName;
 	public static String CleanDialog_alwaysCleanAllButton;
-	public static String CleanDialog_typeFilterText;
-	public static String CleanDialog_clearToolTip;
-	public static String CleanDialog_AccessibleListenerClearButton;
 	public static String IDEEncoding_EncodingJob;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_viewsRelatedLink;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_FileEditorsRelatedLink;

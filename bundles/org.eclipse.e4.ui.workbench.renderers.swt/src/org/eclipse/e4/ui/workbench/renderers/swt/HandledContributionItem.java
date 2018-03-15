@@ -273,7 +273,7 @@ public class HandledContributionItem extends AbstractContributionItem {
 		} else {
 			item.setText(""); //$NON-NLS-1$
 		}
-		final String tooltip = getModel().getLocalizedTooltip();
+		final String tooltip = getToolTipText(false);
 		item.setToolTipText(tooltip);
 		item.setSelection(getModel().isSelected());
 		item.setEnabled(getModel().isEnabled());
