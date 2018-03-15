@@ -199,6 +199,12 @@ public class SearchField {
 					txtQuickAccess.setText(""); //$NON-NLS-1$
 					element.execute();
 
+					// after execution, the element might be disposed (e.g. Bug
+					// 436788)
+					if (txtQuickAccess.isDisposed()) {
+						return;
+					}
+
 					/*
 					 * By design, attempting to activate a part that is already
 					 * active does not change the focus. However in the case of
