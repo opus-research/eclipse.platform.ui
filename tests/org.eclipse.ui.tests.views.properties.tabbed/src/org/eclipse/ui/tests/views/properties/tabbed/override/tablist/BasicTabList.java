@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -34,7 +34,7 @@ import org.eclipse.ui.tests.views.properties.tabbed.override.items.WarningItem;
  * <p>
  * The overridable tab list is a content provider that provides both the
  * sections and the tab labels.
- * 
+ *
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -42,21 +42,13 @@ public class BasicTabList extends AbstractTabList {
 
 	private IOverrideTestsItem[] overrideTestsItems;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.tablist.AbstractTabList#appliesTo(org.eclipse.ui.tests.views.properties.tabbed.model.Element)
-	 */
+	@Override
 	public boolean appliesTo(Element element) {
 		return ((element instanceof Information) ||
 				(element instanceof Warning) || (element instanceof Error));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.tablist.IOverrideTestsTabList#getItems()
-	 */
+	@Override
 	public IOverrideTestsItem[] getItems() {
 		if (overrideTestsItems == null) {
 			overrideTestsItems = new IOverrideTestsItem[] {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 205678
  *******************************************************************************/
 package org.eclipse.ui.part;
 
@@ -20,33 +21,37 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.util.Util;
 import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.TransferData;
+import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
  * The <code>ResourceTransfer</code> class is used to transfer an
- * array of <code>IResource</code>s from one part to another in a 
+ * array of <code>IResource</code>s from one part to another in a
  * drag and drop operation or a cut, copy, paste action.
  * <p>
- * In every drag and drop operation there is a <code>DragSource</code> and 
- * a <code>DropTarget</code>.  When a drag occurs a <code>Transfer</code> is 
- * used to marshal the drag data from the source into a byte array.  If a drop 
+ * In every drag and drop operation there is a <code>DragSource</code> and
+ * a <code>DropTarget</code>.  When a drag occurs a <code>Transfer</code> is
+ * used to marshal the drag data from the source into a byte array.  If a drop
  * occurs another <code>Transfer</code> is used to marshal the byte array into
- * drop data for the target.  
+ * drop data for the target.
  * </p>
  * <p>
- * When a <code>CutAction</code> or a <code>CopyAction</code> is performed, 
- * this transfer is used to place references to the selected resources 
- * on the <code>Clipboard</code>.  When a <code>PasteAction</code> is performed, the 
+ * When a <code>CutAction</code> or a <code>CopyAction</code> is performed,
+ * this transfer is used to place references to the selected resources
+ * on the <code>Clipboard</code>.  When a <code>PasteAction</code> is performed, the
  * references on the clipboard are used to move or copy the resources
  * to the selected destination.
  * </p>
  * <p>
  * This class can be used for a <code>Viewer<code> or an SWT component directly.
- * A singleton is provided which may be serially reused (see <code>getInstance</code>).  
+ * A singleton is provided which may be serially reused (see <code>getInstance</code>).
  * It is not intended to be subclassed.
  * </p>
- *
+ * <p>
+ * The amount of resources which can be transferred is limited to <code>MAX_RESOURCES_TO_TRANSFER</code> elements.
+ * </p>
  * @see org.eclipse.jface.viewers.StructuredViewer
  * @see org.eclipse.swt.dnd.DropTarget
  * @see org.eclipse.swt.dnd.DragSource
@@ -54,9 +59,19 @@ import org.eclipse.swt.dnd.TransferData;
  */
 public class ResourceTransfer extends ByteArrayTransfer {
 
-    /**
-     * Singleton instance.
-     */
+	/**
+	 * See bug 205678: sometimes we can misinterpret native data received from
+	 * clipboard. No one seriously would copy/paste or drag/drop more then
+	 * 100.000 resources: only creating an *empty* array of 100.000.000
+	 * resources will cause OOME on 512 MB heap size (default for shipped
+	 * Eclipse packages), same with copy/paste of a *full* array of 10.000.000
+	 * elements.
+	 */
+	private final static int MAX_RESOURCES_TO_TRANSFER = 1000 * 1000;
+
+	/**
+	 * Singleton instance.
+	 */
     private static final ResourceTransfer instance = new ResourceTransfer();
 
     // Create a unique ID to make sure that different Eclipse
@@ -82,26 +97,18 @@ public class ResourceTransfer extends ByteArrayTransfer {
         return instance;
     }
 
-    /* (non-Javadoc)
-     * Method declared on Transfer.
-     */
-    protected int[] getTypeIds() {
+    @Override
+	protected int[] getTypeIds() {
         return new int[] { TYPEID };
     }
 
-    /* (non-Javadoc)
-     * Returns the type names.
-     *
-     * @return the list of type names
-     */
-    protected String[] getTypeNames() {
+    @Override
+	protected String[] getTypeNames() {
         return new String[] { TYPE_NAME };
     }
 
-    /* (non-Javadoc)
-     * Method declared on Transfer.
-     */
-    protected void javaToNative(Object data, TransferData transferData) {
+    @Override
+	protected void javaToNative(Object data, TransferData transferData) {
         if (!(data instanceof IResource[])) {
             return;
         }
@@ -139,10 +146,8 @@ public class ResourceTransfer extends ByteArrayTransfer {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on Transfer.
-     */
-    protected Object nativeToJava(TransferData transferData) {
+    @Override
+	protected Object nativeToJava(TransferData transferData) {
         /**
          * The resource serialization format is:
          *  (int) number of resources
@@ -159,6 +164,17 @@ public class ResourceTransfer extends ByteArrayTransfer {
                 new ByteArrayInputStream(bytes));
         try {
             int count = in.readInt();
+			if (count > MAX_RESOURCES_TO_TRANSFER) {
+				String message = "Transfer aborted, too many resources: " + count + "."; //$NON-NLS-1$ //$NON-NLS-2$
+				if (Util.isLinux()) {
+					message += "\nIf you are running in x11vnc environment please consider to switch to vncserver " + //$NON-NLS-1$
+							"+ vncviewer or to run x11vnc without clipboard support " + //$NON-NLS-1$
+							"(use '-noclipboard' and '-nosetclipboard' arguments)."; //$NON-NLS-1$
+				}
+				IDEWorkbenchPlugin.log(message, new IllegalArgumentException(
+						"Maximum limit of resources to transfer is: " + MAX_RESOURCES_TO_TRANSFER)); //$NON-NLS-1$
+				return null;
+			}
             IResource[] results = new IResource[count];
             for (int i = 0; i < count; i++) {
                 results[i] = readResource(in);

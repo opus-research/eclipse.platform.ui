@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,13 +22,13 @@ import org.eclipse.ui.services.IServiceScopes;
 
 /**
  * Query where you are in the workbench hierarchy.
- * 
+ *
  * @since 3.4
  */
 public interface IWorkbenchLocationService {
 	/**
 	 * Get the service scope.
-	 * 
+	 *
 	 * @return the service scope. May return <code>null</code>.
 	 * @see IServiceScopes#PARTSITE_SCOPE
 	 */
@@ -36,7 +36,7 @@ public interface IWorkbenchLocationService {
 
 	/**
 	 * A more numeric representation of the service level.
-	 * 
+	 *
 	 * @return the level - 0==workbench, 1==workbench window or dialog, etc
 	 */
 	public int getServiceLevel();

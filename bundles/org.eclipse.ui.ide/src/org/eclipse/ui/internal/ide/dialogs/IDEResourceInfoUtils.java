@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,16 +8,14 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     David Black - bug 198091
+ *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
-
-import com.ibm.icu.text.DateFormat;
-import com.ibm.icu.text.MessageFormat;
-import com.ibm.icu.text.NumberFormat;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
+
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -37,11 +35,15 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.statushandlers.StatusManager;
 
+import com.ibm.icu.text.DateFormat;
+import com.ibm.icu.text.MessageFormat;
+import com.ibm.icu.text.NumberFormat;
+
 /**
  * Utility class supporting common information required from resources.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class IDEResourceInfoUtils {
 
@@ -80,7 +82,7 @@ public class IDEResourceInfoUtils {
 
 	/**
 	 * Return whether or not the file called pathName exists.
-	 * 
+	 *
 	 * @param pathName
 	 * @return boolean <code>true</code> if the file exists.
 	 * @see IFileInfo#exists()
@@ -106,7 +108,7 @@ public class IDEResourceInfoUtils {
 	/**
 	 * Return the value for the date String for the timestamp of the supplied
 	 * resource.
-	 * 
+	 *
 	 * @param resource
 	 *            The resource to query
 	 * @return String
@@ -145,7 +147,7 @@ public class IDEResourceInfoUtils {
 	/**
 	 * Return the fileInfo at pathName or <code>null</code> if the format is
 	 * invalid or if the file info cannot be determined.
-	 * 
+	 *
 	 * @param pathName
 	 * @return IFileInfo or <code>null</code>
 	 */
@@ -160,7 +162,7 @@ public class IDEResourceInfoUtils {
 	/**
 	 * Return the fileInfo at pathName or <code>null</code> if the format is
 	 * invalid or if the file info cannot be determined.
-	 * 
+	 *
 	 * @param pathName
 	 * @return IFileInfo or <code>null</code>
 	 */
@@ -175,7 +177,7 @@ public class IDEResourceInfoUtils {
 	/**
 	 * Return the fileInfo for location. Return <code>null</code> if there is
 	 * a CoreException looking it up
-	 * 
+	 *
 	 * @param location
 	 * @return String or <code>null</code>
 	 */
@@ -191,7 +193,7 @@ public class IDEResourceInfoUtils {
 
 	/**
 	 * Get the file store for the local file system path.
-	 * 
+	 *
 	 * @param string
 	 * @return IFileStore or <code>null</code> if there is a
 	 *         {@link CoreException}.
@@ -208,7 +210,7 @@ public class IDEResourceInfoUtils {
 
 	/**
 	 * Get the file store for the URI.
-	 * 
+	 *
 	 * @param uri
 	 * @return IFileStore or <code>null</code> if there is a
 	 *         {@link CoreException}.
@@ -224,7 +226,7 @@ public class IDEResourceInfoUtils {
 
 	/**
 	 * Get the location of a resource
-	 * 
+	 *
 	 * @param resource
 	 * @return String the text to display the location
 	 */
@@ -247,7 +249,7 @@ public class IDEResourceInfoUtils {
 
 		if (resolvedLocation.getScheme() == null)
 			return location.toString();
-		
+
 		IFileStore store = getFileStore(resolvedLocation);
 		// don't access the file system for closed projects (bug 151089)
 		boolean isPathVariable = isPathVariable(resource);
@@ -275,7 +277,7 @@ public class IDEResourceInfoUtils {
 	/**
 	 * Get the resolved location of a resource. This resolves path variables if
 	 * present in the resource path.
-	 * 
+	 *
 	 * @param resource
 	 * @return String
 	 */
@@ -295,7 +297,7 @@ public class IDEResourceInfoUtils {
 
 		if (location.getScheme() == null)
 			return UNKNOWN_LABEL;
-		
+
 		IFileStore store = getFileStore(location);
 		if (store == null) {
 			return UNKNOWN_LABEL;
@@ -311,7 +313,7 @@ public class IDEResourceInfoUtils {
 
 	/**
 	 * Return a String that indicates the size of the supplied file.
-	 * 
+	 *
 	 * @param resource
 	 * @return String
 	 */
@@ -340,8 +342,7 @@ public class IDEResourceInfoUtils {
 		}
 
 		if (info.exists()) {
-			return NLS.bind(BYTES_LABEL, NumberFormat.getInstance().format(
-					new Long(info.getLength())));
+			return NLS.bind(BYTES_LABEL, NumberFormat.getInstance().format(info.getLength()));
 		}
 
 		return NOT_EXIST_TEXT;
@@ -349,7 +350,7 @@ public class IDEResourceInfoUtils {
 
 	/**
 	 * Get the string that identifies the type of this resource.
-	 * 
+	 *
 	 * @param resource
 	 * @param description
 	 * @return String
@@ -393,7 +394,7 @@ public class IDEResourceInfoUtils {
 	/**
 	 * Returns whether the given resource is a linked resource bound to a path
 	 * variable.
-	 * 
+	 *
 	 * @param resource
 	 *            resource to test
 	 * @return boolean <code>true</code> the given resource is a linked
@@ -429,7 +430,7 @@ public class IDEResourceInfoUtils {
 
 	/**
 	 * Return the file stores that are a child of store that the filter accepts.
-	 * 
+	 *
 	 * @param store
 	 * @param fileFilter
 	 * @param monitor

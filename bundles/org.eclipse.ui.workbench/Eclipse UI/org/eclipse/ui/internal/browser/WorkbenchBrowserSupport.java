@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,7 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
  * Implements the support interface and delegates the calls to the active
  * support if contributed via the extension point, or the default support
  * otherwise.
- * 
+ *
  * @since 3.1
  */
 public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
@@ -42,22 +42,16 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 	private IWorkbenchBrowserSupport activeSupport;
 
 	private boolean initialized;
-    
+
     private String desiredBrowserSupportId;
 
 	private IExtensionChangeHandler handler = new IExtensionChangeHandler() {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
-         */
+
         @Override
 		public void addExtension(IExtensionTracker tracker,IExtension extension) {
             //Do nothing
         }
 
-        /* (non-Javadoc)
-         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
-         */
         @Override
 		public void removeExtension(IExtension source, Object[] objects) {
 			for (int i = 0; i < objects.length; i++) {
@@ -80,7 +74,7 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 
 	/**
 	 * Returns the shared instance.
-	 * 
+	 *
 	 * @return shared instance
 	 */
 	public static IWorkbenchBrowserSupport getInstance() {
@@ -90,9 +84,6 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		return instance;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(int, java.lang.String, java.lang.String, java.lang.String)
-	 */
 	@Override
 	public IWebBrowser createBrowser(int style, String browserId, String name,
 			String tooltip) throws PartInitException {
@@ -100,17 +91,11 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 				.createBrowser(style, browserId, name, tooltip);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(java.lang.String)
-	 */
 	@Override
 	public IWebBrowser createBrowser(String browserId) throws PartInitException {
 		return getActiveSupport().createBrowser(browserId);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#isInternalWebBrowserAvailable()
-	 */
+
 	@Override
 	public boolean isInternalWebBrowserAvailable() {
 		return getActiveSupport().isInternalWebBrowserAvailable();
@@ -126,10 +111,10 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		}
 		return activeSupport;
 	}
-    
+
     /**
      * Answers whether the system has a non-default browser installed.
-     * 
+     *
      * @return whether the system has a non-default browser installed
      */
     public boolean hasNonDefaultBrowser() {
@@ -138,11 +123,6 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 
 	private void loadActiveSupport() {
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see java.lang.Runnable#run()
-			 */
 			@Override
 			public void run() {
                 IConfigurationElement[] elements = Platform
@@ -150,7 +130,7 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
                                 PlatformUI.PLUGIN_ID,
                                 IWorkbenchRegistryConstants.PL_BROWSER_SUPPORT);
 				IConfigurationElement elementToUse = null;
-                
+
                 if (desiredBrowserSupportId != null) {
 					elementToUse = findDesiredElement(elements);
 				} else {
@@ -164,7 +144,7 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
             /**
              * Search for the element whose extension has ID equal to that of
              * the field desiredBrowserSupport.
-             * 
+             *
              * @param elements
              *            the elements to search
              * @return the element or <code>null</code>
@@ -197,7 +177,7 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 					IConfigurationElement element = elements[i];
 					if (element.getName().equals(IWorkbenchRegistryConstants.TAG_SUPPORT)) {
 						String def = element.getAttribute(IWorkbenchRegistryConstants.ATT_DEFAULT);
-						if (def != null && Boolean.valueOf(def).booleanValue()) { 
+						if (def != null && Boolean.valueOf(def).booleanValue()) {
 							if (defaultElement == null) {
 								defaultElement = element;
 							}
@@ -240,10 +220,10 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 
 		});
 	}
-    
+
     /**
      * For debug purposes only.
-     * 
+     *
      * @param desiredBrowserSupportId the desired browser system id
      */
     public void setDesiredBrowserSupportId(String desiredBrowserSupportId) {

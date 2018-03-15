@@ -38,7 +38,8 @@ public abstract class DecoratorEnablementTestCase extends AbstractNavigatorTest
     /**
      * Sets up the hierarchy.
      */
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         super.doSetUp();
         createTestFile();
         showNav();
@@ -47,10 +48,11 @@ public abstract class DecoratorEnablementTestCase extends AbstractNavigatorTest
 
         DecoratorDefinition[] definitions = WorkbenchPlugin.getDefault()
                 .getDecoratorManager().getAllDecoratorDefinitions();
-        for (int i = 0; i < definitions.length; i++) {
-            if (definitions[i].getId().equals(
-                    "org.eclipse.ui.tests.decorators.lightweightdecorator"))
-                definition = definitions[i];
+        for (DecoratorDefinition definition2 : definitions) {
+            if (definition2.getId().equals(
+                    "org.eclipse.ui.tests.decorators.lightweightdecorator")) {
+				definition = definition2;
+			}
         }
     }
 
@@ -61,7 +63,8 @@ public abstract class DecoratorEnablementTestCase extends AbstractNavigatorTest
     /**
      * Remove the listener.
      */
-    protected void doTearDown() throws Exception {
+    @Override
+	protected void doTearDown() throws Exception {
         super.doTearDown();
         getDecoratorManager().removeListener(this);
     }
@@ -89,7 +92,8 @@ public abstract class DecoratorEnablementTestCase extends AbstractNavigatorTest
     /*
      * @see ILabelProviderListener#labelProviderChanged(LabelProviderChangedEvent)
      */
-    public void labelProviderChanged(LabelProviderChangedEvent event) {
+    @Override
+	public void labelProviderChanged(LabelProviderChangedEvent event) {
         updated = true;
     }
 

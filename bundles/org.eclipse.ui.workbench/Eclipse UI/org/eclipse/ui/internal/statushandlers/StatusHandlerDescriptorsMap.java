@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import java.util.Map;
 
 /**
  * Helper class supporting the prefix based status handling policy.
- * 
+ *
  * @since 3.3
  */
 class StatusHandlerDescriptorsMap {
@@ -36,7 +36,7 @@ class StatusHandlerDescriptorsMap {
 
 	/**
 	 * Adds a new handler descriptor to the prefix tree
-	 * 
+	 *
 	 * @param handlerDescriptor
 	 *            the handler descriptor to add
 	 */
@@ -87,7 +87,7 @@ class StatusHandlerDescriptorsMap {
 	/**
 	 * Returns status handler descriptors whose prefixes are the most specific
 	 * for given pluginId.
-	 * 
+	 *
 	 * @param pluginId
 	 * @return handler descriptors list
 	 */

@@ -50,7 +50,7 @@ public class PerspectiveReader extends MementoReader {
 
 	List<InfoReader> getInfos() {
 		IMemento[] infoMems = getInfoMems();
-		List<InfoReader> infos = new ArrayList<InfoReader>(infoMems.length);
+		List<InfoReader> infos = new ArrayList<>(infoMems.length);
 		for (IMemento infoMem : infoMems) {
 			infos.add(new InfoReader(infoMem));
 		}
@@ -74,8 +74,7 @@ public class PerspectiveReader extends MementoReader {
 
 	Map<String, ViewLayoutReader> getViewLayouts() {
 		IMemento[] viewLayoutMems = getChildren(IWorkbenchConstants.TAG_VIEW_LAYOUT_REC);
-		Map<String, ViewLayoutReader> viewLayouts = new HashMap<String, ViewLayoutReader>(
-				viewLayoutMems.length);
+		Map<String, ViewLayoutReader> viewLayouts = new HashMap<>(viewLayoutMems.length);
 		for (IMemento memento : viewLayoutMems) {
 			ViewLayoutReader viewLayout = new ViewLayoutReader(memento);
 			viewLayouts.put(viewLayout.getViewId(), viewLayout);
@@ -113,7 +112,7 @@ public class PerspectiveReader extends MementoReader {
 	 * @return map of fast view bar's ID and side
 	 */
 	Map<String, Integer> getFastViewBars() {
-		Map<String, Integer> bars = new HashMap<String, Integer>();
+		Map<String, Integer> bars = new HashMap<>();
 		for (IMemento bar : getFastViewBarMems()) {
 			bars.put(bar.getString(IWorkbenchConstants.TAG_ID),
 					bar.getInteger(IWorkbenchConstants.TAG_FAST_VIEW_SIDE));
@@ -122,7 +121,7 @@ public class PerspectiveReader extends MementoReader {
 	}
 
 	private List<String> getFastViewIds() {
-		List<String> fastViewIds = new ArrayList<String>();
+		List<String> fastViewIds = new ArrayList<>();
 
 		IMemento fastViews = getChild(IWorkbenchConstants.TAG_FAST_VIEWS);
 		if (fastViews != null) {
@@ -144,7 +143,7 @@ public class PerspectiveReader extends MementoReader {
 	}
 
 	List<String> getDefaultFastViewBarViewIds() {
-		List<String> fastViewIds = new ArrayList<String>();
+		List<String> fastViewIds = new ArrayList<>();
 		IMemento fastViews = getChild(IWorkbenchConstants.TAG_FAST_VIEWS);
 		if (fastViews != null) {
 			for (IMemento view : fastViews.getChildren(IWorkbenchConstants.TAG_VIEW)) {
@@ -175,7 +174,7 @@ public class PerspectiveReader extends MementoReader {
 
 	private List<String> getChildrenIds(String tag) {
 		IMemento[] idMemArr = getChildren(tag);
-		List<String> idList = new ArrayList<String>(idMemArr.length);
+		List<String> idList = new ArrayList<>(idMemArr.length);
 		for (IMemento idMem : idMemArr) {
 			idList.add(idMem.getString(IWorkbenchConstants.TAG_ID));
 		}
@@ -183,7 +182,7 @@ public class PerspectiveReader extends MementoReader {
 	}
 
 	List<DetachedWindowReader> getDetachedWindows() {
-		List<DetachedWindowReader> readers = new ArrayList<DetachedWindowReader>();
+		List<DetachedWindowReader> readers = new ArrayList<>();
 		IMemento layout = getLayout();
 		if (layout != null) {
 			IMemento[] mems = layout.getChildren(IWorkbenchConstants.TAG_DETACHED_WINDOW);
@@ -255,7 +254,7 @@ public class PerspectiveReader extends MementoReader {
 
 		List<PageReader> getPages() {
 			IMemento folder = getFolder();
-			List<PageReader> pages = new ArrayList<PageReader>();
+			List<PageReader> pages = new ArrayList<>();
 			if (folder != null) {
 				IMemento[] pageMems = folder.getChildren(IWorkbenchConstants.TAG_PAGE);
 				for (IMemento pageMem : pageMems) {

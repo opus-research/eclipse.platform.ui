@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,18 +7,20 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 420479
  *******************************************************************************/
 
 package org.eclipse.ui.handlers;
 
 import java.util.Collection;
-
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.State;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -32,8 +34,10 @@ import org.eclipse.ui.IWorkbenchWindow;
  * <p>
  * <b>Note</b>: this class should not be instantiated or extended by clients.
  * </p>
- * 
+ *
  * @since 3.3
+ * @noextend This class is not intended to be subclassed by clients.
+ * @noinstantiate This class is not intended to be instantiated by clients.
  */
 public class HandlerUtil {
 	private static void noVariableFound(ExecutionEvent event, String name)
@@ -54,7 +58,7 @@ public class HandlerUtil {
 
 	/**
 	 * Extract the variable.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @param name
@@ -64,8 +68,7 @@ public class HandlerUtil {
 	 */
 	public static Object getVariable(ExecutionEvent event, String name) {
 		if (event.getApplicationContext() instanceof IEvaluationContext) {
-			Object var = ((IEvaluationContext) event.getApplicationContext())
-					.getVariable(name);
+			Object var = ((IEvaluationContext) event.getApplicationContext()).getVariable(name);
 			return var == IEvaluationContext.UNDEFINED_VARIABLE ? null : var;
 		}
 		return null;
@@ -73,7 +76,7 @@ public class HandlerUtil {
 
 	/**
 	 * Extract the variable.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @param name
@@ -94,7 +97,7 @@ public class HandlerUtil {
 
 	/**
 	 * Extract the variable.
-	 * 
+	 *
 	 * @param context
 	 *            The IEvaluationContext or <code>null</code>
 	 * @param name
@@ -113,7 +116,7 @@ public class HandlerUtil {
 
 	/**
 	 * Return the active contexts.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return a collection of String contextIds, or <code>null</code>.
@@ -128,7 +131,7 @@ public class HandlerUtil {
 
 	/**
 	 * Return the active contexts.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return a collection of String contextIds. Will not return
@@ -149,7 +152,7 @@ public class HandlerUtil {
 	/**
 	 * Return the active shell. Is not necessarily the active workbench window
 	 * shell.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active shell, or <code>null</code>.
@@ -165,7 +168,7 @@ public class HandlerUtil {
 	/**
 	 * Return the active shell. Is not necessarily the active workbench window
 	 * shell.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active shell. Will not return <code>null</code>.
@@ -176,15 +179,14 @@ public class HandlerUtil {
 			throws ExecutionException {
 		Object o = getVariableChecked(event, ISources.ACTIVE_SHELL_NAME);
 		if (!(o instanceof Shell)) {
-			incorrectTypeFound(event, ISources.ACTIVE_SHELL_NAME, Shell.class,
-					o.getClass());
+			incorrectTypeFound(event, ISources.ACTIVE_SHELL_NAME, Shell.class, o.getClass());
 		}
 		return (Shell) o;
 	}
 
 	/**
 	 * Return the active workbench window.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active workbench window, or <code>null</code>.
@@ -199,7 +201,7 @@ public class HandlerUtil {
 
 	/**
 	 * Return the active workbench window.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active workbench window. Will not return <code>null</code>.
@@ -208,18 +210,16 @@ public class HandlerUtil {
 	 */
 	public static IWorkbenchWindow getActiveWorkbenchWindowChecked(
 			ExecutionEvent event) throws ExecutionException {
-		Object o = getVariableChecked(event,
-				ISources.ACTIVE_WORKBENCH_WINDOW_NAME);
+		Object o = getVariableChecked(event, ISources.ACTIVE_WORKBENCH_WINDOW_NAME);
 		if (!(o instanceof IWorkbenchWindow)) {
-			incorrectTypeFound(event, ISources.ACTIVE_WORKBENCH_WINDOW_NAME,
-					IWorkbenchWindow.class, o.getClass());
+			incorrectTypeFound(event, ISources.ACTIVE_WORKBENCH_WINDOW_NAME, IWorkbenchWindow.class, o.getClass());
 		}
 		return (IWorkbenchWindow) o;
 	}
 
 	/**
 	 * Return the active editor.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active editor, or <code>null</code>.
@@ -234,7 +234,7 @@ public class HandlerUtil {
 
 	/**
 	 * Return the active editor.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active editor. Will not return <code>null</code>.
@@ -245,15 +245,14 @@ public class HandlerUtil {
 			throws ExecutionException {
 		Object o = getVariableChecked(event, ISources.ACTIVE_EDITOR_NAME);
 		if (!(o instanceof IEditorPart)) {
-			incorrectTypeFound(event, ISources.ACTIVE_EDITOR_NAME,
-					IEditorPart.class, o.getClass());
+			incorrectTypeFound(event, ISources.ACTIVE_EDITOR_NAME, IEditorPart.class, o.getClass());
 		}
 		return (IEditorPart) o;
 	}
 
 	/**
 	 * Return the part id of the active editor.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the part id of the active editor, or <code>null</code>.
@@ -268,7 +267,7 @@ public class HandlerUtil {
 
 	/**
 	 * Return the part id of the active editor.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the part id of the active editor. Will not return
@@ -280,15 +279,14 @@ public class HandlerUtil {
 			throws ExecutionException {
 		Object o = getVariableChecked(event, ISources.ACTIVE_EDITOR_ID_NAME);
 		if (!(o instanceof String)) {
-			incorrectTypeFound(event, ISources.ACTIVE_EDITOR_ID_NAME,
-					String.class, o.getClass());
+			incorrectTypeFound(event, ISources.ACTIVE_EDITOR_ID_NAME, String.class, o.getClass());
 		}
 		return (String) o;
 	}
 
 	/**
 	 * Return the input of the active editor.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the input of the active editor, or <code>null</code>.
@@ -304,7 +302,7 @@ public class HandlerUtil {
 
 	/**
 	 * Return the input of the active editor.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the input of the active editor. Will not return <code>null</code>
@@ -317,15 +315,14 @@ public class HandlerUtil {
 			throws ExecutionException {
 		Object o = getVariableChecked(event, ISources.ACTIVE_EDITOR_INPUT_NAME);
 		if (!(o instanceof IEditorInput)) {
-			incorrectTypeFound(event, ISources.ACTIVE_EDITOR_INPUT_NAME, IEditorInput.class,
-					o.getClass());
+			incorrectTypeFound(event, ISources.ACTIVE_EDITOR_INPUT_NAME, IEditorInput.class, o.getClass());
 		}
 		return (IEditorInput) o;
 	}
 
 	/**
 	 * Return the active part.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active part, or <code>null</code>.
@@ -340,7 +337,7 @@ public class HandlerUtil {
 
 	/**
 	 * Return the active part.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active part. Will not return <code>null</code>.
@@ -351,15 +348,14 @@ public class HandlerUtil {
 			throws ExecutionException {
 		Object o = getVariableChecked(event, ISources.ACTIVE_PART_NAME);
 		if (!(o instanceof IWorkbenchPart)) {
-			incorrectTypeFound(event, ISources.ACTIVE_PART_NAME,
-					IWorkbenchPart.class, o.getClass());
+			incorrectTypeFound(event, ISources.ACTIVE_PART_NAME, IWorkbenchPart.class, o.getClass());
 		}
 		return (IWorkbenchPart) o;
 	}
 
 	/**
 	 * Return the part id of the active part.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the part id of the active part, or <code>null</code>.
@@ -374,7 +370,7 @@ public class HandlerUtil {
 
 	/**
 	 * Return the part id of the active part.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the part id of the active part. Will not return <code>null</code>.
@@ -385,15 +381,14 @@ public class HandlerUtil {
 			throws ExecutionException {
 		Object o = getVariableChecked(event, ISources.ACTIVE_PART_ID_NAME);
 		if (!(o instanceof String)) {
-			incorrectTypeFound(event, ISources.ACTIVE_PART_ID_NAME,
-					String.class, o.getClass());
+			incorrectTypeFound(event, ISources.ACTIVE_PART_ID_NAME, String.class, o.getClass());
 		}
 		return (String) o;
 	}
 
 	/**
 	 * Return the active part site.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active part site, or <code>null</code>.
@@ -408,7 +403,7 @@ public class HandlerUtil {
 
 	/**
 	 * Return the active part site.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active part site. Will not return <code>null</code>.
@@ -419,15 +414,14 @@ public class HandlerUtil {
 			throws ExecutionException {
 		Object o = getVariableChecked(event, ISources.ACTIVE_SITE_NAME);
 		if (!(o instanceof IWorkbenchSite)) {
-			incorrectTypeFound(event, ISources.ACTIVE_SITE_NAME,
-					IWorkbenchSite.class, o.getClass());
+			incorrectTypeFound(event, ISources.ACTIVE_SITE_NAME, IWorkbenchSite.class, o.getClass());
 		}
 		return (IWorkbenchSite) o;
 	}
 
 	/**
 	 * Return the current selection.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the current selection, or <code>null</code>.
@@ -441,8 +435,27 @@ public class HandlerUtil {
 	}
 
 	/**
+	 * Return the current structured selection, or <code>StructuredSelection.EMPTY</code>
+	 * if the current selection is not a structured selection or <code>null</code>.
+	 *
+	 * @param event
+	 *            The execution event that contains the application context
+	 * @return the current IStructuredSelection, or
+	 *         <code>StructuredSelection.EMPTY</code>.
+	 * @since 3.108
+	 *
+	 */
+	public static IStructuredSelection getCurrentStructuredSelection(ExecutionEvent event) {
+		ISelection selection = getCurrentSelection(event);
+		if (selection instanceof IStructuredSelection) {
+			return (IStructuredSelection) selection;
+		}
+		return StructuredSelection.EMPTY;
+	}
+
+	/**
 	 * Return the current selection.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the current selection. Will not return <code>null</code>.
@@ -454,8 +467,7 @@ public class HandlerUtil {
 		Object o = getVariableChecked(event,
 				ISources.ACTIVE_CURRENT_SELECTION_NAME);
 		if (!(o instanceof ISelection)) {
-			incorrectTypeFound(event, ISources.ACTIVE_CURRENT_SELECTION_NAME,
-					ISelection.class, o.getClass());
+			incorrectTypeFound(event, ISources.ACTIVE_CURRENT_SELECTION_NAME, ISelection.class, o.getClass());
 		}
 		return (ISelection) o;
 	}
@@ -463,7 +475,7 @@ public class HandlerUtil {
 	/**
 	 * Return the menu IDs that were applied to the registered context menu. For
 	 * example, #CompilationUnitEditorContext.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the menu IDs, or <code>null</code>.
@@ -479,7 +491,7 @@ public class HandlerUtil {
 	/**
 	 * Return the menu IDs that were applied to the registered context menu. For
 	 * example, #CompilationUnitEditorContext.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the menu IDs. Will not return <code>null</code>.
@@ -490,8 +502,7 @@ public class HandlerUtil {
 			throws ExecutionException {
 		Object o = getVariableChecked(event, ISources.ACTIVE_MENU_NAME);
 		if (!(o instanceof Collection)) {
-			incorrectTypeFound(event, ISources.ACTIVE_MENU_NAME,
-					Collection.class, o.getClass());
+			incorrectTypeFound(event, ISources.ACTIVE_MENU_NAME, Collection.class, o.getClass());
 		}
 		return (Collection) o;
 	}
@@ -499,7 +510,7 @@ public class HandlerUtil {
 	/**
 	 * Return the active menu selection. The active menu is a registered context
 	 * menu.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active menu selection, or <code>null</code>.
@@ -515,7 +526,7 @@ public class HandlerUtil {
 	/**
 	 * Return the active menu selection. The active menu is a registered context
 	 * menu.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active menu selection. Will not return <code>null</code>.
@@ -527,8 +538,7 @@ public class HandlerUtil {
 		Object o = getVariableChecked(event,
 				ISources.ACTIVE_MENU_SELECTION_NAME);
 		if (!(o instanceof ISelection)) {
-			incorrectTypeFound(event, ISources.ACTIVE_MENU_SELECTION_NAME,
-					ISelection.class, o.getClass());
+			incorrectTypeFound(event, ISources.ACTIVE_MENU_SELECTION_NAME, ISelection.class, o.getClass());
 		}
 		return (ISelection) o;
 	}
@@ -536,7 +546,7 @@ public class HandlerUtil {
 	/**
 	 * Return the active menu editor input, if available. The active menu is a
 	 * registered context menu.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active menu editor, or <code>null</code>.
@@ -553,7 +563,7 @@ public class HandlerUtil {
 	 * Return the active menu editor input. The active menu is a registered
 	 * context menu. Some context menus do not include the editor input which
 	 * will throw an exception.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the active menu editor input. Will not return <code>null</code>.
@@ -565,15 +575,14 @@ public class HandlerUtil {
 		Object o = getVariableChecked(event,
 				ISources.ACTIVE_MENU_EDITOR_INPUT_NAME);
 		if (!(o instanceof ISelection)) {
-			incorrectTypeFound(event, ISources.ACTIVE_MENU_EDITOR_INPUT_NAME,
-					ISelection.class, o.getClass());
+			incorrectTypeFound(event, ISources.ACTIVE_MENU_EDITOR_INPUT_NAME, ISelection.class, o.getClass());
 		}
 		return (ISelection) o;
 	}
 
 	/**
 	 * Return the ShowInContext selection.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the show in selection, or <code>null</code>.
@@ -589,7 +598,7 @@ public class HandlerUtil {
 
 	/**
 	 * Return the ShowInContext selection. Will not return <code>null</code>.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the show in selection, or <code>null</code>.
@@ -609,7 +618,7 @@ public class HandlerUtil {
 
 	/**
 	 * Return the ShowInContext input.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the show in input, or <code>null</code>.
@@ -622,7 +631,7 @@ public class HandlerUtil {
 
 	/**
 	 * Return the ShowInContext input. Will not return <code>null</code>.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return the show in input, or <code>null</code>.
@@ -638,13 +647,13 @@ public class HandlerUtil {
 
 	/**
 	 * Toggles the command's state.
-	 * 
+	 *
 	 * @param command The command whose state needs to be toggled
 	 * @return the original value before toggling
-	 * 
-	 * @throws ExecutionException 
+	 *
+	 * @throws ExecutionException
 	 * 	When the command doesn't contain the toggle state or when the state doesn't contain a boolean value
-	 * 
+	 *
 	 * @since 3.5
 	 */
 	public static boolean toggleCommandState(Command command) throws ExecutionException {
@@ -653,21 +662,21 @@ public class HandlerUtil {
 			throw new ExecutionException("The command does not have a toggle state"); //$NON-NLS-1$
 		 if(!(state.getValue() instanceof Boolean))
 			throw new ExecutionException("The command's toggle state doesn't contain a boolean value"); //$NON-NLS-1$
-			 
+
 		boolean oldValue = ((Boolean) state.getValue()).booleanValue();
-		state.setValue(new Boolean(!oldValue));
+		state.setValue(Boolean.valueOf(!oldValue));
 		return oldValue;
 	}
-	
+
 	/**
 	 * Checks whether the radio state of the command is same as the radio state
 	 * parameter's value
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that contains the application context
 	 * @return <code>true</code> whe the values are same, <code>false</code>
 	 *         otherwise
-	 * 
+	 *
 	 * @throws ExecutionException
 	 *             When the command doesn't have the radio state or the event
 	 *             doesn't have the radio state parameter
@@ -684,23 +693,21 @@ public class HandlerUtil {
 		Command command = event.getCommand();
 		State state = command.getState(RadioState.STATE_ID);
 		if (state == null)
-			throw new ExecutionException(
-					"The command does not have a radio state"); //$NON-NLS-1$
+			throw new ExecutionException("The command does not have a radio state"); //$NON-NLS-1$
 		if (!(state.getValue() instanceof String))
-			throw new ExecutionException(
-					"The command's radio state doesn't contain a String value"); //$NON-NLS-1$
+			throw new ExecutionException("The command's radio state doesn't contain a String value"); //$NON-NLS-1$
 
 		return parameter.equals(state.getValue());
 	}
 
 	/**
 	 * Updates the radio state of the command to the given value
-	 * 
+	 *
 	 * @param command
 	 *            the command whose state should be updated
 	 * @param newState
 	 *            the new state
-	 * 
+	 *
 	 * @throws ExecutionException
 	 *             When the command doesn't have a radio state
 	 * @since 3.5
@@ -710,8 +717,7 @@ public class HandlerUtil {
 
 		State state = command.getState(RadioState.STATE_ID);
 		if (state == null)
-			throw new ExecutionException(
-					"The command does not have a radio state"); //$NON-NLS-1$
+			throw new ExecutionException("The command does not have a radio state"); //$NON-NLS-1$
 		state.setValue(newState);
 	}
 

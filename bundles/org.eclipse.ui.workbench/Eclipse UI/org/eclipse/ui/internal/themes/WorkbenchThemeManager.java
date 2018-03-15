@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,7 +48,7 @@ import org.osgi.service.event.EventHandler;
 
 /**
  * Theme manager for the Workbench.
- * 
+ *
  * @since 3.0
  */
 public class WorkbenchThemeManager extends EventManager implements
@@ -73,7 +73,7 @@ public class WorkbenchThemeManager extends EventManager implements
 
 	/**
 	 * Returns the singelton instance of the WorkbenchThemeManager
-	 * 
+	 *
 	 * @return singleton instance
 	 */
 	public static synchronized WorkbenchThemeManager getInstance() {
@@ -181,15 +181,15 @@ public class WorkbenchThemeManager extends EventManager implements
 	/*
 	 * Update existing theme contents, descriptors, and registries.
 	 * Reread the themes and recompute the registries.
-	 */	
+	 */
 	private void updateThemes() {
 		//reread the themes since their descriptors have changed in value
         ThemeRegistryReader reader = new ThemeRegistryReader();
-        reader.readThemes(Platform.getExtensionRegistry(),(ThemeRegistry) getThemeRegistry());   
+        reader.readThemes(Platform.getExtensionRegistry(),(ThemeRegistry) getThemeRegistry());
 
         //DEFAULT_THEME is not in getThemes() list so must be handled special
-        ThemeElementHelper.populateRegistry(getTheme(IThemeManager.DEFAULT_THEME), getThemeRegistry().getColors(), PrefUtil.getInternalPreferenceStore());			
-        
+        ThemeElementHelper.populateRegistry(getTheme(IThemeManager.DEFAULT_THEME), getThemeRegistry().getColors(), PrefUtil.getInternalPreferenceStore());
+
         IThemeDescriptor[] themeDescriptors = getThemeRegistry().getThemes();
 
        	for (int i=0; i < themeDescriptors.length; i++) {
@@ -198,18 +198,13 @@ public class WorkbenchThemeManager extends EventManager implements
     		//If theme is in our themes table then its already been populated
     		if (theme != null) {
                 ColorDefinition[] colorDefinitions = themeDescriptor.getColors();
-              
+
                if (colorDefinitions.length > 0) {
                 	ThemeElementHelper.populateRegistry(theme, colorDefinitions,PrefUtil.getInternalPreferenceStore());
                 }
     		}
 		}
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.themes.IThemeManager#addPropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
-	 */
 	@Override
 	public void addPropertyChangeListener(IPropertyChangeListener listener) {
 		addListenerObject(listener);
@@ -259,11 +254,6 @@ public class WorkbenchThemeManager extends EventManager implements
 		firePropertyChange(event);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.themes.IThemeManager#getCurrentTheme()
-	 */
 	@Override
 	public ITheme getCurrentTheme() {
 		init();
@@ -286,14 +276,14 @@ public class WorkbenchThemeManager extends EventManager implements
 													PlatformUI.PLUGIN_ID,
 													"Could not restore current theme: " + themeId, null)); //$NON-NLS-1$
 				}
-			}			
+			}
 		}
 		return currentTheme;
 	}
 
 	/**
 	 * Return the default color registry.
-	 * 
+	 *
 	 * @return the default color registry
 	 */
 	public ColorRegistry getDefaultThemeColorRegistry() {
@@ -303,7 +293,7 @@ public class WorkbenchThemeManager extends EventManager implements
 
 	/**
 	 * Return the default font registry.
-	 * 
+	 *
 	 * @return the default font registry
 	 */
 	public FontRegistry getDefaultThemeFontRegistry() {
@@ -320,11 +310,6 @@ public class WorkbenchThemeManager extends EventManager implements
 		return theme;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.themes.IThemeManager#getTheme(java.lang.String)
-	 */
 	@Override
 	public ITheme getTheme(String id) {
 		init();
@@ -349,21 +334,11 @@ public class WorkbenchThemeManager extends EventManager implements
 		return themeRegistry;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.themes.IThemeManager#removePropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
-	 */
 	@Override
 	public void removePropertyChangeListener(IPropertyChangeListener listener) {
 		removeListenerObject(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.themes.IThemeManager#setCurrentTheme(java.lang.String)
-	 */
 	@Override
 	public void setCurrentTheme(String id) {
 		init();
@@ -412,7 +387,7 @@ public class WorkbenchThemeManager extends EventManager implements
 			}
 		}
 	}
-	
+
 	public static class WorkbenchThemeChangedHandler implements EventHandler {
 		@Override
 		public void handleEvent(org.osgi.service.event.Event event) {
@@ -478,7 +453,7 @@ public class WorkbenchThemeManager extends EventManager implements
 				if (def.isOverridden()) {
 					def.resetToDefaultValue();
 					fontRegistry.put(def.getId(), def.getValue() != null ? def.getValue()
-							: PreferenceConverter.FONTDATA_ARRAY_DEFAULT_DEFAULT);
+							: PreferenceConverter.getFontDataArrayDefaultDefault());
 				}
 			}
 			for (ColorDefinition def : themeRegistry.getColors()) {

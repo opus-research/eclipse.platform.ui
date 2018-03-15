@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.fieldassist;
@@ -46,7 +47,7 @@ import org.eclipse.ui.keys.IBindingService;
  * install the content assist decoration on its control.
  * <p>
  * This class is not intended to be subclassed.
- * 
+ *
  * @since 3.2
  */
 public class ContentAssistCommandAdapter extends ContentProposalAdapter {
@@ -57,7 +58,7 @@ public class ContentAssistCommandAdapter extends ContentProposalAdapter {
 	/**
 	 * The command id used for content assist. (value
 	 * <code>"org.eclipse.ui.edit.text.contentAssist.proposals"</code>)
-	 * 
+	 *
 	 * @deprecated As of 3.5, replaced by {@link IWorkbenchCommandConstants#EDIT_CONTENT_ASSIST}
 	 */
 	@Deprecated
@@ -86,7 +87,7 @@ public class ContentAssistCommandAdapter extends ContentProposalAdapter {
 	 * Construct a content proposal adapter that can assist the user with
 	 * choosing content for the field. No visual indicator of content assist is
 	 * shown.
-	 * 
+	 *
 	 * @param control
 	 *            the control for which the adapter is providing content assist.
 	 *            May not be <code>null</code>.
@@ -119,7 +120,7 @@ public class ContentAssistCommandAdapter extends ContentProposalAdapter {
 	/**
 	 * Construct a content proposal adapter that can assist the user with
 	 * choosing content for the field.
-	 * 
+	 *
 	 * @param control
 	 *            the control for which the adapter is providing content assist.
 	 *            May not be <code>null</code>.
@@ -171,7 +172,7 @@ public class ContentAssistCommandAdapter extends ContentProposalAdapter {
 		setAutoActivationDelay(DEFAULT_AUTO_ACTIVATION_DELAY);
 
 		// Cache the handler service so we don't have to retrieve it each time
-		this.handlerService = (IHandlerService) PlatformUI.getWorkbench()
+		this.handlerService = PlatformUI.getWorkbench()
 				.getService(IHandlerService.class);
 
 		// Add listeners to the control to manage activation of the handler
@@ -224,7 +225,7 @@ public class ContentAssistCommandAdapter extends ContentProposalAdapter {
 	/**
 	 * Return the string command ID of the command used to invoke content
 	 * assist.
-	 * 
+	 *
 	 * @return the command ID of the command that invokes content assist.
 	 */
 	public String getCommandId() {
@@ -235,10 +236,10 @@ public class ContentAssistCommandAdapter extends ContentProposalAdapter {
 	 * Return the field decoration that should be used to indicate that content
 	 * assist is available for a field. Ensure that the decoration text includes
 	 * the correct key binding.
-	 * 
+	 *
 	 * @return the {@link FieldDecoration} that should be used to show content
 	 * assist.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private FieldDecoration getContentAssistFieldDecoration() {
@@ -258,7 +259,7 @@ public class ContentAssistCommandAdapter extends ContentProposalAdapter {
 		}
 		// Always update the decoration text since the key binding may
 		// have changed since it was last retrieved.
-		IBindingService bindingService = (IBindingService) PlatformUI
+		IBindingService bindingService = PlatformUI
 				.getWorkbench().getService(IBindingService.class);
 		dec
 				.setDescription(NLS
@@ -271,14 +272,6 @@ public class ContentAssistCommandAdapter extends ContentProposalAdapter {
 		return dec;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * Overridden to hide and show the content assist decoration
-	 * 
-	 * @see org.eclipse.jface.fieldassist.ContentProposalAdapter#setEnabled(boolean)
-	 * @since 3.3
-	 */
 	@Override
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);

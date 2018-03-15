@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.ui.internal.tweaklets.Tweaklets.TweakKey;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public abstract class TabBehaviour {
 
@@ -41,13 +41,13 @@ public abstract class TabBehaviour {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public abstract boolean alwaysShowPinAction();
 
 	/**
-	 * 
+	 *
 	 * @param page
 	 * @return
 	 */
@@ -60,8 +60,8 @@ public abstract class TabBehaviour {
 			IEditorReference reusableEditorRef);
 
 	/**
-	 * Does nothing by default. Can be overridden by subclasses. 
-	 * 
+	 * Does nothing by default. Can be overridden by subclasses.
+	 *
 	 * @param editorReuseGroup
 	 * @param showMultipleEditorTabs
 	 */
@@ -106,20 +106,20 @@ public abstract class TabBehaviour {
 	public boolean enableMRUTabVisibility() {
 		return true;
 	}
-	
+
 	public boolean sortEditorListAlphabetically() {
-		return true;		
+		return true;
 	}
-	
+
 	public Color createVisibleEditorsColor(Display display, RGB originalForegroundColor, RGB originalBackgroundColor) {
 		return new Color(display, originalForegroundColor);
 	}
-	
+
 	public Font createVisibleEditorsFont(Display display, Font originalFont) {
 		FontData fontData[] = originalFont.getFontData();
 		return new Font(display, fontData);
 	}
-	
+
 	public Font createInvisibleEditorsFont(Display display, Font originalFont) {
         FontData fontData[] = originalFont.getFontData();
         // Adding the bold attribute

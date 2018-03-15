@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,9 +17,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.FileTransfer;
@@ -32,16 +31,16 @@ import org.eclipse.ui.part.ResourceTransfer;
 /**
  * Clients may reference this class in the <b>dragAssistant</b> element of a
  * <b>org.eclipse.ui.navigator.viewer</b> extension point.
- * 
+ *
  * <p>
  * Clients may not extend or instantiate this class for any purpose other than
  * {@link INavigatorDnDService#bindDragAssistant(CommonDragAdapterAssistant)}.
  * Clients may have no direct dependencies on the contract of this class.
  * </p>
- * 
+ *
  * @since 3.2
  * @noextend This class is not intended to be subclassed by clients.
- * 
+ *
  */
 public class ResourceDragAdapterAssistant extends
 		CommonDragAdapterAssistant {
@@ -52,22 +51,11 @@ public class ResourceDragAdapterAssistant extends
 
 	private static final Class<IResource> IRESOURCE_TYPE = IResource.class;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.CommonDragAdapterAssistant#getSupportedTransferTypes()
-	 */
 	@Override
 	public Transfer[] getSupportedTransferTypes() {
 		return SUPPORTED_TRANSFERS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.CommonDragAdapterAssistant#setDragData(org.eclipse.swt.dnd.DragSourceEvent,
-	 *      org.eclipse.jface.viewers.IStructuredSelection)
-	 */
 	@Override
 	public boolean setDragData(DragSourceEvent anEvent,
 			IStructuredSelection aSelection) {
@@ -81,8 +69,8 @@ public class ResourceDragAdapterAssistant extends
 							.println("ResourceDragAdapterAssistant.dragSetData set ResourceTransfer"); //$NON-NLS-1$
 				}
 				return true;
-			} 
-				
+			}
+
 			if (FileTransfer.getInstance().isSupportedType(anEvent.dataType)) {
 				// Get the path of each file and set as the drag data
 				final int length = resources.length;
@@ -95,7 +83,7 @@ public class ResourceDragAdapterAssistant extends
 						fileNames[actualLength++] = location.toOSString();
 					}
 				}
-				if (actualLength > 0) { 
+				if (actualLength > 0) {
 					// was one or more of the locations null?
 					if (actualLength < length) {
 						String[] tempFileNames = fileNames;
@@ -104,7 +92,7 @@ public class ResourceDragAdapterAssistant extends
 							fileNames[i] = tempFileNames[i];
 					}
 					anEvent.data = fileNames;
-		
+
 					if (Policy.DEBUG_DND)
 						System.out
 								.println("ResourceDragAdapterAssistant.dragSetData set FileTransfer"); //$NON-NLS-1$
@@ -121,26 +109,12 @@ public class ResourceDragAdapterAssistant extends
 		IResource resource = null;
 		for (Iterator<?> iter = aSelection.iterator(); iter.hasNext();) {
 			Object selected = iter.next();
-			resource = adaptToResource(selected);
+			resource = Adapters.adapt(selected, IRESOURCE_TYPE);
 			if (resource != null) {
 				resources.add(resource);
 		}
 		}
 		return resources.toArray(new IResource[resources.size()]);
-	}
-
-	private IResource adaptToResource(Object selected) {
-		IResource resource;
-		if (selected instanceof IResource) {
-			resource = (IResource) selected;
-		} else if (selected instanceof IAdaptable) {
-			resource = (IResource) ((IAdaptable) selected)
-					.getAdapter(IRESOURCE_TYPE);
-		} else {
-			resource = (IResource) Platform.getAdapterManager().getAdapter(
-					selected, IRESOURCE_TYPE);
-		}
-		return resource;
 	}
 
 }

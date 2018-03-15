@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sebastian Davids <sdavids@gmx.de> - Fix for bug 93373 - [Intro] 
+ *     Sebastian Davids <sdavids@gmx.de> - Fix for bug 93373 - [Intro]
  *     		TipsAndTricksAction should not use magic numbers
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
@@ -41,7 +41,7 @@ public class TipsAndTricksAction extends PartEventAction implements
 
     /**
      * Create an instance of this class.
-     * 
+     *
      * @param window the window
      */
     public TipsAndTricksAction(IWorkbenchWindow window) {
@@ -60,7 +60,8 @@ public class TipsAndTricksAction extends PartEventAction implements
     /**
      *	The user has invoked this action
      */
-    public void run() {
+    @Override
+	public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
@@ -93,7 +94,7 @@ public class TipsAndTricksAction extends PartEventAction implements
                 IIDEHelpContextIds.TIPS_AND_TRICKS_PAGE_SELECTION_DIALOG);
         d.create();
         d.getOkButton().setEnabled(false);
-        
+
         if (d.open() != Window.OK || d.getResult().length != 1) {
 			return;
 		}
@@ -106,12 +107,8 @@ public class TipsAndTricksAction extends PartEventAction implements
         if (feature != null) {
             final String href = feature.getTipsAndTricksHref();
             if (href != null) {
-                BusyIndicator.showWhile(shell.getDisplay(), new Runnable() {
-                    public void run() {
-                        workbenchWindow.getWorkbench().getHelpSystem()
-								.displayHelpResource(href);
-                    }
-                });
+                BusyIndicator.showWhile(shell.getDisplay(), () -> workbenchWindow.getWorkbench().getHelpSystem()
+						.displayHelpResource(href));
             } else {
                 IStatus status = new Status(
                         IStatus.ERROR,
@@ -126,15 +123,13 @@ public class TipsAndTricksAction extends PartEventAction implements
             IStatus status = new Status(IStatus.ERROR,
                     IDEWorkbenchPlugin.IDE_WORKBENCH, IStatus.INFO, IDEWorkbenchMessages.TipsAndTricksErrorDialog_noHref, null);
             ErrorDialog.openError(shell, IDEWorkbenchMessages.TipsAndTricksErrorDialog_title,
-                    IDEWorkbenchMessages.TipsAndTricksErrorDialog_noFeatures, 
+                    IDEWorkbenchMessages.TipsAndTricksErrorDialog_noFeatures,
                     status);
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on ActionFactory.IWorkbenchAction.
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (workbenchWindow == null) {
             // action has already been disposed
             return;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.jface.viewers.ISelection;
  * <li>This service is not available globally, only from the workbench window level down.</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.ui.ISelectionListener
  * @see org.eclipse.ui.INullSelectionListener
  * @see org.eclipse.ui.services.IServiceLocator#getService(Class)
@@ -59,7 +59,7 @@ public interface ISelectionService {
      * but only if the listener implements <code>INullSelectionListener</code>.
      * </p>
      * <p>
-     * Note: This will not correctly track editor parts as each editor does 
+     * Note: This will not correctly track editor parts as each editor does
      * not have a unique partId.
      * </p>
 	 * <p>
@@ -76,11 +76,11 @@ public interface ISelectionService {
     public void addSelectionListener(String partId, ISelectionListener listener);
 
     /**
-     * Adds the given post selection listener.It is equivalent to selection 
-     * changed if the selection was triggered by the mouse but it has a 
+     * Adds the given post selection listener.It is equivalent to selection
+     * changed if the selection was triggered by the mouse but it has a
      * delay if the selection is triggered by the keyboard arrows.
      * Has no effect if an identical listener is already registered.
-     * 
+     *
      * Note: Works only for StructuredViewer(s).
 	 * <p>
 	 * <b>Note:</b> listeners should be removed when no longer necessary. If
@@ -103,7 +103,7 @@ public interface ISelectionService {
      * but only if the listener implements <code>INullSelectionListener</code>.
      * </p>
      * <p>
-     * Note: This will not correctly track editor parts as each editor does 
+     * Note: This will not correctly track editor parts as each editor does
      * not have a unique partId.
      * </p>
 	 * <p>
@@ -117,8 +117,7 @@ public interface ISelectionService {
      * @since 2.0
      * @see #removePostSelectionListener(String, ISelectionListener)
      */
-    public void addPostSelectionListener(String partId,
-            ISelectionListener listener);
+	public void addPostSelectionListener(String partId, ISelectionListener listener);
 
     /**
      * Returns the current selection in the active part.  If the selection in the
@@ -156,8 +155,7 @@ public interface ISelectionService {
      * @param listener a selection listener
      * @since 2.0
      */
-    public void removeSelectionListener(String partId,
-            ISelectionListener listener);
+	public void removeSelectionListener(String partId, ISelectionListener listener);
 
     /**
      * Removes the given post selection listener.
@@ -175,6 +173,5 @@ public interface ISelectionService {
      * @param listener a selection listener
      * @since 2.0
      */
-    public void removePostSelectionListener(String partId,
-            ISelectionListener listener);
+	public void removePostSelectionListener(String partId, ISelectionListener listener);
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,9 +23,9 @@ import org.eclipse.jface.util.Policy;
  * A viewer comparator is used by a {@link StructuredViewer} to
  * reorder the elements provided by its content provider.
  * <p>
- * The default <code>compare</code> method compares elements using two steps. 
- * The first step uses the values returned from <code>category</code>. 
- * By default, all elements are in the same category. 
+ * The default <code>compare</code> method compares elements using two steps.
+ * The first step uses the values returned from <code>category</code>.
+ * By default, all elements are in the same category.
  * The second level uses strings obtained from the content viewer's label
  * provider via <code>ILabelProvider.getText()</code>.
  * The strings are compared using a comparator from {@link Policy#getComparator()}
@@ -33,20 +33,20 @@ import org.eclipse.jface.util.Policy;
  * </p>
  * <p>
  * Subclasses may implement the <code>isSorterProperty</code> method;
- * they may reimplement the <code>category</code> method to provide 
+ * they may reimplement the <code>category</code> method to provide
  * categorization; and they may override the <code>compare</code> methods
  * to provide a totally different way of sorting elements.
  * </p>
  * @see IStructuredContentProvider
  * @see StructuredViewer
- * 
+ *
  * @since 3.2
  */
 public class ViewerComparator {
 	/**
 	 * The comparator to use to sort a viewer's contents.
 	 */
-	private Comparator comparator;
+	private Comparator<? super String> comparator;
 
 	/**
      * Creates a new {@link ViewerComparator}, which uses the default comparator
@@ -56,23 +56,26 @@ public class ViewerComparator {
 	public ViewerComparator(){
 		this(null);
 	}
-	
+
 	/**
-     * Creates a new {@link ViewerComparator}, which uses the given comparator
-     * to sort strings.
-     * 
+	 * Creates a new {@link ViewerComparator}, which uses the given comparator
+	 * to sort strings. The default implementation of
+	 * {@link ViewerComparator#compare(Viewer, Object, Object)} expects this
+	 * comparator to be able to compare the {@link String}s provided by the
+	 * viewer's label provider.
+	 *
 	 * @param comparator
 	 */
-	public ViewerComparator(Comparator comparator){
+	public ViewerComparator(Comparator<? super String> comparator) {
 		this.comparator = comparator;
 	}
 
 	/**
 	 * Returns the comparator used to sort strings.
-	 * 
+	 *
 	 * @return the comparator used to sort strings
 	 */
-	protected Comparator getComparator() {
+	protected Comparator<? super String> getComparator() {
 		if (comparator == null){
 			comparator = Policy.getComparator();
 		}
@@ -104,16 +107,16 @@ public class ViewerComparator {
      * <p>
      * The default implementation of this method is based on
      * comparing the elements' categories as computed by the <code>category</code>
-     * framework method. Elements within the same category are further 
+     * framework method. Elements within the same category are further
      * subjected to a case insensitive compare of their label strings, either
-     * as computed by the content viewer's label provider, or their 
+     * as computed by the content viewer's label provider, or their
      * <code>toString</code> values in other cases. Subclasses may override.
      * </p>
-     * 
+     *
      * @param viewer the viewer
      * @param e1 the first element
      * @param e2 the second element
-     * @return a negative number if the first element is less  than the 
+     * @return a negative number if the first element is less  than the
      *  second element; the value <code>0</code> if the first element is
      *  equal to the second element; and a positive number if the first
      *  element is greater than the second element
@@ -125,14 +128,14 @@ public class ViewerComparator {
         if (cat1 != cat2) {
 			return cat1 - cat2;
 		}
-    	
+
         String name1 = getLabel(viewer, e1);
         String name2 = getLabel(viewer, e2);
 
         // use the comparator to compare the strings
         return getComparator().compare(name1, name2);
     }
-    
+
 	private String getLabel(Viewer viewer, Object e1) {
 		String name1;
 		if (viewer == null || !(viewer instanceof ContentViewer)) {
@@ -154,7 +157,7 @@ public class ViewerComparator {
 	}
 
     /**
-     * Returns whether this viewer sorter would be affected 
+     * Returns whether this viewer sorter would be affected
      * by a change to the given property of the given element.
      * <p>
      * The default implementation of this method returns <code>false</code>.
@@ -173,9 +176,10 @@ public class ViewerComparator {
     /**
      * Sorts the given elements in-place, modifying the given array.
      * <p>
-     * The default implementation of this method uses the 
-     * java.util.Arrays#sort algorithm on the given array, 
-     * calling <code>compare</code> to compare elements.
+	 * The default implementation of this method uses the
+	 * {@link java.util.Arrays#sort(Object[], Comparator)} algorithm on the
+	 * given array, calling {@link #compare(Viewer, Object, Object)} to compare
+	 * elements.
      * </p>
      * <p>
      * Subclasses may reimplement this method to provide a more optimized implementation.
@@ -186,21 +190,27 @@ public class ViewerComparator {
      */
 	public void sort(final Viewer viewer, Object[] elements) {
 		try {
-			Arrays.sort(elements, new Comparator() {
-				@Override
-				public int compare(Object a, Object b) {
-					return ViewerComparator.this.compare(viewer, a, b);
-				}
-			});
+			Arrays.sort(elements, (a, b) -> ViewerComparator.this.compare(viewer, a, b));
 		} catch (IllegalArgumentException e) {
-			String msg = "Workaround for comparator violation:\n\t- set system property java.util.Arrays.useLegacyMergeSort=true\n\t- use a 1.6 JRE "  //$NON-NLS-1$
-					+ "\nmessage: " + e.getLocalizedMessage() //$NON-NLS-1$
+			String msg = e.toString()
+					+ "\nWorkaround for comparator violation:\n\tSet system property -Djava.util.Arrays.useLegacyMergeSort=true" //$NON-NLS-1$
 					+ "\nthis: " + getClass().getName() //$NON-NLS-1$
 					+ "\ncomparator: " + (comparator != null ? comparator.getClass().getName() : null) //$NON-NLS-1$
 					+ "\narray:"; //$NON-NLS-1$
+			StringBuilder labels = new StringBuilder();
+			long timeout = System.currentTimeMillis() + 5000;
 			for (Object element : elements) {
-				msg += "\n\t" + getLabel(viewer, element); //$NON-NLS-1$
+				labels.append("\n\t"); //$NON-NLS-1$
+				if (labels.length() > 50000) {
+					labels.append("... (more elements)"); //$NON-NLS-1$
+					break;
+				} else if (System.currentTimeMillis() > timeout) {
+					labels.append("... (timeout)"); //$NON-NLS-1$
+					break;
+				}
+				labels.append(getLabel(viewer, element));
 			}
+			msg += labels;
 			Policy.getLog().log(new Status(IStatus.ERROR, "org.eclipse.jface", msg)); //$NON-NLS-1$
 			throw e;
 		}

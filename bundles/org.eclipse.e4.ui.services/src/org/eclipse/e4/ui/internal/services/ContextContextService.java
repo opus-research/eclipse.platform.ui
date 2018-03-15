@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -27,15 +27,14 @@ public class ContextContextService implements EContextService {
 
 	private IEclipseContext eclipseContext;
 	private ContextManager contextManager;
-	
-	private boolean deferUpdates = false;
 
-	private int cachingRef = 0;
+	private boolean deferUpdates;
+
+	private int cachingRef;
 
 	public ContextContextService(IEclipseContext context) {
 		eclipseContext = context;
-		contextManager = (ContextManager) context.get(ContextManager.class
-				.getName());
+		contextManager = context.get(ContextManager.class);
 	}
 
 	@Override
@@ -44,8 +43,8 @@ public class ContextContextService implements EContextService {
 			deferActivateContext(id);
 			return;
 		}
-		LinkedList<String> locals = (LinkedList<String>) eclipseContext
-				.getLocal(LOCAL_CONTEXTS);
+		@SuppressWarnings("unchecked")
+		LinkedList<String> locals = (LinkedList<String>) eclipseContext.getLocal(LOCAL_CONTEXTS);
 		if (locals == null) {
 			locals = new LinkedList<String>();
 			locals.add(id);
@@ -58,7 +57,7 @@ public class ContextContextService implements EContextService {
 			}
 		}
 	}
-	
+
 	/**
 	 * Informs the manager that a batch operation has started.
 	 * <p>
@@ -66,11 +65,11 @@ public class ContextContextService implements EContextService {
 	 * <code>deferUpdates(true)</code> that nothing in your batched operation
 	 * will prevent the matching call to <code>deferUpdates(false)</code>.
 	 * </p>
-	 * 
+	 *
 	 * @param defer
 	 *            true when starting a batch operation false when ending the
 	 *            operation
-	 * 
+	 *
 	 * @since 4.2.2
 	 */
 	@Override
@@ -89,8 +88,8 @@ public class ContextContextService implements EContextService {
 	}
 
 	private void deferActivateContext(String id) {
-		LinkedList<String> locals = (LinkedList<String>) eclipseContext
-				.getLocal(DEFERED_ACTIVATES);
+		@SuppressWarnings("unchecked")
+		LinkedList<String> locals = (LinkedList<String>) eclipseContext.getLocal(DEFERED_ACTIVATES);
 		if (locals == null) {
 			locals = new LinkedList<String>();
 			eclipseContext.set(DEFERED_ACTIVATES, locals);
@@ -105,38 +104,36 @@ public class ContextContextService implements EContextService {
 		}
 
 		deferUpdates = false;
-		LinkedList<String> locals = (LinkedList<String>) eclipseContext
-				.getLocal(LOCAL_CONTEXTS);
+		@SuppressWarnings("unchecked")
+		LinkedList<String> locals = (LinkedList<String>) eclipseContext.getLocal(LOCAL_CONTEXTS);
 		if (locals == null) {
 			locals = new LinkedList<String>();
 		}
-		LinkedList<String> activates = (LinkedList<String>) eclipseContext
-				.getLocal(DEFERED_ACTIVATES);
+		@SuppressWarnings("unchecked")
+		LinkedList<String> activates = (LinkedList<String>) eclipseContext.getLocal(DEFERED_ACTIVATES);
 		if (activates != null) {
 			eclipseContext.remove(DEFERED_ACTIVATES);
 			for (String id : activates) {
 				locals.add(id);
 			}
 		}
-		LinkedList<String> deactivates = (LinkedList<String>) eclipseContext
-				.getLocal(DEFERED_DEACTIVATES);
+		LinkedList<?> deactivates = (LinkedList<?>) eclipseContext.getLocal(DEFERED_DEACTIVATES);
 		if (deactivates != null) {
 			eclipseContext.remove(DEFERED_DEACTIVATES);
-			for (String id : deactivates) {
+			for (Object id : deactivates) {
 				locals.remove(id);
 			}
 		}
 		eclipseContext.set(LOCAL_CONTEXTS, locals.clone());
 	}
-	
+
 	@Override
 	public void deactivateContext(String id) {
 		if (deferUpdates) {
 			deferDeactivateContext(id);
 			return;
 		}
-		LinkedList<String> locals = (LinkedList<String>) eclipseContext
-				.getLocal(LOCAL_CONTEXTS);
+		LinkedList<?> locals = (LinkedList<?>) eclipseContext.getLocal(LOCAL_CONTEXTS);
 		if (locals != null && locals.remove(id)) {
 			boolean contained = locals.contains(id);
 			if (!contained) {
@@ -147,10 +144,10 @@ public class ContextContextService implements EContextService {
 	}
 
 	private void deferDeactivateContext(String id) {
-		LinkedList<String> locals = (LinkedList<String>) eclipseContext
-				.getLocal(DEFERED_DEACTIVATES);
+		@SuppressWarnings("unchecked")
+		LinkedList<String> locals = (LinkedList<String>) eclipseContext.getLocal(DEFERED_DEACTIVATES);
 		if (locals == null) {
-			locals = new LinkedList<String>();
+			locals = new LinkedList<>();
 			eclipseContext.set(DEFERED_DEACTIVATES, locals);
 		}
 		locals.add(id);
@@ -158,8 +155,8 @@ public class ContextContextService implements EContextService {
 
 	@Override
 	public Collection<String> getActiveContextIds() {
-		Set<String> set = (Set<String>) eclipseContext
-				.get(IServiceConstants.ACTIVE_CONTEXTS);
+		@SuppressWarnings("unchecked")
+		Set<String> set = (Set<String>) eclipseContext.get(IServiceConstants.ACTIVE_CONTEXTS);
 		if (set != null) {
 			contextManager.setActiveContextIds(set);
 		}

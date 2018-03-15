@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2009 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,16 +22,16 @@ import org.eclipse.ui.ide.IDEEncoding;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public final class EncodingFieldEditor extends AbstractEncodingFieldEditor {
 
-	
+
 	/**
 	 * Creates a new encoding field editor with the given preference name, label
 	 * and parent.
-	 * 
+	 *
 	 * @param name
 	 *            the name of the preference this field editor works on
 	 * @param labelText
@@ -64,25 +64,22 @@ public final class EncodingFieldEditor extends AbstractEncodingFieldEditor {
 		init(name, labelText);
 		createControl(parent);
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.ide.dialogs.AbstractEncodingFieldEditor#getStoredValue()
-	 */
+
+	@Override
 	protected String getStoredValue() {
 		return getPreferenceStore().getString(getPreferenceName());
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.FieldEditor#doStore()
-	 */
+
+	@Override
 	protected void doStore() {
 		String encoding = getSelectedEncoding();
-		
+
 		if(hasSameEncoding(encoding)) {
 			return;
 		}
-		
+
 		IDEEncoding.addIDEEncoding(encoding);
-		
+
 		if (encoding.equals(getDefaultEnc())) {
 			getPreferenceStore().setToDefault(getPreferenceName());
 		} else {

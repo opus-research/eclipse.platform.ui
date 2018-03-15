@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,16 +24,16 @@ public class EditMaskTest {
 
       Text text = new Text(shell, SWT.BORDER);
       text.setText("XXXXXXXXXXXXX");// Put some X's in there to pad out the field's default size
-      
+
       Text text2 = new Text(shell, SWT.BORDER);
       text2.setText("630XXXXXXXXXX");
-      
+
       shell.setLayout(new RowLayout(SWT.VERTICAL));
       shell.setSize(800, 600);
-      
+
       new EditMask(text).setMask("(###) ###-####");
       new EditMask(text2).setMask("(###) ###-####");
-      
+
       shell.open();
       while (!shell.isDisposed()) {
          if (!display.readAndDispatch()) {

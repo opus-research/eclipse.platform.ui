@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * A <code>SubContributionItem</code> is a wrapper for an <code>IContributionItem</code>.  
+ * A <code>SubContributionItem</code> is a wrapper for an <code>IContributionItem</code>.
  * It is used within a <code>SubContributionManager</code> to control the visibility
  * of items.
  * <p>
@@ -31,7 +31,7 @@ public class SubContributionItem implements IContributionItem {
     private boolean visible;
 
     /**
-     * The inner item for this contribution.  
+     * The inner item for this contribution.
      */
     private IContributionItem innerItem;
 
@@ -52,9 +52,6 @@ public class SubContributionItem implements IContributionItem {
         innerItem.dispose();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public void fill(Composite parent) {
         if (visible) {
@@ -62,9 +59,6 @@ public class SubContributionItem implements IContributionItem {
 		}
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public void fill(Menu parent, int index) {
         if (visible) {
@@ -72,9 +66,6 @@ public class SubContributionItem implements IContributionItem {
 		}
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public void fill(ToolBar parent, int index) {
         if (visible) {
@@ -82,9 +73,6 @@ public class SubContributionItem implements IContributionItem {
 		}
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public String getId() {
         return innerItem.getId();
@@ -99,90 +87,57 @@ public class SubContributionItem implements IContributionItem {
         return innerItem;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public boolean isEnabled() {
         return innerItem.isEnabled();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public boolean isDirty() {
         return innerItem.isDirty();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public boolean isDynamic() {
         return innerItem.isDynamic();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public boolean isGroupMarker() {
         return innerItem.isGroupMarker();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public boolean isSeparator() {
         return innerItem.isSeparator();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public boolean isVisible() {
         return visible && innerItem.isVisible();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public void setParent(IContributionManager parent) {
         // do nothing, the parent of our inner item
         // is its SubContributionManager
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public void setVisible(boolean visible) {
         this.visible = visible;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public void update() {
         innerItem.update();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public void update(String id) {
         innerItem.update(id);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.CoolBar, int)
-     */
     @Override
 	public void fill(CoolBar parent, int index) {
         if (visible) {
@@ -190,9 +145,6 @@ public class SubContributionItem implements IContributionItem {
 		}
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#saveWidgetState()
-     */
     @Override
 	public void saveWidgetState() {
     }

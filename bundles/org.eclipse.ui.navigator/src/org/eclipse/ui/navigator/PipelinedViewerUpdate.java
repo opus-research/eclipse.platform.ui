@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,12 +19,12 @@ import java.util.Set;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 
 /**
- * 
+ *
  * A pipelined viewer update should map requests to refresh or update elements
  * in the viewer to their correct, modified structure. Clients use
  * {@link PipelinedViewerUpdate} as the input and return type from intercept
  * methods on {@link IPipelinedTreeContentProvider}.
- * 
+ *
  * <p>
  * Clients should use the viewer update to describe how the request from the
  * upstream extension (see {@link IPipelinedTreeContentProvider} for more
@@ -47,9 +47,9 @@ import org.eclipse.jface.viewers.AbstractTreeViewer;
  * calls and the <code>updateLabels</code> field is only applicable for
  * <code>refresh()</code> calls.
  * </p>
- *  
+ *
  * @since 3.2
- * 
+ *
  */
 public final class PipelinedViewerUpdate {
 
@@ -63,11 +63,11 @@ public final class PipelinedViewerUpdate {
 
 	/**
 	 * Properties allow optimization for <code>update</code> calls.
-	 * 
+	 *
 	 * @param aTarget
 	 *            The target which may have specific properties associated with
 	 *            it for an optimized refresh.
-	 * 
+	 *
 	 * @return Returns the properties for the given target. If no properties are
 	 *         specified, then an empty array is returned. <b>null</b> will
 	 *         never be returned.
@@ -81,9 +81,9 @@ public final class PipelinedViewerUpdate {
 	}
 
 	/**
-	 * 
+	 *
 	 * Properties allow optimization for <code>update</code> calls.
-	 * 
+	 *
 	 * @param aTarget
 	 *            The target of the properties.
 	 * @param theProperties

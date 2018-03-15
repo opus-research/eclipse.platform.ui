@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.util.ILogger;
@@ -28,11 +26,17 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import junit.framework.TestCase;
+
 public class ComboViewerComparerTest extends TestCase {
 
 	private Shell shell;
 
 	private StructuredViewer viewer;
+
+	private ILogger oldLogger;
+
+	private ISafeRunnableRunner oldRunner;
 
 	private static final class TestElement {
 
@@ -50,12 +54,14 @@ public class ComboViewerComparerTest extends TestCase {
 	public void testSetSelection() {
 		viewer.setContentProvider(new ArrayContentProvider());
 		viewer.setComparer(new IElementComparer() {
+			@Override
 			public boolean equals(final Object element1, final Object element2) {
 				TestElement testElement1 = (TestElement) element1;
 				TestElement testElement2 = (TestElement) element2;
 				return testElement1.getName().equals(testElement2.getName());
 			}
 
+			@Override
 			public int hashCode(final Object element) {
 				TestElement testElement = (TestElement) element;
 				return testElement.getName().hashCode();
@@ -72,13 +78,18 @@ public class ComboViewerComparerTest extends TestCase {
 		assertEquals(aElement.getName(), selectedElement.getName());
 	}
 
+	@Override
 	protected void setUp() {
+		oldLogger = Policy.getLog();
+		oldRunner = SafeRunnable.getRunner();
 		Policy.setLog(new ILogger() {
+			@Override
 			public void log(IStatus status) {
 				fail(status.getMessage());
 			}
 		});
 		SafeRunnable.setRunner(new ISafeRunnableRunner() {
+			@Override
 			public void run(ISafeRunnable code) {
 				try {
 					code.run();
@@ -98,7 +109,10 @@ public class ComboViewerComparerTest extends TestCase {
 		shell.open();
 	}
 
+	@Override
 	protected void tearDown() {
+		Policy.setLog(oldLogger);
+		SafeRunnable.setRunner(oldRunner);
 		processEvents();
 		viewer = null;
 		if (shell != null) {

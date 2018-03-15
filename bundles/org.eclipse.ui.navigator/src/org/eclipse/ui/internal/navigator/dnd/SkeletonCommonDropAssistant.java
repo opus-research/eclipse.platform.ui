@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,9 +20,9 @@ import org.eclipse.ui.navigator.CommonDropAdapterAssistant;
 
 /**
  * A Skeleton implementation of {@link CommonDropAdapterAssistant}.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class SkeletonCommonDropAssistant extends CommonDropAdapterAssistant {
 
@@ -34,23 +34,13 @@ public class SkeletonCommonDropAssistant extends CommonDropAdapterAssistant {
 	private SkeletonCommonDropAssistant() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.CommonDropAdapterAssistant#handleDrop(org.eclipse.ui.navigator.CommonDropAdapter,
-	 *      org.eclipse.swt.dnd.DropTargetEvent, java.lang.Object)
-	 */
+	@Override
 	public IStatus handleDrop(CommonDropAdapter aDropAdapter,
 			DropTargetEvent aDropTargetEvent, Object aTarget) {
 		return Status.CANCEL_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.CommonDropAdapterAssistant#validateDrop(java.lang.Object,
-	 *      int, org.eclipse.swt.dnd.TransferData)
-	 */
+	@Override
 	public IStatus validateDrop(Object target, int operation,
 			TransferData transferType) {
 		return Status.CANCEL_STATUS;

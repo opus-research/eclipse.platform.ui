@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * <p>
  * Replacement for: ActivateEditorAction
  * </p>
- * 
+ *
  * @since 3.3
  */
 public class ActivateEditorHandler extends AbstractEvaluationHandler {
@@ -42,11 +42,6 @@ public class ActivateEditorHandler extends AbstractEvaluationHandler {
 		registerEnablement();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil
@@ -70,11 +65,6 @@ public class ActivateEditorHandler extends AbstractEvaluationHandler {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.AbstractEvaluationHandler#getEnabledWhenExpression()
-	 */
 	@Override
 	protected Expression getEnabledWhenExpression() {
 		if (enabledWhen == null) {
@@ -92,11 +82,6 @@ public class ActivateEditorHandler extends AbstractEvaluationHandler {
 					return EvaluationResult.FALSE;
 				}
 
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see org.eclipse.core.expressions.Expression#collectExpressionInfo(org.eclipse.core.expressions.ExpressionInfo)
-				 */
 				@Override
 				public void collectExpressionInfo(ExpressionInfo info) {
 					info

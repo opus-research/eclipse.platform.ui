@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2013 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ public abstract class FocusCellHighlighter {
 	void setMgr(SWTFocusCellManager mgr) {
 		this.mgr = mgr;
 	}
-	
+
 	/**
 	 * @return the focus cell
 	 */
@@ -40,10 +40,10 @@ public abstract class FocusCellHighlighter {
 		// to the SWTFocusCellManager instance
 		if( mgr != null ) {
 		    // Use this method because it ensure that no
-		    // cell update (which might cause scrolling) happens 
-			return mgr._getFocusCell();	
+		    // cell update (which might cause scrolling) happens
+			return mgr._getFocusCell();
 		}
-		
+
 		return viewer.getColumnViewerEditor().getFocusCell();
 	}
 
@@ -52,7 +52,8 @@ public abstract class FocusCellHighlighter {
 	 * extend.
 	 *
 	 * @param cell
-	 *            the new focus cell
+	 *            the new focus cell or <code>null</code> if no new cell
+	 *            receives the focus
 	 * @deprecated use {@link #focusCellChanged(ViewerCell, ViewerCell)} instead
 	 */
 	@Deprecated

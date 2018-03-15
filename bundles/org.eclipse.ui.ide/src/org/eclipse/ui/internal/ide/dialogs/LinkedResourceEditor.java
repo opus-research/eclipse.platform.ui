@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Serge Beauchamp (Freescale Semiconductor) - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
+ *     Mickael Istria (Red Hat Inc.) - Bug 486901
  ******************************************************************************/
 
 package org.eclipse.ui.internal.ide.dialogs;
@@ -27,14 +28,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -45,11 +44,9 @@ import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
@@ -80,11 +77,11 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 /**
  * UI to edit the location of the linked resources contained in a project.
  * @since 3.5
- * 
+ *
  */
 public class LinkedResourceEditor {
 
-	
+
 	private static int NAME_COLUMN = 0;
 	private static int PATH_COLUMN = -1;
 	private static int LOCATION_COLUMN = 1;
@@ -134,6 +131,7 @@ public class LinkedResourceEditor {
 		fEditResourceButton = createButton(groupComponent,
 				IDEWorkbenchMessages.LinkedResourceEditor_editLinkedLocation);
 		fEditResourceButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				editLocation();
 			}
@@ -142,6 +140,7 @@ public class LinkedResourceEditor {
 		fConvertAbsoluteButton = createButton(groupComponent,
 				IDEWorkbenchMessages.LinkedResourceEditor_convertToVariableLocation);
 		fConvertAbsoluteButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				convertLocation();
 			}
@@ -149,11 +148,12 @@ public class LinkedResourceEditor {
 		fRemoveButton = createButton(groupComponent,
 				IDEWorkbenchMessages.LinkedResourceEditor_remove);
 		fRemoveButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				removeSelection();
 			}
 		});
-		
+
 		updateSelection();
 	}
 
@@ -178,7 +178,7 @@ public class LinkedResourceEditor {
 	/**
 	 * Creates the widget group. Callers must call <code>dispose</code> when the
 	 * group is no longer needed.
-	 * 
+	 *
 	 * @param parent
 	 *            the widget parent
 	 * @return container of the widgets
@@ -204,7 +204,7 @@ public class LinkedResourceEditor {
         Label variableLabel = new Label(pageComponent, SWT.LEFT);
         variableLabel.setText(NLS
 				.bind(IDEWorkbenchMessages.LinkedResourceEditor_descriptionBlock,
-						fProject != null? fProject.getName():new String()));
+				fProject != null ? fProject.getName() : "")); //$NON-NLS-1$
 
         data = new GridData();
         data.horizontalAlignment = GridData.FILL;
@@ -220,11 +220,7 @@ public class LinkedResourceEditor {
 
 		fTree = new TreeViewer(treeComposite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 
-		fTree.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				updateSelection();
-			}
-		});
+		fTree.addSelectionChangedListener(event -> updateSelection());
 
 		data = new GridData(GridData.FILL_BOTH);
 		data.heightHint = fTree.getTree().getItemHeight() * 10;
@@ -257,12 +253,14 @@ public class LinkedResourceEditor {
 		createButtons(pageComponent);
 
 		fTree.getTree().addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 		        if (getSelectedResource().length == 1)
 		        	editLocation();
 			}
         });
 		fTree.getTree().addKeyListener(new KeyAdapter() {
+			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.DEL) {
 					e.doit = false;
@@ -284,7 +282,7 @@ public class LinkedResourceEditor {
     }
 
     /**
-     * 
+     *
     */
 	public void dispose() {
 		fixedImg.dispose();
@@ -300,6 +298,7 @@ public class LinkedResourceEditor {
 			super();
 		}
 
+		@Override
 		public String getColumnText(Object obj, int index) {
 			if (obj instanceof IResource) {
 				IResource resource = (IResource) obj;
@@ -318,6 +317,7 @@ public class LinkedResourceEditor {
 			return null;
 		}
 
+		@Override
 		public Image getColumnImage(Object obj, int index) {
 			if (index == NAME_COLUMN) {
 				if (obj instanceof String) {
@@ -332,42 +332,30 @@ public class LinkedResourceEditor {
 			return null;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
-		 */
+		@Override
 		public void addListener(ILabelProviderListener listener) {
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
-		 */
+		@Override
 		public void dispose() {
 			stockProvider.dispose();
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object, java.lang.String)
-		 */
+		@Override
 		public boolean isLabelProperty(Object element, String property) {
 			return stockProvider.isLabelProperty(element, property);
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
-		 */
+		@Override
 		public void removeListener(ILabelProviderListener listener) {
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-		 */
+		@Override
 		public Image getImage(Object element) {
 			return getColumnImage(element, 0);
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-		 */
+		@Override
 		public String getText(Object element) {
 			return getColumnText(element, 0);
 		}
@@ -375,15 +363,18 @@ public class LinkedResourceEditor {
 
 	class ContentProvider implements IContentProvider, ITreeContentProvider {
 
+		@Override
 		public void dispose() {
 		}
 
+		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
+		@Override
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof LinkedResourceEditor) {
-				ArrayList list = new ArrayList(); 
+				ArrayList list = new ArrayList();
 				Object[] objs = { BROKEN, ABSOLUTE, FIXED };
 				for (int i = 0; i < objs.length; i++) {
 					Object[] children = getChildren(objs[i]);
@@ -401,6 +392,7 @@ public class LinkedResourceEditor {
 			return null;
 		}
 
+		@Override
 		public Object getParent(Object element) {
 			if (element instanceof IResource) {
 				String fullPath = ((IResource) element).getFullPath()
@@ -415,6 +407,7 @@ public class LinkedResourceEditor {
 			return null;
 		}
 
+		@Override
 		public boolean hasChildren(Object element) {
 			if (element instanceof LinkedResourceEditor) {
 				return true;
@@ -428,6 +421,7 @@ public class LinkedResourceEditor {
 			return false;
 		}
 
+		@Override
 		public Object[] getElements(Object parentElement) {
 			return getChildren(parentElement);
 		}
@@ -441,17 +435,11 @@ public class LinkedResourceEditor {
 																		 * >
 																		 */();
 			try {
-				fProject.accept(new IResourceVisitor() {
-					/**
-					 * @throws CoreException
-					 */
-					public boolean visit(IResource resource)
-							throws CoreException {
-						if (resource.isLinked() && !resource.isVirtual())
-							resources.add(resource);
-						return true;
-					}
-				});
+				fProject.accept(resource -> {
+if (resource.isLinked() && !resource.isVirtual())
+				resources.add(resource);
+return true;
+});
 			} catch (CoreException e) {
 			}
 			projectFiles = (IResource[]) resources.toArray(new IResource[0]);
@@ -540,8 +528,8 @@ public class LinkedResourceEditor {
 	}
 
 	private void convertLocation() {
-		if (MessageDialog.openConfirm(fConvertAbsoluteButton.getShell(), 
-				IDEWorkbenchMessages.LinkedResourceEditor_convertTitle, 
+		if (MessageDialog.openConfirm(fConvertAbsoluteButton.getShell(),
+				IDEWorkbenchMessages.LinkedResourceEditor_convertTitle,
 				IDEWorkbenchMessages.LinkedResourceEditor_convertMessage)) {
 			ArrayList/* <IResource> */resources = new ArrayList/* <IResource> */();
 			IResource[] selectedResources = getSelectedResource();
@@ -558,31 +546,21 @@ public class LinkedResourceEditor {
 				IDEWorkbenchMessages.LinkedResourceEditor_removeTitle,
 				IDEWorkbenchMessages.LinkedResourceEditor_removeMessage)) {
 			final IResource[] selectedResources = getSelectedResource();
-			final ArrayList/*<IResource>*/ removedResources = new ArrayList();
+			final ArrayList<IResource> removedResources = new ArrayList<>();
 
-			IRunnableWithProgress op = new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor) {
+			IRunnableWithProgress op = monitor -> {
+				SubMonitor subMonitor = SubMonitor.convert(monitor,
+						IDEWorkbenchMessages.LinkedResourceEditor_removingMessage, selectedResources.length);
+				for (int i = 0; i < selectedResources.length; i++) {
+					String fullPath = selectedResources[i].getFullPath().toPortableString();
 					try {
-						monitor.beginTask(
-								IDEWorkbenchMessages.LinkedResourceEditor_removingMessage,
-								selectedResources.length);
-						for (int i = 0; i < selectedResources.length; i++) {
-							if (monitor.isCanceled())
-								break;
-							String fullPath = selectedResources[i]
-									.getFullPath().toPortableString();
-							try {
-								selectedResources[i].delete(true, new SubProgressMonitor(monitor, 1));
-								removedResources.add(selectedResources[i]);
-								fBrokenResources.remove(fullPath);
-								fFixedResources.remove(fullPath);
-								fAbsoluteResources.remove(fullPath);
-							} catch (CoreException e) {
-								e.printStackTrace();
-							}
-						}
-					} finally {
-						monitor.done();
+						selectedResources[i].delete(true, subMonitor.split(1));
+						removedResources.add(selectedResources[i]);
+						fBrokenResources.remove(fullPath);
+						fFixedResources.remove(fullPath);
+						fAbsoluteResources.remove(fullPath);
+					} catch (CoreException e) {
+						e.printStackTrace();
 					}
 				}
 			};
@@ -638,7 +616,7 @@ public class LinkedResourceEditor {
 	/**
 	 * @param res
 	 * @param location
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	private void setLinkLocation(IResource res, IPath location) throws CoreException {
 		if (res.getType() == IResource.FILE)
@@ -670,13 +648,12 @@ public class LinkedResourceEditor {
 				new String[] { IDEWorkbenchMessages.linkedResourceEditor_OK },
 				0) {
 
-			/* (non-Javadoc)
-			 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
-			 */
+			@Override
 			protected boolean isResizable() {
 				return true;
 			}
 
+			@Override
 			protected Control createCustomArea(Composite comp) {
 				setShellStyle(getShellStyle() | SWT.RESIZE);
 				Composite parent = new Composite(comp, 0);
@@ -716,7 +693,7 @@ public class LinkedResourceEditor {
 	private void convertToRelative(ArrayList/* <IResource> */resources,
 			IResource[] selectedResources) {
 		ArrayList/* <String> */report = new ArrayList/* <String> */();
-		
+
 		// first, try to use the automatic converter
 		ArrayList/* <IResource> */remaining = new ArrayList/* <IResource> */();
 		Iterator/* <IResource> */it = resources.iterator();
@@ -879,7 +856,7 @@ public class LinkedResourceEditor {
 			IPath commonPath = resLocation.removeLastSegments(1);
 			String variableName = getSuitablePathVariable(commonPath);
 			try {
-				fProject.getPathVariableManager().setURIValue(variableName, 
+				fProject.getPathVariableManager().setURIValue(variableName,
 						URIUtil.toURI(commonPath));
 			} catch (CoreException e) {
 				report
@@ -1049,7 +1026,7 @@ public class LinkedResourceEditor {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void reloadContent() {
 		refreshContent();

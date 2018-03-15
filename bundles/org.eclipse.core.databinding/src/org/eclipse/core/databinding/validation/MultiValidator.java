@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@
  *     Boris Bokowski - bug 218269
  *     Matthew Hall - bug 237884, 240590, 251003, 251424, 278550, 332504
  *     Ovidio Mallo - bug 238909, 235859
- *     Stefan R�ck - bug 332504 
+ *     Stefan R�ck - bug 332504
  ******************************************************************************/
 
 package org.eclipse.core.databinding.validation;
@@ -49,7 +49,7 @@ import org.eclipse.core.runtime.IStatus;
 
 /**
  * A validator for cross-constraints between observables.
- * 
+ *
  * <p>
  * Some practical examples of cross-constraints:
  * <ul>
@@ -59,13 +59,13 @@ import org.eclipse.core.runtime.IStatus;
  * <p>
  * Example: require two integer fields to contain either both even or both odd
  * numbers.
- * 
+ *
  * <pre>
  * DataBindingContext dbc = new DataBindingContext();
- * 
+ *
  * IObservableValue target0 = SWTObservables.observeText(text0, SWT.Modify);
  * IObservableValue target1 = SWTObservables.observeText(text1, SWT.Modify);
- * 
+ *
  * // Binding in two stages (from target to middle, then from middle to model)
  * // simplifies the validation logic.  Using the middle observables saves
  * // the trouble of converting the target values (Strings) to the model type
@@ -74,7 +74,7 @@ import org.eclipse.core.runtime.IStatus;
  * final IObservableValue middle1 = new WritableValue(null, Integer.TYPE);
  * dbc.bind(target0, middle0, null, null);
  * dbc.bind(target1, middle1, null, null);
- * 
+ *
  * // Create the multi-validator
  * MultiValidator validator = new MultiValidator() {
  * 	protected IStatus validate() {
@@ -88,24 +88,24 @@ import org.eclipse.core.runtime.IStatus;
  * 	}
  * };
  * dbc.addValidationStatusProvider(validator);
- * 
- * // Bind the middle observables to the model observables. 
+ *
+ * // Bind the middle observables to the model observables.
  * IObservableValue model0 = new WritableValue(new Integer(2), Integer.TYPE);
  * IObservableValue model1 = new WritableValue(new Integer(4), Integer.TYPE);
  * dbc.bind(middle0, model0, null, null);
  * dbc.bind(middle1, model1, null, null);
  * </pre>
- * 
+ *
  * <p>
  * MultiValidator can also prevent invalid data from being copied to model. This
  * is done by wrapping each target observable in a validated observable, and
  * then binding the validated observable to the model.
- * 
+ *
  * <pre>
- * 
+ *
  * ...
- * 
- * // Validated observables do not change value until the validator passes. 
+ *
+ * // Validated observables do not change value until the validator passes.
  * IObservableValue validated0 = validator.observeValidatedValue(middle0);
  * IObservableValue validated1 = validator.observeValidatedValue(middle1);
  * IObservableValue model0 = new WritableValue(new Integer(2), Integer.TYPE);
@@ -114,12 +114,12 @@ import org.eclipse.core.runtime.IStatus;
  * dbc.bind(validated0, model0, null, null);
  * dbc.bind(validated1, model1, null, null);
  * </pre>
- * 
+ *
  * Note: No guarantee is made as to the order of updates when multiple validated
  * observables change value at once (i.e. multiple updates pending when the
  * status becomes valid). Therefore the model may be in an invalid state after
  * the first but before the last pending update.
- * 
+ *
  * @since 1.1
  */
 public abstract class MultiValidator extends ValidationStatusProvider {
@@ -131,14 +131,17 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	private IObservableList models;
 
 	IListChangeListener targetsListener = new IListChangeListener() {
+		@Override
 		public void handleListChange(ListChangeEvent event) {
 			event.diff.accept(new ListDiffVisitor() {
+				@Override
 				public void handleAdd(int index, Object element) {
 					IObservable dependency = (IObservable) element;
 					dependency.addChangeListener(dependencyListener);
 					dependency.addStaleListener(dependencyListener);
 				}
 
+				@Override
 				public void handleRemove(int index, Object element) {
 					IObservable dependency = (IObservable) element;
 					dependency.removeChangeListener(dependencyListener);
@@ -149,10 +152,12 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	};
 
 	private class DependencyListener implements IChangeListener, IStaleListener {
+		@Override
 		public void handleChange(ChangeEvent event) {
 			revalidate();
 		}
 
+		@Override
 		public void handleStale(StaleEvent staleEvent) {
 			validationStatus.makeStale();
 		}
@@ -169,7 +174,7 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 
 	/**
 	 * Constructs a MultiValidator on the given realm.
-	 * 
+	 *
 	 * @param realm
 	 *            the realm on which validation takes place.
 	 */
@@ -204,10 +209,11 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	 * Returns an {@link IObservableValue} whose value is always the current
 	 * validation status of this MultiValidator. The returned observable is in
 	 * the same realm as this MultiValidator.
-	 * 
+	 *
 	 * @return an {@link IObservableValue} whose value is always the current
 	 *         validation status of this MultiValidator.
 	 */
+	@Override
 	public IObservableValue getValidationStatus() {
 		if (unmodifiableValidationStatus == null) {
 			ObservableTracker.setIgnore(true);
@@ -235,7 +241,7 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	 * immediately re-evaluate the validation status by calling
 	 * {@link #validate} when becoming dirty. Instead, it may decide to perform
 	 * the re-evaluation lazily.
-	 * 
+	 *
 	 * @see #validate()
 	 * @since 1.2
 	 */
@@ -243,6 +249,7 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 		class ValidationRunnable implements Runnable {
 			IStatus validationResult;
 
+			@Override
 			public void run() {
 				try {
 					validationResult = validate();
@@ -318,9 +325,9 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	 * <i>explicitly</i> call {@link #revalidate()} whenever the validation
 	 * status needs to be re-evaluated due to some arbitrary change in the
 	 * application state.
-	 * 
+	 *
 	 * @return the current validation status.
-	 * 
+	 *
 	 * @see #revalidate()
 	 */
 	protected abstract IStatus validate();
@@ -340,7 +347,7 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	 * <li>When status changes from invalid to valid, the wrapper takes the
 	 * value of the target observable, and synchronization resumes.
 	 * </ul>
-	 * 
+	 *
 	 * @param target
 	 *            the target observable being wrapped. Must be in the same realm
 	 *            as the MultiValidator.
@@ -367,7 +374,7 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	 * <li>When status changes from invalid to valid, the wrapper takes the
 	 * elements of the target observable, and synchronization resumes.
 	 * </ul>
-	 * 
+	 *
 	 * @param target
 	 *            the target observable being wrapped. Must be in the same realm
 	 *            as the MultiValidator.
@@ -394,7 +401,7 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	 * <li>When status changes from invalid to valid, the wrapper takes the
 	 * elements of the target observable, and synchronization resumes.
 	 * </ul>
-	 * 
+	 *
 	 * @param target
 	 *            the target observable being wrapped. Must be in the same realm
 	 *            as the MultiValidator.
@@ -421,7 +428,7 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	 * <li>When status changes from invalid to valid, the wrapper takes the
 	 * entries of the target observable, and synchronization resumes.
 	 * </ul>
-	 * 
+	 *
 	 * @param target
 	 *            the target observable being wrapped. Must be in the same realm
 	 *            as the MultiValidator.
@@ -433,14 +440,17 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 		return new ValidatedObservableMap(target, getValidationStatus());
 	}
 
+	@Override
 	public IObservableList getTargets() {
 		return unmodifiableTargets;
 	}
 
+	@Override
 	public IObservableList getModels() {
 		return models;
 	}
 
+	@Override
 	public void dispose() {
 		if (targets != null) {
 			targets.clear(); // Remove listeners from dependencies
@@ -486,10 +496,12 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 			super(realm);
 		}
 
+		@Override
 		protected Object doGetValue() {
 			return value;
 		}
 
+		@Override
 		protected void doSetValue(Object value) {
 			boolean oldStale = stale;
 
@@ -523,11 +535,13 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 			}
 		}
 
+		@Override
 		public boolean isStale() {
 			ObservableTracker.getterCalled(this);
 			return stale;
 		}
 
+		@Override
 		public Object getValueType() {
 			return IStatus.class;
 		}

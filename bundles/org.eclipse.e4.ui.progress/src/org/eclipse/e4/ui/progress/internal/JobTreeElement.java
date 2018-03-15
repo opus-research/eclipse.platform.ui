@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ public abstract class JobTreeElement implements Comparable<Object> {
 
 	/**
 	 * Return the parent of this object.
-	 * 
+	 *
 	 * @return Object
 	 */
 	public Object getParent() {
@@ -29,28 +29,28 @@ public abstract class JobTreeElement implements Comparable<Object> {
 
 	/**
 	 * Return whether or not the receiver has children.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	abstract boolean hasChildren();
 
 	/**
 	 * Return the children of the receiver.
-	 * 
+	 *
 	 * @return Object[]
 	 */
 	abstract Object[] getChildren();
 
 	/**
 	 * Return the displayString for the receiver.
-	 * 
+	 *
 	 * @return String
 	 */
 	abstract String getDisplayString();
 
 	/**
 	 * Return the displayString for the receiver.
-	 * 
+	 *
 	 * @param showProgress
 	 *            Whether or not progress is being shown (if relevant).
 	 * @return String
@@ -61,7 +61,7 @@ public abstract class JobTreeElement implements Comparable<Object> {
 
 	/**
 	 * Get the image for the reciever.
-	 * 
+	 *
 	 * @return Image or <code>null</code>.
 	 */
 	public Image getDisplayImage() {
@@ -70,7 +70,7 @@ public abstract class JobTreeElement implements Comparable<Object> {
 
 	/**
 	 * Return the condensed version of the display string
-	 * 
+	 *
 	 * @return String
 	 */
 	String getCondensedDisplayString() {
@@ -79,16 +79,12 @@ public abstract class JobTreeElement implements Comparable<Object> {
 
 	/**
 	 * Return whether or not the receiver is an info.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	abstract boolean isJobInfo();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
+	@Override
 	public int compareTo(Object arg0) {
 		if (arg0 instanceof JobTreeElement)
 			return getDisplayString().compareTo(
@@ -98,14 +94,14 @@ public abstract class JobTreeElement implements Comparable<Object> {
 
 	/**
 	 * Return whether or not this is currently active.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	abstract boolean isActive();
 
 	/**
 	 * Return whether or not the receiver can be cancelled.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public boolean isCancellable() {

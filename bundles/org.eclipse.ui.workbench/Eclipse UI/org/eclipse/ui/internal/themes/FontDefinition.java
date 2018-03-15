@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ public class FontDefinition extends ThemeElementDefinition implements
 
     /**
      * Create a new instance of the receiver.
-     * 
+     *
      * @param fontName The name display
      * ed in the preference page.
      * @param uniqueId The id used to refer to this definition.
@@ -54,9 +54,9 @@ public class FontDefinition extends ThemeElementDefinition implements
 
     /**
      * Create a new instance of the receiver.
-     * 
-     * @param originalFont the original definition.  This will be used to populate 
-     * all fields except defaultsTo and value.  defaultsTo will always be 
+     *
+     * @param originalFont the original definition.  This will be used to populate
+     * all fields except defaultsTo and value.  defaultsTo will always be
      * <code>null</code>.
      * @param datas the FontData[] value
      */
@@ -79,7 +79,7 @@ public class FontDefinition extends ThemeElementDefinition implements
 
     /**
      * Returns the value.
-     * 
+     *
      * @return FontData []
      */
     @Override
@@ -103,17 +103,11 @@ public class FontDefinition extends ThemeElementDefinition implements
 		super.resetToDefaultValue();
 	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.themes.IEditable#isEditable()
-     */
     @Override
 	public boolean isEditable() {
         return isEditable;
     }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
+
     @Override
 	public boolean equals(Object obj) {
         if (obj instanceof FontDefinition) {
@@ -121,22 +115,12 @@ public class FontDefinition extends ThemeElementDefinition implements
         }
         return false;
     }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
+
     @Override
 	public int hashCode() {
 		return getId().hashCode();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.css.swt.definition.IDefinitionOverridable#setData(java
-	 * .lang.Object)
-	 */
 	@Override
 	public void setValue(FontData[] data) {
 		if (data != null && data.length > 0) {

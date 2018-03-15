@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
+ * Copyright (c) 2013, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -16,13 +17,13 @@ import org.eclipse.core.commands.IParameterValues;
 
 /**
  * Display the values that can be used in the keybindings page and quick access.
- * 
+ *
  * @since 3.106
  */
 public class SplitValues implements IParameterValues {
 
-	private HashMap<String, String> values = new HashMap<String, String>();
-	
+	private HashMap<String, String> values = new HashMap<>();
+
 	public SplitValues() {
 		values.put(WorkbenchMessages.SplitValues_Horizontal, "true"); //$NON-NLS-1$
 		values.put(WorkbenchMessages.SplitValues_Vertical, "false"); //$NON-NLS-1$

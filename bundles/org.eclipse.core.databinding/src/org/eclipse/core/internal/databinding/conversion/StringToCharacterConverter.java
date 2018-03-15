@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2005, 2007 db4objects Inc.  http://www.db4o.com
- * 
+ * Copyright (C) 2005, 2015 db4objects Inc.  http://www.db4o.com
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,18 +22,14 @@ public class StringToCharacterConverter implements IConverter {
 	private final boolean primitiveTarget;
 
 	/**
-	 * 
+	 *
 	 * @param primitiveTarget
 	 */
 	public StringToCharacterConverter(boolean primitiveTarget) {
 		this.primitiveTarget = primitiveTarget;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.binding.converter.IConverter#convert(java.lang.Object)
-	 */
+	@Override
 	public Object convert(Object source) {
 		if (source != null && !(source instanceof String))
 			throw new IllegalArgumentException(
@@ -62,10 +58,12 @@ public class StringToCharacterConverter implements IConverter {
 		return result;
 	}
 
+	@Override
 	public Object getFromType() {
 		return String.class;
 	}
 
+	@Override
 	public Object getToType() {
 		return primitiveTarget ? Character.TYPE : Character.class;
 	}

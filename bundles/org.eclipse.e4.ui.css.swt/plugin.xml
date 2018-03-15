@@ -443,6 +443,17 @@
       <handler
             adapter="org.eclipse.e4.ui.css.swt.dom.CTabFolderElement"
             composite="false"
+            handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertyUnselectHotTabsColorBackgroundHandler">
+         <property-name
+               name="swt-unselected-hot-tab-color-background">
+         </property-name>
+         <property-name
+               name="unselected-hot-tab-color-background" deprecated="renamed as swt-unselected-hot-tab-color-background">
+         </property-name>
+      </handler>
+      <handler
+            adapter="org.eclipse.e4.ui.css.swt.dom.CTabFolderElement"
+            composite="false"
             handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertyShadowColorHandler">
          <property-name
                name="swt-shadow-color">
@@ -478,9 +489,57 @@
                name="swt-background-mode">
          </property-name>
       </handler>
-      
-      
-      <!-- Theme element definitions -->            
+      <handler
+            adapter="org.eclipse.e4.ui.css.swt.dom.TreeElement"
+            handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertyTreeArrowsSWTHandler">
+         <property-name
+               name="swt-tree-arrows-color">
+         </property-name>
+         <property-name
+               name="swt-tree-arrows-mode"> <!--triangle/square -->
+         </property-name>
+      </handler>
+      <handler
+            adapter="org.eclipse.e4.ui.css.swt.dom.TreeElement"
+            handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertySelectionBackgroundHandler">
+         <property-name
+               name="swt-selection-foreground-color">
+         </property-name>
+         <property-name
+               name="swt-selection-background-color">
+         </property-name>
+         <property-name
+               name="swt-selection-border-color">
+         </property-name>
+         <property-name
+               name="swt-hot-background-color">
+         </property-name>
+         <property-name
+               name="swt-hot-border-color">
+         </property-name>
+      </handler>
+      <handler
+            adapter="org.eclipse.e4.ui.css.swt.dom.TableElement"
+            handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertySelectionBackgroundHandler">
+         <property-name
+               name="swt-selection-foreground-color">
+         </property-name>
+         <property-name
+               name="swt-selection-background-color">
+         </property-name>
+         <property-name
+               name="swt-selection-border-color">
+         </property-name>
+         <property-name
+               name="swt-hot-background-color">
+         </property-name>
+         <property-name
+               name="swt-hot-border-color">
+         </property-name>
+      </handler>
+
+
+      <!-- Theme element definitions -->
       <handler
             adapter="org.eclipse.e4.ui.css.swt.dom.definition.ThemeDefinitionElement"
             handler="org.eclipse.e4.ui.css.swt.properties.definition.CSSPropertyThemeElementDefinitionHandler">

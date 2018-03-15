@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.ui.model;
 
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.resource.ColorDescriptor;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -35,7 +36,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.util.Util;
 
 /**
  * Provides basic labels for adaptable objects that have the
@@ -50,7 +50,7 @@ public class WorkbenchLabelProvider extends LabelProvider implements
     /**
      * Returns a workbench label provider that is hooked up to the decorator
      * mechanism.
-     * 
+     *
      * @return a new <code>DecoratingLabelProvider</code> which wraps a <code>
      *   new <code>WorkbenchLabelProvider</code>
      */
@@ -59,7 +59,7 @@ public class WorkbenchLabelProvider extends LabelProvider implements
                 PlatformUI.getWorkbench().getDecoratorManager()
                         .getLabelDecorator());
     }
-    
+
     /**
      * Listener that tracks changes to the editor registry and does a full update
      * when it changes, since many workbench adapters derive their icon from the file
@@ -72,7 +72,7 @@ public class WorkbenchLabelProvider extends LabelProvider implements
 				fireLabelProviderChanged(new LabelProviderChangedEvent(WorkbenchLabelProvider.this));
 			}
 		}
-	};		
+	};
 	private ResourceManager resourceManager;
 
     /**
@@ -89,7 +89,7 @@ public class WorkbenchLabelProvider extends LabelProvider implements
      *
      * Subclasses may reimplement this method to decorate an object's
      * image.
-     * 
+     *
      * @param input The base image to decorate.
      * @param element The element used to look up decorations.
      * @return the resuling ImageDescriptor.
@@ -115,9 +115,6 @@ public class WorkbenchLabelProvider extends LabelProvider implements
         return input;
     }
 
-    /* (non-Javadoc)
-     * Method declared on ILabelProvider
-     */
     @Override
 	public void dispose() {
     	PlatformUI.getWorkbench().getEditorRegistry().removePropertyListener(editorRegistryListener);
@@ -126,32 +123,32 @@ public class WorkbenchLabelProvider extends LabelProvider implements
     	resourceManager = null;
     	super.dispose();
     }
-    
+
     /**
      * Returns the implementation of IWorkbenchAdapter for the given
-     * object.  
+     * object.
      * @param o the object to look up.
      * @return IWorkbenchAdapter or<code>null</code> if the adapter is not defined or the
-     * object is not adaptable. 
+     * object is not adaptable.
      */
     protected final IWorkbenchAdapter getAdapter(Object o) {
-        return (IWorkbenchAdapter)Util.getAdapter(o, IWorkbenchAdapter.class);
+        return Adapters.adapt(o, IWorkbenchAdapter.class);
     }
 
     /**
      * Returns the implementation of IWorkbenchAdapter2 for the given
-     * object.  
+     * object.
      * @param o the object to look up.
      * @return IWorkbenchAdapter2 or<code>null</code> if the adapter is not defined or the
-     * object is not adaptable. 
+     * object is not adaptable.
      */
     protected final IWorkbenchAdapter2 getAdapter2(Object o) {
-        return (IWorkbenchAdapter2)Util.getAdapter(o, IWorkbenchAdapter2.class);
+        return Adapters.adapt(o, IWorkbenchAdapter2.class);
     }
 
 	/**
 	 * Returns the implementation of IWorkbenchAdapter3 for the given object.
-	 * 
+	 *
 	 * @param o
 	 *            the object to look up.
 	 * @return IWorkbenchAdapter3 or<code>null</code> if the adapter is not
@@ -159,12 +156,12 @@ public class WorkbenchLabelProvider extends LabelProvider implements
 	 * @since 3.7
 	 */
 	protected final IWorkbenchAdapter3 getAdapter3(Object o) {
-		return (IWorkbenchAdapter3) Util.getAdapter(o, IWorkbenchAdapter3.class);
+		return Adapters.adapt(o, IWorkbenchAdapter3.class);
 	}
 
 	/**
 	 * Lazy load the resource manager
-	 * 
+	 *
 	 * @return The resource manager, create one if necessary
 	 */
 	private ResourceManager getResourceManager() {
@@ -176,9 +173,6 @@ public class WorkbenchLabelProvider extends LabelProvider implements
 		return resourceManager;
 	}
 
-    /* (non-Javadoc)
-     * Method declared on ILabelProvider
-     */
     @Override
 	public final Image getImage(Object element) {
         //obtain the base image by querying the element
@@ -200,12 +194,12 @@ public class WorkbenchLabelProvider extends LabelProvider implements
 	/**
 	 * The default implementation of this returns the styled text label for the
 	 * given element.
-	 * 
+	 *
 	 * @param element
 	 *            the element to evaluate the styled string for
-	 * 
+	 *
 	 * @return the styled string.
-	 * 
+	 *
 	 * @since 3.7
 	 */
     @Override
@@ -230,21 +224,18 @@ public class WorkbenchLabelProvider extends LabelProvider implements
 	 * Sets the {@link Styler} to be used for string decorations. By default the
 	 * {@link StyledString#DECORATIONS_STYLER decoration style}. Clients can
 	 * override.
-	 * 
+	 *
 	 * @param element
 	 *            the element that has been decorated
-	 * 
+	 *
 	 * @return return the decoration style
-	 * 
+	 *
 	 * @since 3.7
 	 */
 	protected Styler getDecorationStyle(Object element) {
 		return StyledString.DECORATIONS_STYLER;
 	}
 
-    /* (non-Javadoc)
-     * Method declared on ILabelProvider
-     */
     @Override
 	public final String getText(Object element) {
         //query the element for its label
@@ -258,25 +249,16 @@ public class WorkbenchLabelProvider extends LabelProvider implements
         return decorateText(label, element);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
-     */
     @Override
 	public Color getForeground(Object element) {
         return getColor(element, true);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
-     */
     @Override
 	public Color getBackground(Object element) {
         return getColor(element, false);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
-     */
     @Override
 	public Font getFont(Object element) {
         IWorkbenchAdapter2 adapter = getAdapter2(element);

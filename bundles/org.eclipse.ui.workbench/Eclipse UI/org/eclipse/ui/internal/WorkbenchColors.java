@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * This class manages the common workbench colors.  
+ * This class manages the common workbench colors.
  */
 public class WorkbenchColors {
     static private boolean init = false;
@@ -66,7 +66,7 @@ public class WorkbenchColors {
                 new Color(d, 149, 168, 199), new Color(d, 128, 148, 178),
                 new Color(d, 106, 128, 158), new Color(d, 255, 255, 255),
                 new Color(d, 0, 0, 0), new Color(d, 0, 0, 0),
-                //Perspective 
+                //Perspective
                 new Color(d, 132, 130, 132), new Color(d, 143, 141, 138),
                 new Color(d, 171, 168, 165),
                 //PreferenceDialog and TitleAreaDialog

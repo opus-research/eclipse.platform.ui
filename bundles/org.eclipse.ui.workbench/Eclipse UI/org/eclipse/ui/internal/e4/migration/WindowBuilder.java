@@ -133,7 +133,6 @@ public class WindowBuilder {
 		} else if (windowReader.isMaximized()) {
 			tags.add(IPresentationEngine.WINDOW_MAXIMIZED_TAG);
 		}
-
 		sharedElements = window.getSharedElements();
 	}
 
@@ -141,8 +140,7 @@ public class WindowBuilder {
 		addEditorArea();
 		addEditors();
 		addViews();
-
-		perspectives = new ArrayList<MPerspective>();
+		perspectives = new ArrayList<>();
 		mainSash = modelService.createModelElement(MPartSashContainer.class);
 		mainSash.setHorizontal(true);
 
@@ -155,8 +153,7 @@ public class WindowBuilder {
 
 		for (PerspectiveReader perspReader : windowReader.getPerspectiveReaders()) {
 			PerspectiveBuilder builder = factory.createPerspectiveBuilder(perspReader);
-			MPerspective perspective = builder.createPerspective(windowReader
-					.getDefaultFastViewSide());
+			MPerspective perspective = builder.createPerspective(windowReader.getDefaultFastViewSide());
 			perspectiveStack.getChildren().add(perspective);
 			MPlaceholder eaPlaceholder = builder.getEditorAreaPlaceholder();
 			if (eaPlaceholder != null) {
@@ -193,8 +190,8 @@ public class WindowBuilder {
 
 	private void createTrimBars(MPerspective perspective) {
 		// Find any minimized stacks and show their trim
-		List<MUIElement> minimizedElements = modelService.findElements(perspective, null,
-				MUIElement.class, Arrays.asList(IPresentationEngine.MINIMIZED));
+		List<MUIElement> minimizedElements = modelService.findElements(perspective, null, MUIElement.class,
+				Arrays.asList(IPresentationEngine.MINIMIZED));
 		for (MUIElement element : minimizedElements) {
 			createTrim(element, perspective);
 		}
@@ -281,7 +278,7 @@ public class WindowBuilder {
 	}
 
 	private void addEditors() {
-		Map<MPartStack, InfoReader> stackToReader = new HashMap<MPartStack, InfoReader>();
+		Map<MPartStack, InfoReader> stackToReader = new HashMap<>();
 
 		// add stacks to shared area
 		List<InfoReader> stackReaders = windowReader.getEditorStacks();
@@ -327,7 +324,7 @@ public class WindowBuilder {
 			}
 			int[] partOrder = stackReader.getPartOrder();
 			List<MStackElement> stackChildren = editorStack.getChildren();
-			List<MStackElement> originalOrder = new ArrayList<MStackElement>(stackChildren);
+			List<MStackElement> originalOrder = new ArrayList<>(stackChildren);
 			MStackElement selectedElement = editorStack.getSelectedElement();
 			stackChildren.clear();
 			for (int i = 0; i < partOrder.length; i++) {
@@ -409,5 +406,7 @@ public class WindowBuilder {
 		 */
 		return part;
 	}
+
+
 
 }

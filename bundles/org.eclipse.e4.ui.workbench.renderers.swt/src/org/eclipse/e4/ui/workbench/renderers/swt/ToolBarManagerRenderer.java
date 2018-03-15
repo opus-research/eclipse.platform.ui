@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,9 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426535, 433234, 431868
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868, 472654, 485852
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990
+ *     Sopot Cela <scela@redhat.com> - Bug 472761
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 473184
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -97,22 +100,21 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public static final String UPDATE_VARS = "ToolBarManagerRenderer.updateVars"; //$NON-NLS-1$
 	private static final String DISPOSE_ADDED = "ToolBarManagerRenderer.disposeAdded"; //$NON-NLS-1$
 
-	private Map<MToolBar, ToolBarManager> modelToManager = new HashMap<MToolBar, ToolBarManager>();
-	private Map<ToolBarManager, MToolBar> managerToModel = new HashMap<ToolBarManager, MToolBar>();
+	private Map<MToolBar, ToolBarManager> modelToManager = new HashMap<>();
+	private Map<ToolBarManager, MToolBar> managerToModel = new HashMap<>();
 
-	private Map<MToolBarElement, IContributionItem> modelToContribution = new HashMap<MToolBarElement, IContributionItem>();
-	private Map<IContributionItem, MToolBarElement> contributionToModel = new HashMap<IContributionItem, MToolBarElement>();
+	private Map<MToolBarElement, IContributionItem> modelToContribution = new HashMap<>();
+	private Map<IContributionItem, MToolBarElement> contributionToModel = new HashMap<>();
 
-	private Map<MToolBarElement, ToolBarContributionRecord> modelContributionToRecord = new HashMap<MToolBarElement, ToolBarContributionRecord>();
+	private Map<MToolBarElement, ToolBarContributionRecord> modelContributionToRecord = new HashMap<>();
 
-	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<MToolBarElement, ArrayList<ToolBarContributionRecord>>();
+	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<>();
 
 	private ToolItemUpdater enablementUpdater = new ToolItemUpdater();
 
 	@Inject
 	private MApplication application;
 
-	@SuppressWarnings("hiding")
 	@Inject
 	EModelService modelService;
 
@@ -161,10 +163,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				if (parent != null) {
 					modelProcessSwitch(parent, itemModel);
 					parent.update(true);
-					ToolBar tb = parent.getControl();
-					if (tb != null && !tb.isDisposed()) {
-						tb.pack(true);
-						tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
+					ToolBar toolbar = parent.getControl();
+					if (toolbar != null && !toolbar.isDisposed()) {
+						toolbar.requestLayout();
 					}
 				}
 			} else {
@@ -210,10 +211,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 			parent.markDirty();
 			parent.update(true);
-			ToolBar tb = parent.getControl();
-			if (tb != null && !tb.isDisposed()) {
-				tb.pack(true);
-				tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
+			ToolBar toolbar = parent.getControl();
+			if (toolbar != null && !toolbar.isDisposed()) {
+				toolbar.requestLayout();
 			}
 		}
 	}
@@ -263,9 +263,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
-	private HashSet<String> updateVariables = new HashSet<String>();
+	private HashSet<String> updateVariables = new HashSet<>();
 
-	@SuppressWarnings("unused")
 	@Inject
 	@Optional
 	private void subscribeTopicDirtyChanged(@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
@@ -276,7 +275,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	@Optional
 	private void subscribeTopicUpdateToolbarEnablement(
 			@UIEventTopic(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC) Event eventData) {
-		final Object v = eventData.getProperty(IEventBroker.DATA);
+		final Object v = eventData != null ? eventData.getProperty(IEventBroker.DATA) : UIEvents.ALL_ELEMENT_ID;
 		Selector s;
 		if (v instanceof Selector) {
 			s = (Selector) v;
@@ -321,7 +320,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	@Inject
 	@Optional
 	private void subscribeTopicAppStartup(@UIEventTopic(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE) Event event) {
@@ -377,7 +375,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		Control renderedCtrl = newTB;
 		MUIElement parentElement = element.getParent();
 		if (parentElement instanceof MTrimBar) {
-			element.getTags().add(IPresentationEngine.DRAGGABLE);
+			if (!element.getTags().contains(IPresentationEngine.NO_MOVE)) {
+				element.getTags().add(IPresentationEngine.DRAGGABLE);
+			}
 
 			setCSSInfo(element, newTB);
 
@@ -387,7 +387,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			IEclipseContext parentContext = getContextForParent(element);
 			CSSRenderingUtils cssUtils = parentContext.get(CSSRenderingUtils.class);
 			if (cssUtils != null) {
-				renderedCtrl = cssUtils.frameMeIfPossible(newTB, null, vertical, true);
+				MUIElement modelElement = (MUIElement) newTB.getData(AbstractPartRenderer.OWNING_ME);
+				boolean draggable = ((modelElement != null) && (modelElement.getTags().contains(IPresentationEngine.DRAGGABLE)));
+				renderedCtrl = cssUtils.frameMeIfPossible(newTB, null, vertical, draggable);
 			}
 		}
 
@@ -405,7 +407,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			addCleanupDisposeListener(toolbarModel, manager.getControl());
 		}
 
-		final ArrayList<MToolBarContribution> toContribute = new ArrayList<MToolBarContribution>();
+		final ArrayList<MToolBarContribution> toContribute = new ArrayList<>();
 		ContributionsAnalyzer.XXXgatherToolBarContributions(toolbarModel,
 				application.getToolBarContributions(), elementId, toContribute);
 		generateContributions(toolbarModel, toContribute);
@@ -420,6 +422,11 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(toolbarModel);
+					Object dispose = transientData.get(POST_PROCESSING_DISPOSE);
+					if (dispose instanceof Runnable) {
+						((Runnable) dispose).run();
+					}
+					transientData.remove(POST_PROCESSING_DISPOSE);
 					transientData.remove(DISPOSE_ADDED);
 				}
 			});
@@ -432,7 +439,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		ToolBarManager manager = getManager(toolbarModel);
 		boolean done = toContribute.size() == 0;
 		while (!done) {
-			ArrayList<MToolBarContribution> curList = new ArrayList<MToolBarContribution>(toContribute);
+			ArrayList<MToolBarContribution> curList = new ArrayList<>(toContribute);
 			int retryCount = toContribute.size();
 			toContribute.clear();
 
@@ -512,11 +519,11 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 			manager.setStyle(style);
 		}
-		ToolBar bar = manager.createControl(parent);
-		bar.setData(manager);
-		bar.setData(AbstractPartRenderer.OWNING_ME, element);
-		bar.getShell().layout(new Control[] { bar }, SWT.DEFER);
-		return bar;
+		ToolBar btoolbar = manager.createControl(parent);
+		btoolbar.setData(manager);
+		btoolbar.setData(AbstractPartRenderer.OWNING_ME, element);
+		btoolbar.requestLayout();
+		return btoolbar;
 	}
 
 	protected void cleanUp(MToolBar toolbarModel) {
@@ -586,10 +593,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 		parentManager.update(true);
 
-		ToolBar tb = getToolbarFrom(container.getWidget());
-		if (tb != null) {
-			tb.pack(true);
-			tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
+		ToolBar toolbar = getToolbarFrom(container.getWidget());
+		if (toolbar != null) {
+			toolbar.requestLayout();
 		}
 	}
 
@@ -638,8 +644,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 			ToolBar toolbar = (ToolBar) getUIContainer(child);
 			if (toolbar != null && !toolbar.isDisposed()) {
-				toolbar.pack(true);
-				toolbar.getShell().layout(new Control[] { toolbar }, SWT.DEFER);
+				toolbar.requestLayout();
 			}
 		}
 	}
@@ -650,8 +655,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		processContents(parentElement);
 		ToolBar toolbar = (ToolBar) getUIContainer(element);
 		if (toolbar != null && !toolbar.isDisposed()) {
-			toolbar.pack(true);
-			toolbar.getShell().layout(new Control[] { toolbar }, SWT.DEFER);
+			toolbar.requestLayout();
 		}
 	}
 
@@ -873,7 +877,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public ArrayList<ToolBarContributionRecord> getList(MToolBarElement item) {
 		ArrayList<ToolBarContributionRecord> tmp = sharedElementToRecord.get(item);
 		if (tmp == null) {
-			tmp = new ArrayList<ToolBarContributionRecord>();
+			tmp = new ArrayList<>();
 			sharedElementToRecord.put(item, tmp);
 		}
 		return tmp;
@@ -901,7 +905,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 */
 	public void reconcileManagerToModel(IToolBarManager menuManager, MToolBar toolBar) {
 		List<MToolBarElement> modelChildren = toolBar.getChildren();
-		HashSet<MToolItem> oldModelItems = new HashSet<MToolItem>();
+		HashSet<MToolItem> oldModelItems = new HashSet<>();
 		for (MToolBarElement itemModel : modelChildren) {
 			if (OpaqueElementUtil.isOpaqueToolItem(itemModel)) {
 				oldModelItems.add((MToolItem) itemModel);
@@ -942,13 +946,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#postProcess
-	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
-	 */
 	@Override
 	public void postProcess(MUIElement element) {
 		if (element instanceof MToolBar) {
